@@ -2011,7 +2011,7 @@ SQL)->execute();
 
                 // now update drafts & revisions too
                 $ids = array_merge(
-                    Entry::find()->draftOf($entry)->status(null)->site('*')->unique()->ids(),
+                    Entry::find()->draftOf($entry)->provisionalDrafts(null)->status(null)->site('*')->unique()->ids(),
                     Entry::find()->revisionOf($entry)->status(null)->site('*')->unique()->ids(),
                 );
                 if (!empty($ids)) {
