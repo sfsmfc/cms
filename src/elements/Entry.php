@@ -19,7 +19,6 @@ use craft\behaviors\DraftBehavior;
 use craft\controllers\ElementIndexesController;
 use craft\db\Connection;
 use craft\db\FixedOrderExpression;
-use craft\db\Query;
 use craft\db\Table;
 use craft\elements\actions\Delete;
 use craft\elements\actions\DeleteForSite;
@@ -42,6 +41,7 @@ use craft\enums\Color;
 use craft\enums\PropagationMethod;
 use craft\events\DefineEntryTypesEvent;
 use craft\events\ElementCriteriaEvent;
+use craft\fieldlayoutelements\entries\EntryTitleField;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Cp;
 use craft\helpers\DateTimeHelper;
@@ -64,6 +64,7 @@ use DateTime;
 use Illuminate\Support\Collection;
 use Throwable;
 use yii\base\Exception;
+use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\db\Expression;
 
@@ -751,6 +752,13 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
     public bool $deletedWithEntryType = false;
 
     /**
+     * @var bool Whether the entry was deleted along with its section
+     * @see beforeDelete()
+     * @internal
+     */
+    public bool $deletedWithSection = false;
+
+    /**
      * @var int[] Entry author IDs
      * @see getAuthorIds()
      * @see setAuthorIds()
@@ -798,6 +806,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
     {
         $names = array_flip($this->traitAttributes());
         unset($names['deletedWithEntryType']);
+        unset($names['deletedWithSection']);
         $names['authorId'] = true;
         $names['authorIds'] = true;
         $names['typeId'] = true;
@@ -893,7 +902,17 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
      */
     protected function shouldValidateTitle(): bool
     {
-        return $this->getType()->hasTitleField;
+        $entryType = $this->getType();
+        if (!$entryType->hasTitleField) {
+            return false;
+        }
+        try {
+            /** @var EntryTitleField $titleField */
+            $titleField = $entryType->getFieldLayout()->getField('title');
+        } catch (InvalidArgumentException) {
+            return true;
+        }
+        return $titleField->required;
     }
 
     /**
@@ -1935,7 +1954,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
                 return $section ? Html::encode(Craft::t('site', $section->name)) : '';
             case 'type':
                 try {
-                    return Html::encode(Craft::t('site', $this->getType()->name));
+                    return Cp::chipHtml($this->getType());
                 } catch (InvalidConfigException) {
                     return Craft::t('app', 'Unknown');
                 }
@@ -2330,7 +2349,7 @@ JS;
     {
         $entryType = $this->getType();
 
-        if ($entryType->hasTitleField) {
+        if ($entryType->hasTitleField && trim($this->title ?? '') !== '') {
             return;
         }
 
@@ -2510,7 +2529,6 @@ JS;
 
             // Capture the dirty attributes from the record
             $dirtyAttributes = array_keys($record->getDirtyAttributes());
-
             $record->save(false);
 
             // save authors
@@ -2523,60 +2541,9 @@ JS;
                 }
             }
 
-            // ownerId will be null when creating a revision
-            $ownerId = $this->getOwnerId();
-            if (isset($this->fieldId) && $ownerId && $this->saveOwnership) {
-                if (!isset($this->sortOrder) && (!$isNew || $this->duplicateOf)) {
-                    // figure out if we should proceed this way
-                    // if we're dealing with an element that's being duplicated, and it has a draftId
-                    // it means we're creating a draft of something
-                    // if we're duplicating element via duplicate action - draftId would be empty
-                    $elementId = null;
-                    if ($this->duplicateOf) {
-                        if ($this->draftId) {
-                            $elementId = $this->duplicateOf->id;
-                        }
-                    } else {
-                        // if we're not duplicating - use element's id
-                        $elementId = $this->id;
-                    }
-                    if ($elementId) {
-                        $this->sortOrder = (new Query())
-                            ->select('sortOrder')
-                            ->from(Table::ELEMENTS_OWNERS)
-                            ->where([
-                                'elementId' => $elementId,
-                                'ownerId' => $ownerId,
-                            ])
-                            ->scalar() ?: null;
-                    }
-                }
-                if (!isset($this->sortOrder)) {
-                    $max = (new Query())
-                        ->from(['eo' => Table::ELEMENTS_OWNERS])
-                        ->innerJoin(['e' => Table::ENTRIES], '[[e.id]] = [[eo.elementId]]')
-                        ->where([
-                            'eo.ownerId' => $ownerId,
-                            'e.fieldId' => $this->fieldId,
-                        ])
-                        ->max('[[eo.sortOrder]]');
-                    $this->sortOrder = $max ? $max + 1 : 1;
-                }
-                if ($isNew) {
-                    Db::insert(Table::ELEMENTS_OWNERS, [
-                        'elementId' => $this->id,
-                        'ownerId' => $ownerId,
-                        'sortOrder' => $this->sortOrder,
-                    ]);
-                } else {
-                    Db::update(Table::ELEMENTS_OWNERS, [
-                        'sortOrder' => $this->sortOrder,
-                    ], [
-                        'elementId' => $this->id,
-                        'ownerId' => $ownerId,
-                    ]);
-                }
-            }
+            $this->setDirtyAttributes($dirtyAttributes);
+
+            $this->saveOwnership($isNew, Table::ENTRIES);
 
             if ($this->getIsCanonical() && isset($this->sectionId) && $section->type == Section::TYPE_STRUCTURE) {
                 // Has the parent changed?
@@ -2589,8 +2556,6 @@ JS;
                     Craft::$app->getElements()->updateDescendantSlugsAndUris($this, true, true);
                 }
             }
-
-            $this->setDirtyAttributes($dirtyAttributes);
         }
 
         parent::afterSave($isNew);
@@ -2677,6 +2642,7 @@ JS;
 
         $data = [
             'deletedWithEntryType' => $this->deletedWithEntryType,
+            'deletedWithSection' => $this->deletedWithSection,
             'parentId' => null,
         ];
 
@@ -2704,8 +2670,10 @@ JS;
     public function afterRestore(): void
     {
         $this->deletedWithEntryType = false;
+        $this->deletedWithSection = false;
         Db::update(Table::ENTRIES, [
             'deletedWithEntryType' => null,
+            'deletedWithSection' => null,
         ], ['id' => $this->id]);
 
         $section = $this->getSection();
