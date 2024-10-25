@@ -18,6 +18,7 @@
 ### Administration
 - All relation fields can now be selected as field layouts’ thumbnail providers. ([#15651](https://github.com/craftcms/cms/discussions/15651))
 - Added the “Markdown” field layout UI element type. ([#15674](https://github.com/craftcms/cms/pull/15674), [#15664](https://github.com/craftcms/cms/discussions/15664))
+- Added the “Language” element condition rule. ([#15952](https://github.com/craftcms/cms/discussions/15952))
 - The Sections index table can now be sorted by Name, Handle, and Type. ([#15936](https://github.com/craftcms/cms/pull/15936))
 - Sections are no longer required to have unique names. ([#9829](https://github.com/craftcms/cms/discussions/9829))
 - Customize Sources modals now display native sources’ handles, when known.
@@ -46,7 +47,7 @@
 - Added `craft\events\DefineAddressCountriesEvent`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\filters\BasicHttpAuthLogin`. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added `craft\filters\BasicHttpAuthStatic`. ([#15720](https://github.com/craftcms/cms/pull/15720))
-- Added `craft\filters\SiteFilterTrait::$enabled`. ([#15720](https://github.com/craftcms/cms/pull/15720))
+- Added `craft\filters\ConditionalFilterTrait`. ([#15948](https://github.com/craftcms/cms/pull/15948))
 - Added `craft\filters\UtilityAccess`.
 - Added `craft\helpers\Console::indent()`.
 - Added `craft\helpers\Console::indentStr()`.
@@ -56,6 +57,7 @@
 - Added `craft\services\Addresses::EVENT_DEFINE_ADDRESS_COUNTRIES`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\services\Addresses::getCountryList()`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\services\Fields::EVENT_BEFORE_APPLY_FIELD_SAVE`. ([#15872](https://github.com/craftcms/cms/discussions/15872))
+- Added `craft\services\Users::getMaxUsers()`.
 - Added `craft\web\View::registerCpTwigExtension()`.
 - Added `craft\web\View::registerSiteTwigExtension()`.
 - Added `craft\helpers\Console::$outputCount`.
