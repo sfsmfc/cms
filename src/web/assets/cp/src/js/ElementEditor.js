@@ -677,27 +677,22 @@ Craft.ElementEditor = Garnish.Base.extend(
       });
 
       $body.append(
-        `<h3 class="h2">${Craft.t('app', 'Copy content from site')}</h3>`
+        `<h1 id="${headingId}" class="h2">${Craft.t(
+          'app',
+          'Copy content from site'
+        )}</h1>`
       );
 
       $body.append(
         $(
           `<p>${Craft.t(
             'app',
-            'Only translatable (<span class="t9n-indicator" data-icon="language" data-handle="title"></span>) field values will be copied, and only if their content differs from the current.'
+            'Only translatable <span aria-hidden="true">(<span class="t9n-indicator" data-icon="language" data-handle="title"></span>)</span> field values will be copied, and only if their content differs from the current.'
           )}</p>`
         )
       );
 
       $body.append(this._getCopyBetweenSitesForm());
-      $hudContent.append(
-        $(
-          `<div class="visually-hidden"><h1 id="${headingId}">${Craft.t(
-            'app',
-            'Copy content from site'
-          )}</h1></div>`
-        )
-      );
       $hudContent.append($body);
 
       this.copyModal = new Garnish.Modal($hudContent);

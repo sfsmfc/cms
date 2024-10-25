@@ -1454,16 +1454,17 @@ JS, [
             ])
             : '';
 
-
+        $translationDescription = $config['translationDescription'] ?? Craft::t('app', 'This field is translatable.');
         $translationIconHtml = Html::button('', [
             'class' => ['t9n-indicator'],
             'data' => [
                 'icon' => 'language',
             ],
-            'role' => 'img',
+            'aria' => [
+                'label' => $translationDescription,
+            ],
         ]);
 
-        $translationDescription = $config['translationDescription'] ?? Craft::t('app', 'This field is translatable.');
         $translationIconHtml = Html::tag('craft-tooltip', $translationIconHtml, [
             'placement' => 'bottom',
             'max-width' => '200px',
