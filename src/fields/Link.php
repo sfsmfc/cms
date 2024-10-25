@@ -256,30 +256,49 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
      */
     public function getSettingsHtml(): ?string
     {
-        // Sort them by label, with URL at the top
-        /** @var Collection<string|BaseLinkType> $types */
-        /** @phpstan-var Collection<class-string<BaseLinkType>> $types */
-        $types = Collection::make(self::types())
-            ->sort(function(string $a, string $b) {
-                /** @var string|BaseLinkType $a */
-                /** @var string|BaseLinkType $b */
-                /** @phpstan-var class-string<BaseLinkType> $a */
-                /** @phpstan-var class-string<BaseLinkType> $b */
-                if ($a === UrlType::class) {
-                    return -1;
-                }
-                if ($b === UrlType::class) {
-                    return 1;
-                }
-                return $a::displayName() <=> $b::displayName();
-            });
+        // Sort types by the order from the config and if anything remains by the label, with URL at the top
+        // get only the selected types
+        $selectedTypes = [];
+        foreach (self::types() as $typeId => $type) {
+            if (in_array($typeId, $this->types)) {
+                $selectedTypes[$typeId] = $type;
+            }
+        }
+        // and ensure they're sorted by $this->types order
+        $selectedTypes = Collection::make(array_replace(array_flip($this->types), $selectedTypes));
+
+        // now get the remaining types (if there are any)
+        $remainingTypes = Collection::make([]);
+        if ($selectedTypes->count() < count(self::types())) {
+            $remainingTypes = Collection::make(self::types())
+                ->filter(function($value, $key) use ($selectedTypes) {
+                    return !isset($selectedTypes[$key]);
+                })
+                // and sort them by label, with URL at the top
+                ->sort(function(string $a, string $b) {
+                    /** @var string|BaseLinkType $a */
+                    /** @var string|BaseLinkType $b */
+                    /** @phpstan-var class-string<BaseLinkType> $a */
+                    /** @phpstan-var class-string<BaseLinkType> $b */
+                    if ($a === UrlType::class) {
+                        return -1;
+                    }
+                    if ($b === UrlType::class) {
+                        return 1;
+                    }
+                    return $a::displayName() <=> $b::displayName();
+                });
+        }
+
+        // combine both array of types
+        $types = $selectedTypes->merge($remainingTypes);
 
         $linkTypeOptions = $types->map(fn(string $type) => [
             'label' => $type::displayName(),
             'value' => $type::id(),
         ])->all();
 
-        $html = Cp::checkboxSelectFieldHtml([
+        $html = Cp::sortableCheckboxSelectFieldHtml([
             'label' => Craft::t('app', 'Allowed Link Types'),
             'id' => 'types',
             'fieldClass' => 'mb-0',
@@ -288,6 +307,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
             'values' => $this->types,
             'required' => true,
             'targetPrefix' => 'types-',
+            'draggable' => true,
         ]);
 
         $linkTypes = $this->getLinkTypes();
@@ -400,7 +420,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
         }
 
         if (!$value) {
-            $valueTypeId = in_array(UrlType::id(), $this->types) ? UrlType::id() : reset($this->types);
+            $valueTypeId = reset($this->types);
         }
 
         $id = $this->getInputId();
