@@ -2247,6 +2247,12 @@ abstract class Element extends Component implements ElementInterface
     private $_serializeFields = false;
 
     /**
+     * @var bool|null
+     * @see getIsCopyable()
+     */
+    private ?bool $_isCopyable = null;
+
+    /**
      * @inheritdoc
      */
     public function __construct($config = [])
@@ -3609,7 +3615,7 @@ abstract class Element extends Component implements ElementInterface
         if (
             !$this->getIsRevision() &&
             $this->canSave($user) &&
-            ElementHelper::supportsFieldCopying($this)
+            $this->getIsCopyable()
         ) {
             $copyContentId = sprintf('action-copy-content-%s', mt_rand());
             $items[] = [
@@ -5241,6 +5247,25 @@ JS, [
         }
 
         return $this->_currentRevision ?: null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIsCopyable(): bool
+    {
+        if (!isset($this->_isCopyable)) {
+            $this->_isCopyable = !(
+                !Craft::$app->getIsMultiSite() ||
+                // check if user can edit this element in other site ids
+                count(ElementHelper::editableSiteIdsForElement($this)) < 2 ||
+                // also check if the element exists in other sites
+                empty(array_diff(array_keys(ElementHelper::siteStatusesForElement($this, true)), [$this->siteId]))
+            );
+            ;
+        }
+
+        return $this->_isCopyable;
     }
 
     // Indexes, etc.

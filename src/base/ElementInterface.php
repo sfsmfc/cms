@@ -1602,6 +1602,16 @@ interface ElementInterface extends
      */
     public function getCurrentRevision(): ?self;
 
+    /**
+     * Return if the element is copyable between sites.
+     * Checks if it's a multisite installation, if user can edit the element in other sites,
+     * and if the element actually exists in other sites.
+     *
+     * @return bool
+     * @since 5.5.0
+     */
+    public function getIsCopyable(): bool;
+
     // Indexes, etc.
     // -------------------------------------------------------------------------
 

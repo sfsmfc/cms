@@ -138,6 +138,6 @@ class AltField extends TextareaField
             return false;
         }
 
-        return $this->translatable($element) && ElementHelper::supportsFieldCopying($element);
+        return $this->translatable($element) && $element?->getIsCopyable();
     }
 }

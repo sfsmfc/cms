@@ -9,7 +9,6 @@ namespace craft\fieldlayoutelements;
 
 use Craft;
 use craft\base\ElementInterface;
-use craft\helpers\ElementHelper;
 
 /**
  * TitleField represents a Title field that can be included in field layouts.
@@ -101,6 +100,6 @@ class TitleField extends TextField
             return false;
         }
 
-        return $this->translatable($element) && ElementHelper::supportsFieldCopying($element);
+        return $this->translatable($element) && $element?->getIsCopyable();
     }
 }

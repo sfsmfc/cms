@@ -717,22 +717,15 @@ Craft.ElementEditor = Garnish.Base.extend(
         class: 'copy-translation-dialogue',
       });
 
-      // only allow the copy field value of a copyable field
-      // only if this element exists on other sites too
-      if (
-        $btn.attr('data-copyable') &&
-        this._getSitesForCopyFieldAction().length > 0
-      ) {
-        $hudContent.append(
-          this._getCopyBetweenSitesForm({
-            fieldHandle: $btn.data('field-handle'),
-            elementId: $btn.data('element-id')
-              ? $btn.data('element-id')
-              : this.settings.canonicalId,
-            namespace: $btn.data('namespace'),
-          })
-        );
-      }
+      $hudContent.append(
+        this._getCopyBetweenSitesForm({
+          fieldHandle: $btn.data('field-handle'),
+          elementId: $btn.data('element-id')
+            ? $btn.data('element-id')
+            : this.settings.canonicalId,
+          namespace: $btn.data('namespace'),
+        })
+      );
 
       this.copyHud = new Garnish.HUD($btn, $hudContent);
 
