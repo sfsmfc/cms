@@ -531,6 +531,7 @@ class ElementIndexesController extends BaseElementsController
             ->id($elementIds)
             ->status(null)
             ->drafts(null)
+            ->provisionalDrafts(null)
             ->siteId($siteId)
             ->all();
 
