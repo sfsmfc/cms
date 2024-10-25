@@ -25,12 +25,12 @@ Craft.SortableCheckboxSelect = Garnish.Base.extend(
       });
     },
 
-    initItem: function(item) {
+    initItem: function (item) {
       return new Craft.SortableCheckboxSelect.Item(this, item);
-    }
+    },
   },
   {
-    defaults: {}
+    defaults: {},
   }
 );
 
@@ -129,6 +129,6 @@ Craft.SortableCheckboxSelect.Item = Garnish.Base.extend(
     },
   },
   {
-    defaults: {}
+    defaults: {},
   }
 );
