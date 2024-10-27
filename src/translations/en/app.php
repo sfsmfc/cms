@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'Status:',
     'Statuses updated.' => 'Statuses updated.',
     'Stay signed in for {duration}' => 'Stay signed in for {duration}',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'Step {number}:',
     'Stretch to fit' => 'Stretch to fit',
     'Stretch' => 'Stretch',

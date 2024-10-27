@@ -102,6 +102,12 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
     public int|null|float $max = null;
 
     /**
+     * @var int|float|null The step value for the input
+     * @since 5.5.0
+     */
+    public int|float|null $step = null;
+
+    /**
      * @var int The number of digits allowed after the decimal point
      */
     public int $decimals = 0;
@@ -141,7 +147,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
     public function __construct($config = [])
     {
         // Config normalization
-        foreach (['defaultValue', 'min', 'max'] as $name) {
+        foreach (['defaultValue', 'min', 'max', 'step'] as $name) {
             if (isset($config[$name])) {
                 $config[$name] = $this->_normalizeNumber($config[$name]);
             }
@@ -156,7 +162,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
     protected function defineRules(): array
     {
         $rules = parent::defineRules();
-        $rules[] = [['defaultValue', 'min', 'max'], 'number'];
+        $rules[] = [['defaultValue', 'min', 'max', 'step'], 'number'];
         $rules[] = [['decimals', 'size'], 'integer'];
 
         $rules[] = [
@@ -186,10 +192,9 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
      */
     public function getSettingsHtml(): ?string
     {
-        return Craft::$app->getView()->renderTemplate('_components/fieldtypes/Number/settings.twig',
-            [
-                'field' => $this,
-            ]);
+        return Craft::$app->getView()->renderTemplate('_components/fieldtypes/Number/settings.twig', [
+            'field' => $this,
+        ]);
     }
 
     /**
@@ -243,7 +248,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
         $formatter = Craft::$app->getFormatter();
 
         try {
-            $formatNumber = !$formatter->willBeMisrepresented($value);
+            $formatNumber = !$this->step && !$formatter->willBeMisrepresented($value);
         } catch (InvalidArgumentException $e) {
             $formatNumber = false;
         }

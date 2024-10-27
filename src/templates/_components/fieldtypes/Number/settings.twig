@@ -45,6 +45,16 @@
     data: {'error-key': 'max'},
 }, decimals) }}
 
+{{ _self.numberField({
+    label: 'Step Size'|t('app'),
+    id: 'step',
+    name: 'step',
+    value: field.step,
+    size: 5,
+    errors: field.getErrors('step'),
+    data: {'error-key': 'step'},
+}, null) }}
+
 {{ forms.textField({
     label: "Decimal Points"|t('app'),
     id: 'decimals',
