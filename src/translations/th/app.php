@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'Status:',
     'Statuses updated.' => 'Statuses updated.',
     'Stay signed in for {duration}' => 'เข้าสู่ระบบเป็นเวลา {duration}',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'ขั้นที่ {number}:',
     'Stretch to fit' => 'Stretch to fit',
     'Stretch' => 'Stretch',
