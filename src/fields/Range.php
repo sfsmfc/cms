@@ -148,6 +148,14 @@ class Range extends Field implements InlineEditableFieldInterface, SortableField
     /**
      * @inheritdoc
      */
+    public function useFieldset(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function normalizeValue(mixed $value, ?ElementInterface $element): mixed
     {
         if ($value === null) {
