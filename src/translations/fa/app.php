@@ -93,6 +93,7 @@ return [
     'All users' => 'همه کاربرها',
     'All' => 'همه',
     'Allow Upscaling' => 'اجازه ارتقاء مقیاس',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'رفتن به خط بعد را اجازه بده',
     'Allow public registration' => 'اجازه ثبت نام برای عموم',
