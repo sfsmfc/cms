@@ -93,6 +93,7 @@ return [
     'All users' => 'Všetci používatelia',
     'All' => 'Všetky',
     'Allow Upscaling' => 'Povoliť upscaling',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'Povoliť zalamovanie riadkov',
     'Allow public registration' => 'Povoliť verejnú registráciu',
