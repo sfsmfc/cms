@@ -6577,6 +6577,12 @@ return array(
     'terms' => ' christmas claus fly holiday santa sled snow xmas ',
     'pro' => false,
   ),
+  'slider' =>
+  array(
+    'name' => ' slider ',
+    'terms' => ' adjust configuration modify settings toggle ',
+    'pro' => true,
+  ),
   'sliders' =>
   array(
     'name' => ' sliders ',

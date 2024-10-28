@@ -1,0 +1,115 @@
+@charset "utf-8";
+
+/* range inputs */
+
+/* h/t https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/ */
+
+/* h/t https://stackoverflow.com/a/38163892/1688568 */
+
+$lowerTrackColor: var(--ui-control-color);
+$upperTrackColor: var(--gray-100);
+$focusedTrackColor: var(--gray-400);
+$trackHeight: var(--xs);
+$trackBorderRadius: calc(var(--xs) / 2);
+$thumbColor: var(--ui-control-color);
+$thumbSize: var(--m);
+$thumbBorderRadius: calc(var(--touch-target-size) / 2);
+
+.range-wrapper {
+  max-width: 200px;
+}
+
+input.range {
+  display: block;
+  appearance: none;
+  width: 100%; // for FF
+}
+
+input.range:focus {
+  outline: none;
+}
+
+input.range::-webkit-slider-runnable-track {
+  width: 100%;
+  height: $trackHeight;
+  cursor: pointer;
+  background: $upperTrackColor;
+  border-radius: $trackBorderRadius;
+  border: none;
+}
+
+input.range::-webkit-slider-thumb {
+  border: none;
+  height: $thumbSize;
+  width: $thumbSize;
+  border-radius: $thumbBorderRadius;
+  background: $thumbColor;
+  cursor: pointer;
+  appearance: none;
+  margin-block-start: calc((#{$thumbSize} / 2) * -1 + (#{$trackHeight} / 2));
+}
+
+input.range:focus::-webkit-slider-runnable-track {
+  background: $focusedTrackColor;
+}
+
+input.range::-moz-range-track {
+  width: 100%;
+  height: $trackHeight;
+  cursor: pointer;
+  background: $upperTrackColor;
+  border-radius: $trackBorderRadius;
+  border: none;
+}
+
+input.range::-moz-range-progress {
+  background: $lowerTrackColor;
+}
+
+input.range::-moz-range-thumb {
+  border: none;
+  height: $thumbSize;
+  width: $thumbSize;
+  border-radius: $thumbBorderRadius;
+  background: $thumbColor;
+  cursor: pointer;
+}
+
+input.range::-ms-track {
+  width: 100%;
+  height: $trackHeight;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  border-width: 16px 0;
+  color: transparent;
+}
+
+input.range::-ms-fill-lower {
+  background: $upperTrackColor;
+  border: none;
+  border-radius: $trackBorderRadius;
+}
+
+input.range::-ms-fill-upper {
+  background: $upperTrackColor;
+  border: none;
+  border-radius: $trackBorderRadius;
+}
+
+input.range::-ms-thumb {
+  border: none;
+  height: $thumbSize;
+  width: $thumbSize;
+  border-radius: $thumbBorderRadius;
+  background: $thumbColor;
+  cursor: pointer;
+}
+
+input.range:focus::-ms-fill-lower {
+  background: $lowerTrackColor;
+}
+
+input.range:focus::-ms-fill-upper {
+  background: $focusedTrackColor;
+}

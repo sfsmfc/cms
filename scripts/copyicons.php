@@ -1142,6 +1142,7 @@ $icons = [
     'solid/skull.svg',
     'solid/slash.svg',
     'solid/sleigh.svg',
+    'solid/slider.svg',
     'solid/sliders.svg',
     'solid/slot-machine.svg',
     'solid/smoking.svg',
