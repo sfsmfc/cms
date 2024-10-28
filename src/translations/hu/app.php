@@ -93,6 +93,7 @@ return [
     'All users' => 'Az összes felhasználó',
     'All' => 'Mind',
     'Allow Upscaling' => 'Upscaling engedélyezése',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'Sortörés engedélyezése',
     'Allow public registration' => 'Engedélyezed a publikus regisztrációt',
