@@ -93,6 +93,7 @@ return [
     'All users' => 'ผู้ใช้ทั้งหมด',
     'All' => 'ทั้งหมด',
     'Allow Upscaling' => 'อนุญาตให้ปรับขยาย',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'อนุญาตให้ใช้ตัวแบ่งบรรทัด',
     'Allow public registration' => 'อนุญาตให้ลงทะเบียนสาธารณะ',
