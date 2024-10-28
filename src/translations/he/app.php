@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'סטטוס:',
     'Statuses updated.' => 'הסטטוסים עודכנו.',
     'Stay signed in for {duration}' => 'הישאר מחובר למשך {duration}',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'שלב {number}:',
     'Stretch to fit' => 'מתח כדי להתאים',
     'Stretch' => 'מתיחה',
