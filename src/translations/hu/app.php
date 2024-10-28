@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'Státusz',
     'Statuses updated.' => 'Státuszok frissítve.',
     'Stay signed in for {duration}' => 'Maradjon bejelentkezve {duration}-ig',
+    'Step Size' => 'Step Size',
     'Step {number}:' => '{number}. lépés:',
     'Stretch to fit' => 'Mérethez igazít',
     'Stretch' => 'Nyújtás',
