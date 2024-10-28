@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'Status:',
     'Statuses updated.' => 'Statussen bijgewerkt.',
     'Stay signed in for {duration}' => '{duration} aangemeld blijven',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'Stap {number}:',
     'Stretch to fit' => 'Rekken om passend te maken',
     'Stretch' => 'Rekken',
