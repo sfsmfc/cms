@@ -93,6 +93,7 @@ return [
     'All users' => 'Alle gebruikers',
     'All' => 'Alles',
     'Allow Upscaling' => 'Opschalen toestaan',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'Sta afbreken van regels toe',
     'Allow public registration' => 'Publieke registratie toelaten',
