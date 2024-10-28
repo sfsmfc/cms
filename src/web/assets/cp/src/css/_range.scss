@@ -64,6 +64,7 @@ input.range::-moz-range-track {
 
 input.range::-moz-range-progress {
   background: $lowerTrackColor;
+  border-radius: $trackBorderRadius;
 }
 
 input.range::-moz-range-thumb {
