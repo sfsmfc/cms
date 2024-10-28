@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'Durum:',
     'Statuses updated.' => 'Durum ayarlandı.',
     'Stay signed in for {duration}' => '{duration} boyunca oturumu açık tut',
+    'Step Size' => 'Step Size',
     'Step {number}:' => '{number}. Adım:',
     'Stretch to fit' => 'Sığdırmak için uzat',
     'Stretch' => 'Esnet',
