@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'Status:',
     'Statuses updated.' => 'Statusar uppdaterade.',
     'Stay signed in for {duration}' => 'Fortsätt vara inloggad i {duration}',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'Steg {number}:',
     'Stretch to fit' => 'Streck ut så att den passar',
     'Stretch' => 'Dra ut',
