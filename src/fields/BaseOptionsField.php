@@ -52,6 +52,12 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
     protected static bool $optgroups = false;
 
     /**
+     * @var bool Whether the field should allow adding a custom option
+     * @since 5.5.0
+     */
+    protected static bool $allowCustomOption = false;
+
+    /**
      * @inheritdoc
      */
     public static function phpType(): string
@@ -106,6 +112,12 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
     public array $options;
 
     /**
+     * @var bool Whether a custom option is allowed.
+     * @since 5.5.0
+     */
+    public bool $customOption = false;
+
+    /**
      * @inheritdoc
      */
     public function __construct($config = [])
@@ -137,6 +149,10 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
         // remove unused settings
         unset($config['multi'], $config['optgroups'], $config['columnType']);
 
+        if (!static::$multi || !static::$allowCustomOption) {
+            unset($config['customOption']);
+        }
+
         parent::__construct($config);
     }
 
@@ -147,6 +163,7 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
     {
         $attributes = parent::settingsAttributes();
         $attributes[] = 'options';
+        $attributes[] = 'customOption';
         return $attributes;
     }
 
@@ -252,7 +269,7 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
             $rows[] = $option;
         }
 
-        return Cp::editableTableFieldHtml([
+        $html = Cp::editableTableFieldHtml([
             'label' => $this->optionsSettingLabel(),
             'instructions' => Craft::t('app', 'Define the available options.'),
             'id' => 'options',
@@ -266,6 +283,17 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
             'errors' => $this->getErrors('options'),
             'data' => ['error-key' => 'options'],
         ]);
+
+        if (static::$allowCustomOption) {
+            $html .= Cp::lightswitchFieldHtml([
+                'label' => Craft::t('app', 'Allow a custom option'),
+                'id' => 'custom-option',
+                'name' => 'customOption',
+                'on' => $this->customOption,
+            ]);
+        }
+
+        return $html;
     }
 
     /**
@@ -290,9 +318,18 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
             $value = $this->defaultValue();
         }
 
+        $customValue = is_array($value) ? ArrayHelper::remove($value, '__custom__') : null;
+
         // Normalize to an array of strings
         $selectedValues = [];
         foreach ((array)$value as $val) {
+            if ($val === '__custom__') {
+                if ($customValue !== null && $customValue !== '') {
+                    $selectedValues[] = $customValue;
+                }
+                continue;
+            }
+
             $val = (string)$val;
             if (str_starts_with($val, 'base64:')) {
                 $val = base64_decode(StringHelper::removeLeft($val, 'base64:'));
@@ -366,6 +403,15 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
                     $serialized[] = $option->value;
                 }
             }
+
+            if ($this->customOption) {
+                /** @var OptionData|null $customOption */
+                $customOption = ArrayHelper::firstWhere($value, fn(OptionData $option) => !$option->valid);
+                if ($customOption) {
+                    $serialized[] = $customOption->value;
+                }
+            }
+
             return $serialized;
         }
 
@@ -409,29 +455,18 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
      */
     public function getElementValidationRules(): array
     {
-        // Get all of the acceptable values
-        $range = [];
-
-        foreach ($this->options() as $option) {
-            if (!isset($option['optgroup'])) {
-                // Cast the option value to a string in case it is an integer
-                $range[] = (string)$option['value'];
-            }
-        }
-
-        $request = Craft::$app->getRequest();
-
         return [
-            [
-                'in',
-                'range' => $range,
-                'allowArray' => static::$multi,
-                // Don't allow saving invalid blank values via Selectize
-                'skipOnEmpty' => !(
-                    $this instanceof Dropdown &&
-                    ($request->getIsCpRequest() || $request->getIsConsoleRequest())
-                ),
-            ],
+            [function(ElementInterface $element) {
+                $value = $element->getFieldValue($this->handle);
+                $options = $value instanceof MultiOptionsFieldData ? $value : [$value];
+                $invalidCount = count(ArrayHelper::where($options, fn(OptionData $option) => !$option->valid));
+                $maxInvalidOptions = $this->customOption ? 1 : 0;
+                if ($invalidCount > $maxInvalidOptions) {
+                    $element->addError($this->handle, Craft::t('yii', '{attribute} is invalid.', [
+                        'attribute' => Craft::t('site', $this->name),
+                    ]));
+                }
+            }],
         ];
     }
 
@@ -576,15 +611,37 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
             $options = $event->options;
         }
 
+        if ($this->customOption) {
+            $invalidValue = null;
+            /** @var MultiOptionsFieldData|SingleOptionFieldData $value */
+            if (static::$multi) {
+                $invalidValue = ArrayHelper::firstWhere($value, fn(OptionData $option) => !$option->valid);
+            } elseif (!$value->valid) {
+                $invalidValue = $value;
+            }
+
+            if (!$invalidValue) {
+                $invalidValue = new OptionData(null, null, false, false);
+            }
+
+            $options[] = [
+                'label' => $invalidValue->value,
+                'value' => '__custom__',
+                'custom' => true,
+            ];
+        }
+
         foreach ($options as $option) {
             if (isset($option['optgroup'])) {
                 $translatedOptions[] = [
                     'optgroup' => Craft::t('site', $option['optgroup']),
                 ];
             } else {
+                $custom = $option['custom'] ?? false;
                 $translatedOptions[] = [
                     'label' => Craft::t('site', $option['label']),
-                    'value' => $encode ? $this->encodeValue($option['value']) : $option['value'],
+                    'value' => $encode && !$custom ? $this->encodeValue($option['value']) : $option['value'],
+                    'custom' => $custom,
                 ];
             }
         }

@@ -19,12 +19,15 @@
         {%- if option is not iterable %}
             {%- set option = {label: option, value: key} %}
         {%- endif %}
+        {% set custom = option.custom ?? false %}
         <div class="checkboxfield">
             {% include "_includes/forms/checkbox" with {
                 describedBy: describedBy ?? false,
                 name: optionName,
-                checked: (option.value is defined and option.value in values),
-                autofocus: loop.first and (autofocus ?? false) and not craft.app.request.isMobileBrowser(true)
+                checked: custom ? option.label is not same as(null) : option.value is defined and option.value in values,
+                autofocus: loop.first and (autofocus ?? false) and not craft.app.request.isMobileBrowser(true),
+                custom,
+                customInputName: optionName|trim('[]', side: 'right') ~ '[__custom__]',
             }|merge(option) only %}
         </div>
     {%- endfor %}
