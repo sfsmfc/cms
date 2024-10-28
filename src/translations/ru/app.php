@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'Статус:',
     'Statuses updated.' => 'Статусы обновлены.',
     'Stay signed in for {duration}' => 'Не выходить из системы {duration}',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'Шаг {number}:',
     'Stretch to fit' => 'Растянуть по размеру экрана',
     'Stretch' => 'Растянуть',
