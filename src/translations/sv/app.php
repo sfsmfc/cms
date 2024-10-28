@@ -93,6 +93,7 @@ return [
     'All users' => 'Alla användare',
     'All' => 'Alla',
     'Allow Upscaling' => 'Tillåt uppskalning',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'Tillåt radbrytning',
     'Allow public registration' => 'Tillåt allmän registrering',
