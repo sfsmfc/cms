@@ -93,6 +93,7 @@ return [
     'All users' => '所有用户',
     'All' => '全部',
     'Allow Upscaling' => '允许升级',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => '允许使用换行符',
     'Allow public registration' => '允许公开注册',
