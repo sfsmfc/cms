@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'الحالة:',
     'Statuses updated.' => 'تم تحديث الحالات.',
     'Stay signed in for {duration}' => 'الإبقاء على تسجيل الدخول لمدة {duration}',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'الخطوة {number}:',
     'Stretch to fit' => 'تمديد للملائمة',
     'Stretch' => 'تمديد',
