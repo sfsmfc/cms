@@ -93,6 +93,7 @@ return [
     'All users' => 'כל המשתמשים',
     'All' => 'הכל',
     'Allow Upscaling' => 'אפשר שדרוג',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'אפשר שבירת שורות',
     'Allow public registration' => 'אפשר הרשמה פומבית',
