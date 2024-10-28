@@ -7689,7 +7689,7 @@ $titlebarBorderRadius: calc(var(--large-border-radius) - 1px);
     display: flex;
     align-items: center;
     position: absolute;
-    top: 5px;
+    top: 3px;
     @include right(14px);
     cursor: default;
 
@@ -7699,7 +7699,8 @@ $titlebarBorderRadius: calc(var(--large-border-radius) - 1px);
 
     & .settings {
       padding: 0 8px;
-      height: 20px;
+      height: var(--touch-target-size);
+      min-height: var(--touch-target-size);
       color: var(--ui-control-color);
 
       &:before {
