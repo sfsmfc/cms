@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'Stav:',
     'Statuses updated.' => 'Stavy aktualizovány.',
     'Stay signed in for {duration}' => 'Zůstat přihlášen/a po dobu {duration}',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'Krok {number}:',
     'Stretch to fit' => 'Přizpůsobit roztažením',
     'Stretch' => 'Roztáhnout',
