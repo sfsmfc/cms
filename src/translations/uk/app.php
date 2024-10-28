@@ -93,6 +93,7 @@ return [
     'All users' => 'Усі користувачі',
     'All' => 'Усі',
     'Allow Upscaling' => 'Дозволити масштабування',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'Дозволити перенесення рядків',
     'Allow public registration' => 'Дозволити публічну реєстрацію',
