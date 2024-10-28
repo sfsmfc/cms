@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'ステータス:',
     'Statuses updated.' => 'ステータスを更新しました。',
     'Stay signed in for {duration}' => '{duration}の間サインインしたままにする',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'ステップ{number}:',
     'Stretch to fit' => 'フィットまでのストレッチ',
     'Stretch' => 'ストレッチ',
