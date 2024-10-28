@@ -93,6 +93,7 @@ return [
     'All users' => 'Tüm Kullanıcılar',
     'All' => 'Tümü',
     'Allow Upscaling' => 'Yükseltmeye izin ver',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'Satır aralıklarına izin ver',
     'Allow public registration' => 'Umumi hesap oluşturmaya izin ver',
