@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'وضعیت:',
     'Statuses updated.' => 'وضعیت ها بروز گردید.',
     'Stay signed in for {duration}' => 'ماندن در سیستم به مدت {duration}',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'مرحله {number}:',
     'Stretch to fit' => 'کشیدن برای جا شدن',
     'Stretch' => 'کشیدن',
