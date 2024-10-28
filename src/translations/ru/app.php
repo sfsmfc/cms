@@ -93,6 +93,7 @@ return [
     'All users' => 'Все пользователи',
     'All' => 'Все',
     'Allow Upscaling' => 'Разрешить масштабирование',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'Разрешить переносы строк',
     'Allow public registration' => 'Разрешить публичную регистрацию',
