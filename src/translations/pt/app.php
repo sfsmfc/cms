@@ -93,6 +93,7 @@ return [
     'All users' => 'Todos os usuários',
     'All' => 'Tudo',
     'Allow Upscaling' => 'Permitir aumento de escala',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'Permitir quebras de linha',
     'Allow public registration' => 'Permitir o registo público',
