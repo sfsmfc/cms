@@ -1516,6 +1516,7 @@ return [
     'Status:' => '状态：',
     'Statuses updated.' => '状态已更新。',
     'Stay signed in for {duration}' => '在 {duration}内保持登录状态',
+    'Step Size' => 'Step Size',
     'Step {number}:' => '第 {number} 步：',
     'Stretch to fit' => '拉伸来适应',
     'Stretch' => '拉伸',
