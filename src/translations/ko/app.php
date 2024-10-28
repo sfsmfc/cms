@@ -1516,6 +1516,7 @@ return [
     'Status:' => '상태:',
     'Statuses updated.' => '상태 업데이트.',
     'Stay signed in for {duration}' => '{duration} 동안 로그인 상태 유지',
+    'Step Size' => 'Step Size',
     'Step {number}:' => '{number}단계:',
     'Stretch to fit' => '늘여서 맞추기',
     'Stretch' => '늘이기',
