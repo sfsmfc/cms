@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'Situação:',
     'Statuses updated.' => 'Status atualizado.',
     'Stay signed in for {duration}' => 'Manter a sessão por {duration}',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'Passo {number}:',
     'Stretch to fit' => 'Redimensionar para caber',
     'Stretch' => 'Esticar',
