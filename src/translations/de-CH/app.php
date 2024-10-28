@@ -1516,6 +1516,7 @@ return [
     'Status:' => 'Status:',
     'Statuses updated.' => 'Der Status wurde aktualisiert.',
     'Stay signed in for {duration}' => 'Angemeldet bleiben für {duration}',
+    'Step Size' => 'Step Size',
     'Step {number}:' => 'Schritt {number}:',
     'Stretch to fit' => 'Grösse an den Behälter anpassen',
     'Stretch' => 'Strecken',
