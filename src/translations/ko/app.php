@@ -93,6 +93,7 @@ return [
     'All users' => '모든 사용자',
     'All' => '모두',
     'Allow Upscaling' => '업스케일링 허용',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => '줄바꿈 허용하기',
     'Allow public registration' => '공개 등록을 허락하시겠습니까',
