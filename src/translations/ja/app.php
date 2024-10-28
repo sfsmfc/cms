@@ -93,6 +93,7 @@ return [
     'All users' => 'すべてのユーザ',
     'All' => 'すべて',
     'Allow Upscaling' => 'アップスケールを許可',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => '改行を許可',
     'Allow public registration' => 'パブリック登録を許可する',
