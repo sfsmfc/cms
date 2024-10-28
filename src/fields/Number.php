@@ -87,11 +87,6 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
     }
 
     /**
-     * @var int|float|null The default value for new elements
-     */
-    public int|null|float $defaultValue = null;
-
-    /**
      * @var int|float|null The minimum allowed number
      */
     public int|null|float $min = 0;
@@ -116,6 +111,11 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
      * @var int|null The size of the field
      */
     public ?int $size = null;
+
+    /**
+     * @var int|float|null The default value for new elements
+     */
+    public int|null|float $defaultValue = null;
 
     /**
      * @var string|null Text that should be displayed before the input
@@ -162,7 +162,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
     protected function defineRules(): array
     {
         $rules = parent::defineRules();
-        $rules[] = [['defaultValue', 'min', 'max', 'step'], 'number'];
+        $rules[] = [['min', 'max', 'step', 'defaultValue'], 'number'];
         $rules[] = [['decimals', 'size'], 'integer'];
 
         $rules[] = [
