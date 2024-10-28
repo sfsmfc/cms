@@ -14,8 +14,10 @@
 - Improved the control panel for screen readers. ([#15665](https://github.com/craftcms/cms/pull/15665))
 - Improved keyboard control. ([#15665](https://github.com/craftcms/cms/pull/15665))
 - Improved the color contrast of required field indicators. ([#15665](https://github.com/craftcms/cms/pull/15665))
+- Improved the accessibility of text inputs for screen readers.
 
 ### Administration
+- Added the “Range” field type. ([#15972](https://github.com/craftcms/cms/pull/15972))
 - All relation fields can now be selected as field layouts’ thumbnail providers. ([#15651](https://github.com/craftcms/cms/discussions/15651))
 - Added the “Markdown” field layout UI element type. ([#15674](https://github.com/craftcms/cms/pull/15674), [#15664](https://github.com/craftcms/cms/discussions/15664))
 - Added the “Language” element condition rule. ([#15952](https://github.com/craftcms/cms/discussions/15952))
@@ -53,6 +55,8 @@
 - Added `craft\helpers\Console::indent()`.
 - Added `craft\helpers\Console::indentStr()`.
 - Added `craft\helpers\Console::outdent()`.
+- Added `craft\helpers\Cp::rangeFieldHtml()`. ([#15972](https://github.com/craftcms/cms/pull/15972))
+- Added `craft\helpers\Cp::rangeHtml()`. ([#15972](https://github.com/craftcms/cms/pull/15972))
 - Added `craft\helpers\StringHelper::firstLine()`.
 - Added `craft\helpers\UrlHelper::encodeUrl()`. ([#15838](https://github.com/craftcms/cms/issues/15838))
 - Added `craft\services\Addresses::EVENT_DEFINE_ADDRESS_COUNTRIES`. ([#15711](https://github.com/craftcms/cms/pull/15711))
@@ -68,6 +72,7 @@
 - `craft\helpers\Console::output()` now prepends an indent to each line of the passed-in string, if `indent()` had been called prior.
 - Deprecated the `enableBasicHttpAuth` config setting. `craft\filters\BasicHttpAuthLogin` should be used instead. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added the `serializeForm` event to `Craft.ElementEditor`. ([#15794](https://github.com/craftcms/cms/discussions/15794))
+- Added the `range()` and `rangeField()` macros to `_includes/forms.twig`. ([#15972](https://github.com/craftcms/cms/pull/15972))
 
 ### System
 - `Location` headers added via `craft\web\Response::redirect()` are now set to encoded URLs. ([#15838](https://github.com/craftcms/cms/issues/15838))
