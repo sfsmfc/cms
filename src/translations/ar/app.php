@@ -93,6 +93,7 @@ return [
     'All users' => 'جميع المستخدمين',
     'All' => 'الكل',
     'Allow Upscaling' => 'السماح بالترقية',
+    'Allow a custom option' => 'Allow a custom option',
     'Allow anchors' => 'Allow anchors',
     'Allow line breaks' => 'السماح بفواصل الأسطر',
     'Allow public registration' => 'السماح بالتسجيل العام',
