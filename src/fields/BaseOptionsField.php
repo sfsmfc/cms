@@ -149,7 +149,7 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
         // remove unused settings
         unset($config['multi'], $config['optgroups'], $config['columnType']);
 
-        if (!static::$multi || !static::$allowCustomOptions) {
+        if (!static::$allowCustomOptions) {
             unset($config['customOptions']);
         }
 

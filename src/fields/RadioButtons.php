@@ -23,6 +23,11 @@ class RadioButtons extends BaseOptionsField implements SortableFieldInterface
     /**
      * @inheritdoc
      */
+    protected static bool $allowCustomOptions = true;
+
+    /**
+     * @inheritdoc
+     */
     public static function displayName(): string
     {
         return Craft::t('app', 'Radio Buttons');
@@ -54,11 +59,21 @@ class RadioButtons extends BaseOptionsField implements SortableFieldInterface
             Craft::$app->getView()->setInitialDeltaValue($this->handle, null);
         }
 
+        $options = $this->translatedOptions(true, $value, $element);
+        if ($this->customOptions && $value->valid) {
+            // Add the custom option
+            $options[] = [
+                'label' => null,
+                'value' => '',
+                'custom' => true,
+            ];
+        }
+
         return Craft::$app->getView()->renderTemplate('_includes/forms/radioGroup.twig', [
             'describedBy' => $this->describedBy,
             'name' => $this->handle,
             'value' => $this->encodeValue($value),
-            'options' => $this->translatedOptions(true, $value, $element),
+            'options' => $options,
         ]);
     }
 
