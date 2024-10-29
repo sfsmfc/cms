@@ -9,7 +9,6 @@ namespace craft\fields;
 
 use Craft;
 use craft\base\ElementInterface;
-use craft\fields\data\MultiOptionsFieldData;
 use craft\fields\data\OptionData;
 use craft\helpers\ArrayHelper;
 
@@ -29,7 +28,7 @@ class Checkboxes extends BaseOptionsField
     /**
      * @inheritdoc
      */
-    protected static bool $allowCustomOption = true;
+    protected static bool $allowCustomOptions = true;
 
     /**
      * @inheritdoc
@@ -60,10 +59,7 @@ class Checkboxes extends BaseOptionsField
      */
     protected function inputHtml(mixed $value, ?ElementInterface $element, bool $inline): string
     {
-        /** @var MultiOptionsFieldData $value */
-        $invalidOptions = count(ArrayHelper::where($value, fn(OptionData $option) => !$option->valid));
-        $maxInvalidOptions = $this->customOption ? 1 : 0;
-        if ($invalidOptions > $maxInvalidOptions) {
+        if (!$this->customOptions && ArrayHelper::contains($value, fn(OptionData $option) => !$option->valid)) {
             Craft::$app->getView()->setInitialDeltaValue($this->handle, null);
         }
 
@@ -72,6 +68,7 @@ class Checkboxes extends BaseOptionsField
             'name' => $this->handle,
             'values' => $this->encodeValue($value),
             'options' => $this->translatedOptions(true, $value, $element),
+            'allowCustomOptions' => $this->customOptions,
         ]);
     }
 

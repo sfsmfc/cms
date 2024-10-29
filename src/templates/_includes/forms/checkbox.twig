@@ -38,8 +38,8 @@
 <label for="{{ id }}">
     {% if custom ?? false %}
         {{ text({
-            name: customInputName,
-            value: label,
+            name: null,
+            value: value ?? null,
             class: 'small',
         }) }}
     {% else %}
