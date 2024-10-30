@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'Mostrar la barra de herramientas de depuración en el panel de control',
     'Show the debug toolbar on the front end' => 'Mostrar la barra de herramientas de depuración en el front-end',
     'Show the site menu' => 'Mostrar el menú del sitio',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'Mostrarlas indefinidamente',
     'Show thumbnails and titles' => 'Mostrar miniaturas y títulos',
     'Show thumbnails only' => 'Solo mostrar miniaturas',
