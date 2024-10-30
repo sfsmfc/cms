@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'Показувати панель налагодження на панелі керування',
     'Show the debug toolbar on the front end' => 'Показувати панель налагодження в зовнішньому інтерфейсі',
     'Show the site menu' => 'Показати меню сайту',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'Показувати необмежену кількість разів',
     'Show thumbnails and titles' => 'Показати ескізи й заголовки',
     'Show thumbnails only' => 'Показати лише ескізи',
