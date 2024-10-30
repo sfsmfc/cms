@@ -19,6 +19,7 @@
 ### Administration
 - Added the “Range” field type. ([#15972](https://github.com/craftcms/cms/pull/15972))
 - Added the “Allow custom options” setting to Checkboxes and Radio Buttons fields.
+- Added the “Show the ‘Label’ field” and “Show the ‘Open in a new tab’ field” settings to Link fields. ([#15983](https://github.com/craftcms/cms/pull/15983))
 - All relation fields can now be selected as field layouts’ thumbnail providers. ([#15651](https://github.com/craftcms/cms/discussions/15651))
 - Added the “Markdown” field layout UI element type. ([#15674](https://github.com/craftcms/cms/pull/15674), [#15664](https://github.com/craftcms/cms/discussions/15664))
 - Added the “Language” element condition rule. ([#15952](https://github.com/craftcms/cms/discussions/15952))
@@ -49,6 +50,8 @@
 - Added `craft\elements\db\NestedElementQueryTrait`. ([#15894](https://github.com/craftcms/cms/pull/15894))
 - Added `craft\events\ApplyFieldSaveEvent`. ([#15872](https://github.com/craftcms/cms/discussions/15872))
 - Added `craft\events\DefineAddressCountriesEvent`. ([#15711](https://github.com/craftcms/cms/pull/15711))
+- Added `craft\fields\data\LinkData::$target`.
+- Added `craft\fields\data\LinkData::setLabel()`.
 - Added `craft\filters\BasicHttpAuthLogin`. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added `craft\filters\BasicHttpAuthStatic`. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added `craft\filters\ConditionalFilterTrait`. ([#15948](https://github.com/craftcms/cms/pull/15948))
@@ -70,6 +73,7 @@
 - Added `craft\helpers\Console::$prependNewline`.
 - Added `craft\fieldlayoutelements\Template::$templateMode`. ([#15932](https://github.com/craftcms/cms/pull/15932))
 - Added `craft\models\FieldLayout::prependElements()`.
+- `craft\fields\data\LinkData::getLabel()` now has a `$custom` argument.
 - `craft\helpers\Console::output()` now prepends an indent to each line of the passed-in string, if `indent()` had been called prior.
 - Deprecated the `enableBasicHttpAuth` config setting. `craft\filters\BasicHttpAuthLogin` should be used instead. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added the `serializeForm` event to `Craft.ElementEditor`. ([#15794](https://github.com/craftcms/cms/discussions/15794))
