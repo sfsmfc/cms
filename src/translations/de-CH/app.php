@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'Debug-Symbolleiste im Control Panel anzeigen',
     'Show the debug toolbar on the front end' => 'Debug-Symbolleiste im Front-End anzeigen',
     'Show the site menu' => 'Site-Menü anzeigen',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'Unbegrenzt anzeigen',
     'Show thumbnails and titles' => 'Miniaturansichten und Titel anzeigen',
     'Show thumbnails only' => 'Nur Miniaturansichten anzeigen',
