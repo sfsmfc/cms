@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'Afficher la barre d’outils de débogage dans le panneau de configuration',
     'Show the debug toolbar on the front end' => 'Afficher la barre d’outils de débogage sur le frontal',
     'Show the site menu' => 'Afficher le menu du site',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'Les afficher indéfiniment',
     'Show thumbnails and titles' => 'Afficher les vignettes et les titres',
     'Show thumbnails only' => 'Afficher uniquement les vignettes',
