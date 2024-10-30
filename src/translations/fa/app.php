@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'نمایش نوار ابزار خطایابی در صفحه کنترل',
     'Show the debug toolbar on the front end' => 'نمایش نوار ابزار خطایابی در سایت',
     'Show the site menu' => 'نمایش منوی سایت',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'نمایش برای همیشه',
     'Show thumbnails and titles' => 'نشان دادن تصاویر کوچک و عنوان‌ها',
     'Show thumbnails only' => 'نشان دادن فقط تصاویر کوچک',
