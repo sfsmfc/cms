@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'הצג את סרגל הכלים לניפוי באגים בלוח הבקרה',
     'Show the debug toolbar on the front end' => 'הצג את סרגל הכלים לאיתור באגים בחזית',
     'Show the site menu' => 'הצג את תפריט האתרים',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'הצג אותם ללא הגבלת זמן',
     'Show thumbnails and titles' => 'הצג תמונות ממוזערות וכותרות',
     'Show thumbnails only' => 'הצג תמונות ממוזערות בלבד',
