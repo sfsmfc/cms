@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'إظهار شريط أدوات تصحيح الأخطاء في لوحة التحكم',
     'Show the debug toolbar on the front end' => 'إظهار شريط أدوات تصحيح الأخطاء في الواجهة الأمامية',
     'Show the site menu' => 'إظهار قائمة المواقع',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'عرضها إلى أجل غير مسمى',
     'Show thumbnails and titles' => 'عرض المصغرات والعناوين',
     'Show thumbnails only' => 'عرض المصغرات فقط',
