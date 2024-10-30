@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'Pokaż w panelu sterowania pasek narzędzi debugowania',
     'Show the debug toolbar on the front end' => 'Pokaż w interfejsie frontend pasek narzędzi do debugowania',
     'Show the site menu' => 'Pokaż menu witryny',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'Pokazuj je w nieskończoność',
     'Show thumbnails and titles' => 'Pokaż miniatury i tytuły',
     'Show thumbnails only' => 'Pokaż tylko miniatury',
