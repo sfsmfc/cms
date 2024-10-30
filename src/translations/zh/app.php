@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => '在控制面板中显示调试工具栏',
     'Show the debug toolbar on the front end' => '在前端显示调试工具栏',
     'Show the site menu' => '显示站点菜单',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => '无限期显示',
     'Show thumbnails and titles' => '显示缩略图和标题',
     'Show thumbnails only' => '仅显示缩略图',
