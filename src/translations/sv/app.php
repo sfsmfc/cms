@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'Visa verktygsfältet för felsökning i kontrollpanelen',
     'Show the debug toolbar on the front end' => 'Visa verktygsfältet för felsökning frontend',
     'Show the site menu' => 'Visa webbplatsens meny',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'Visa dem alltid',
     'Show thumbnails and titles' => 'Visa miniatyrer och titlar',
     'Show thumbnails only' => 'Visa endast miniatyrer',
