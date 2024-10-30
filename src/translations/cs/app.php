@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'Zobrazovat na ovládacím panelu nástrojovou lištu pro ladění',
     'Show the debug toolbar on the front end' => 'Zobrazovat na front-endu panel nástrojů pro ladění',
     'Show the site menu' => 'Zobrazit menu stránky',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'Zobrazit na dobu neurčitou',
     'Show thumbnails and titles' => 'Zobrazit náhledy a názvy',
     'Show thumbnails only' => 'Zobrazit jen náhledy',
