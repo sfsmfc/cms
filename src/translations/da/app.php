@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'Vis værktøjslinjen til fejlfinding i kontrolpanelet',
     'Show the debug toolbar on the front end' => 'Vis værktøjslinjen til fejlfinding i front-end',
     'Show the site menu' => 'Vis sitemenuen',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'Vis dem uendeligt',
     'Show thumbnails and titles' => 'Vis miniaturer og titler',
     'Show thumbnails only' => 'Vis kun miniaturer',
