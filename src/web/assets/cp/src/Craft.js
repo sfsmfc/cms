@@ -76,6 +76,7 @@ import './js/IconPicker.js';
 import './js/ImageUpload.js';
 import './js/InfoIcon.js';
 import './js/LightSwitch.js';
+import './js/LinkField.js';
 import './js/LinkInput.js';
 import './js/Listbox.js';
 import './js/LivePreview.js';

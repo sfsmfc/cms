@@ -14,8 +14,12 @@
 - Improved the control panel for screen readers. ([#15665](https://github.com/craftcms/cms/pull/15665))
 - Improved keyboard control. ([#15665](https://github.com/craftcms/cms/pull/15665))
 - Improved the color contrast of required field indicators. ([#15665](https://github.com/craftcms/cms/pull/15665))
+- Improved the accessibility of text inputs for screen readers.
 
 ### Administration
+- Added the “Range” field type. ([#15972](https://github.com/craftcms/cms/pull/15972))
+- Added the “Allow custom options” setting to Checkboxes and Radio Buttons fields.
+- Added the “Show the ‘Label’ field” and “Show the ‘Open in a new tab’ field” settings to Link fields. ([#15983](https://github.com/craftcms/cms/pull/15983))
 - All relation fields can now be selected as field layouts’ thumbnail providers. ([#15651](https://github.com/craftcms/cms/discussions/15651))
 - Added the “Markdown” field layout UI element type. ([#15674](https://github.com/craftcms/cms/pull/15674), [#15664](https://github.com/craftcms/cms/discussions/15664))
 - Added the “Language” element condition rule. ([#15952](https://github.com/craftcms/cms/discussions/15952))
@@ -25,7 +29,8 @@
 - Removed the “Show the Title field” entry type setting. The “Title” element can now be removed from the field layout instead. ([#15942](https://github.com/craftcms/cms/pull/15942))
 - Entry types can now specify a Default Title Format, which will be used even if the Title field is included in the field layout, to generate a default Title value if the field is blank. ([#15942](https://github.com/craftcms/cms/pull/15942))
 - It’s now possible to control whether entry types’ Title fields are required. ([#15942](https://github.com/craftcms/cms/pull/15942))
-- Added the `camera-retro`, `chevron-down`, `chevron-left`, `chevron-right`, `chevron-up`, `chevrons-down`, `chevrons-left`, `chevrons-right`, `chevrons-up`, `codepen`, `discord`, `dribbble`, `facebook`, `image-landscape`, `image-portrait`, `instagram`, `kickstarter`, `linkedin`, `panorama`, `pen-clip`, `pen-fancy`, `pen-field`, `pen-line`, `pen-nib`, `pen-paintbrush`, `pencil-mechanical`, `photo-film-music`, `photo-film`, `pinterest`, `product-hunt`, `rebel`, `shopify`, `threads`, `tiktok`, `vimeo`, `whatsapp`, `x-twitter`, and `youtube` icons.
+- Added the “Step Size” Number field setting.
+- Added several new icons.
 - Added `pc/*` commands as an alias of `project-config/*`.
 - Added the `resave/all` command.
 - Added the `--except`, `--minor-only`, and `--patch-only` options to the `update` command. ([#15829](https://github.com/craftcms/cms/pull/15829))
@@ -45,6 +50,8 @@
 - Added `craft\elements\db\NestedElementQueryTrait`. ([#15894](https://github.com/craftcms/cms/pull/15894))
 - Added `craft\events\ApplyFieldSaveEvent`. ([#15872](https://github.com/craftcms/cms/discussions/15872))
 - Added `craft\events\DefineAddressCountriesEvent`. ([#15711](https://github.com/craftcms/cms/pull/15711))
+- Added `craft\fields\data\LinkData::$target`.
+- Added `craft\fields\data\LinkData::setLabel()`.
 - Added `craft\filters\BasicHttpAuthLogin`. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added `craft\filters\BasicHttpAuthStatic`. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added `craft\filters\ConditionalFilterTrait`. ([#15948](https://github.com/craftcms/cms/pull/15948))
@@ -52,6 +59,8 @@
 - Added `craft\helpers\Console::indent()`.
 - Added `craft\helpers\Console::indentStr()`.
 - Added `craft\helpers\Console::outdent()`.
+- Added `craft\helpers\Cp::rangeFieldHtml()`. ([#15972](https://github.com/craftcms/cms/pull/15972))
+- Added `craft\helpers\Cp::rangeHtml()`. ([#15972](https://github.com/craftcms/cms/pull/15972))
 - Added `craft\helpers\StringHelper::firstLine()`.
 - Added `craft\helpers\UrlHelper::encodeUrl()`. ([#15838](https://github.com/craftcms/cms/issues/15838))
 - Added `craft\services\Addresses::EVENT_DEFINE_ADDRESS_COUNTRIES`. ([#15711](https://github.com/craftcms/cms/pull/15711))
@@ -64,9 +73,11 @@
 - Added `craft\helpers\Console::$prependNewline`.
 - Added `craft\fieldlayoutelements\Template::$templateMode`. ([#15932](https://github.com/craftcms/cms/pull/15932))
 - Added `craft\models\FieldLayout::prependElements()`.
+- `craft\fields\data\LinkData::getLabel()` now has a `$custom` argument.
 - `craft\helpers\Console::output()` now prepends an indent to each line of the passed-in string, if `indent()` had been called prior.
 - Deprecated the `enableBasicHttpAuth` config setting. `craft\filters\BasicHttpAuthLogin` should be used instead. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added the `serializeForm` event to `Craft.ElementEditor`. ([#15794](https://github.com/craftcms/cms/discussions/15794))
+- Added the `range()` and `rangeField()` macros to `_includes/forms.twig`. ([#15972](https://github.com/craftcms/cms/pull/15972))
 
 ### System
 - `Location` headers added via `craft\web\Response::redirect()` are now set to encoded URLs. ([#15838](https://github.com/craftcms/cms/issues/15838))

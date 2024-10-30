@@ -123,6 +123,11 @@
 {% endmacro %}
 
 
+{% macro range(config) %}
+    {% include "_includes/forms/range" with config only %}
+{% endmacro %}
+
+
 {% macro editableTable(config) %}
     {% include "_includes/forms/editableTable" with config only %}
 {% endmacro %}
@@ -340,6 +345,12 @@
         fieldLabel: config.fieldLabel ?? config.label ?? null,
     })|withoutKey('label') %}
     {{ _self.field(config, 'template:_includes/forms/lightswitch') }}
+{% endmacro %}
+
+
+{% macro rangeField(config) %}
+    {% set config = config|merge({id: config.id ?? "range#{random()}"}) %}
+    {{ _self.field(config, 'template:_includes/forms/range') }}
 {% endmacro %}
 
 

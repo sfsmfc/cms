@@ -7867,6 +7867,12 @@ input.checkbox {
   position: absolute;
   width: var(--checkbox-size);
   height: var(--checkbox-size);
+
+  & + label:has(> .text) {
+    &::before {
+      inset-block-start: 6px;
+    }
+  }
 }
 
 input.checkbox + label,

@@ -89,9 +89,14 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
     /**
      * @inheritdoc
      */
-    public static function dbType(): string
+    public static function dbType(): array
     {
-        return Schema::TYPE_STRING;
+        return [
+            'value' => Schema::TYPE_STRING,
+            'type' => Schema::TYPE_STRING,
+            'label' => Schema::TYPE_STRING,
+            'target' => Schema::TYPE_STRING,
+        ];
     }
 
     /**
@@ -131,6 +136,18 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
 
         return self::$_types;
     }
+
+    /**
+     * @var bool Whether the Label field should be shown.
+     * @since 5.5.0
+     */
+    public bool $showLabelField = false;
+
+    /**
+     * @var bool Whether the “Open in a new tab” field should be shown.
+     * @since 5.5.0
+     */
+    public bool $showTargetField = false;
 
     /**
      * @var array<string,BaseLinkType>
@@ -334,6 +351,18 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
 
         return $html .
             Html::tag('hr') .
+            Cp::lightswitchFieldHtml([
+                'label' => Craft::t('app', 'Show the “Label” field'),
+                'id' => 'show-label-field',
+                'name' => 'showLabelField',
+                'on' => $this->showLabelField,
+            ]) .
+            Cp::lightswitchFieldHtml([
+                'label' => Craft::t('app', 'Show the “Open in a new tab” field'),
+                'id' => 'show-target-field',
+                'name' => 'showTargetField',
+                'on' => $this->showTargetField,
+            ]) .
             Cp::textFieldHtml([
                 'label' => Craft::t('app', 'Max Length'),
                 'instructions' => Craft::t('app', 'The maximum length (in bytes) the field can hold.'),
@@ -388,7 +417,11 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
 
         if (is_array($value)) {
             $typeId = $value['type'] ?? UrlType::id();
-            $value = trim($value[$typeId]['value'] ?? '');
+            $config = array_filter([
+                'label' => $this->showLabelField ? ($value['label'] ?? null) : null,
+                'target' => $this->showTargetField ? ($value['target'] ?? null) : null,
+            ]);
+            $value = trim($value['value'] ?? $value[$typeId]['value'] ?? '');
 
             if (!$value) {
                 return null;
@@ -412,9 +445,10 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
 
             $typeId = $this->resolveType($value);
             $linkType = $linkTypes[$typeId] ?? Component::createComponent(self::types()[$typeId], BaseLinkType::class);
+            $config = [];
         }
 
-        return new LinkData($value, $linkType);
+        return new LinkData($value, $linkType, $config);
     }
 
     /**
@@ -452,8 +486,13 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
         }
 
         $id = $this->getInputId();
-
         $view = Craft::$app->getView();
+
+        $view->registerJsWithVars(fn($id) => <<<JS
+new Craft.LinkField($('#' + $id));
+JS, [
+            $view->namespaceInputId($id),
+        ]);
 
         if (!$value) {
             // Override the initial value being set to null by CustomField::inputHtml()
@@ -502,7 +541,7 @@ JS;
             $containerId = "$id-$typeId";
             $nsContainerId = $view->namespaceInputId($containerId);
             $selected = $typeId === $valueTypeId;
-            $typeValue = $selected ? $value?->serialize() : null;
+            $typeValue = $selected ? $value?->serialize()['value'] : null;
             $isTextLink = is_subclass_of($linkType, BaseTextLinkType::class);
             $innerHtml .=
                 Html::beginTag('div', [
@@ -512,6 +551,7 @@ JS;
                         'hidden' => !$selected,
                         'text-link' => $isTextLink,
                     ])),
+                    'data' => ['link-type' => $typeId],
                 ]) .
                 $view->namespaceInputs(
                     fn() => $linkType->inputHtml($this, $typeValue, $nsContainerId),
@@ -520,17 +560,49 @@ JS;
                 Html::endTag('div');
         }
 
-        return
+        $pane = $this->showLabelField || $this->showTargetField;
+        $html =
             Html::beginTag('div', [
                 'id' => $id,
-                'class' => array_keys(array_filter([
-                    'link-input' => true,
-                ])),
+                'class' => $pane ? ['pane', 'hairline', 'padding-m'] : null,
+            ]) .
+            Html::beginTag('div', [
+                'class' => 'link-input',
+                'data' => ['link-field' => true],
             ]) .
             Html::tag('div', $innerHtml, [
                 'class' => ['flex', 'flex-nowrap'],
             ]) .
             Html::endTag('div');
+
+        if ($this->showLabelField) {
+            $html .= Cp::textFieldHtml([
+                'fieldClass' => 'my-m',
+                'fieldAttributes' => [
+                    'data' => ['label-field' => true],
+                ],
+                'label' => Craft::t('app', 'Label'),
+                'id' => "$id-label",
+                'name' => "$this->handle[label]",
+                'value' => $value?->getLabel(true),
+                'placeholder' => $value?->getLabel(false),
+            ]);
+        }
+
+        if ($this->showTargetField) {
+            $html .= Cp::lightswitchFieldHtml([
+                'fieldClass' => 'my-m',
+                'label' => Craft::t('app', 'Open in a new tab'),
+                'id' => "$id-target",
+                'name' => "$this->handle[target]",
+                'on' => $value?->target,
+                'value' => '_blank',
+            ]);
+        }
+
+        $html .= Html::endTag('div');
+
+        return $html;
     }
 
     /**
@@ -553,8 +625,9 @@ JS;
                         return;
                     }
                     $linkType = $linkTypes[$value->type];
+                    $value = $value->serialize()['value'];
                     $error = null;
-                    if (!$linkType->validateValue($value->serialize(), $error)) {
+                    if (!$linkType->validateValue($value, $error)) {
                         /** @var string|null $error */
                         $element->addError("field:$this->handle", $error ?? Craft::t('yii', '{attribute} is invalid.', [
                             'attribute' => $this->getUiLabel(),
@@ -563,7 +636,7 @@ JS;
                     }
 
                     $stringValidator = new StringValidator(['max' => $this->maxLength]);
-                    if (!$stringValidator->validate($value->serialize(), $error)) {
+                    if (!$stringValidator->validate($value, $error)) {
                         $element->addError("field:$this->handle", $error);
                     }
                 },

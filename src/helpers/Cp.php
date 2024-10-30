@@ -1783,6 +1783,33 @@ JS, [
     }
 
     /**
+     * Renders a range input’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.5.0
+     */
+    public static function rangeHtml(array $config): string
+    {
+        return static::renderTemplate('_includes/forms/range.twig', $config);
+    }
+
+    /**
+     * Renders a lightswitch field’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.5.0
+     */
+    public static function rangeFieldHtml(array $config): string
+    {
+        $config['id'] = $config['id'] ?? 'range' . mt_rand();
+        return static::fieldHtml('template:_includes/forms/range.twig', $config);
+    }
+
+    /**
      * Renders a money input’s HTML.
      *
      * @param array $config
