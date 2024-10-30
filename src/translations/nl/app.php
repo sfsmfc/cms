@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'De werkbalk voor foutopsporing weergeven in het configuratiescherm',
     'Show the debug toolbar on the front end' => 'De werkbalk voor foutopsporing weergeven op de front-end',
     'Show the site menu' => 'Sitemenu tonen',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'Oneindig weergeven',
     'Show thumbnails and titles' => 'Miniaturen en titels tonen',
     'Show thumbnails only' => 'Alleen miniaturen tonen',
