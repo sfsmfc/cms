@@ -118,15 +118,18 @@ abstract class BaseElementLinkType extends BaseLinkType
         $view->registerJsWithVars(fn($id, $refHandle) => <<<JS
 (() => {
   const container = $('#' + $id);
+  const field = container.closest('[data-link-field]').parent().data('linkField');
   const input = container.next('input');
   const elementSelect = container.data('elementSelect');
   const refHandle = $refHandle;
   elementSelect.on('selectElements', (ev) => {
     const element = ev.elements[0];
     input.val(`{\${refHandle}:\${element.id}@\${element.siteId}:url}`);
+    field.updateLabel(element.label);
   });
   elementSelect.on('removeElements', () => {
     input.val('');
+    field.updateLabel('');
   });
 })();
 JS, [
