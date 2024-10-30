@@ -1454,6 +1454,8 @@ return [
     'Show the debug toolbar in the control panel' => 'Show the debug toolbar in the control panel',
     'Show the debug toolbar on the front end' => 'Show the debug toolbar on the front end',
     'Show the site menu' => 'Show the site menu',
+    'Show the “Label” field' => 'Show the “Label” field',
+    'Show the “Open in a new tab” field' => 'Show the “Open in a new tab” field',
     'Show them indefinitely' => 'แสดงรายการอย่างไม่ทีกำหนด',
     'Show thumbnails and titles' => 'Show thumbnails and titles',
     'Show thumbnails only' => 'Show thumbnails only',
