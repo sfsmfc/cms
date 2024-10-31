@@ -316,7 +316,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
             'value' => $type::id(),
         ])->all();
 
-        $html = Cp::sortableCheckboxSelectFieldHtml([
+        $html = Cp::checkboxSelectFieldHtml([
             'label' => Craft::t('app', 'Allowed Link Types'),
             'id' => 'types',
             'fieldClass' => 'mb-0',
@@ -325,7 +325,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
             'values' => $this->types,
             'required' => true,
             'targetPrefix' => 'types-',
-            'draggable' => true,
+            'sortable' => true,
         ]);
 
         $linkTypes = $this->getLinkTypes();

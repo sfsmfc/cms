@@ -1642,20 +1642,6 @@ JS, [
     }
 
     /**
-     * Renders a sortable checkbox select field’s HTML.
-     *
-     * @param array $config
-     * @return string
-     * @since 5.5.0
-     */
-    public static function sortableCheckboxSelectFieldHtml(array $config): string
-    {
-        $config['id'] = $config['id'] ?? 'sortablecheckboxselect' . mt_rand();
-        $config['fieldset'] = true;
-        return static::fieldHtml('template:_includes/forms/sortableCheckboxSelect.twig', $config);
-    }
-
-    /**
      * Renders a checkbox group input.
      *
      * @param array $config

@@ -3,132 +3,148 @@
 /**
  * Sortable checkbox select class
  */
-Craft.SortableCheckboxSelect = Garnish.Base.extend(
-  {
-    $container: null,
+Craft.SortableCheckboxSelect = Garnish.Base.extend({
+  $container: null,
 
-    init: function (containerId, settings) {
-      this.$container = $('#' + containerId);
+  init: function (container) {
+    this.$container = $(container);
+    this.$container.data('sortableCheckboxSelect', this);
 
-      this.setSettings(settings, Craft.SortableCheckboxSelect.defaults);
+    const $sortItems = this.$container.children(
+      '.checkbox-select-item:not(.all)'
+    );
+    if ($sortItems.length) {
+      new Garnish.DragSort($sortItems, {
+        axis: Garnish.Y_AXIS,
+        handle: '.draggable-handle',
+      });
 
-      const sortItems = this.$container.find('.draggable');
-      if (sortItems.length) {
-        let dragSort = new Garnish.DragSort(sortItems, {
-          axis: Garnish.Y_AXIS,
-          handle: '.draggable-handle',
-        });
-      }
-
-      this.$container.find('.draggable').each((key, item) => {
+      $sortItems.each((key, item) => {
         this.initItem(item);
       });
-    },
-
-    initItem: function (item) {
-      return new Craft.SortableCheckboxSelect.Item(this, item);
-    },
+    }
   },
-  {
-    defaults: {},
-  }
-);
 
-Craft.SortableCheckboxSelect.Item = Garnish.Base.extend(
-  {
-    $selectContainer: null,
-    $item: null,
-    $actionMenu: null,
-    actionDisclosure: null,
-    $actionMenuOptions: null,
-
-    init: function (select, item, settings) {
-      this.$selectContainer = select.$container;
-      this.$item = $(item);
-
-      this.setSettings(settings, Craft.SortableCheckboxSelect.Item.defaults);
-
-      const $actionMenuBtn = this.$item.find('> .action-btn');
-      const actionDisclosure =
-        $actionMenuBtn.data('trigger') ||
-        new Garnish.DisclosureMenu($actionMenuBtn);
-
-      this.$actionMenu = actionDisclosure.$container;
-      this.actionDisclosure = actionDisclosure;
-
-      actionDisclosure.on('show', () => {
-        this.$item.addClass('active');
-        if (this.$item.prev('.draggable').length) {
-          this.$actionMenu
-            .find('button[data-action=moveUp]:first')
-            .parent()
-            .removeClass('hidden');
-        } else {
-          this.$actionMenu
-            .find('button[data-action=moveUp]:first')
-            .parent()
-            .addClass('hidden');
-        }
-        if (this.$item.next('.draggable').length) {
-          this.$actionMenu
-            .find('button[data-action=moveDown]:first')
-            .parent()
-            .removeClass('hidden');
-        } else {
-          this.$actionMenu
-            .find('button[data-action=moveDown]:first')
-            .parent()
-            .addClass('hidden');
-        }
-      });
-
-      this.$actionMenuOptions = this.$actionMenu.find('button[data-action]');
-
-      this.addListener(
-        this.$actionMenuOptions,
-        'activate',
-        this.handleActionClick
-      );
-    },
-
-    handleActionClick: function (event) {
-      event.preventDefault();
-      this.onActionSelect(event.target);
-    },
-
-    onActionSelect: function (option) {
-      const $option = $(option);
-
-      switch ($option.data('action')) {
-        case 'moveUp': {
-          this.moveUp();
-          break;
-        }
-
-        case 'moveDown': {
-          this.moveDown();
-          break;
-        }
-      }
-
-      this.actionDisclosure.hide();
-    },
-
-    moveUp: function () {
-      let $prev = this.$item.prev('.draggable');
-      if ($prev.length) {
-        this.$item.insertBefore($prev);
-      }
-    },
-
-    moveDown: function () {
-      let $next = this.$item.next('.draggable');
-      if ($next.length) {
-        this.$item.insertAfter($next);
-      }
-    },
+  initItem: function (item) {
+    return new Craft.SortableCheckboxSelect.Item(this, item);
   },
-  {
-    defaults: {},
-  }
-);
+});
+
+Craft.SortableCheckboxSelect.Item = Garnish.Base.extend({
+  select: null,
+  $item: null,
+  $moveHandle: null,
+  $checkbox: null,
+  $actionMenuBtn: null,
+  $actionMenu: null,
+  actionDisclosure: null,
+  moveUpBtn: null,
+  moveDownBtn: null,
+
+  init: function (select, item) {
+    this.select = select;
+    this.$item = $(item);
+    this.$moveHandle = this.$item.children('.move');
+    this.$checkbox = this.$item.children('input[type=checkbox]');
+
+    this.addListener(this.$checkbox, 'change', () => {
+      this.handleCheckboxChange();
+    });
+
+    this.handleCheckboxChange();
+  },
+
+  handleCheckboxChange: function () {
+    if (this.$checkbox.prop('checked')) {
+      this.onCheck();
+    } else {
+      this.onUncheck();
+    }
+  },
+
+  onCheck: function () {
+    if (this.$actionMenuBtn) {
+      this.onUncheck();
+    }
+
+    this.$moveHandle.removeClass('disabled');
+
+    const menuId = 'menu-' + Math.floor(Math.random() * 1000000000);
+    this.$actionMenuBtn = $('<button/>', {
+      class: 'btn action-btn',
+      'aria-controls': menuId,
+      'aria-label': Craft.t('app', 'Actions'),
+      'data-disclosure-trigger': '',
+      'data-icon': 'ellipsis',
+    }).appendTo(this.$item);
+    this.$actionMenu = $('<div/>', {
+      id: menuId,
+      class: 'menu menu--disclosure',
+    }).appendTo(this.$item);
+
+    this.actionDisclosure = new Garnish.DisclosureMenu(this.$actionMenuBtn);
+    this.moveUpBtn = this.actionDisclosure.addItem({
+      icon: 'arrow-up',
+      label: Craft.t('app', 'Move up'),
+      onActivate: () => {
+        this.moveUp();
+      },
+    });
+    this.moveDownBtn = this.actionDisclosure.addItem({
+      icon: 'arrow-down',
+      label: Craft.t('app', 'Move down'),
+      onActivate: () => {
+        this.moveDown();
+      },
+    });
+
+    this.actionDisclosure.on('show', () => {
+      if (this.getPrevCheckedItem()) {
+        this.actionDisclosure.showItem(this.moveUpBtn);
+      } else {
+        this.actionDisclosure.hideItem(this.moveUpBtn);
+      }
+      if (this.getNextCheckedItem()) {
+        this.actionDisclosure.showItem(this.moveDownBtn);
+      } else {
+        this.actionDisclosure.hideItem(this.moveDownBtn);
+      }
+    });
+  },
+
+  onUncheck: function () {
+    this.$moveHandle?.addClass('disabled');
+    this.$actionMenuBtn?.remove();
+    this.$actionMenu?.remove();
+    this.actionDisclosure?.destroy();
+    this.$actionMenuBtn = this.actionDisclosure = null;
+  },
+
+  getPrevCheckedItem: function () {
+    const $item = this.$item.prevAll(
+      '.checkbox-select-item:not(.all):has(input[type=checkbox]:checked):first'
+    );
+    return $item.length ? $item : null;
+  },
+
+  getNextCheckedItem: function () {
+    const $item = this.$item.nextAll(
+      '.checkbox-select-item:not(.all):has(input[type=checkbox]:checked):first'
+    );
+    return $item.length ? $item : null;
+  },
+
+  moveUp: function () {
+    const $prev = this.getPrevCheckedItem();
+    if ($prev) {
+      this.$item.insertBefore($prev);
+    }
+  },
+
+  moveDown: function () {
+    const $next = this.getNextCheckedItem();
+    if ($next) {
+      this.$item.insertAfter($next);
+    }
+  },
+});
