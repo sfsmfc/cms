@@ -90,6 +90,7 @@ import './js/PromptHandler.js';
 import './js/SlidePicker.js';
 import './js/SlideRuleInput.js';
 import './js/SlugGenerator.js';
+import './js/SortableCheckboxSelect.js';
 import './js/Structure.js';
 import './js/StructureDrag.js';
 import './js/TableElementIndexView.js';
