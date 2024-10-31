@@ -2752,7 +2752,7 @@ JS,[
             switch ($this->kind) {
                 case Asset::KIND_VIDEO:
                     $previewInner =
-                        Html::tag('video', null, [
+                        Html::tag('video', '', [
                             'class' => 'preview-thumb',
                             'src' => $this->url,
                             'controls' => true,
@@ -2761,7 +2761,7 @@ JS,[
                     break;
                 case Asset::KIND_AUDIO:
                     $previewInner =
-                        Html::tag('audio', null, [
+                        Html::tag('audio', '', [
                             'class' => 'preview-thumb',
                             'src' => $this->url,
                             'controls' => true,
