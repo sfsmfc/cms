@@ -429,7 +429,12 @@ class DateTimeHelperTest extends TestCase
      */
     public function testRelativeTimeToSeconds(int $expected, int $number, string $unit): void
     {
-        self::assertSame($expected, DateTimeHelper::relativeTimeToSeconds($number, $unit));
+        // account for DST changes
+        self::assertContains(DateTimeHelper::relativeTimeToSeconds($number, $unit), [
+            $expected,
+            $expected + (60 * 60),
+            $expected - (60 * 60),
+        ]);
     }
 
     /**
