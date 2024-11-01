@@ -1,11 +1,4 @@
-import {
-  arrow,
-  autoUpdate,
-  computePosition,
-  flip,
-  offset,
-  shift,
-} from '@floating-ui/dom';
+import {arrow, autoUpdate, computePosition, flip, offset, shift} from '@floating-ui/dom';
 
 /**
  * Tooltip
@@ -72,7 +65,6 @@ class CraftTooltip extends HTMLElement {
       ['mouseenter', this.show, this.delay],
       ['click', this.toggle],
       ['focus', this.show],
-      ['mouseleave', this.hide],
       ['blur', this.hide],
     ];
 
@@ -181,6 +173,9 @@ class CraftTooltip extends HTMLElement {
 
       // Close on ESC
       document.addEventListener('keyup', this.handleKeyUp);
+
+      // Only close when leaving the entire element, not just the trigger
+      this.addEventListener('mouseleave', this.hide);
     }, delay);
   };
 
@@ -196,6 +191,9 @@ class CraftTooltip extends HTMLElement {
     });
 
     this.showing = false;
+
+    document.removeEventListener('keyup', this.handleKeyUp);
+    this.removeEventListener('mouseleave', this.hide);
   };
 
   getInitialTransform() {
