@@ -33,10 +33,10 @@ class UrlTest extends TestCase
             ['/some-relative-url', false, [
                 'allowRootRelativeUrls' => false,
             ]],
-            ['https://testing.com#with-anchor', false, [
+            ['#anchor', false, [
                 'allowAnchors' => false,
             ]],
-            ['https://testing.com#with-anchor', true, [
+            ['#anchor', true, [
                 'allowAnchors' => true,
             ]],
         ];
