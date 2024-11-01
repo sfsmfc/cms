@@ -2211,6 +2211,9 @@ JS, [
                 ->uid($elementUid)
                 ->siteId($siteId)
                 ->preferSites($preferSites)
+                // when autosaveDrafts is off, we need to factor in drafts
+                // https://github.com/craftcms/cms/issues/15985
+                ->drafts(!Craft::$app->getConfig()->getGeneral()->autosaveDrafts)
                 ->unique()
                 ->status(null)
                 ->one();
