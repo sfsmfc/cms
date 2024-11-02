@@ -51,12 +51,15 @@
 - Added `craft\elements\db\NestedElementQueryTrait`. ([#15894](https://github.com/craftcms/cms/pull/15894))
 - Added `craft\events\ApplyFieldSaveEvent`. ([#15872](https://github.com/craftcms/cms/discussions/15872))
 - Added `craft\events\DefineAddressCountriesEvent`. ([#15711](https://github.com/craftcms/cms/pull/15711))
+- Added `craft\fieldlayoutelements\Template::$templateMode`. ([#15932](https://github.com/craftcms/cms/pull/15932))
 - Added `craft\fields\data\LinkData::$target`.
 - Added `craft\fields\data\LinkData::setLabel()`.
 - Added `craft\filters\BasicHttpAuthLogin`. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added `craft\filters\BasicHttpAuthStatic`. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added `craft\filters\ConditionalFilterTrait`. ([#15948](https://github.com/craftcms/cms/pull/15948))
 - Added `craft\filters\UtilityAccess`.
+- Added `craft\helpers\Console::$outputCount`.
+- Added `craft\helpers\Console::$prependNewline`.
 - Added `craft\helpers\Console::indent()`.
 - Added `craft\helpers\Console::indentStr()`.
 - Added `craft\helpers\Console::outdent()`.
@@ -64,16 +67,13 @@
 - Added `craft\helpers\Cp::rangeHtml()`. ([#15972](https://github.com/craftcms/cms/pull/15972))
 - Added `craft\helpers\StringHelper::firstLine()`.
 - Added `craft\helpers\UrlHelper::encodeUrl()`. ([#15838](https://github.com/craftcms/cms/issues/15838))
+- Added `craft\models\FieldLayout::prependElements()`.
 - Added `craft\services\Addresses::EVENT_DEFINE_ADDRESS_COUNTRIES`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\services\Addresses::getCountryList()`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\services\Fields::EVENT_BEFORE_APPLY_FIELD_SAVE`. ([#15872](https://github.com/craftcms/cms/discussions/15872))
 - Added `craft\services\Users::getMaxUsers()`.
 - Added `craft\web\View::registerCpTwigExtension()`.
 - Added `craft\web\View::registerSiteTwigExtension()`.
-- Added `craft\helpers\Console::$outputCount`.
-- Added `craft\helpers\Console::$prependNewline`.
-- Added `craft\fieldlayoutelements\Template::$templateMode`. ([#15932](https://github.com/craftcms/cms/pull/15932))
-- Added `craft\models\FieldLayout::prependElements()`.
 - `craft\fields\data\LinkData::getLabel()` now has a `$custom` argument.
 - `craft\helpers\Console::output()` now prepends an indent to each line of the passed-in string, if `indent()` had been called prior.
 - Deprecated the `enableBasicHttpAuth` config setting. `craft\filters\BasicHttpAuthLogin` should be used instead. ([#15720](https://github.com/craftcms/cms/pull/15720))
