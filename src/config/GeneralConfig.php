@@ -1071,6 +1071,7 @@ class GeneralConfig extends BaseConfig
      *
      * @group Security
      * @since 3.5.0
+     * @deprecated in 4.13.0. [[\craft\filters\BasicHttpAuthLogin]] should be used instead.
      */
     public bool $enableBasicHttpAuth = false;
 
@@ -3963,6 +3964,10 @@ class GeneralConfig extends BaseConfig
      */
     public function defaultCountryCode(string $value): self
     {
+        if (empty($value)) {
+            throw new InvalidConfigException('`defaultCountryCode` cannot be empty', 0);
+        }
+
         $this->defaultCountryCode = $value;
         return $this;
     }

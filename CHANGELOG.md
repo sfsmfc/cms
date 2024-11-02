@@ -1,5 +1,39 @@
 # Release Notes for Craft CMS 4
 
+## Unreleased
+
+- Fixed a styling bug.
+
+## 4.12.8 - 2024-10-22
+
+- The `install` command now runs through database connection setup, if Craft can’t yet connect to the database. ([#15943](https://github.com/craftcms/cms/issues/15943))
+- Fixed a bug where admin table header cells weren’t indicating when they were sorted. ([#15897](https://github.com/craftcms/cms/issues/15897))
+- Fixed an error that occurred when creating a database backup, if the System Name contained any quote-like characters. ([#15933](https://github.com/craftcms/cms/issues/15933))
+- Fixed a bug where buttons could bleed out of their containers. ([#15931](https://github.com/craftcms/cms/issues/15931), [#15946](https://github.com/craftcms/cms/pull/15946))
+- Fixed a PHP error. ([#15915](https://github.com/craftcms/cms/issues/15915))
+- Fixed an information disclosure vulnerability.
+
+## 4.12.7 - 2024-10-15
+
+- Fixed a privilege escalation vulnerability.
+
+## 4.12.6.1 - 2024-10-09
+
+- Custom field condition rules are now ignored if they reference a field with an incompatible type. ([#15850](https://github.com/craftcms/cms/issues/15850))
+
+## 4.12.6 - 2024-10-08
+
+- The Plugin Store now displays plugin ratings and reviews. ([#15860](https://github.com/craftcms/cms/pull/15860))
+- An `InvalidConfigException` is now thrown if the `defaultCountryCode` config setting is set to an empty string. ([#15812](https://github.com/craftcms/cms/pull/15812))
+- Fixed an error that could occur when saving an element, if a Date field’s time zone input was focused.
+- Fixed a bug where the time zones listed in Date fields weren’t labelled properly based on the selected date. ([#15805](https://github.com/craftcms/cms/issues/15805))
+- Fixed an error that could occur if a native element property was attempted to be eager-loaded. ([#15822](https://github.com/craftcms/cms/issues/15822))
+- Fixed errors that could occur if a custom source or field condition referenced a custom field whose type had changed. ([#15850](https://github.com/craftcms/cms/issues/15850))
+- Fixed a bug where disclosure menus weren’t sticking to their trigger element as it was scrolled, if it was within a slideout or other inline-scrollable container. ([#15852](https://github.com/craftcms/cms/issues/15852))
+- Fixed a bug where the default backup command for MySQL was exporting triggers twice. ([#15854](https://github.com/craftcms/cms/pull/15854))
+- Fixed a bug where Multi-select fields were saving the selected options in the user-selected order rather than the field-defined order. ([#15857](https://github.com/craftcms/cms/issues/15857))
+- Fixed a missing authorization vulnerability.
+
 ## 4.12.5 - 2024-09-27
 
 - Fixed a bug where entries’ `deletedWithEntryType` values in the `entries` table weren’t getting set back to `null` after being restored.
@@ -516,7 +550,7 @@
 - Fixed a SQL error that occurred when setting the Max Length of a URL field beyond what’s allowed by a `varchar` column. ([#14408](https://github.com/craftcms/cms/issues/14408))
 - Fixed a bug where `data-target` and `data-reverse-target` attributes weren’t getting properly namespaced if they included a class name selector.
 - Fixed the type annotation for `craft\behaviors\CustomFieldBehavior::$fieldHandles`. ([#14421](https://github.com/craftcms/cms/issues/14421))
-- Fixed a bug where the <kbd>Shift</kbd> + <kbd>Spacebar</kbd> keyboard shortcut for previewing assets was only working for the first selected asset, rather than the focussed one.
+- Fixed a bug where the <kbd>Shift</kbd> + <kbd>Spacebar</kbd> keyboard shortcut for previewing assets was only working for the first selected asset, rather than the focused one.
 - Fixed a JavaScript error that could occur when previewing an image.
 - Fixed a bug where PHP errors that occurred during bootstrap weren’t getting logged to `stderr` for console requests. ([#14424](https://github.com/craftcms/cms/pull/14424))
 - Fixed a bug where disabled elements and drafts weren’t automatically getting propagated to newly-created sites, when appropriate.
