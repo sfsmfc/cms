@@ -18,6 +18,12 @@
 - Added `craft\filters\BasicHttpAuthStatic`. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added `craft\filters\ConditionalFilterTrait`. ([#15948](https://github.com/craftcms/cms/pull/15948))
 - Added `craft\filters\UtilityAccess`.
+- Added `craft\helpers\Session::addFlash()`.
+- Added `craft\helpers\Session::getAllFlashes()`.
+- Added `craft\helpers\Session::getFlash()`.
+- Added `craft\helpers\Session::hasFlash()`.
+- Added `craft\helpers\Session::removeAllFlashes()`.
+- Added `craft\helpers\Session::removeFlash()`.
 - Added `craft\helpers\UrlHelper::encodeUrl()`. ([#15838](https://github.com/craftcms/cms/issues/15838))
 - Added `craft\log\MonologTarget::getAllowLineBreaks()`.
 - Added `craft\log\MonologTarget::getFormatter()`.
