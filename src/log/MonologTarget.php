@@ -2,7 +2,6 @@
 
 namespace craft\log;
 
-use Closure;
 use Craft;
 use craft\helpers\App;
 use craft\helpers\ArrayHelper;
