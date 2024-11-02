@@ -172,6 +172,8 @@ Craft.FieldToggle = Garnish.Base.extend({
 
       delete this.onToggleChange._show;
     }
+
+    this.trigger('toggleChange');
   },
 
   showTarget: function ($target) {
