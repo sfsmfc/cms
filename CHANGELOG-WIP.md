@@ -19,11 +19,19 @@
 - Added `craft\filters\ConditionalFilterTrait`. ([#15948](https://github.com/craftcms/cms/pull/15948))
 - Added `craft\filters\UtilityAccess`.
 - Added `craft\helpers\UrlHelper::encodeUrl()`. ([#15838](https://github.com/craftcms/cms/issues/15838))
+- Added `craft\log\MonologTarget::getAllowLineBreaks()`.
+- Added `craft\log\MonologTarget::getFormatter()`.
+- Added `craft\log\MonologTarget::getLevel()`.
+- Added `craft\log\MonologTarget::getMaxFiles()`.
+- Added `craft\log\MonologTarget::getName()`.
+- Added `craft\log\MonologTarget::getProcessor()`.
+- Added `craft\log\MonologTarget::getUseMicrosecondTimestamps()`.
 - Added `craft\services\Addresses::EVENT_DEFINE_ADDRESS_COUNTRIES`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\services\Addresses::getCountryList()`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\services\Fields::EVENT_BEFORE_APPLY_FIELD_SAVE`. ([#15872](https://github.com/craftcms/cms/discussions/15872))
 - Added `craft\web\View::registerCpTwigExtension()`.
 - Added `craft\web\View::registerSiteTwigExtension()`.
+- Improved support for creating log targets for third party logging services. ([#14974](https://github.com/craftcms/cms/pull/14974))
 - Deprecated the `enableBasicHttpAuth` config setting. `craft\filters\BasicHttpAuthLogin` should be used instead. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added the `serializeForm` event to `Craft.ElementEditor`. ([#15794](https://github.com/craftcms/cms/discussions/15794))
 
