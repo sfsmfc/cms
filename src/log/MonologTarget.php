@@ -5,6 +5,7 @@ namespace craft\log;
 use Closure;
 use Craft;
 use craft\helpers\App;
+use craft\helpers\ArrayHelper;
 use DateTimeZone;
 use Illuminate\Support\Collection;
 use Monolog\Formatter\FormatterInterface;
@@ -85,8 +86,7 @@ class MonologTarget extends PsrTarget
     public function __construct($config = [])
     {
         // Store and unset logger, so we can create it with a closure
-        $logger = $config['logger'] ?? null;
-        unset($config['logger']);
+        $logger = ArrayHelper::remove($config, 'logger');
 
         parent::__construct($config);
 
