@@ -67,6 +67,13 @@
 - Added `craft\helpers\Cp::rangeHtml()`. ([#15972](https://github.com/craftcms/cms/pull/15972))
 - Added `craft\helpers\StringHelper::firstLine()`.
 - Added `craft\helpers\UrlHelper::encodeUrl()`. ([#15838](https://github.com/craftcms/cms/issues/15838))
+- Added `craft\log\MonologTarget::getAllowLineBreaks()`.
+- Added `craft\log\MonologTarget::getFormatter()`.
+- Added `craft\log\MonologTarget::getLevel()`.
+- Added `craft\log\MonologTarget::getMaxFiles()`.
+- Added `craft\log\MonologTarget::getName()`.
+- Added `craft\log\MonologTarget::getProcessor()`.
+- Added `craft\log\MonologTarget::getUseMicrosecondTimestamps()`.
 - Added `craft\models\FieldLayout::prependElements()`.
 - Added `craft\services\Addresses::EVENT_DEFINE_ADDRESS_COUNTRIES`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\services\Addresses::getCountryList()`. ([#15711](https://github.com/craftcms/cms/pull/15711))
@@ -76,6 +83,7 @@
 - Added `craft\web\View::registerSiteTwigExtension()`.
 - `craft\fields\data\LinkData::getLabel()` now has a `$custom` argument.
 - `craft\helpers\Console::output()` now prepends an indent to each line of the passed-in string, if `indent()` had been called prior.
+- Improved support for creating log targets for third party logging services. ([#14974](https://github.com/craftcms/cms/pull/14974))
 - Deprecated the `enableBasicHttpAuth` config setting. `craft\filters\BasicHttpAuthLogin` should be used instead. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added the `serializeForm` event to `Craft.ElementEditor`. ([#15794](https://github.com/craftcms/cms/discussions/15794))
 - Added the `range()` and `rangeField()` macros to `_includes/forms.twig`. ([#15972](https://github.com/craftcms/cms/pull/15972))
