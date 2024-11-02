@@ -224,12 +224,20 @@ class MonologTarget extends PsrTarget
         $this->_setLoggerProperty('name', $name);
     }
 
+    /**
+     * Returns the log target’s name.
+     *
+     * @return string
+     * @since 4.13.0
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
     /**
+     * Sets whether the log target should allow line breaks.
+     *
      * @param bool $allowLineBreaks
      * @throws InvalidConfigException
      */
@@ -238,12 +246,20 @@ class MonologTarget extends PsrTarget
         $this->_setLoggerProperty('allowLineBreaks', $allowLineBreaks);
     }
 
+    /**
+     * Returns whether the log target should allow line breaks.
+     *
+     * @return bool
+     * @since 4.13.0
+     */
     public function getAllowLineBreaks(): bool
     {
         return $this->allowLineBreaks;
     }
 
     /**
+     * Sets the log level.
+     *
      * @param string|null $level
      * @throws InvalidConfigException
      */
@@ -252,12 +268,20 @@ class MonologTarget extends PsrTarget
         $this->_setLoggerProperty('level', $level);
     }
 
+    /**
+     * Returns the log level.
+     *
+     * @return string
+     * @since 4.13.0
+     */
     public function getLevel(): string
     {
         return $this->level;
     }
 
     /**
+     * Sets the maximum number of log files to store.
+     *
      * @param int $maxFiles
      * @throws InvalidConfigException
      */
@@ -266,12 +290,20 @@ class MonologTarget extends PsrTarget
         $this->_setLoggerProperty('maxFiles', $maxFiles);
     }
 
+    /**
+     * Returns the maximum number of log files to store.
+     *
+     * @return int
+     * @since 4.13.0
+     */
     public function getMaxFiles(): int
     {
         return $this->maxFiles;
     }
 
     /**
+     * Sets whether logs should show microseconds in timestamps.
+     *
      * @param bool $useMicrosecondTimestamps
      * @throws InvalidConfigException
      */
@@ -280,12 +312,20 @@ class MonologTarget extends PsrTarget
         $this->_setLoggerProperty('useMicrosecondTimestamps', $useMicrosecondTimestamps);
     }
 
+    /**
+     * Returns whether logs should show microseconds in timestamps.
+     *
+     * @return bool
+     * @since 4.13.0
+     */
     public function getUseMicrosecondTimestamps(): bool
     {
         return $this->useMicrosecondTimestamps;
     }
 
     /**
+     * Sets the log formatter.
+     *
      * @param FormatterInterface|null $formatter
      * @throws InvalidConfigException
      */
@@ -294,12 +334,20 @@ class MonologTarget extends PsrTarget
         $this->_setLoggerProperty('formatter', $formatter);
     }
 
+    /**
+     * Returns the log formatter.
+     *
+     * @return FormatterInterface|null
+     * @since 4.13.0
+     */
     public function getFormatter(): ?FormatterInterface
     {
         return $this->formatter;
     }
 
     /**
+     * Sets the log processor.
+     *
      * @param ProcessorInterface|null $processor
      * @throws InvalidConfigException
      */
@@ -308,6 +356,12 @@ class MonologTarget extends PsrTarget
         $this->_setLoggerProperty('processor', $processor);
     }
 
+    /**
+     * Returns the log processor.
+     *
+     * @return ProcessorInterface|null
+     * @since 4.13.0
+     */
     public function getProcessor(): ?ProcessorInterface
     {
         return $this->processor;
