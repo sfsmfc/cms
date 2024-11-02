@@ -99,7 +99,7 @@ class MonologTarget extends PsrTarget
 
         $this->logger = match (true) {
             $logger instanceof Logger => $logger,
-            $logger instanceof Closure => $logger($this),
+            is_callable($logger) => $logger($this),
             default => $this->_createDefaultLogger(),
         };
     }
