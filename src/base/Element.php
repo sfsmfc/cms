@@ -2888,7 +2888,9 @@ abstract class Element extends Component implements ElementInterface
                 ->ignorePlaceholders();
 
             if ($this instanceof NestedElementInterface && $query instanceof NestedElementQueryInterface) {
-                $query->ownerId($this->getOwnerId());
+                $query
+                    ->fieldId($this->getField()?->id)
+                    ->ownerId($this->getOwnerId());
             }
 
             $this->$prop = $query->one();
