@@ -1655,8 +1655,10 @@ Craft.ElementEditor = Garnish.Base.extend(
         );
       }
 
-      for (const [name, value] of Object.entries(this.settings.saveParams)) {
-        params.push(`${this.namespaceInputName(name)}=${value}`);
+      if (this.settings.saveParams) {
+        for (const [name, value] of Object.entries(this.settings.saveParams)) {
+          params.push(`${this.namespaceInputName(name)}=${value}`);
+        }
       }
 
       return asArray ? params : params.join('&');
@@ -2305,7 +2307,7 @@ Craft.ElementEditor = Garnish.Base.extend(
       ownerId: null,
       siteId: null,
       siteStatuses: [],
-      saveParams: {},
+      saveParams: null,
       siteToken: null,
       visibleLayoutElements: {},
       updatedTimestamp: null,

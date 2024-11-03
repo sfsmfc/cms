@@ -55,13 +55,15 @@ Craft.ElementEditorSlideout = Craft.CpScreenSlideout.extend(
         }
 
         this.elementEditor.on('beforeSubmit', () => {
-          Object.keys(this.settings.saveParams).forEach((name) => {
-            $('<input/>', {
-              class: 'hidden',
-              name: this.elementEditor.namespaceInputName(name),
-              value: this.settings.saveParams[name],
-            }).appendTo(this.$container);
-          });
+          if (this.settings.saveParams) {
+            Object.keys(this.settings.saveParams).forEach((name) => {
+              $('<input/>', {
+                class: 'hidden',
+                name: this.elementEditor.namespaceInputName(name),
+                value: this.settings.saveParams[name],
+              }).appendTo(this.$container);
+            });
+          }
           this.showSubmitSpinner();
         });
         this.elementEditor.on('afterSubmit', () => {
@@ -191,7 +193,7 @@ Craft.ElementEditorSlideout = Craft.CpScreenSlideout.extend(
       elementType: null,
       siteId: null,
       prevalidate: false,
-      saveParams: {},
+      saveParams: null,
       onSaveElement: null,
       validators: [],
       expandData: [],
