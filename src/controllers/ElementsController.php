@@ -948,7 +948,10 @@ class ElementsController extends Controller
             $components = [];
 
             if ($element->id) {
-                $components[] = Html::hiddenInput('elementId', (string)$element->getCanonicalId());
+                // don't use the canonical ID if this is a normal element that's keeping track of its canonical
+                // e.g. nested Matrix entries that were duplicated for an owner's draft
+                $id = $element->getIsDraft() || $element->getIsRevision() ? $element->getCanonicalId() : $element->id;
+                $components[] = Html::hiddenInput('elementId', (string)$id);
             }
 
             if ($element->siteId) {
