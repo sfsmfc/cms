@@ -1,6 +1,8 @@
 # Release Notes for Craft CMS 5.5 (WIP)
 
 ### Content Management
+- When saving a nested element within a Matrix/Addresses field in card view, the changes are now saved to a draft of the owner element, rather than published immediately. ([#16002](https://github.com/craftcms/cms/pull/16002))
+- Nested element cards now show status indicators if they are new or contain unpublished changes. ([#16002](https://github.com/craftcms/cms/pull/16002))
 - Improved the styling of element cards with thumbnails. ([#15692](https://github.com/craftcms/cms/pull/15692), [#15673](https://github.com/craftcms/cms/issues/15673))
 - Elements within element selection inputs now have “Replace” actions.
 - Entry types listed within entry indexes now show their icon and color. ([#15922](https://github.com/craftcms/cms/discussions/15922))
@@ -89,6 +91,7 @@
 - Added `craft\web\View::registerSiteTwigExtension()`.
 - `craft\fields\data\LinkData::getLabel()` now has a `$custom` argument.
 - `craft\helpers\Console::output()` now prepends an indent to each line of the passed-in string, if `indent()` had been called prior.
+- Added the `elements/save-nested-element-for-draft` action. ([#16002](https://github.com/craftcms/cms/pull/16002))
 - Improved support for creating log targets for third party logging services. ([#14974](https://github.com/craftcms/cms/pull/14974))
 - Deprecated the `enableBasicHttpAuth` config setting. `craft\filters\BasicHttpAuthLogin` should be used instead. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added the `serializeForm` event to `Craft.ElementEditor`. ([#15794](https://github.com/craftcms/cms/discussions/15794))
