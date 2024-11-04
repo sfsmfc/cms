@@ -405,40 +405,47 @@ $gridColor: var(--gray-100);
 }
 
 // card view designer
-.card-view-designer {
-  .cvd-container {
-    display: flex;
-    align-items: stretch;
-    position: relative;
-    overflow: hidden;
-    box-shadow: none;
+.cvd-container {
+  display: grid;
+  grid-template-columns: minmax(20%, 300px) 1fr;
+  position: relative;
+  overflow: hidden;
+  box-shadow: none;
+  gap: var(--xl);
+}
 
-    .cvd-library {
-      flex-grow: 1;
-    }
-
-    .cvd-preview {
-      flex-grow: 2;
-      padding-inline: $base 0;
-      padding-block: 0 $base;
-
-      &:not(.loading) .spinner {
-        display: none;
-      }
-    }
-  }
+.cvd-library {
+  flex-grow: 1;
 
   .draggable {
     display: flex;
   }
+}
 
-  .card-placeholder {
-    display: inline-block;
-    border: 1px dashed mixins.$grey300;
-    border-radius: var(--small-border-radius);
-    padding-block: 0.1em;
-    padding-inline: 0.5em;
+.cvd-preview {
+  &:not(.loading) .spinner {
+    display: none;
   }
+}
+
+.cvd-thumbnail {
+  --icon-size: 2rem;
+  --icon-color: var(--gray-300);
+  width: 100%;
+  aspect-ratio: 4/3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--gray-150);
+  border-radius: var(--medium-border-radius);
+}
+
+.card-placeholder {
+  display: inline-block;
+  border: 1px dashed mixins.$grey300;
+  border-radius: var(--small-border-radius);
+  padding-block: 0.1em;
+  padding-inline: 0.5em;
 }
 
 .field.cvd-field {

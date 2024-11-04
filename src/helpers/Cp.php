@@ -22,7 +22,6 @@ use craft\base\Statusable;
 use craft\base\Thumbable;
 use craft\behaviors\DraftBehavior;
 use craft\elements\Address;
-use craft\elements\Entry;
 use craft\enums\CmsEdition;
 use craft\enums\Color;
 use craft\enums\MenuItemType;
@@ -2462,11 +2461,11 @@ JS, [
             Html::beginTag('div', ['class' => 'cvd-library']) .
             $checkboxes .
             Html::endTag('div') . // .cvd-library
-            Html::beginTag('div',  ['class' => 'cvd-preview']) .
-            Html::tag('h3', Craft::t('app','Card Layout Preview'), [
+            Html::beginTag('div', ['class' => 'cvd-preview']) .
+            Html::tag('h3', Craft::t('app', 'Card Layout Preview'), [
                 'class' => 'visually-hidden',
             ]) .
-            Html::tag('p', Craft::t('app','The following content is for preview only.'), [
+            Html::tag('p', Craft::t('app', 'The following content is for preview only.'), [
                 'class' => 'visually-hidden',
             ]) .
             $previewHtml .
@@ -2507,21 +2506,6 @@ JS, [
         $elementType = new ($fieldLayout['type']);
         $labels = [$elementType::hasStatuses() ? static::componentStatusLabelHtml($elementType) : null];
 
-        // get thumb placeholder
-        $thumbSvg = null;
-        if ($showThumb) {
-            $thumbSvg = file_get_contents(Craft::getAlias('@app/elements/thumbs/file.svg'));
-            if ($thumbSvg) {
-                $thumbSvg = Html::svg($thumbSvg, false, true);
-                $thumbSvg = Html::modifyTagAttributes($thumbSvg, ['role' => 'img']);
-                $thumbSvg = Html::tag('div', $thumbSvg, [
-                    'class' => array_filter([
-                        'thumb',
-                        null,
-                    ]),
-                ]);
-            }
-        }
 
         $previewHtml =
             Html::beginTag('div', [
@@ -2533,9 +2517,16 @@ JS, [
                 ]),
             ]);
 
-        if ($thumbSvg) {
-            $previewHtml .= Html::tag('div', $thumbSvg, ['class' => ['thumb', 'checkered']]);
+        // get thumb placeholder
+        if ($showThumb) {
+            $previewThumb = Html::tag('div',
+                Html::tag('div', Cp::iconSvg('image'), ['class' => 'cp-icon']),
+                ['class' => 'cvd-thumbnail']
+            );
+
+            $previewHtml .= Html::tag('div', $previewThumb, ['class' => ['thumb']]);
         }
+
 
         $previewHtml .=
             Html::beginTag('div', [
