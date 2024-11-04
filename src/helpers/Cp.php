@@ -2439,6 +2439,197 @@ JS, [
     }
 
     /**
+     * Renders a card view designer.
+     *
+     * @param FieldLayout $fieldLayout
+     * @param array $config
+     * @return string
+     * @since 5.5.0
+     */
+    public static function cardViewDesignerHtml(FieldLayout $fieldLayout, array $config = []): string
+    {
+        $config += [
+            'id' => 'cvd' . mt_rand(),
+        ];
+
+        // get the attributes that are set to be visible in the card body
+        $selectedCardAttributes = $fieldLayout->getCardBodyAttributes();
+
+        // get remaining attributes
+        $elementType = new ($fieldLayout['type']);
+        $remainingItems = $elementType::cardAttributes();
+        foreach ($remainingItems as $key => $cardAttributes) {
+            if (isset($selectedCardAttributes[$key])) {
+                unset($remainingItems[$key]);
+            } else {
+                $remainingItems[$key]['value'] = $key;
+            }
+        }
+
+        // get all the previewable fields
+        // and split them between those visible in the card's body and remaining ones
+        $fldOptions = [];
+        foreach ($fieldLayout->getAllElements() as $layoutElement) {
+            if (
+                $layoutElement instanceof BaseField &&
+                $layoutElement->previewable()
+            ) {
+                if ($layoutElement->includeInCards) {
+                    $fldOptions['layoutElement:' . $layoutElement->uid] = [
+                        'label' => $layoutElement->label(),
+                        'value' => 'layoutElement:' . $layoutElement->uid,
+                    ];
+                } else {
+                    $remainingItems['layoutElement:' . $layoutElement->uid] = [
+                        'label' => $layoutElement->label(),
+                        'value' => 'layoutElement:' . $layoutElement->uid,
+                    ];
+                }
+            }
+        }
+
+        // merge selected card attributes with selected fields
+        $selectedOptions = array_merge($fldOptions, $selectedCardAttributes);
+
+        // make sure we don't have any cardViewValues that are no longer allowed to show in cards
+        $cardViewValues = $fieldLayout->getCardView();
+        $cardViewValues = array_filter($cardViewValues, function($value) use ($selectedOptions) {
+            return isset($selectedOptions[$value]);
+        });
+
+        // sort all selected options by the cardView order
+        $selectedOptions = array_replace(
+            array_flip($cardViewValues),
+            $selectedOptions
+        );
+
+        // sort the remaining attributes alphabetically, by label
+        $labels = array_column($remainingItems, 'label');
+        array_multisort($labels, SORT_ASC, $remainingItems);
+
+        // and now that both parts are sorted, merge them
+        $options = array_values(array_merge($selectedOptions, $remainingItems));
+
+        $checkboxSelect = self::checkboxSelectFieldHtml([
+            'label' => Craft::t('app', 'Card Attributes'),
+            'id' => $config['id'],
+            'name' => 'cardView',
+            'options' => $options,
+            'values' => array_keys($selectedOptions),
+            'required' => true,
+            //'targetPrefix' => 'cardView-',
+            'sortable' => true,
+        ]);
+
+
+        // js is initiated via Craft.FieldLayoutDesigner
+        $previewHtml = self::cardPreviewHtml($fieldLayout, showThumb: $fieldLayout->getThumbField() !== null);
+
+        return
+            Html::beginTag('div', [
+                'id' => $config['id'] . '-container',
+                'class' => 'card-view-designer',
+            ]) .
+            Html::tag('h2', Craft::t('app', 'Card Layout Editor'), ['class' => 'visually-hidden']) .
+            Html::beginTag('div', ['class' => 'cvd-container']) .
+            Html::beginTag('div', ['class' => 'cvd-library']) .
+            $checkboxSelect .
+            Html::endTag('div') . // .cvd-library
+            Html::beginTag('div', ['class' => 'cvd-preview-container']) .
+            Html::beginTag('div', ['class' => 'cvd-preview']) .
+            Html::tag('h3', Craft::t('app', 'Card Layout Preview'), [
+                'class' => 'visually-hidden',
+            ]) .
+            Html::tag('p', Craft::t('app', 'The following content is for preview only.'), [
+                'class' => 'visually-hidden',
+            ]) .
+            $previewHtml .
+            Html::endTag('div') . // .cvd-preview-container
+            Html::endTag('div') . // .cvd-preview
+            Html::endTag('div') . // .cvd-container
+            Html::endTag('div'); // .card-view-designer
+    }
+
+    /**
+     * Returns HTML for the card preview based on selected fields and attributes.
+     *
+     * @param FieldLayout $fieldLayout
+     * @param array $cardElements
+     * @return string
+     * @throws \Throwable
+     */
+    public static function cardPreviewHtml(FieldLayout $fieldLayout, array $cardElements = [], $showThumb = false): string
+    {
+        // get heading
+        $heading = Html::tag('craft-element-label',
+            Html::tag('a', Html::tag('span', Craft::t('app', 'Title')), [
+                'class' => ['label-link'],
+                'href' => '#',
+                'aria-disabled' => 'true',
+            ]),
+            [
+                'class' => 'label',
+            ]
+        );
+
+        // get status label placeholder
+        /** @var ElementInterface $elementType */
+        $elementType = new ($fieldLayout['type']);
+        $labels = [$elementType::hasStatuses() ? static::componentStatusLabelHtml($elementType) : null];
+
+        $previewHtml =
+            Html::beginTag('div', [
+                'class' => ['element', 'card'],
+            ]);
+
+        // get thumb placeholder
+        if ($showThumb) {
+            $previewThumb = Html::tag('div',
+                Html::tag('div', Cp::iconSvg('image'), ['class' => 'cp-icon']),
+                ['class' => 'cvd-thumbnail']
+            );
+
+            $previewHtml .= Html::tag('div', $previewThumb, ['class' => ['thumb']]);
+        }
+
+
+        $previewHtml .=
+            Html::beginTag('div', [
+                'class' => ['card-content'],
+            ]) .
+            Html::tag('div', $heading, ['class' => 'card-heading']) .
+            Html::beginTag('div', [
+                'class' => 'card-body',
+            ]);
+
+        // get body elements (fields and attributes)
+        $cardElements = $fieldLayout->getCardBodyElements(null, $cardElements);
+
+        foreach ($cardElements as $cardElement) {
+            if ($cardElement instanceof CustomField) {
+                $previewHtml .= Html::tag('div', $cardElement->getField()->previewPlaceholderHtml(null, null));
+            } else {
+                $previewHtml .= Html::tag('div', $elementType::attributePreviewHtml($cardElement));
+            }
+        }
+
+        if (!empty(array_filter($labels))) {
+            $previewHtml .= Html::ul($labels, [
+                'class' => ['flex', 'gap-xs'],
+                'encode' => false,
+            ]);
+        }
+
+        $previewHtml .=
+            Html::endTag('div') . // .card-body
+            Html::endTag('div') . // .card-content
+            Html::tag('div', '', ['class' => 'spinner spinner-absolute']) .
+            Html::endTag('div'); // .element.card
+
+        return $previewHtml;
+    }
+
+    /**
      * Renders a field layout designer.
      *
      * @param FieldLayout $fieldLayout
@@ -2495,6 +2686,7 @@ JS, [
             'elementType' => $fieldLayout->type,
             'customizableTabs' => $config['customizableTabs'],
             'customizableUi' => $config['customizableUi'],
+            'withCardViewDesigner' => $config['withCardViewDesigner'] ?? false,
         ]);
         $namespacedId = $view->namespaceInputId($config['id']);
 
