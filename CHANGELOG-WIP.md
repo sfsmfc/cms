@@ -24,6 +24,7 @@
 - Added the “Show the ‘Label’ field” and “Show the ‘Open in a new tab’ field” settings to Link fields. ([#15983](https://github.com/craftcms/cms/pull/15983))
 - Link fields’ Allowed Link Types settings are now sortable. ([#15963](https://github.com/craftcms/cms/pull/15963))
 - All relation fields can now be selected as field layouts’ thumbnail providers. ([#15651](https://github.com/craftcms/cms/discussions/15651))
+- It’s now possible to include element attributes in card views, alongside custom fields, via new “Card Attributes” configurators. ([#15283](https://github.com/craftcms/cms/pull/15283)) 
 - Added the “Markdown” field layout UI element type. ([#15674](https://github.com/craftcms/cms/pull/15674), [#15664](https://github.com/craftcms/cms/discussions/15664))
 - Added the “Language” element condition rule. ([#15952](https://github.com/craftcms/cms/discussions/15952))
 - The Sections index table can now be sorted by Name, Handle, and Type. ([#15936](https://github.com/craftcms/cms/pull/15936))
@@ -47,14 +48,20 @@
 - Added support for appending subpaths to environment variable names in environmental settings (e.g. `$PRIMARY_SITE_URL/uploads`).
 
 ### Extensibility
+- Added `craft\base\Element::EVENT_REGISTER_CARD_ATTRIBUTES`.
+- Added `craft\base\Element::defineCardAttributes()`.
+- Added `craft\base\ElementInterface::attributePreviewHtml()`.
+- Added `craft\base\ElementInterface::cardAttributes()`.
 - Added `craft\base\ElementInterface::indexViewModes()`.
 - Added `craft\base\NestedElementTrait::saveOwnership()`. ([#15894](https://github.com/craftcms/cms/pull/15894))
+- Added `craft\base\PreviewableFieldInterface::previewPlaceholderHtml()`.
 - Added `craft\base\RequestTrait::getIsWebRequest()`. ([#15690](https://github.com/craftcms/cms/pull/15690))
 - Added `craft\console\Controller::output()`. 
 - Added `craft\console\controllers\ResaveController::hasTheFields()`.
 - Added `craft\elements\db\NestedElementQueryTrait`. ([#15894](https://github.com/craftcms/cms/pull/15894))
 - Added `craft\events\ApplyFieldSaveEvent`. ([#15872](https://github.com/craftcms/cms/discussions/15872))
 - Added `craft\events\DefineAddressCountriesEvent`. ([#15711](https://github.com/craftcms/cms/pull/15711))
+- Added `craft\events\RegisterElementCardAttributesEvent`.
 - Added `craft\fieldlayoutelements\Template::$templateMode`. ([#15932](https://github.com/craftcms/cms/pull/15932))
 - Added `craft\fields\data\LinkData::$target`.
 - Added `craft\fields\data\LinkData::setLabel()`.
@@ -67,8 +74,12 @@
 - Added `craft\helpers\Console::indent()`.
 - Added `craft\helpers\Console::indentStr()`.
 - Added `craft\helpers\Console::outdent()`.
+- Added `craft\helpers\Cp::cardPreviewHtml()`.
+- Added `craft\helpers\Cp::cardViewDesignerHtml()`.
 - Added `craft\helpers\Cp::rangeFieldHtml()`. ([#15972](https://github.com/craftcms/cms/pull/15972))
 - Added `craft\helpers\Cp::rangeHtml()`. ([#15972](https://github.com/craftcms/cms/pull/15972))
+- Added `craft\helpers\ElementHelper::linkAttributeHtml()`.
+- Added `craft\helpers\ElementHelper::uriAttributeHtml()`.
 - Added `craft\helpers\Session::addFlash()`.
 - Added `craft\helpers\Session::getAllFlashes()`.
 - Added `craft\helpers\Session::getFlash()`.
@@ -84,7 +95,11 @@
 - Added `craft\log\MonologTarget::getName()`.
 - Added `craft\log\MonologTarget::getProcessor()`.
 - Added `craft\log\MonologTarget::getUseMicrosecondTimestamps()`.
+- Added `craft\models\FieldLayout::getCardBodyAttributes()`.
+- Added `craft\models\FieldLayout::getCardBodyElements()`.
+- Added `craft\models\FieldLayout::getCardView()`.
 - Added `craft\models\FieldLayout::prependElements()`.
+- Added `craft\models\FieldLayout::setCardView()`.
 - Added `craft\services\Addresses::EVENT_DEFINE_ADDRESS_COUNTRIES`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\services\Addresses::getCountryList()`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\services\Fields::EVENT_BEFORE_APPLY_FIELD_SAVE`. ([#15872](https://github.com/craftcms/cms/discussions/15872))
@@ -98,7 +113,10 @@
 - Deprecated the `enableBasicHttpAuth` config setting. `craft\filters\BasicHttpAuthLogin` should be used instead. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added the `serializeForm` event to `Craft.ElementEditor`. ([#15794](https://github.com/craftcms/cms/discussions/15794))
 - Added the `range()` and `rangeField()` macros to `_includes/forms.twig`. ([#15972](https://github.com/craftcms/cms/pull/15972))
+- Added the `fieldLayoutDesigner()` and `cardViewDesigner()` global Twig functions for control panel templates.
+- Field layout designers can now be instantiated with a `withCardViewDesigner` param. ([#15283](https://github.com/craftcms/cms/pull/15283)
 - Checkbox selects can now be passed a `sortable` option. ([#15963](https://github.com/craftcms/cms/pull/15963))
+- Deprecated the `craft.cp.fieldLayoutDesigner()` function. The global `fieldLayoutDesigner()` function should be used instead.
 
 ### System
 - `Location` headers added via `craft\web\Response::redirect()` are now set to encoded URLs. ([#15838](https://github.com/craftcms/cms/issues/15838))
