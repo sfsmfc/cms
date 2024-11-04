@@ -2557,12 +2557,6 @@ JS, [
      */
     public static function cardPreviewHtml(FieldLayout $fieldLayout, array $cardElements = [], $showThumb = false): string
     {
-        // get colour
-        $color = null;
-        if ($fieldLayout->provider instanceof Colorable) {
-            $color = $fieldLayout->provider->color ?? null;
-        }
-
         // get heading
         $heading = Html::tag('craft-element-label',
             Html::tag('a', Html::tag('span', Craft::t('app', 'Title')), [
@@ -2598,11 +2592,6 @@ JS, [
         $previewHtml =
             Html::beginTag('div', [
                 'class' => ['element', 'card'],
-                'style' => array_filter([
-                    '--custom-bg-color' => $color?->cssVar(50),
-                    '--custom-text-color' => $color?->cssVar(900),
-                    '--custom-sel-bg-color' => $color?->cssVar(900),
-                ]),
             ]);
 
         if ($thumbSvg) {
