@@ -18,10 +18,12 @@ use craft\base\ElementInterface;
 use craft\base\FieldLayoutElement;
 use craft\base\Grippable;
 use craft\base\Iconic;
+use craft\base\NestedElementInterface;
 use craft\base\Statusable;
 use craft\base\Thumbable;
 use craft\behaviors\DraftBehavior;
 use craft\elements\Address;
+use craft\enums\AttributeStatus;
 use craft\enums\CmsEdition;
 use craft\enums\Color;
 use craft\enums\MenuItemType;
@@ -35,6 +37,8 @@ use craft\models\FieldLayout;
 use craft\models\FieldLayoutTab;
 use craft\models\Site;
 use craft\services\ElementSources;
+use craft\utilities\ProjectConfig as ProjectConfigUtility;
+use craft\utilities\Updates;
 use craft\web\twig\TemplateLoaderException;
 use craft\web\View;
 use Illuminate\Support\Collection;
@@ -168,10 +172,12 @@ class Cp
             ]);
         }
 
+        $utilitiesService = Craft::$app->getUtilities();
+
         // Critical update available?
         if (
             $path !== 'utilities/updates' &&
-            $user->can('utility:updates') &&
+            $utilitiesService->checkAuthorization(Updates::class) &&
             Craft::$app->getUpdates()->getIsCriticalUpdateAvailable()
         ) {
             $alerts[] = Craft::t('app', 'A critical update is available.') .
@@ -194,7 +200,7 @@ class Cp
         $projectConfig = Craft::$app->getProjectConfig();
         if (
             $path !== 'utilities/project-config' &&
-            $user->can('utility:project-config') &&
+            $utilitiesService->checkAuthorization(ProjectConfigUtility::class) &&
             $projectConfig->areChangesPending() &&
             ($projectConfig->writeYamlAutomatically || $projectConfig->get('dateModified') <= $projectConfig->get('dateModified', true))
         ) {
@@ -579,6 +585,11 @@ class Cp
             'sortable' => false,
         ];
 
+        if ($element->getIsRevision()) {
+            $config['showActionMenu'] = false;
+            $config['selectable'] = false;
+        }
+
         $color = $element instanceof Colorable ? $element->getColor() : null;
 
         $classes = ['card'];
@@ -622,6 +633,38 @@ class Cp
             ]);
         }
 
+        // is this a nested element that will end up replacing its canonical
+        // counterpart when the owner is saved?
+        if (
+            $element instanceof NestedElementInterface &&
+            $element->getOwnerId() !== null &&
+            $element->getOwnerId() === $element->getPrimaryOwnerId() &&
+            !$element->getIsDraft() &&
+            !$element->getIsRevision() &&
+            $element->getOwner()->getIsDraft()
+        ) {
+            if ($element->getIsCanonical()) {
+                // this element was created for the owner
+                $statusLabel = Craft::t('app', 'This is a new {type}.', [
+                    'type' => $element::lowerDisplayName(),
+                ]);
+            } else {
+                // this element is a derivative of another element owned by the canonical owner
+                $statusLabel = Craft::t('app', 'This {type} has been edited.', [
+                    'type' => $element::lowerDisplayName(),
+                ]);
+            }
+
+            $status = Html::beginTag('div', [
+                    'class' => ['status-badge', AttributeStatus::Modified->value],
+                    'title' => $statusLabel,
+                ]) .
+                Html::tag('span', $statusLabel, [
+                    'class' => 'visually-hidden',
+                ]) .
+                Html::endTag('div');
+        }
+
         $thumb = $element->getThumbHtml(128);
         if ($thumb === null && $element instanceof Iconic) {
             $icon = $element->getIcon();
@@ -637,6 +680,7 @@ class Cp
         }
 
         $html = Html::beginTag('div', $attributes) .
+            ($status ?? '') .
             ($thumb ?? '') .
             Html::beginTag('div', ['class' => 'card-content']) .
             ($headingContent !== '' ? Html::tag('div', $headingContent, ['class' => 'card-heading']) : '') .
@@ -862,6 +906,9 @@ class Cp
                     'id' => $element->isProvisionalDraft ? $element->getCanonicalId() : $element->id,
                     'draft-id' => $element->isProvisionalDraft ? null : $element->draftId,
                     'revision-id' => $element->revisionId,
+                    'field-id' => $element instanceof NestedElementInterface ? $element->getField()?->id : null,
+                    'primary-owner-id' => $element instanceof NestedElementInterface ? $element->getPrimaryOwnerId() : null,
+                    'owner-id' => $element instanceof NestedElementInterface ? $element->getOwnerId() : null,
                     'site-id' => $element->siteId,
                     'status' => $element->getStatus(),
                     'label' => (string)$element,
@@ -1759,6 +1806,33 @@ JS, [
     }
 
     /**
+     * Renders a range input’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.5.0
+     */
+    public static function rangeHtml(array $config): string
+    {
+        return static::renderTemplate('_includes/forms/range.twig', $config);
+    }
+
+    /**
+     * Renders a lightswitch field’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.5.0
+     */
+    public static function rangeFieldHtml(array $config): string
+    {
+        $config['id'] = $config['id'] ?? 'range' . mt_rand();
+        return static::fieldHtml('template:_includes/forms/range.twig', $config);
+    }
+
+    /**
      * Renders a money input’s HTML.
      *
      * @param array $config
@@ -2082,9 +2156,9 @@ JS, [
             $value = $config['value'] ?? '';
             if (!isset($config['tip']) && (!isset($value[0]) || !in_array($value[0], ['$', '@']))) {
                 if ($config['suggestAliases'] ?? false) {
-                    $config['tip'] = Craft::t('app', 'This can be set to an environment variable, or begin with an alias.');
+                    $config['tip'] = Craft::t('app', 'This can begin with an environment variable or alias.');
                 } else {
-                    $config['tip'] = Craft::t('app', 'This can be set to an environment variable.');
+                    $config['tip'] = Craft::t('app', 'This can begin with an environment variable.');
                 }
                 $config['tip'] .= ' ' .
                     Html::a(Craft::t('app', 'Learn more'), 'https://craftcms.com/docs/5.x/configure.html#control-panel-settings', [

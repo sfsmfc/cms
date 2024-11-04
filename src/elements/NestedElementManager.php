@@ -469,6 +469,7 @@ class NestedElementManager extends Component
             'pageSize' => 50,
             'storageKey' => null,
             'defaultViewMode' => 'cards',
+            'static' => $owner->getIsRevision(),
         ];
 
         if ($config['storageKey'] === null) {
@@ -513,8 +514,9 @@ class NestedElementManager extends Component
                     'criteria' => array_merge($criteria, $this->criteria),
                     'batchSize' => $config['pageSize'],
                     'actions' => [],
-                    'canHaveDrafts' => $elementType::hasDrafts(),
+                    'canHaveDrafts' => $config['canHaveDrafts'] ?? $elementType::hasDrafts(),
                     'storageKey' => $config['storageKey'],
+                    'static' => $config['static'],
                 ];
 
                 if ($config['sortable']) {
