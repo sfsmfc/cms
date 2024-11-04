@@ -14,6 +14,8 @@ use craft\base\FieldLayoutComponent;
 use craft\base\NestedElementInterface;
 use craft\behaviors\DraftBehavior;
 use craft\behaviors\RevisionBehavior;
+use craft\db\Query;
+use craft\db\Table;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\NestedElementQueryInterface;
 use craft\elements\User;
@@ -74,6 +76,7 @@ class ElementsController extends Controller
     private ?string $_elementUid = null;
     private ?int $_draftId = null;
     private ?int $_revisionId = null;
+    private ?int $_fieldId = null;
     private ?int $_ownerId = null;
     private ?int $_siteId = null;
 
@@ -116,6 +119,7 @@ class ElementsController extends Controller
         $this->_elementUid = $this->_param('elementUid');
         $this->_draftId = $this->_param('draftId');
         $this->_revisionId = $this->_param('revisionId');
+        $this->_fieldId = $this->_param('fieldId') ?: null;
         $this->_ownerId = $this->_param('ownerId') ?: null;
         $this->_siteId = $this->_param('siteId');
         $this->_enabled = $this->_param('enabled', $this->_param('setEnabled', true) ? true : null);
@@ -431,6 +435,7 @@ class ElementsController extends Controller
                         'previewToken' => $previewTargets ? $security->generateRandomString() : null,
                         'previewParamValue' => $previewTargets ? $security->hashData(StringHelper::randomString(10)) : null,
                         'revisionId' => $element->revisionId,
+                        'fieldId' => $element instanceof NestedElementInterface ? $element->getField()?->id : null,
                         'ownerId' => $element instanceof NestedElementInterface ? $element->getOwnerId() : null,
                         'siteId' => $element->siteId,
                         'siteStatuses' => $siteStatuses,
@@ -1052,7 +1057,10 @@ class ElementsController extends Controller
             $components = [];
 
             if ($element->id) {
-                $components[] = Html::hiddenInput('elementId', (string)$element->getCanonicalId());
+                // don't use the canonical ID if this is a normal element that's keeping track of its canonical
+                // e.g. nested Matrix entries that were duplicated for an owner's draft
+                $id = $element->getIsDraft() || $element->getIsRevision() ? $element->getCanonicalId() : $element->id;
+                $components[] = Html::hiddenInput('elementId', (string)$id);
             }
 
             if ($element->siteId) {
@@ -1396,6 +1404,129 @@ JS, [
         return $this->_asSuccess(Craft::t('app', '{type} saved.', [
             'type' => $element::displayName(),
         ]), $element, supportsAddAnother: true);
+    }
+
+    /**
+     * Saves a nested element for a draft of its owner.
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
+     * @throws ServerErrorHttpException
+     * @since 5.5.0
+     */
+    public function actionSaveNestedElementForDraft(): ?Response
+    {
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+
+        if (!isset($this->_ownerId)) {
+            throw new BadRequestHttpException('No new owner was identified by the request.');
+        }
+
+        /** @var Element|null $element */
+        $element = $this->_element();
+
+        if (!$element instanceof NestedElementInterface || $element->getIsRevision()) {
+            throw new BadRequestHttpException('No element was identified by the request.');
+        }
+
+        $this->element = $element;
+        $elementsService = Craft::$app->getElements();
+        $user = static::currentUser();
+
+        // Check save permissions before and after applying POST params to the element
+        // in case the request was tampered with.
+        if (!$elementsService->canSave($element, $user)) {
+            throw new ForbiddenHttpException('User not authorized to save this element.');
+        }
+
+        // Get the owner and make sure it's a draft,
+        // and that its canonical element is the nested element's primary owner
+        $owner = $elementsService->getElementById($this->_ownerId, siteId: $element->siteId);
+        if (
+            !$owner->getIsDraft() ||
+            $owner->getIsCanonical() ||
+            $owner->getCanonicalId() !== $element->getPrimaryOwnerId() ||
+            !$elementsService->canSave($owner, $user)
+        ) {
+            throw new ForbiddenHttpException('User not authorized to save the owner element.');
+        }
+
+        // Get the old sort order
+        $sortOrder = (new Query())
+            ->select('sortOrder')
+            ->from(Table::ELEMENTS_OWNERS)
+            ->where([
+                'elementId' => $element->id,
+                'ownerId' => $owner->id,
+            ])
+            ->scalar() ?: null;
+        $element->setSortOrder($sortOrder);
+
+        $db = Craft::$app->getDb();
+        $transaction = $db->beginTransaction();
+
+        try {
+            // Remove existing ownership data for the element within the canonical owner,
+            // and for its canonical element within the draft
+            Db::delete(Table::ELEMENTS_OWNERS, [
+                'or',
+                ['elementId' => $element->id, 'ownerId' => $owner->getCanonicalId()],
+                ['elementId' => $element->getCanonicalId(), 'ownerId' => $owner->id],
+            ]);
+
+            if ($element->getIsDraft()) {
+                // Just remove the draft data, but preserve the canonicalId
+                $element->setPrimaryOwner($owner);
+                $element->setOwner($owner);
+                $elementsService->saveElement($element);
+            } else {
+                // Duplicate it
+                $element = $elementsService->duplicateElement($element, [
+                    'canonicalId' => $element->id,
+                    'primaryOwner' => $owner,
+                    'owner' => $owner,
+                ]);
+            }
+
+            $this->_applyParamsToElement($element);
+
+            if (!$elementsService->canSave($element, $user)) {
+                throw new ForbiddenHttpException('User not authorized to save this element.');
+            }
+
+            if ($element->enabled && $element->getEnabledForSite()) {
+                $element->setScenario(Element::SCENARIO_LIVE);
+            }
+
+            try {
+                $success = $elementsService->saveElement($element);
+            } catch (UnsupportedSiteException $e) {
+                $element->addError('siteId', $e->getMessage());
+                $success = false;
+            }
+
+            if (!$success) {
+                $transaction->rollBack();
+                return $this->_asFailure($element, Craft::t('app', 'Couldn’t save {type}.', [
+                    'type' => $element::lowerDisplayName(),
+                ]));
+            }
+
+            if ($element->getIsDraft()) {
+                Craft::$app->getDrafts()->removeDraftData($element);
+            }
+
+            $transaction->commit();
+        } catch (Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+
+        return $this->_asSuccess(Craft::t('app', '{type} saved.', [
+            'type' => $element::displayName(),
+        ]), $element);
     }
 
     /**
@@ -2328,7 +2459,9 @@ JS, [
         /** @var string|ElementInterface $elementType */
         $query = $elementType::find();
         if ($query instanceof NestedElementQueryInterface) {
-            $query->ownerId($this->_ownerId);
+            $query
+                ->fieldId($this->_fieldId)
+                ->ownerId($this->_ownerId);
         }
         return $query;
     }

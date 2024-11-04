@@ -48,6 +48,7 @@ use craft\fields\MultiSelect;
 use craft\fields\Number;
 use craft\fields\PlainText;
 use craft\fields\RadioButtons;
+use craft\fields\Range;
 use craft\fields\Table as TableField;
 use craft\fields\Tags as TagsField;
 use craft\fields\Time;
@@ -238,6 +239,7 @@ class Fields extends Component
             Number::class,
             PlainText::class,
             RadioButtons::class,
+            Range::class,
             TableField::class,
             TagsField::class,
             Time::class,

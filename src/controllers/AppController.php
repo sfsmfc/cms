@@ -762,6 +762,7 @@ class AppController extends Controller
             /** @var string|ElementInterface $elementType */
             $elementType = $criterion['type'];
             $id = $criterion['id'];
+            $fieldId = $criterion['fieldId'] ?? null;
             $ownerId = $criterion['ownerId'] ?? null;
             $siteId = $criterion['siteId'];
             $instances = $criterion['instances'];
@@ -779,7 +780,9 @@ class AppController extends Controller
                 ->status(null);
 
             if ($query instanceof NestedElementQueryInterface) {
-                $query->ownerId($ownerId);
+                $query
+                    ->fieldId($fieldId)
+                    ->ownerId($ownerId);
             }
 
             $elements = $query->all();

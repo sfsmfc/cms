@@ -1,6 +1,7 @@
 {%- set options = options ?? [] %}
 {%- set value = value ?? null %}
 
+{%- set id = id ?? "radio-group-#{random()}" %}
 {%- set class = (class ?? [])|explodeClass|merge([
     'radio-group',
     (toggle ?? false) ? 'fieldtoggle' : null,
@@ -8,7 +9,8 @@
 ]|filter) %}
 
 {%- set containerAttributes = {
-    class: class,
+    id,
+    class,
     data: {
         'target-prefix': (toggle ?? false) ? (targetPrefix ?? '#') : false,
     },
