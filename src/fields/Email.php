@@ -157,7 +157,7 @@ class Email extends Field implements InlineEditableFieldInterface, MergeableFiel
     /**
      * @inheritdoc
      */
-    public function previewPlaceholderHtml(mixed $value = null, ?ElementInterface $element = null): string
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
         if (!$value) {
             $value = Craft::$app->getUser()->getIdentity()->email;

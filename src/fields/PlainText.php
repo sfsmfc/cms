@@ -224,7 +224,7 @@ class PlainText extends Field implements InlineEditableFieldInterface, SortableF
     /**
      * @inheritdoc
      */
-    public function previewPlaceholderHtml(mixed $value = null, ?ElementInterface $element = null): string
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
         if (!$value) {
             $value = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';

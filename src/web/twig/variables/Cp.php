@@ -1090,22 +1090,10 @@ class Cp extends Component
      * @param array $config
      * @return string
      * @since 4.0.0
+     * @deprecated in 5.5.0. The `fieldLayoutDesigner()` global CP function should be used instead.
      */
     public function fieldLayoutDesigner(FieldLayout $fieldLayout, array $config = []): string
     {
         return CpHelper::fieldLayoutDesignerHtml($fieldLayout, $config);
-    }
-
-    /**
-     * Renders a card view designer’s HTML.
-     *
-     * @param FieldLayout $fieldLayout
-     * @param array $config
-     * @return string
-     * @since 5.5.0
-     */
-    public function cardViewDesigner(FieldLayout $fieldLayout, array $config = []): string
-    {
-        return CpHelper::cardViewDesignerHtml($fieldLayout, $config);
     }
 }

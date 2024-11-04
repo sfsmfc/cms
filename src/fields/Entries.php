@@ -140,7 +140,7 @@ class Entries extends BaseRelationField
     /**
      * @inheritdoc
      */
-    public function previewPlaceholderHtml(mixed $value = null, ?ElementInterface $element = null): string
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
         $mockup = new Entry();
         $mockup->title = Craft::t('app', 'Related {type} Title', ['type' => $mockup->displayName()]);

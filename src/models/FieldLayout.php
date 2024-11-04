@@ -788,6 +788,7 @@ class FieldLayout extends Model
     public function getCardBodyAttributes(): array
     {
         $cardViewValues = $this->getCardView();
+        /** @var ElementInterface $elementType */
         $elementType = new ($this->type);
 
         // filter only the selected attributes

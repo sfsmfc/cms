@@ -2511,7 +2511,7 @@ JS, [
         $options = array_values(array_merge($selectedOptions, $remainingItems));
 
         $checkboxSelect = self::checkboxSelectFieldHtml([
-            'label' => Craft::t('app', 'Card View'),
+            'label' => Craft::t('app', 'Card Attributes'),
             'id' => $config['id'],
             'name' => 'cardView',
             'options' => $options,
@@ -2573,9 +2573,9 @@ JS, [
         );
 
         // get status label placeholder
+        /** @var ElementInterface $elementType */
         $elementType = new ($fieldLayout['type']);
         $labels = [$elementType::hasStatuses() ? static::componentStatusLabelHtml($elementType) : null];
-
 
         $previewHtml =
             Html::beginTag('div', [
@@ -2607,7 +2607,7 @@ JS, [
 
         foreach ($cardElements as $cardElement) {
             if ($cardElement instanceof CustomField) {
-                $previewHtml .= Html::tag('div', $cardElement->getField()->previewPlaceholderHtml());
+                $previewHtml .= Html::tag('div', $cardElement->getField()->previewPlaceholderHtml(null, null));
             } else {
                 $previewHtml .= Html::tag('div', $elementType::attributePreviewHtml($cardElement));
             }

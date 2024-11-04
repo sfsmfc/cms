@@ -123,7 +123,7 @@ class Country extends Field implements InlineEditableFieldInterface, MergeableFi
     /**
      * @inheritdoc
      */
-    public function previewPlaceholderHtml(mixed $value = null, ?ElementInterface $element = null): string
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
         if (!$value) {
             $countries = Craft::$app->getAddresses()->getCountryRepository()->getList(Craft::$app->language);

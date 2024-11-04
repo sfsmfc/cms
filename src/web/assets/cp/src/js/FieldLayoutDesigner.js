@@ -136,7 +136,7 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
         this.createField();
       });
 
-      // initiate Card View Designer
+      // initiate Card Attributes Designer
       if (this.settings.withCardViewDesigner) {
         this.$cvd = this.$container
           .parents('.fld-cvd')

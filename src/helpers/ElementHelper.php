@@ -839,6 +839,7 @@ class ElementHelper
      *
      * @param string|null $url
      * @return string
+     * @since 5.5.0
      */
     public static function linkAttributeHtml(?string $url): string
     {
@@ -861,6 +862,7 @@ class ElementHelper
      * @param string|null $value
      * @param string|null $url
      * @return string
+     * @since 5.5.0
      */
     public static function uriAttributeHtml(?string $value, ?string $url): string
     {

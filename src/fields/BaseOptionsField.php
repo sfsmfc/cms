@@ -501,7 +501,7 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
     /**
      * @inheritdoc
      */
-    public function previewPlaceholderHtml(mixed $value = null, ?ElementInterface $element = null): string
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
         $options = array_values(array_filter($this->options, fn($option) => !empty($option['value'])));
 

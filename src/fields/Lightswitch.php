@@ -258,7 +258,7 @@ class Lightswitch extends Field implements InlineEditableFieldInterface, Sortabl
     /**
      * @inheritdoc
      */
-    public function previewPlaceholderHtml(mixed $value = null, ?ElementInterface $element = null): string
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
         if (!$value) {
             $value = 1;

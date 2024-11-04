@@ -541,6 +541,15 @@ interface ElementInterface extends
     public static function cardAttributes(): array;
 
     /**
+     * Return HTML for the attribute in the card preview.
+     *
+     * @param array $attribute
+     * @return mixed
+     * @since 5.5.0
+     */
+    public static function attributePreviewHtml(array $attribute): mixed;
+
+    /**
      * Returns an array that maps source-to-target element IDs based on the given sub-property handle.
      *
      * This method aids in the eager-loading of elements when performing an element query. The returned array should

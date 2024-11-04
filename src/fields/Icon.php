@@ -133,7 +133,7 @@ class Icon extends Field implements InlineEditableFieldInterface, ThumbableField
     /**
      * @inheritdoc
      */
-    public function previewPlaceholderHtml(mixed $value = null, ?ElementInterface $element = null): string
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
         if (!$value) {
             $value = 'info';

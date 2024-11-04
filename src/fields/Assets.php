@@ -489,7 +489,7 @@ class Assets extends BaseRelationField
     /**
      * @inheritdoc
      */
-    public function previewPlaceholderHtml(mixed $value = null, ?ElementInterface $element = null): string
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
         $asset = new Asset();
         $asset->title = Craft::t('app', 'Related {type} Title', ['type' => $asset->displayName()]);

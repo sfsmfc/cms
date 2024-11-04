@@ -1557,7 +1557,7 @@ abstract class Element extends Component implements ElementInterface
             ],
             'uid' => [
                 'label' => Craft::t('app', 'UID'),
-                'placeholder' => 'abcd----------uid--------------abcd',
+                'placeholder' => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
             ],
         ];
 
@@ -1583,10 +1583,7 @@ abstract class Element extends Component implements ElementInterface
     }
 
     /**
-     * Return HTML for the attribute in the card preview.
-     *
-     * @param array $attribute
-     * @return mixed
+     * @inheritdoc
      */
     public static function attributePreviewHtml(array $attribute): mixed
     {

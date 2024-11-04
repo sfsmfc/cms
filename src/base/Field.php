@@ -814,7 +814,7 @@ JS, [
      * @see PreviewableFieldInterface::previewPlaceholderHtml()
      * @since 5.5.0
      */
-    public function previewPlaceholderHtml(mixed $value = null, ?ElementInterface $element = null): string
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
         if ($value !== null) {
             return $value;

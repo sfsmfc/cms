@@ -239,7 +239,7 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
     /**
      * @inheritdoc
      */
-    public function previewPlaceholderHtml(mixed $value = null, ?ElementInterface $element = null): string
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
         if (!$value) {
             $value = new ColorData(sprintf('#%06X', mt_rand(0, 0xFFFFFF)));
