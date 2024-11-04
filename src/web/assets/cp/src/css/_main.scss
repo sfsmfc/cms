@@ -3627,6 +3627,7 @@ table {
   cursor: default;
   user-select: none;
   width: 100%;
+  overflow: hidden;
 
   &::after {
     border-radius: var(--large-border-radius);
@@ -7721,28 +7722,31 @@ fieldset {
   }
 }
 
+.status-badge {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: 2px;
+  height: 100%;
+  content: '';
+  cursor: help;
+
+  &.modified {
+    background-color: var(--blue-600);
+    box-shadow: 0 0 5px hsl(221deg 83% 53% / 15%);
+  }
+
+  &.outdated {
+    background-color: var(--pending-color);
+    box-shadow: 0 0 5px hsl(27deg 96% 61% / 15%);
+  }
+}
+
 .field {
   min-inline-size: initial;
 
   & > .status-badge {
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    width: 2px;
-    height: 100%;
     border-radius: 1px;
-    content: '';
-    cursor: help;
-
-    &.modified {
-      background-color: var(--blue-600);
-      box-shadow: 0 0 5px hsl(221deg 83% 53% / 15%);
-    }
-
-    &.outdated {
-      background-color: var(--pending-color);
-      box-shadow: 0 0 5px hsl(27deg 96% 61% / 15%);
-    }
   }
 
   & > .heading {

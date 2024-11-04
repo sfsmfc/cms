@@ -23,6 +23,7 @@ use craft\base\Statusable;
 use craft\base\Thumbable;
 use craft\behaviors\DraftBehavior;
 use craft\elements\Address;
+use craft\enums\AttributeStatus;
 use craft\enums\CmsEdition;
 use craft\enums\Color;
 use craft\enums\MenuItemType;
@@ -632,6 +633,38 @@ class Cp
             ]);
         }
 
+        // is this a nested element that will end up replacing its canonical
+        // counterpart when the owner is saved?
+        if (
+            $element instanceof NestedElementInterface &&
+            $element->getOwnerId() !== null &&
+            $element->getOwnerId() === $element->getPrimaryOwnerId() &&
+            !$element->getIsDraft() &&
+            !$element->getIsRevision() &&
+            $element->getOwner()->getIsDraft()
+        ) {
+            if ($element->getIsCanonical()) {
+                // this element was created for the owner
+                $statusLabel = Craft::t('app', 'This is a new {type}.', [
+                    'type' => $element::lowerDisplayName(),
+                ]);
+            } else {
+                // this element is a derivative of another element owned by the canonical owner
+                $statusLabel = Craft::t('app', 'This {type} has been edited.', [
+                    'type' => $element::lowerDisplayName(),
+                ]);
+            }
+
+            $status = Html::beginTag('div', [
+                    'class' => ['status-badge', AttributeStatus::Modified->value],
+                    'title' => $statusLabel,
+                ]) .
+                Html::tag('span', $statusLabel, [
+                    'class' => 'visually-hidden',
+                ]) .
+                Html::endTag('div');
+        }
+
         $thumb = $element->getThumbHtml(128);
         if ($thumb === null && $element instanceof Iconic) {
             $icon = $element->getIcon();
@@ -647,6 +680,7 @@ class Cp
         }
 
         $html = Html::beginTag('div', $attributes) .
+            ($status ?? '') .
             ($thumb ?? '') .
             Html::beginTag('div', ['class' => 'card-content']) .
             ($headingContent !== '' ? Html::tag('div', $headingContent, ['class' => 'card-heading']) : '') .
@@ -873,6 +907,7 @@ class Cp
                     'draft-id' => $element->isProvisionalDraft ? null : $element->draftId,
                     'revision-id' => $element->revisionId,
                     'field-id' => $element instanceof NestedElementInterface ? $element->getField()?->id : null,
+                    'primary-owner-id' => $element instanceof NestedElementInterface ? $element->getPrimaryOwnerId() : null,
                     'owner-id' => $element instanceof NestedElementInterface ? $element->getOwnerId() : null,
                     'site-id' => $element->siteId,
                     'status' => $element->getStatus(),

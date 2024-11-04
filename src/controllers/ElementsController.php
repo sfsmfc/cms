@@ -14,6 +14,8 @@ use craft\base\FieldLayoutComponent;
 use craft\base\NestedElementInterface;
 use craft\behaviors\DraftBehavior;
 use craft\behaviors\RevisionBehavior;
+use craft\db\Query;
+use craft\db\Table;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\NestedElementQueryInterface;
 use craft\elements\User;
@@ -1298,6 +1300,129 @@ JS, [
         return $this->_asSuccess(Craft::t('app', '{type} saved.', [
             'type' => $element::displayName(),
         ]), $element, supportsAddAnother: true);
+    }
+
+    /**
+     * Saves a nested element for a draft of its owner.
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
+     * @throws ServerErrorHttpException
+     * @since 5.5.0
+     */
+    public function actionSaveNestedElementForDraft(): ?Response
+    {
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+
+        if (!isset($this->_ownerId)) {
+            throw new BadRequestHttpException('No new owner was identified by the request.');
+        }
+
+        /** @var Element|null $element */
+        $element = $this->_element();
+
+        if (!$element instanceof NestedElementInterface || $element->getIsRevision()) {
+            throw new BadRequestHttpException('No element was identified by the request.');
+        }
+
+        $this->element = $element;
+        $elementsService = Craft::$app->getElements();
+        $user = static::currentUser();
+
+        // Check save permissions before and after applying POST params to the element
+        // in case the request was tampered with.
+        if (!$elementsService->canSave($element, $user)) {
+            throw new ForbiddenHttpException('User not authorized to save this element.');
+        }
+
+        // Get the owner and make sure it's a draft,
+        // and that its canonical element is the nested element's primary owner
+        $owner = $elementsService->getElementById($this->_ownerId, siteId: $element->siteId);
+        if (
+            !$owner->getIsDraft() ||
+            $owner->getIsCanonical() ||
+            $owner->getCanonicalId() !== $element->getPrimaryOwnerId() ||
+            !$elementsService->canSave($owner, $user)
+        ) {
+            throw new ForbiddenHttpException('User not authorized to save the owner element.');
+        }
+
+        // Get the old sort order
+        $sortOrder = (new Query())
+            ->select('sortOrder')
+            ->from(Table::ELEMENTS_OWNERS)
+            ->where([
+                'elementId' => $element->id,
+                'ownerId' => $owner->id,
+            ])
+            ->scalar() ?: null;
+        $element->setSortOrder($sortOrder);
+
+        $db = Craft::$app->getDb();
+        $transaction = $db->beginTransaction();
+
+        try {
+            // Remove existing ownership data for the element within the canonical owner,
+            // and for its canonical element within the draft
+            Db::delete(Table::ELEMENTS_OWNERS, [
+                'or',
+                ['elementId' => $element->id, 'ownerId' => $owner->getCanonicalId()],
+                ['elementId' => $element->getCanonicalId(), 'ownerId' => $owner->id],
+            ]);
+
+            if ($element->getIsDraft()) {
+                // Just remove the draft data, but preserve the canonicalId
+                $element->setPrimaryOwner($owner);
+                $element->setOwner($owner);
+                $elementsService->saveElement($element);
+            } else {
+                // Duplicate it
+                $element = $elementsService->duplicateElement($element, [
+                    'canonicalId' => $element->id,
+                    'primaryOwner' => $owner,
+                    'owner' => $owner,
+                ]);
+            }
+
+            $this->_applyParamsToElement($element);
+
+            if (!$elementsService->canSave($element, $user)) {
+                throw new ForbiddenHttpException('User not authorized to save this element.');
+            }
+
+            if ($element->enabled && $element->getEnabledForSite()) {
+                $element->setScenario(Element::SCENARIO_LIVE);
+            }
+
+            try {
+                $success = $elementsService->saveElement($element);
+            } catch (UnsupportedSiteException $e) {
+                $element->addError('siteId', $e->getMessage());
+                $success = false;
+            }
+
+            if (!$success) {
+                $transaction->rollBack();
+                return $this->_asFailure($element, Craft::t('app', 'Couldn’t save {type}.', [
+                    'type' => $element::lowerDisplayName(),
+                ]));
+            }
+
+            if ($element->getIsDraft()) {
+                Craft::$app->getDrafts()->removeDraftData($element);
+            }
+
+            $transaction->commit();
+        } catch (Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+
+        return $this->_asSuccess(Craft::t('app', '{type} saved.', [
+            'type' => $element::displayName(),
+        ]), $element);
     }
 
     /**
