@@ -71,6 +71,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
     $updateSpinner: null,
     $viewModeBtnContainer: null,
     viewModeBtns: null,
+    defaultViewMode: null,
     _viewParams: null,
     _previousViewParams: null,
     _viewMode: null,
@@ -2226,6 +2227,10 @@ Craft.BaseElementIndex = Garnish.Base.extend(
 
       // Get the new list of view modes
       this.sourceViewModes = this.getViewModesForSource();
+      this.defaultViewMode = this.getSourceData(
+        this.$source,
+        'defaultViewMode'
+      );
 
       // Create the buttons if there's more than one mode available to this source
       if (this.sourceViewModes.length > 1) {
@@ -2267,7 +2272,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
       }
 
       // Figure out which mode we should start with
-      var viewMode = this.getSelectedSourceState('mode');
+      let viewMode = this.getSelectedSourceState('mode', this.defaultViewMode);
 
       // Maintain the structure view for source states that were saved with an older Craft version
       if (
@@ -2470,38 +2475,23 @@ Craft.BaseElementIndex = Garnish.Base.extend(
     },
 
     getViewModesForSource: function () {
-      const viewModes = [];
+      let viewModes = this.$source.data('viewModes');
 
-      if (!Garnish.isMobileBrowser(true)) {
-        if (Garnish.hasAttr(this.$source, 'data-has-structure')) {
-          viewModes.push({
-            mode: 'structure',
-            title: Craft.t('app', 'Display in a structured table'),
-            icon: Craft.orientation === 'rtl' ? 'structurertl' : 'structure',
-          });
-        }
-
-        viewModes.push({
-          mode: 'table',
-          title: Craft.t('app', 'Display in a table'),
-          icon: 'list',
-        });
+      // apply availableOnMobile
+      if (Garnish.isMobileBrowser(true)) {
+        viewModes = viewModes.filter(
+          (viewMode) => viewMode.availableOnMobile ?? true
+        );
       }
 
-      if (this.$source && Garnish.hasAttr(this.$source, 'data-has-thumbs')) {
-        viewModes.push({
-          mode: 'thumbs',
-          title: Craft.t('app', 'Display as thumbnails'),
-          icon: 'grid',
-        });
+      // apply structuresOnly
+      if (!Garnish.hasAttr(this.$source, 'data-has-structure')) {
+        viewModes = viewModes.filter(
+          (viewMode) => !(viewMode.structuresOnly ?? false)
+        );
       }
 
-      viewModes.push({
-        mode: 'cards',
-        title: Craft.t('app', 'Display as cards'),
-        icon: 'element-cards',
-      });
-
+      // filter down to the allowed ones
       if (this.settings.allowedViewModes) {
         return viewModes.filter((mode) =>
           this.settings.allowedViewModes.includes(mode.mode)
@@ -4035,6 +4025,12 @@ const ViewMenu = Garnish.Base.extend({
       this.$trigger.addClass('active');
       this.updateSortField();
       this.updateTableFieldVisibility();
+      if (
+        this.elementIndex.getSelectedSourceState('mode') !==
+        this.elementIndex.defaultViewMode
+      ) {
+        this._createRevertBtn();
+      }
     });
 
     this.menu.on('hide', () => {
@@ -4067,9 +4063,6 @@ const ViewMenu = Garnish.Base.extend({
         this.$tableColumnsContainer
           .closest('.table-columns-field')
           .addClass('hidden');
-      }
-      if (this.$revertBtn) {
-        this.$revertBtn.addClass('hidden');
       }
     } else {
       if (this.$tableColumnsContainer) {

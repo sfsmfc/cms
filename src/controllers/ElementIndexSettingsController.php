@@ -12,6 +12,7 @@ use craft\base\ElementInterface;
 use craft\base\PreviewableFieldInterface;
 use craft\elements\conditions\ElementConditionInterface;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Cp;
 use craft\models\UserGroup;
 use craft\services\ElementSources;
 use craft\services\ProjectConfig;
@@ -164,6 +165,10 @@ class ElementIndexSettingsController extends BaseElementsController
         }
         unset($source);
 
+        $viewModes = array_map(fn(array $viewMode) => array_merge($viewMode, [
+            'iconSvg' => Cp::iconSvg($viewMode['icon'] ?? 'table'),
+        ]), $elementType::indexViewModes());
+
         // Get the default sort options for custom sources
         $defaultSortOptions = Collection::make($sourcesService->getSourceSortOptions($elementType, 'custom:x'))
             ->map(fn(array $option) => [
@@ -213,6 +218,7 @@ class ElementIndexSettingsController extends BaseElementsController
 
         return $this->asJson([
             'sources' => $sources,
+            'viewModes' => $viewModes,
             'baseSortOptions' => $baseSortOptions,
             'defaultSortOptions' => $defaultSortOptions,
             'availableTableAttributes' => $availableTableAttributes,
@@ -268,6 +274,10 @@ class ElementIndexSettingsController extends BaseElementsController
 
                     if (isset($postedSettings['defaultSort'])) {
                         $sourceConfig['defaultSort'] = $postedSettings['defaultSort'];
+                    }
+
+                    if (isset($postedSettings['defaultViewMode'])) {
+                        $sourceConfig['defaultViewMode'] = $postedSettings['defaultViewMode'];
                     }
 
                     if ($isCustom) {

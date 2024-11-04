@@ -33,6 +33,7 @@
 - Entry types can now specify a Default Title Format, which will be used even if the Title field is included in the field layout, to generate a default Title value if the field is blank. ([#15942](https://github.com/craftcms/cms/pull/15942))
 - It’s now possible to control whether entry types’ Title fields are required. ([#15942](https://github.com/craftcms/cms/pull/15942))
 - Added the “Step Size” Number field setting.
+- Added the “Default View Mode” element source setting. ([#15824](https://github.com/craftcms/cms/pull/15824))
 - Added several new icons.
 - Added `pc/*` commands as an alias of `project-config/*`.
 - Added the `resave/all` command.
@@ -46,6 +47,7 @@
 - Added support for appending subpaths to environment variable names in environmental settings (e.g. `$PRIMARY_SITE_URL/uploads`).
 
 ### Extensibility
+- Added `craft\base\ElementInterface::indexViewModes()`.
 - Added `craft\base\NestedElementTrait::saveOwnership()`. ([#15894](https://github.com/craftcms/cms/pull/15894))
 - Added `craft\base\RequestTrait::getIsWebRequest()`. ([#15690](https://github.com/craftcms/cms/pull/15690))
 - Added `craft\console\Controller::output()`. 
