@@ -138,7 +138,7 @@ Craft.ElementEditor = Garnish.Base.extend(
         class: `revision-status ${this.isFullPage ? 'invisible' : 'hidden'}`,
       }).appendTo($spinnerContainer);
 
-      this.$expandSiteStatusesBtn = $('.expand-status-btn');
+      this.$expandSiteStatusesBtn = this.$container.find('.expand-status-btn');
 
       if (this.settings.canEditMultipleSites) {
         this.addListener(
@@ -421,6 +421,8 @@ Craft.ElementEditor = Garnish.Base.extend(
                     redirect: this.settings.hashedCpEditUrl,
                     params: {
                       draftId: this.settings.draftId,
+                      fieldId: this.settings.fieldId,
+                      ownerId: this.settings.ownerId,
                       provisional: 1,
                     },
                   });
@@ -429,6 +431,9 @@ Craft.ElementEditor = Garnish.Base.extend(
                     data: {
                       elementId: this.settings.canonicalId,
                       draftId: this.settings.draftId,
+                      fieldId: this.settings.fieldId,
+                      ownerId: this.settings.ownerId,
+                      siteId: this.settings.siteId,
                       provisional: 1,
                     },
                   })
@@ -1162,7 +1167,16 @@ Craft.ElementEditor = Garnish.Base.extend(
       // remove embedded element index names
       data = data.replace(/&elementindex-[^&]*/g, '');
 
-      return data;
+      // Give other things the ability to customize the serialized data
+      // (need to be passed via a nested object so changes persist upstream)
+      const eventData = {
+        serialized: data,
+      };
+      this.trigger('serializeForm', {
+        data: eventData,
+      });
+
+      return eventData.serialized;
     },
 
     /**
@@ -1637,8 +1651,22 @@ Craft.ElementEditor = Garnish.Base.extend(
         );
       }
 
-      for (const [name, value] of Object.entries(this.settings.saveParams)) {
-        params.push(`${this.namespaceInputName(name)}=${value}`);
+      if (this.settings.fieldId !== null) {
+        params.push(
+          `${this.namespaceInputName('fieldId')}=${this.settings.fieldId}`
+        );
+      }
+
+      if (this.settings.ownerId !== null) {
+        params.push(
+          `${this.namespaceInputName('ownerId')}=${this.settings.ownerId}`
+        );
+      }
+
+      if (this.settings.saveParams) {
+        for (const [name, value] of Object.entries(this.settings.saveParams)) {
+          params.push(`${this.namespaceInputName(name)}=${value}`);
+        }
       }
 
       return asArray ? params : params.join('&');
@@ -2040,6 +2068,10 @@ Craft.ElementEditor = Garnish.Base.extend(
         } finally {
           this.submittingForm = false;
           this.trigger('afterSubmit');
+
+          // after fully saving the element in a slideout, trigger checkForm but without creating a draft
+          // see https://github.com/craftcms/cms/issues/15938
+          this.checkForm(false, false);
         }
 
         if (this.settings.isUnpublishedDraft) {
@@ -2280,9 +2312,11 @@ Craft.ElementEditor = Garnish.Base.extend(
       previewToken: null,
       previewParamValue: null,
       revisionId: null,
+      fieldId: null,
+      ownerId: null,
       siteId: null,
       siteStatuses: [],
-      saveParams: {},
+      saveParams: null,
       siteToken: null,
       visibleLayoutElements: {},
       updatedTimestamp: null,

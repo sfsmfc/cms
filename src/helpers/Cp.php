@@ -18,10 +18,12 @@ use craft\base\ElementInterface;
 use craft\base\FieldLayoutElement;
 use craft\base\Grippable;
 use craft\base\Iconic;
+use craft\base\NestedElementInterface;
 use craft\base\Statusable;
 use craft\base\Thumbable;
 use craft\behaviors\DraftBehavior;
 use craft\elements\Address;
+use craft\enums\AttributeStatus;
 use craft\enums\CmsEdition;
 use craft\enums\Color;
 use craft\enums\MenuItemType;
@@ -35,6 +37,8 @@ use craft\models\FieldLayout;
 use craft\models\FieldLayoutTab;
 use craft\models\Site;
 use craft\services\ElementSources;
+use craft\utilities\ProjectConfig as ProjectConfigUtility;
+use craft\utilities\Updates;
 use craft\web\twig\TemplateLoaderException;
 use craft\web\View;
 use Illuminate\Support\Collection;
@@ -168,10 +172,12 @@ class Cp
             ]);
         }
 
+        $utilitiesService = Craft::$app->getUtilities();
+
         // Critical update available?
         if (
             $path !== 'utilities/updates' &&
-            $user->can('utility:updates') &&
+            $utilitiesService->checkAuthorization(Updates::class) &&
             Craft::$app->getUpdates()->getIsCriticalUpdateAvailable()
         ) {
             $alerts[] = Craft::t('app', 'A critical update is available.') .
@@ -194,7 +200,7 @@ class Cp
         $projectConfig = Craft::$app->getProjectConfig();
         if (
             $path !== 'utilities/project-config' &&
-            $user->can('utility:project-config') &&
+            $utilitiesService->checkAuthorization(ProjectConfigUtility::class) &&
             $projectConfig->areChangesPending() &&
             ($projectConfig->writeYamlAutomatically || $projectConfig->get('dateModified') <= $projectConfig->get('dateModified', true))
         ) {
@@ -579,6 +585,11 @@ class Cp
             'sortable' => false,
         ];
 
+        if ($element->getIsRevision()) {
+            $config['showActionMenu'] = false;
+            $config['selectable'] = false;
+        }
+
         $color = $element instanceof Colorable ? $element->getColor() : null;
 
         $classes = ['card'];
@@ -622,6 +633,38 @@ class Cp
             ]);
         }
 
+        // is this a nested element that will end up replacing its canonical
+        // counterpart when the owner is saved?
+        if (
+            $element instanceof NestedElementInterface &&
+            $element->getOwnerId() !== null &&
+            $element->getOwnerId() === $element->getPrimaryOwnerId() &&
+            !$element->getIsDraft() &&
+            !$element->getIsRevision() &&
+            $element->getOwner()->getIsDraft()
+        ) {
+            if ($element->getIsCanonical()) {
+                // this element was created for the owner
+                $statusLabel = Craft::t('app', 'This is a new {type}.', [
+                    'type' => $element::lowerDisplayName(),
+                ]);
+            } else {
+                // this element is a derivative of another element owned by the canonical owner
+                $statusLabel = Craft::t('app', 'This {type} has been edited.', [
+                    'type' => $element::lowerDisplayName(),
+                ]);
+            }
+
+            $status = Html::beginTag('div', [
+                    'class' => ['status-badge', AttributeStatus::Modified->value],
+                    'title' => $statusLabel,
+                ]) .
+                Html::tag('span', $statusLabel, [
+                    'class' => 'visually-hidden',
+                ]) .
+                Html::endTag('div');
+        }
+
         $thumb = $element->getThumbHtml(128);
         if ($thumb === null && $element instanceof Iconic) {
             $icon = $element->getIcon();
@@ -637,6 +680,7 @@ class Cp
         }
 
         $html = Html::beginTag('div', $attributes) .
+            ($status ?? '') .
             ($thumb ?? '') .
             Html::beginTag('div', ['class' => 'card-content']) .
             ($headingContent !== '' ? Html::tag('div', $headingContent, ['class' => 'card-heading']) : '') .
@@ -862,6 +906,9 @@ class Cp
                     'id' => $element->isProvisionalDraft ? $element->getCanonicalId() : $element->id,
                     'draft-id' => $element->isProvisionalDraft ? null : $element->draftId,
                     'revision-id' => $element->revisionId,
+                    'field-id' => $element instanceof NestedElementInterface ? $element->getField()?->id : null,
+                    'primary-owner-id' => $element instanceof NestedElementInterface ? $element->getPrimaryOwnerId() : null,
+                    'owner-id' => $element instanceof NestedElementInterface ? $element->getOwnerId() : null,
                     'site-id' => $element->siteId,
                     'status' => $element->getStatus(),
                     'label' => (string)$element,
@@ -1758,6 +1805,33 @@ JS, [
     }
 
     /**
+     * Renders a range input’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.5.0
+     */
+    public static function rangeHtml(array $config): string
+    {
+        return static::renderTemplate('_includes/forms/range.twig', $config);
+    }
+
+    /**
+     * Renders a lightswitch field’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.5.0
+     */
+    public static function rangeFieldHtml(array $config): string
+    {
+        $config['id'] = $config['id'] ?? 'range' . mt_rand();
+        return static::fieldHtml('template:_includes/forms/range.twig', $config);
+    }
+
+    /**
      * Renders a money input’s HTML.
      *
      * @param array $config
@@ -2081,9 +2155,9 @@ JS, [
             $value = $config['value'] ?? '';
             if (!isset($config['tip']) && (!isset($value[0]) || !in_array($value[0], ['$', '@']))) {
                 if ($config['suggestAliases'] ?? false) {
-                    $config['tip'] = Craft::t('app', 'This can be set to an environment variable, or begin with an alias.');
+                    $config['tip'] = Craft::t('app', 'This can begin with an environment variable or alias.');
                 } else {
-                    $config['tip'] = Craft::t('app', 'This can be set to an environment variable.');
+                    $config['tip'] = Craft::t('app', 'This can begin with an environment variable.');
                 }
                 $config['tip'] .= ' ' .
                     Html::a(Craft::t('app', 'Learn more'), 'https://craftcms.com/docs/5.x/configure.html#control-panel-settings', [
@@ -2379,43 +2453,45 @@ JS, [
 
         // get the attributes that are set to be visible in the card body
         $selectedCardAttributes = $fieldLayout->getCardBodyAttributes();
-        // ensure they have checked and value keys
-        array_walk($selectedCardAttributes, function(&$attribute) {
-            $attribute['checked'] = true;
-            $attribute['fieldClass'] = ['cvd-field'];
-        });
 
         // get remaining attributes
         $elementType = new ($fieldLayout['type']);
-        $remainingCardAttributes = $elementType::cardAttributes();
-        foreach ($remainingCardAttributes as $key => $cardAttributes) {
+        $remainingItems = $elementType::cardAttributes();
+        foreach ($remainingItems as $key => $cardAttributes) {
             if (isset($selectedCardAttributes[$key])) {
-                unset($remainingCardAttributes[$key]);
+                unset($remainingItems[$key]);
             } else {
-                $remainingCardAttributes[$key]['value'] = $key;
-                $remainingCardAttributes[$key]['fieldClass'] = ['cvd-field'];
+                $remainingItems[$key]['value'] = $key;
             }
         }
 
-        // get all the custom fields that are set to be visible in the card body
+        // get all the previewable fields
+        // and split them between those visible in the card's body and remaining ones
         $fldOptions = [];
-        foreach ($fieldLayout->getCardBodyFields(null) as $bodyField) {
-            $fldOptions['layoutElement:' . $bodyField->uid] = [
-                'label' => $bodyField->label(),
-                'value' => 'layoutElement:' . $bodyField->uid,
-                'fieldClass' => ['disabled', 'cvd-field'],
-                'checked' => true, // all fields that are set to show in the card are selected and cannot be unchecked
-                'aria' => [
-                    'disabled' => 'true',
-                ],
-            ];
+        foreach ($fieldLayout->getAllElements() as $layoutElement) {
+            if (
+                $layoutElement instanceof BaseField &&
+                $layoutElement->previewable()
+            ) {
+                if ($layoutElement->includeInCards) {
+                    $fldOptions['layoutElement:' . $layoutElement->uid] = [
+                        'label' => $layoutElement->label(),
+                        'value' => 'layoutElement:' . $layoutElement->uid,
+                    ];
+                } else {
+                    $remainingItems['layoutElement:' . $layoutElement->uid] = [
+                        'label' => $layoutElement->label(),
+                        'value' => 'layoutElement:' . $layoutElement->uid,
+                    ];
+                }
+            }
         }
 
         // merge selected card attributes with selected fields
         $selectedOptions = array_merge($fldOptions, $selectedCardAttributes);
-        $cardViewValues = $fieldLayout->getCardView();
 
         // make sure we don't have any cardViewValues that are no longer allowed to show in cards
+        $cardViewValues = $fieldLayout->getCardView();
         $cardViewValues = array_filter($cardViewValues, function($value) use ($selectedOptions) {
             return isset($selectedOptions[$value]);
         });
@@ -2426,40 +2502,37 @@ JS, [
             $selectedOptions
         );
 
-
         // sort the remaining attributes alphabetically, by label
-        $labels = array_column($remainingCardAttributes, 'label');
-        array_multisort($labels, SORT_ASC, $remainingCardAttributes);
+        $labels = array_column($remainingItems, 'label');
+        array_multisort($labels, SORT_ASC, $remainingItems);
 
         // and now that both parts are sorted, merge them
-        $options = array_values(array_merge($selectedOptions, $remainingCardAttributes));
+        $options = array_values(array_merge($selectedOptions, $remainingItems));
 
-        $checkboxes = [];
-        foreach ($options as $option) {
-            $option['checkboxLabel'] = $option['label'];
-            $option['name'] = 'cardView[]';
-            $checkbox = Html::beginTag('div', [
-                'class' => ['draggable'],
-            ]) .
-                Html::tag('a', '', [
-                    'class' => ['move', 'icon', 'draggable-handle'],
-                ]) .
-                self::checkboxFieldHtml($option) .
-                Html::endTag('div');
-            $checkboxes[] = $checkbox;
-        }
-        $checkboxes = implode("\n", $checkboxes);
+        $checkboxSelect = self::checkboxSelectFieldHtml([
+            'label' => Craft::t('app', 'Card View'),
+            'id' => $config['id'],
+            'name' => 'cardView',
+            'options' => $options,
+            'values' => array_keys($selectedOptions),
+            'required' => true,
+            //'targetPrefix' => 'cardView-',
+            'sortable' => true,
+        ]);
+
+
         // js is initiated via Craft.FieldLayoutDesigner
         $previewHtml = self::cardPreviewHtml($fieldLayout, showThumb: $fieldLayout->getThumbField() !== null);
 
         return
             Html::beginTag('div', [
-                'id' => $config['id'],
+                'id' => $config['id'] . '-container',
                 'class' => 'card-view-designer',
             ]) .
+            Html::tag('h2', Craft::t('app', 'Card Layout Editor'), ['class' => 'visually-hidden']) .
             Html::beginTag('div', ['class' => 'cvd-container']) .
             Html::beginTag('div', ['class' => 'cvd-library']) .
-            $checkboxes .
+            $checkboxSelect .
             Html::endTag('div') . // .cvd-library
             Html::beginTag('div', ['class' => 'cvd-preview-container']) .
             Html::beginTag('div', ['class' => 'cvd-preview']) .
@@ -2486,12 +2559,6 @@ JS, [
      */
     public static function cardPreviewHtml(FieldLayout $fieldLayout, array $cardElements = [], $showThumb = false): string
     {
-        // get colour
-        $color = null;
-        if ($fieldLayout->provider instanceof Colorable) {
-            $color = $fieldLayout->provider->color ?? null;
-        }
-
         // get heading
         $heading = Html::tag('craft-element-label',
             Html::tag('a', Html::tag('span', Craft::t('app', 'Title')), [
@@ -2512,11 +2579,6 @@ JS, [
         $previewHtml =
             Html::beginTag('div', [
                 'class' => ['element', 'card'],
-                'style' => array_filter([
-                    '--custom-bg-color' => $color?->cssVar(50),
-                    '--custom-text-color' => $color?->cssVar(900),
-                    '--custom-sel-bg-color' => $color?->cssVar(900),
-                ]),
             ]);
 
         // get thumb placeholder
@@ -2623,7 +2685,7 @@ JS, [
             'elementType' => $fieldLayout->type,
             'customizableTabs' => $config['customizableTabs'],
             'customizableUi' => $config['customizableUi'],
-            'withCardViewDesigner' => $config['withCardViewDesigner'],
+            'withCardViewDesigner' => $config['withCardViewDesigner'] ?? false,
         ]);
         $namespacedId = $view->namespaceInputId($config['id']);
 

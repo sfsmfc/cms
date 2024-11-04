@@ -1042,10 +1042,6 @@ class ElementHelper
 
         $first = reset($canonicalElements);
 
-        if (!$first::hasDrafts()) {
-            return;
-        }
-
         $drafts = $first::find()
             ->draftOf($canonicalElements)
             ->draftCreator($user)
@@ -1072,6 +1068,11 @@ class ElementHelper
                     $draft->lft = $element->lft;
                     $draft->rgt = $element->rgt;
                     $draft->level = $element->level;
+                }
+
+                // retain the canonical element's ownerId
+                if ($element instanceof NestedElementInterface && $draft instanceof NestedElementInterface) {
+                    $draft->setOwnerId($element->getOwnerId());
                 }
 
                 $elements[$i] = $draft;

@@ -410,7 +410,42 @@ Craft.NestedElementManager = Garnish.Base.extend(
             // Let the link/button do its thing
             return;
           }
-          Craft.createElementEditor(this.elementType, $element);
+
+          const slideout = Craft.createElementEditor(
+            this.elementType,
+            $element,
+            {
+              onBeforeSubmit: async () => {
+                // If the nested element is primarily owned by the canonical entry being edited,
+                // then ensure we're working with a draft and save the nested entry changes to the draft
+                if (
+                  $element.data('primary-owner-id') ==
+                  this.elementEditor.settings.canonicalId
+                ) {
+                  await this.markAsDirty();
+                  if (this.elementEditor.settings.draftId) {
+                    if (!slideout.elementEditor.settings.saveParams) {
+                      slideout.elementEditor.settings.saveParams = {};
+                    }
+                    slideout.elementEditor.settings.saveParams.action =
+                      'elements/save-nested-element-for-draft';
+                    slideout.elementEditor.settings.saveParams.ownerId =
+                      this.settings.ownerId;
+                  }
+                }
+              },
+              onSubmit: (ev) => {
+                if (ev.data.id != $element.data('id')) {
+                  // swap the element with the new one
+                  $element
+                    .attr('data-id', ev.data.id)
+                    .data('id', ev.data.id)
+                    .data('owner-id', ev.data.ownerId);
+                  Craft.refreshElementInstances(ev.data.id);
+                }
+              },
+            }
+          );
         });
       }
 
@@ -419,25 +454,27 @@ Craft.NestedElementManager = Garnish.Base.extend(
       }
 
       const $actionMenuBtn = $element.find('.action-btn');
-      const disclosureMenu = $actionMenuBtn
-        .disclosureMenu()
-        .data('disclosureMenu');
+      if ($actionMenuBtn.length > 0) {
+        const disclosureMenu = $actionMenuBtn
+          .disclosureMenu()
+          .data('disclosureMenu');
 
-      if (Garnish.hasAttr($element, 'data-deletable')) {
-        const ul = disclosureMenu.addGroup();
-        disclosureMenu.addItem(
-          {
-            icon: 'trash',
-            label: this.settings.deleteLabel || Craft.t('app', 'Delete'),
-            destructive: true,
-            onActivate: () => {
-              if (confirm(this.settings.deleteConfirmationMessage)) {
-                this.deleteElement($element);
-              }
+        if (Garnish.hasAttr($element, 'data-deletable')) {
+          const ul = disclosureMenu.addGroup();
+          disclosureMenu.addItem(
+            {
+              icon: 'trash',
+              label: this.settings.deleteLabel || Craft.t('app', 'Delete'),
+              destructive: true,
+              onActivate: () => {
+                if (confirm(this.settings.deleteConfirmationMessage)) {
+                  this.deleteElement($element);
+                }
+              },
             },
-          },
-          ul
-        );
+            ul
+          );
+        }
       }
     },
 

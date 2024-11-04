@@ -179,6 +179,7 @@ class ElementCondition extends BaseCondition implements ElementConditionInterfac
 
         if (Craft::$app->getIsMultiSite() && (!$elementType || $elementType::isLocalized())) {
             $types[] = SiteConditionRule::class;
+            $types[] = LanguageConditionRule::class;
 
             if (count(Craft::$app->getSites()->getAllGroups()) > 1) {
                 $types[] = SiteGroupConditionRule::class;
@@ -199,13 +200,11 @@ class ElementCondition extends BaseCondition implements ElementConditionInterfac
                 $types[] = TitleConditionRule::class;
             }
 
-            $fieldLabels = [];
-
             foreach ($this->getFieldLayouts() as $fieldLayout) {
                 foreach ($fieldLayout->getCustomFieldElements() as $layoutElement) {
-                    // Discard fields with empty/non-unique labels
+                    // Discard fields with empty labels
                     $label = $layoutElement->label();
-                    if ($label === null || isset($fieldLabels[$label])) {
+                    if ($label === null) {
                         continue;
                     }
                     $field = $layoutElement->getField();
@@ -213,8 +212,6 @@ class ElementCondition extends BaseCondition implements ElementConditionInterfac
                     if ($type === null) {
                         continue;
                     }
-
-                    $fieldLabels[$label] = true;
 
                     if (is_string($type)) {
                         $type = ['class' => $type];
