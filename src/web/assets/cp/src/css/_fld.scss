@@ -405,21 +405,37 @@ $gridColor: var(--gray-100);
 }
 
 // card view designer
+.card-view-designer {
+  container: cvd / inline-size;
+}
+
 .cvd-container {
   display: grid;
-  grid-template-columns: minmax(20%, 300px) 1fr;
   position: relative;
   overflow: hidden;
   box-shadow: none;
   gap: var(--xl);
 }
 
-.cvd-library {
-  flex-grow: 1;
+@container cvd (width > 37.5rem) {
+  .cvd-container {
+    grid-template-columns: 1fr 2fr;
+  }
+}
 
+.cvd-library {
   .draggable {
     display: flex;
   }
+}
+
+.cvd-preview-container {
+  padding: var(--xl);
+  border: 1px solid #{color.adjust(mixins.$inputColor, $alpha: -0.75)} !important;
+  border-radius: var(--small-border-radius);
+  display: grid;
+  height: 100%;
+  align-items: center;
 }
 
 .cvd-preview {
