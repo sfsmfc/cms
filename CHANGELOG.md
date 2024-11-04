@@ -4,6 +4,9 @@
 
 - Fixed a styling bug.
 - Fixed a bug `craft\services\Categories::saveGroup()` and `craft\services\Tags::saveTagGroup()` weren’t respecting predefined UUID values on new models.
+- Fixed an error that could occur when editing a nested Matrix entry in a slideout or full-page editor, if it was initially edited while the Matrix field was in inline-editable blocks mode.
+- Fixed an error that could occur when editing an address that had provisional changes.
+- Fixed a bug where address cards weren’t showing provisional changes.
 
 ## 5.4.9 - 2024-10-22
 

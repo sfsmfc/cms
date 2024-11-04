@@ -1042,10 +1042,6 @@ class ElementHelper
 
         $first = reset($canonicalElements);
 
-        if (!$first::hasDrafts()) {
-            return;
-        }
-
         $drafts = $first::find()
             ->draftOf($canonicalElements)
             ->draftCreator($user)
