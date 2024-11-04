@@ -487,11 +487,8 @@
                 {% set config = config|filter((v, k) => k != 'id') %}
             {% endif %}
 
-            <h2 class="visually-hidden">{{ 'Card Layout Editor'|t('app') }}</h2>
-            {{ _self.field({
-                label: 'Card View'|t('app'),
-                fieldset: true,
-            }|merge(config), 'template:_includes/forms/cardViewDesigner') }}
+            {% include '_includes/forms/cardViewDesigner' with {'fieldLayout' : config.fieldLayout} %}
+
         {% endif %}
     </div>
 {% endmacro %}

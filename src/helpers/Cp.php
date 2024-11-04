@@ -2418,43 +2418,45 @@ JS, [
 
         // get the attributes that are set to be visible in the card body
         $selectedCardAttributes = $fieldLayout->getCardBodyAttributes();
-        // ensure they have checked and value keys
-        array_walk($selectedCardAttributes, function(&$attribute) {
-            $attribute['checked'] = true;
-            $attribute['fieldClass'] = ['cvd-field'];
-        });
 
         // get remaining attributes
         $elementType = new ($fieldLayout['type']);
-        $remainingCardAttributes = $elementType::cardAttributes();
-        foreach ($remainingCardAttributes as $key => $cardAttributes) {
+        $remainingItems = $elementType::cardAttributes();
+        foreach ($remainingItems as $key => $cardAttributes) {
             if (isset($selectedCardAttributes[$key])) {
-                unset($remainingCardAttributes[$key]);
+                unset($remainingItems[$key]);
             } else {
-                $remainingCardAttributes[$key]['value'] = $key;
-                $remainingCardAttributes[$key]['fieldClass'] = ['cvd-field'];
+                $remainingItems[$key]['value'] = $key;
             }
         }
 
-        // get all the custom fields that are set to be visible in the card body
+        // get all the previewable fields
+        // and split them between those visible in the card's body and remaining ones
         $fldOptions = [];
-        foreach ($fieldLayout->getCardBodyFields(null) as $bodyField) {
-            $fldOptions['layoutElement:' . $bodyField->uid] = [
-                'label' => $bodyField->label(),
-                'value' => 'layoutElement:' . $bodyField->uid,
-                'fieldClass' => ['disabled', 'cvd-field'],
-                'checked' => true, // all fields that are set to show in the card are selected and cannot be unchecked
-                'aria' => [
-                    'disabled' => 'true',
-                ],
-            ];
+        foreach ($fieldLayout->getAllElements() as $layoutElement) {
+            if (
+                $layoutElement instanceof BaseField &&
+                $layoutElement->previewable()
+            ) {
+                if ($layoutElement->includeInCards) {
+                    $fldOptions['layoutElement:' . $layoutElement->uid] = [
+                        'label' => $layoutElement->label(),
+                        'value' => 'layoutElement:' . $layoutElement->uid,
+                    ];
+                } else {
+                    $remainingItems['layoutElement:' . $layoutElement->uid] = [
+                        'label' => $layoutElement->label(),
+                        'value' => 'layoutElement:' . $layoutElement->uid,
+                    ];
+                }
+            }
         }
 
         // merge selected card attributes with selected fields
         $selectedOptions = array_merge($fldOptions, $selectedCardAttributes);
-        $cardViewValues = $fieldLayout->getCardView();
 
         // make sure we don't have any cardViewValues that are no longer allowed to show in cards
+        $cardViewValues = $fieldLayout->getCardView();
         $cardViewValues = array_filter($cardViewValues, function($value) use ($selectedOptions) {
             return isset($selectedOptions[$value]);
         });
@@ -2465,40 +2467,37 @@ JS, [
             $selectedOptions
         );
 
-
         // sort the remaining attributes alphabetically, by label
-        $labels = array_column($remainingCardAttributes, 'label');
-        array_multisort($labels, SORT_ASC, $remainingCardAttributes);
+        $labels = array_column($remainingItems, 'label');
+        array_multisort($labels, SORT_ASC, $remainingItems);
 
         // and now that both parts are sorted, merge them
-        $options = array_values(array_merge($selectedOptions, $remainingCardAttributes));
+        $options = array_values(array_merge($selectedOptions, $remainingItems));
 
-        $checkboxes = [];
-        foreach ($options as $option) {
-            $option['checkboxLabel'] = $option['label'];
-            $option['name'] = 'cardView[]';
-            $checkbox = Html::beginTag('div', [
-                'class' => ['draggable'],
-            ]) .
-                Html::tag('a', '', [
-                    'class' => ['move', 'icon', 'draggable-handle'],
-                ]) .
-                self::checkboxFieldHtml($option) .
-                Html::endTag('div');
-            $checkboxes[] = $checkbox;
-        }
-        $checkboxes = implode("\n", $checkboxes);
+        $checkboxSelect = self::checkboxSelectFieldHtml([
+            'label' => Craft::t('app', 'Card View'),
+            'id' => $config['id'],
+            'name' => 'cardView',
+            'options' => $options,
+            'values' => array_keys($selectedOptions),
+            'required' => true,
+            //'targetPrefix' => 'cardView-',
+            'sortable' => true,
+        ]);
+
+
         // js is initiated via Craft.FieldLayoutDesigner
         $previewHtml = self::cardPreviewHtml($fieldLayout, showThumb: $fieldLayout->getThumbField() !== null);
 
         return
             Html::beginTag('div', [
-                'id' => $config['id'],
+                'id' => $config['id'] . '-container',
                 'class' => 'card-view-designer',
             ]) .
+            Html::tag('h2', Craft::t('app', 'Card Layout Editor'), ['class' => 'visually-hidden']) .
             Html::beginTag('div', ['class' => 'cvd-container']) .
             Html::beginTag('div', ['class' => 'cvd-library']) .
-            $checkboxes .
+            $checkboxSelect .
             Html::endTag('div') . // .cvd-library
             Html::beginTag('div',  ['class' => 'cvd-preview']) .
             Html::tag('h3', Craft::t('app','Card Layout Preview'), [

@@ -176,7 +176,13 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
     },
 
     initCvd: function () {
-      new Craft.FieldLayoutDesigner.CardViewDesigner(this, this.$cvd);
+      let cvd = new Craft.FieldLayoutDesigner.CardViewDesigner(this, this.$cvd);
+
+      cvd.$libraryContainer
+        .data('sortableCheckboxSelect')
+        .dragSort.on('dragStop', function () {
+          cvd.updatePreview();
+        });
     },
 
     initTab: function ($tab) {
@@ -946,31 +952,6 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
           actionUl
         );
       }
-
-      if (this.previewable) {
-        showInCardsBtn = disclosureMenu.addItem(
-          {
-            label: Craft.t('app', 'Show in element cards'),
-            icon: 'eye',
-            iconColor: 'blue',
-            onActivate: () => {
-              this.showInCards();
-            },
-          },
-          actionUl
-        );
-        omitFromCardsBtn = disclosureMenu.addItem(
-          {
-            label: Craft.t('app', 'Don’t show in element cards'),
-            icon: 'eye-slash',
-            iconColor: 'gray',
-            onActivate: () => {
-              this.omitFromCards();
-            },
-          },
-          actionUl
-        );
-      }
     }
 
     const moveGroup = disclosureMenu.addGroup();
@@ -1021,11 +1002,6 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
           !this.config.providesThumbs
         );
         disclosureMenu.toggleItem(dropThumbnailBtn, this.config.providesThumbs);
-      }
-
-      if (this.previewable) {
-        disclosureMenu.toggleItem(showInCardsBtn, !this.config.includeInCards);
-        disclosureMenu.toggleItem(omitFromCardsBtn, this.config.includeInCards);
       }
 
       disclosureMenu.toggleItem(
@@ -1169,10 +1145,6 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
     await this.applyConfig((config) => {
       config.includeInCards = true;
       return config;
-    }).then(() => {
-      if (this.tab.designer.settings.withCardViewDesigner) {
-        this.tab.designer.$cvd.data('cvd').addCheckbox(this);
-      }
     });
   },
 
@@ -1180,10 +1152,6 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
     await this.applyConfig((config) => {
       config.includeInCards = false;
       return config;
-    }).then(() => {
-      if (this.tab.designer.settings.withCardViewDesigner) {
-        this.tab.designer.$cvd.data('cvd').removeCheckbox(this);
-      }
     });
   },
 
@@ -1826,6 +1794,8 @@ Craft.FieldLayoutDesigner.ElementDrag =
 
         if (this.draggingLibraryElement) {
           element = tab.initElement(this.$draggee);
+          element.$container.attr('data-uid', element.uid);
+          tab.designer.$cvd.data('cvd').addCheckbox(element);
         } else {
           element = this.$draggee.data('fld-element');
 
@@ -1858,6 +1828,7 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
   $previewContainer: null,
   $libraryContainer: null,
   showThumb: null,
+  sortableCheckboxSelect: null,
 
   init: function (designer, container) {
     this.designer = designer;
@@ -1865,11 +1836,16 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
     this.$container.data('cvd', this);
 
     this.$previewContainer = this.$container.find('.cvd-preview');
-    this.$libraryContainer = this.$container.find('.cvd-library');
+    this.$libraryContainer = this.$container.find(
+      '.cvd-library .checkbox-select'
+    );
+    this.sortableCheckboxSelect = this.$libraryContainer.data(
+      'sortableCheckboxSelect'
+    );
 
     // trigger preview update when items are checked/unchecked
     this.$libraryContainer.on('change', function (ev) {
-      if ($(ev.target).parents('.cvd-field.disabled').length > 0) {
+      if ($(ev.target).parents('.checkbox').length > 0) {
         $(ev.target).prop('checked', true);
       } else {
         let cvd = $(this).parents('.card-view-designer').data('cvd');
@@ -1877,23 +1853,59 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
       }
     });
 
-    this.initDrag(this.$container);
+    this.listenToSortableEvents();
     this.disablePreviewLinks();
   },
 
-  initDrag: function ($container) {
-    const sortItems = $container.find('.draggable');
-    if (sortItems.length) {
-      let dragSort = new Garnish.DragSort(sortItems, {
-        axis: Garnish.Y_AXIS,
-        handle: '.draggable-handle',
-      });
+  initDrag: function ($draggable) {
+    this.sortableCheckboxSelect.initDrag();
+    this.sortableCheckboxSelect.initItem($draggable);
 
-      // trigger preview update when items are dragged into new position
-      dragSort.on('dragStop', function () {
-        $container.data('cvd').updatePreview();
-      });
-    }
+    // trigger preview update when items are dragged into new position
+    let cvd = this.$container.data('cvd');
+    this.sortableCheckboxSelect.dragSort.on('dragStop', function () {
+      cvd.updatePreview();
+    });
+
+    this.listenToSortableEvents();
+  },
+
+  listenToSortableEvents: function () {
+    let cvd = this.$container.data('cvd');
+
+    // when item is moved up or down via disclosure menu - update preview
+    this.sortableCheckboxSelect.$container.on('movedUp movedDown', function () {
+      cvd.updatePreview();
+    });
+
+    // when checkbox is checked or unchecked - apply config & update preview
+    this.sortableCheckboxSelect.$container.on(
+      'checked unchecked',
+      function (ev) {
+        console.log('checked or unchecked');
+        let val = $(ev.target).find('input.checkbox').val();
+        if (!val.startsWith('layoutElement:')) {
+          return;
+        }
+
+        val = val.substring(14);
+
+        let $fld = cvd.designer.$tabContainer.find(
+          '.fld-field[data-uid="' + val + '"]'
+        );
+        if ($fld.length > 0) {
+          let fldElement = $fld.data('fld-element');
+
+          if (ev.type == 'checked') {
+            fldElement.showInCards();
+          } else {
+            fldElement.omitFromCards();
+          }
+        }
+
+        cvd.updatePreview();
+      }
+    );
   },
 
   updatePreview: function () {
@@ -1958,22 +1970,18 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
       return null;
     }
 
-    let $draggable = $('<div class="draggable"/>');
-    let $moveIcon = $('<a class="move icon draggable-handle"/>').appendTo(
-      $draggable
-    );
+    let $draggable = $('<div class="checkbox-select-item"/>');
+    let $moveIcon = $(
+      '<a class="move icon draggable-handle disabled"/>'
+    ).appendTo($draggable);
     let $checkboxContainer = Craft.ui
-      .createCheckboxField({
+      .createCheckbox({
         name: 'cardView[]',
         value: 'layoutElement:' + element.uid,
         label: this.getCheckboxLabel(element.$container),
-        checked: true,
-        fieldClass: ['disabled', 'cvd-field'],
+        checked: false,
         data: {
           'field-id': element.fieldId,
-        },
-        aria: {
-          disabled: true,
         },
       })
       .appendTo($draggable);
@@ -1981,10 +1989,7 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
     $draggable.appendTo(this.$libraryContainer);
 
     // re-init dragging
-    this.initDrag(this.$container);
-
-    // and now make a call to update the card preview
-    this.updatePreview();
+    this.initDrag($draggable);
   },
 
   removeCheckbox: function (element) {
@@ -2008,7 +2013,7 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
 
     return this.$libraryContainer
       .find('input[value="layoutElement:' + uid + '"]')
-      .parents('.draggable');
+      .parents('.checkbox-select-item');
   },
 
   updateLabel: function ($container) {
