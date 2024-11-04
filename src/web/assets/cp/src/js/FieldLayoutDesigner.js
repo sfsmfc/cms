@@ -1882,7 +1882,6 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
     this.sortableCheckboxSelect.$container.on(
       'checked unchecked',
       function (ev) {
-        console.log('checked or unchecked');
         let val = $(ev.target).find('input.checkbox').val();
         if (!val.startsWith('layoutElement:')) {
           return;
