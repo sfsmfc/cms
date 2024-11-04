@@ -1103,7 +1103,8 @@ class Fields extends Component
     {
         $paramPrefix = $namespace ? rtrim($namespace, '.') . '.' : '';
         $config = Json::decode(Craft::$app->getRequest()->getBodyParam($paramPrefix . 'fieldLayout'));
-        $config['cardView'] = Craft::$app->getRequest()->getBodyParam($paramPrefix . 'cardView');
+        $cardView = Craft::$app->getRequest()->getBodyParam($paramPrefix . 'cardView');
+        $config['cardView'] = empty($cardView) ? null : $cardView;
         $layout = $this->createLayout($config);
 
         // Make sure all the elements have a dateAdded value set
