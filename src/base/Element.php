@@ -1570,7 +1570,7 @@ abstract class Element extends Component implements ElementInterface
                 ],
                 'slug' => [
                     'label' => Craft::t('app', 'Slug'),
-                    'placeholder' => Craft::t('app', 'slug'),
+                    'placeholder' => Craft::t('app', 'Slug'),
                 ],
                 'uri' => [
                     'label' => Craft::t('app', 'URI'),

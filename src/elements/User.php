@@ -523,7 +523,7 @@ class User extends Element implements IdentityInterface
             ],
             'groups' => [
                 'label' => Craft::t('app', 'Groups'),
-                'placeholder' => Craft::t('app', 'Group name'),
+                'placeholder' => Craft::t('app', 'Group Name'),
             ],
             'preferredLanguage' => [
                 'label' => Craft::t('app', 'Preferred Language'),
