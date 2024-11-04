@@ -1121,7 +1121,7 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
       return config;
     }).then(() => {
       if (this.tab.designer.settings.withCardViewDesigner) {
-        let cvd = this.tab.designer.$cvd.data('cvd');
+        let cvd = this.tab.designer.$cvd?.data('cvd');
         cvd.showThumb = true;
         cvd.updatePreview();
       }
@@ -1134,7 +1134,7 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
       return config;
     }).then(() => {
       if (this.tab.designer.settings.withCardViewDesigner) {
-        let cvd = this.tab.designer.$cvd.data('cvd');
+        let cvd = this.tab.designer.$cvd?.data('cvd');
         cvd.showThumb = false;
         cvd.updatePreview();
       }
@@ -1346,7 +1346,7 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
       }
     }
 
-    this.tab.designer.$cvd.data('cvd').removeCheckbox(this);
+    this.tab.designer.$cvd?.data('cvd').removeCheckbox(this);
 
     this.base();
   },
@@ -1795,7 +1795,7 @@ Craft.FieldLayoutDesigner.ElementDrag =
         if (this.draggingLibraryElement) {
           element = tab.initElement(this.$draggee);
           element.$container.attr('data-uid', element.uid);
-          tab.designer.$cvd.data('cvd').addCheckbox(element);
+          tab.designer.$cvd?.data('cvd').addCheckbox(element);
         } else {
           element = this.$draggee.data('fld-element');
 

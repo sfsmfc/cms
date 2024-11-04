@@ -2691,7 +2691,7 @@ JS, [
             'elementType' => $fieldLayout->type,
             'customizableTabs' => $config['customizableTabs'],
             'customizableUi' => $config['customizableUi'],
-            'withCardViewDesigner' => $config['withCardViewDesigner'],
+            'withCardViewDesigner' => $config['withCardViewDesigner'] ?? false,
         ]);
         $namespacedId = $view->namespaceInputId($config['id']);
 
