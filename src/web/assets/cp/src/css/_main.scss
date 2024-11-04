@@ -2318,6 +2318,10 @@ ul.icons {
     inset-block-start: 50%;
     inset-inline-start: 50%;
     z-index: 101;
+
+    .rtl & {
+      transform: translateX(50%) translateY(-50%);
+    }
   }
 }
 
