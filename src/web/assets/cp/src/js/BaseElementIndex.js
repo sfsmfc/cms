@@ -2272,7 +2272,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
       }
 
       // Figure out which mode we should start with
-      var viewMode = this.getSelectedSourceState('mode', this.defaultViewMode);
+      let viewMode = this.getSelectedSourceState('mode', this.defaultViewMode);
 
       // Maintain the structure view for source states that were saved with an older Craft version
       if (
@@ -2475,19 +2475,19 @@ Craft.BaseElementIndex = Garnish.Base.extend(
     },
 
     getViewModesForSource: function () {
-      let viewModes = this.$source.data('viewModes').map((viewMode) => {
-        return {
-          mode: viewMode['value'],
-          title: viewMode['label'],
-          icon: viewMode['icon'],
-          availableOnMobiles: viewMode['availableOnMobiles'],
-        };
-      });
+      let viewModes = this.$source.data('viewModes');
 
-      // filter out those that are not suitable for mobiles
+      // apply availableOnMobile
       if (Garnish.isMobileBrowser(true)) {
         viewModes = viewModes.filter(
-          (viewMode) => viewMode['availableOnMobiles']
+          (viewMode) => viewMode.availableOnMobile ?? true
+        );
+      }
+
+      // apply structuresOnly
+      if (!Garnish.hasAttr(this.$source, 'data-has-structure')) {
+        viewModes = viewModes.filter(
+          (viewMode) => !(viewMode.structuresOnly ?? false)
         );
       }
 
@@ -4195,22 +4195,16 @@ const ViewMenu = Garnish.Base.extend({
       .appendTo(this.$tableColumnsContainer);
   },
 
-  updateViewModeBtns: function () {
-    this.elementIndex.selectViewMode(this.elementIndex.defaultViewMode);
-  },
-
   revert: function () {
     this.elementIndex.setSelecetedSourceState({
       order: null,
       sort: null,
       tableColumns: null,
-      mode: null,
     });
 
     this.updateSortField();
     this.updateTableColumnField();
     this.tidyTableColumnField();
-    this.updateViewModeBtns();
 
     this.$revertBtn.remove();
     this.$revertBtn = null;
@@ -4249,11 +4243,19 @@ const ViewMenu = Garnish.Base.extend({
     if (
       this.elementIndex.getSelectedSourceState('order') ||
       this.elementIndex.getSelectedSourceState('sort') ||
-      this.elementIndex.getSelectedSourceState('tableColumns') ||
-      this.elementIndex.getSelectedSourceState('mode') !==
-        this.elementIndex.defaultViewMode
+      this.elementIndex.getSelectedSourceState('tableColumns')
     ) {
       this._createRevertBtn();
+    }
+
+    // we only want to show the "Use defaults" btn in table and structure views
+    if (
+      this.elementIndex.viewMode !== 'table' &&
+      this.elementIndex.viewMode !== 'structure'
+    ) {
+      if (this.$revertBtn) {
+        this.$revertBtn.addClass('hidden');
+      }
     }
 
     this.$closeBtn = $('<button/>', {

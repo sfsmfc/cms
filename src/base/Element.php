@@ -1355,27 +1355,34 @@ abstract class Element extends Component implements ElementInterface
      */
     public static function indexViewModes(): array
     {
-        $viewModes[] = [
-            'value' => 'table',
-            'label' => Craft::t('app', 'Display in a table'),
-            'icon' => 'list',
-            'availableOnMobiles' => false,
+        $viewModes = [
+            [
+                'mode' => 'structure',
+                'title' => Craft::t('app', 'Display in a structured table'),
+                'icon' => Craft::$app->getLocale()->getOrientation() === 'rtl' ? 'structurertl' : 'structure',
+                'availableOnMobile' => false,
+                'structuresOnly' => true,
+            ],
+            [
+                'mode' => 'table',
+                'title' => Craft::t('app', 'Display in a table'),
+                'icon' => 'list',
+                'availableOnMobile' => false,
+            ],
         ];
 
         if (static::hasThumbs()) {
             $viewModes[] = [
-                'value' => 'thumbs',
-                'label' => Craft::t('app', 'Display as thumbnails'),
+                'mode' => 'thumbs',
+                'title' => Craft::t('app', 'Display as thumbnails'),
                 'icon' => 'grid',
-                'availableOnMobiles' => true,
             ];
         }
 
         $viewModes[] = [
-            'value' => 'cards',
-            'label' => Craft::t('app', 'Display as cards'),
+            'mode' => 'cards',
+            'title' => Craft::t('app', 'Display as cards'),
             'icon' => 'element-cards',
-            'availableOnMobiles' => true,
         ];
 
         return $viewModes;

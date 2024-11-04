@@ -12,6 +12,7 @@ use craft\base\ElementInterface;
 use craft\base\PreviewableFieldInterface;
 use craft\elements\conditions\ElementConditionInterface;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Cp;
 use craft\models\UserGroup;
 use craft\services\ElementSources;
 use craft\services\ProjectConfig;
@@ -65,8 +66,6 @@ class ElementIndexSettingsController extends BaseElementsController
             ->values()
             ->all();
 
-        $baseViewModes = $elementType::indexViewModes();
-
         // Get the source info
         $sourcesService = Craft::$app->getElementSources();
         $sources = $sourcesService->getSources($elementType, ElementSources::CONTEXT_INDEX, true);
@@ -74,11 +73,6 @@ class ElementIndexSettingsController extends BaseElementsController
         foreach ($sources as &$source) {
             if ($source['type'] === ElementSources::TYPE_HEADING) {
                 continue;
-            }
-
-            $source['viewModes'] = array_merge($sourcesService->getSourceViewModes($source), $baseViewModes);
-            if (!isset($source['defaultViewMode'])) {
-                $source['defaultViewMode'] = 'table';
             }
 
             // Sort options
@@ -171,6 +165,10 @@ class ElementIndexSettingsController extends BaseElementsController
         }
         unset($source);
 
+        $viewModes = array_map(fn(array $viewMode) => array_merge($viewMode, [
+            'iconSvg' => Cp::iconSvg($viewMode['icon'] ?? 'table'),
+        ]), $elementType::indexViewModes());
+
         // Get the default sort options for custom sources
         $defaultSortOptions = Collection::make($sourcesService->getSourceSortOptions($elementType, 'custom:x'))
             ->map(fn(array $option) => [
@@ -220,7 +218,7 @@ class ElementIndexSettingsController extends BaseElementsController
 
         return $this->asJson([
             'sources' => $sources,
-            'baseViewModes' => $baseViewModes,
+            'viewModes' => $viewModes,
             'baseSortOptions' => $baseSortOptions,
             'defaultSortOptions' => $defaultSortOptions,
             'availableTableAttributes' => $availableTableAttributes,

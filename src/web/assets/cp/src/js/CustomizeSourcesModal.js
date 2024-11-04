@@ -30,7 +30,7 @@ Craft.CustomizeSourcesModal = Garnish.Modal.extend({
   baseSortOptions: null,
   availableTableAttributes: null,
   customFieldAttributes: null,
-  baseViewModes: null,
+  viewModes: null,
 
   conditionBuilderHtml: null,
   conditionBuilderJs: null,
@@ -120,7 +120,7 @@ Craft.CustomizeSourcesModal = Garnish.Modal.extend({
     this.conditionBuilderJs = response.conditionBuilderJs;
     this.sites = response.sites;
     this.userGroups = response.userGroups;
-    this.baseViewModes = response.baseViewModes;
+    this.viewModes = response.viewModes;
 
     if (response.headHtml) {
       await Craft.appendHeadHtml(response.headHtml);
@@ -197,7 +197,6 @@ Craft.CustomizeSourcesModal = Garnish.Modal.extend({
         defaultSort: [sortOptions[0].attr, sortOptions[1].defaultDir],
         tableAttributes: [],
         availableTableAttributes: [],
-        viewModes: this.baseViewModes,
       });
       this.focusLabelInput();
     });
@@ -624,6 +623,9 @@ Craft.CustomizeSourcesModal.BaseSource = Garnish.Base.extend({
 
 Craft.CustomizeSourcesModal.Source =
   Craft.CustomizeSourcesModal.BaseSource.extend({
+    $viewModeInput: null,
+    viewModeListbox: null,
+
     $sortAttributeSelect: null,
     $sortDirectionPicker: null,
     $sortDirectionInput: null,
@@ -641,26 +643,61 @@ Craft.CustomizeSourcesModal.Source =
           on: !this.sourceData.disabled,
         })
         .appendTo($container);
+      this.createViewModeField($container);
       this.createSortField($container);
       this.createTableAttributesField($container);
-      this.createViewModeField($container);
     },
 
     createViewModeField: function ($container) {
-      const $inputContainer = $('<div class="flex"/>');
+      const $inputContainer = $('<section/>', {
+        class: 'btngroup btngroup--exclusive',
+        'aria-label': Craft.t('app', 'View mode options'),
+      });
 
-      const $viewModeSelectContainer = Craft.ui
-        .createSelect({
-          name: `sources[${this.sourceData.key}][defaultViewMode]`,
-          options: this.sourceData.viewModes ?? [],
-          value: this.sourceData.defaultViewMode,
+      const viewModes = this.modal.viewModes.filter(
+        (viewMode) => !viewMode.structuresOnly || this.sourceData.structureId
+      );
+      let defaultViewMode = this.sourceData.defaultViewMode;
+      if (
+        !defaultViewMode ||
+        !viewModes.some((viewMode) => viewMode.mode === defaultViewMode)
+      ) {
+        defaultViewMode = viewModes[0]?.mode;
+      }
+
+      for (let viewMode of viewModes) {
+        const $btn = $('<button/>', {
+          type: 'button',
+          class: 'btn',
+          title: viewMode.title,
+          'aria-label': viewMode.title,
+          'data-mode': viewMode.mode,
+        }).appendTo($inputContainer);
+        $('<div/>', {
+          class: 'cp-icon small',
         })
-        .addClass('fullwidth')
-        .appendTo($('<div/>').appendTo($inputContainer));
+          .append(viewMode.iconSvg)
+          .appendTo($btn);
+        if (viewMode.mode === defaultViewMode) {
+          $btn.addClass('active').attr('aria-pressed', 'true');
+        } else {
+          $btn.attr('aria-pressed', 'false');
+        }
+      }
 
-      this.$viewModeSelect = $viewModeSelectContainer
-        .children('select')
-        .attr('aria-label', Craft.t('app', 'View Mode'));
+      $inputContainer.children('button:last').addClass('btngroup-btn-last');
+
+      this.$viewModeInput = $('<input/>', {
+        type: 'hidden',
+        name: `sources[${this.sourceData.key}][defaultViewMode]`,
+        value: this.sourceData.defaultViewMode,
+      }).appendTo($inputContainer);
+
+      this.viewModeListbox = new Craft.Listbox($inputContainer, {
+        onChange: ($selectedOption) => {
+          this.$viewModeInput.val($selectedOption.data('mode'));
+        },
+      });
 
       Craft.ui
         .createField($inputContainer, {
@@ -669,11 +706,6 @@ Craft.CustomizeSourcesModal.Source =
         })
         .appendTo($container)
         .addClass('view-mode-field');
-
-      // on change - update selected view mode
-      this.$viewModeSelect.on('change', () => {
-        this.modal.elementIndex.selectViewMode(this.$viewModeSelect.val());
-      });
     },
 
     createSortField: function ($container) {

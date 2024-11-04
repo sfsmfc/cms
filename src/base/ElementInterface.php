@@ -486,18 +486,19 @@ interface ElementInterface extends
      *
      * This method should return an array, where each item is a sub-array with the following keys:
      *
-     * - `label` – How this mode should be described to the user
-     * - `value` – Name of the view mode
-     * - `availableOnMobiles` - Whether the view mode is available on mobile devices (small screens)
-     * - `icon` – Icon representing this view mode (optional)
+     * - `mode` – Name of the view mode
+     * - `title` – How this mode should be described to the user
+     * - `icon` – Icon representing this view mode
+     * - `availableOnMobile` - Whether the view mode is available on mobile devices (defaults to `true`)
+     * - `structuresOnly` – Whether the view mode should only be available for structured sources (defaults to `false`)
      *
      * ```php
      * return [
      *     [
-     *         'label' => Craft::t('app', 'Display in a table'),
-     *         'value' => 'table',
-     *         'availableOnMobiles' => false,
+     *         'mode' => 'table',
+     *         'title' => Craft::t('app', 'Display in a table'),
      *         'icon' => 'list',
+     *         'availableOnMobile' => false,
      *     ],
      * ];
      *  ```

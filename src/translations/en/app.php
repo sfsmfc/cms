@@ -1884,6 +1884,7 @@ return [
     'View all revisions' => 'View all revisions',
     'View assets uploaded by other users' => 'View assets uploaded by other users',
     'View in a new tab' => 'View in a new tab',
+    'View mode options' => 'View mode options',
     'View other users’ {type}' => 'View other users’ {type}',
     'View settings' => 'View settings',
     'View site' => 'View site',
