@@ -2213,10 +2213,17 @@ JS, [
         }
 
         if ($elementUid) {
+            $withDrafts = false;
+            if (!Craft::$app->getConfig()->getGeneral()->autosaveDrafts) {
+                $withDrafts = null;
+            }
             return $this->_elementQuery($elementType)
                 ->uid($elementUid)
                 ->siteId($siteId)
                 ->preferSites($preferSites)
+                // when autosaveDrafts is off, we need search among drafts too
+                // https://github.com/craftcms/cms/issues/15985
+                ->drafts($withDrafts)
                 ->unique()
                 ->status(null)
                 ->one();
