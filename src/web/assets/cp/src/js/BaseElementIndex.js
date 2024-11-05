@@ -3625,6 +3625,8 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         var params = this.getViewParams();
         delete params.baseCriteria.offset;
         delete params.baseCriteria.limit;
+        delete params.criteria.offset;
+        delete params.criteria.limit;
         delete params.collapsedElementIds;
 
         params.type = $typeField.find('select').val();
