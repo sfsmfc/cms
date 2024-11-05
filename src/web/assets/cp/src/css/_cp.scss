@@ -922,7 +922,7 @@ li.breadcrumb-toggle-wrapper {
   }
 
   h1 {
-    line-height: 34px;
+    line-height: 1.3;
     margin-block: 0;
     min-width: 0;
   }
@@ -934,6 +934,13 @@ li.breadcrumb-toggle-wrapper {
 }
 
 #page-title {
+  --page-title-columns: 1fr 34px;
+  min-height: 34px;
+  display: grid;
+  grid-template-columns: var(--page-title-columns);
+  align-items: center;
+  gap: var(--s);
+
   &.has-toolbar {
     @media only screen and (min-width: $minHorizontalUiWidth) {
       min-width: calc(#{$sidebarWidth} - var(--xl) - var(--s)) !important;
@@ -983,7 +990,17 @@ li.breadcrumb-toggle-wrapper {
   }
 }
 
+#revision-indicators {
+  min-width: 34px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  align-self: start;
+}
+
 #action-buttons {
+  flex-shrink: 0;
+
   .action-btn {
     width: var(--ui-control-height);
     height: var(--ui-control-height);
