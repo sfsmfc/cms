@@ -9,6 +9,7 @@
 - Fixed a bug where address cards weren’t showing provisional changes.
 - Fixed a bug where it was possible to edit nested addresses when viewing a revision. ([#15961](https://github.com/craftcms/cms/pull/15961))
 - Fixed a bug where nested elements could have checkboxes and drag handles when viewing a revision. ([#15961](https://github.com/craftcms/cms/pull/15961))
+- Fixed an error that could occur when bulk-editing elements from an element index, if any of them had provisional drafts. ([#15962](https://github.com/craftcms/cms/pull/15962))
 - Updated Axios to 1.7.7. ([#15958](https://github.com/craftcms/cms/issues/15958))
 
 ## 5.4.9 - 2024-10-22
