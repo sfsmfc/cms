@@ -17,6 +17,7 @@
 - Improved keyboard control. ([#15665](https://github.com/craftcms/cms/pull/15665))
 - Improved the color contrast of required field indicators. ([#15665](https://github.com/craftcms/cms/pull/15665))
 - Improved the accessibility of text inputs for screen readers.
+- It’s now possible to move an image’s focal point without dragging it. ([#15904](https://github.com/craftcms/cms/pull/15904))
 
 ### Administration
 - Added the “Range” field type. ([#15972](https://github.com/craftcms/cms/pull/15972))
