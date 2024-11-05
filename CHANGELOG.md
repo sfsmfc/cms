@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Fixed a styling bug.
+- Fixed styling issues. ([#15965](https://github.com/craftcms/cms/issues/15965))
 
 ## 4.12.8 - 2024-10-22
 
