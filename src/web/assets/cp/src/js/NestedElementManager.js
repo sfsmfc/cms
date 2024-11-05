@@ -411,10 +411,19 @@ Craft.NestedElementManager = Garnish.Base.extend(
             return;
           }
 
+          let ownerId = $element.data('owner-id');
+          if (
+            this.elementEditor.settings.isProvisionalDraft &&
+            $element.data('owner-id') !== this.elementEditor.settings.elementId
+          ) {
+            ownerId = this.elementEditor.settings.elementId;
+          }
+
           const slideout = Craft.createElementEditor(
             this.elementType,
             $element,
             {
+              ownerId: ownerId,
               onBeforeSubmit: async () => {
                 // If the nested element is primarily owned by the canonical entry being edited,
                 // then ensure we're working with a draft and save the nested entry changes to the draft
