@@ -46,7 +46,6 @@ use craft\events\AssetEvent;
 use craft\events\DefineAssetUrlEvent;
 use craft\events\GenerateTransformEvent;
 use craft\fieldlayoutelements\assets\AltField;
-use craft\fs\Temp;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Assets;
 use craft\helpers\Cp;
@@ -2752,18 +2751,21 @@ JS,[
             switch ($this->kind) {
                 case Asset::KIND_VIDEO:
                     $previewInner =
-                        Html::tag('video', '', [
-                            'class' => 'preview-thumb',
+                        Html::tag('video', Html::tag('source', '', [
+                            'type' => $this->getMimeType(),
                             'src' => $this->url,
+                        ]), [
+                            'class' => 'preview-thumb',
                             'controls' => true,
                             'preload' => 'metadata',
                         ]);
                     break;
                 case Asset::KIND_AUDIO:
                     $previewInner =
-                        Html::tag('audio', '', [
-                            'class' => 'preview-thumb',
+                        Html::tag('audio', Html::tag('source', '', [
                             'src' => $this->url,
+                            'type' => $this->getMimeType(),
+                        ]), [
                             'controls' => true,
                             'preload' => 'metadata',
                         ]);
@@ -2774,7 +2776,7 @@ JS,[
                             'class' => 'preview-thumb',
                         ]);
             }
-            
+
             $previewThumbHtml =
                 Html::beginTag('div', [
                     'id' => 'thumb-container',
