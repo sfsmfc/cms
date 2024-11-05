@@ -129,8 +129,7 @@ Craft.ElementEditor = Garnish.Base.extend(
 
       const $spinnerContainer =
         this.settings.$spinnerContainer ??
-        (this.isFullPage ? $('<div>', {id: 'revision-indicators'}) : $());
-      $spinnerContainer.appendTo('#page-title');
+        (this.isFullPage ? $('#revision-indicators') : $());
 
       this.$spinner = $('<div/>', {
         class: 'revision-spinner spinner hidden',

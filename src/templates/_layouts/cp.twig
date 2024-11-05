@@ -217,6 +217,7 @@ history.replaceState(undefined, undefined, window.location.href.match(/^[^#]*/)[
                                                 {% if title is defined and title|length %}
                                                     <h1 class="screen-title" title="{{ title }}">{{ title }}</h1>
                                                 {% endif %}
+                                                <div id="revision-indicators"></div>
                                             {% endblock %}
                                         </div>
                                         {% if toolbar %}
