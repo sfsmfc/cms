@@ -425,6 +425,7 @@ Craft.ElementEditor = Garnish.Base.extend(
                     redirect: this.settings.hashedCpEditUrl,
                     params: {
                       draftId: this.settings.draftId,
+                      fieldId: this.settings.fieldId,
                       ownerId: this.settings.ownerId,
                       provisional: 1,
                     },
@@ -434,6 +435,7 @@ Craft.ElementEditor = Garnish.Base.extend(
                     data: {
                       elementId: this.settings.canonicalId,
                       draftId: this.settings.draftId,
+                      fieldId: this.settings.fieldId,
                       ownerId: this.settings.ownerId,
                       siteId: this.settings.siteId,
                       provisional: 1,
@@ -1651,14 +1653,22 @@ Craft.ElementEditor = Garnish.Base.extend(
         );
       }
 
+      if (this.settings.fieldId !== null) {
+        params.push(
+          `${this.namespaceInputName('fieldId')}=${this.settings.fieldId}`
+        );
+      }
+
       if (this.settings.ownerId !== null) {
         params.push(
           `${this.namespaceInputName('ownerId')}=${this.settings.ownerId}`
         );
       }
 
-      for (const [name, value] of Object.entries(this.settings.saveParams)) {
-        params.push(`${this.namespaceInputName(name)}=${value}`);
+      if (this.settings.saveParams) {
+        for (const [name, value] of Object.entries(this.settings.saveParams)) {
+          params.push(`${this.namespaceInputName(name)}=${value}`);
+        }
       }
 
       return asArray ? params : params.join('&');
@@ -2311,10 +2321,11 @@ Craft.ElementEditor = Garnish.Base.extend(
       previewToken: null,
       previewParamValue: null,
       revisionId: null,
+      fieldId: null,
       ownerId: null,
       siteId: null,
       siteStatuses: [],
-      saveParams: {},
+      saveParams: null,
       siteToken: null,
       visibleLayoutElements: {},
       updatedTimestamp: null,
