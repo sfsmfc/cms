@@ -847,12 +847,6 @@ JS, [
             $orderBy = "CAST($orderBy AS CHAR(255))";
         }
 
-        // for pgsql, we have to make sure decimals column type is cast to decimal, otherwise it won't be sorted correctly
-        // see https://github.com/craftcms/cms/issues/15828
-        if ($db->getIsPgsql() && is_string($dbType) && Db::parseColumnType($dbType) === Schema::TYPE_DECIMAL) {
-            $orderBy = "CAST($orderBy AS DECIMAL)";
-        }
-
         // The attribute name should match the table attribute name,
         // per ElementSources::getTableAttributesForFieldLayouts()
         return [
@@ -991,6 +985,7 @@ JS, [
         $qb = $db->getQueryBuilder();
         $sql = $qb->jsonExtract('elements_sites.content', $jsonPath);
 
+        $castType = null;
         if ($db->getIsMysql()) {
             // If the field uses an optimized DB type, cast it so its values can be indexed
             // (see "Functional Key Parts" on https://dev.mysql.com/doc/refman/8.0/en/create-index.html)
@@ -1012,20 +1007,30 @@ JS, [
                 SCHEMA::TYPE_TIME => 'TIME',
                 default => null,
             };
-            if ($castType !== null) {
-                // if a length was specified, replace the default with that
-                $length = Db::parseColumnLength($dbType);
-                if ($length) {
-                    $castType = preg_replace('/\(\d+\)/', "($length)", $castType);
-                } elseif ($castType === 'DECIMAL') {
-                    [$precision, $scale] = Db::parseColumnPrecisionAndScale($dbType) ?? [null, null];
-                    if ($precision && $scale) {
-                        $castType .= "($precision,$scale)";
-                    }
-                }
+        }
 
-                $sql = "CAST($sql AS $castType)";
+        // for pgsql, we have to make sure decimals column type is cast to decimal, otherwise they won't be sorted correctly
+        // see https://github.com/craftcms/cms/issues/15828, https://github.com/craftcms/cms/issues/15973
+        if ($db->getIsPgsql()) {
+            $castType = match (Db::parseColumnType($dbType)) {
+                Schema::TYPE_DECIMAL => 'DECIMAL',
+                default => null,
+            };
+        }
+
+        if ($castType !== null) {
+            // if a length was specified, replace the default with that
+            $length = Db::parseColumnLength($dbType);
+            if ($length) {
+                $castType = preg_replace('/\(\d+\)/', "($length)", $castType);
+            } elseif ($castType === 'DECIMAL') {
+                [$precision, $scale] = Db::parseColumnPrecisionAndScale($dbType) ?? [null, null];
+                if ($precision && $scale) {
+                    $castType .= "($precision,$scale)";
+                }
             }
+
+            $sql = "CAST($sql AS $castType)";
         }
 
         return $sql;
