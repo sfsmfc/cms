@@ -41,6 +41,7 @@ use craft\enums\Color;
 use craft\enums\PropagationMethod;
 use craft\events\DefineEntryTypesEvent;
 use craft\events\ElementCriteriaEvent;
+use craft\fieldlayoutelements\entries\EntryTitleField;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Cp;
 use craft\helpers\DateTimeHelper;
@@ -63,6 +64,7 @@ use DateTime;
 use Illuminate\Support\Collection;
 use Throwable;
 use yii\base\Exception;
+use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\db\Expression;
 
@@ -630,6 +632,79 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
     /**
      * @inheritdoc
      */
+    protected static function defineCardAttributes(): array
+    {
+        $currentUser = Craft::$app->getUser()->getIdentity();
+
+        $attributes = array_merge(parent::defineCardAttributes(), [
+            'section' => [
+                'label' => Craft::t('app', 'Section'),
+                'placeholder' => Craft::t('app', 'Section'),
+            ],
+            'type' => [
+                'label' => Craft::t('app', 'Entry Type'),
+                'placeholder' => Craft::t('app', 'Entry Type'),
+            ],
+            'authors' => [
+                'label' => Craft::t('app', 'Authors'),
+                'placeholder' => $currentUser ? Cp::elementChipHtml($currentUser) : '',
+            ],
+            'parent' => [
+                'label' => Craft::t('app', 'Parent'),
+                'placeholder' => Html::tag(
+                    'span',
+                    Craft::t('app', 'Parent {type} Title', ['type' => self::displayName()]),
+                    ['class' => 'card-placeholder'],
+                ),
+            ],
+            'postDate' => [
+                'label' => Craft::t('app', 'Post Date'),
+                'placeholder' => (new \DateTime())->sub(new \DateInterval('P15D')),
+            ],
+            'expiryDate' => [
+                'label' => Craft::t('app', 'Expiry Date'),
+                'placeholder' => (new \DateTime())->add(new \DateInterval('P15D')),
+            ],
+            'revisionNotes' => [
+                'label' => Craft::t('app', 'Revision Notes'),
+                'placeholder' => Craft::t('app', 'Revision Notes'),
+            ],
+            'revisionCreator' => [
+                'label' => Craft::t('app', 'Last Edited By'),
+                'placeholder' => $currentUser ? Cp::elementChipHtml($currentUser) : '',
+            ],
+            'drafts' => [
+                'label' => Craft::t('app', 'Drafts'),
+                'placeholder' => Html::tag(
+                    'span',
+                    Craft::t('app', 'Draft {num}', ['num' => 1]),
+                    ['class' => 'card-placeholder'],
+                ),
+            ],
+        ]);
+
+        // Hide Author & Last Edited By from Craft Solo
+        if (Craft::$app->edition === CmsEdition::Solo) {
+            unset($attributes['authors'], $attributes['revisionCreator']);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function attributePreviewHtml(array $attribute): mixed
+    {
+        return match ($attribute['value']) {
+            'authors', 'parent', 'revisionCreator', 'drafts' => $attribute['placeholder'],
+            default => parent::attributePreviewHtml($attribute),
+        };
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function eagerLoadingMap(array $sourceElements, string $handle): array|null|false
     {
         switch ($handle) {
@@ -900,7 +975,17 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
      */
     protected function shouldValidateTitle(): bool
     {
-        return $this->getType()->hasTitleField;
+        $entryType = $this->getType();
+        if (!$entryType->hasTitleField) {
+            return false;
+        }
+        try {
+            /** @var EntryTitleField $titleField */
+            $titleField = $entryType->getFieldLayout()->getField('title');
+        } catch (InvalidArgumentException) {
+            return true;
+        }
+        return $titleField->required;
     }
 
     /**
@@ -1633,7 +1718,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
             'sectionId' => $this->sectionId,
             'fieldId' => $this->fieldId,
             'primaryOwnerId' => $this->getPrimaryOwnerId(),
-            'ownerId' => $this->getPrimaryOwnerId(),
+            'ownerId' => $this->getOwnerId(),
             'sortOrder' => null,
             'typeId' => $this->typeId,
             'siteId' => $this->siteId,
@@ -1942,7 +2027,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
                 return $section ? Html::encode(Craft::t('site', $section->name)) : '';
             case 'type':
                 try {
-                    return Html::encode(Craft::t('site', $this->getType()->name));
+                    return Cp::chipHtml($this->getType());
                 } catch (InvalidConfigException) {
                     return Craft::t('app', 'Unknown');
                 }
@@ -2337,7 +2422,7 @@ JS;
     {
         $entryType = $this->getType();
 
-        if ($entryType->hasTitleField) {
+        if ($entryType->hasTitleField && trim($this->title ?? '') !== '') {
             return;
         }
 

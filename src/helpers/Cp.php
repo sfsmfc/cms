@@ -18,10 +18,12 @@ use craft\base\ElementInterface;
 use craft\base\FieldLayoutElement;
 use craft\base\Grippable;
 use craft\base\Iconic;
+use craft\base\NestedElementInterface;
 use craft\base\Statusable;
 use craft\base\Thumbable;
 use craft\behaviors\DraftBehavior;
 use craft\elements\Address;
+use craft\enums\AttributeStatus;
 use craft\enums\CmsEdition;
 use craft\enums\Color;
 use craft\enums\MenuItemType;
@@ -631,6 +633,38 @@ class Cp
             ]);
         }
 
+        // is this a nested element that will end up replacing its canonical
+        // counterpart when the owner is saved?
+        if (
+            $element instanceof NestedElementInterface &&
+            $element->getOwnerId() !== null &&
+            $element->getOwnerId() === $element->getPrimaryOwnerId() &&
+            !$element->getIsDraft() &&
+            !$element->getIsRevision() &&
+            $element->getOwner()->getIsDraft()
+        ) {
+            if ($element->getIsCanonical()) {
+                // this element was created for the owner
+                $statusLabel = Craft::t('app', 'This is a new {type}.', [
+                    'type' => $element::lowerDisplayName(),
+                ]);
+            } else {
+                // this element is a derivative of another element owned by the canonical owner
+                $statusLabel = Craft::t('app', 'This {type} has been edited.', [
+                    'type' => $element::lowerDisplayName(),
+                ]);
+            }
+
+            $status = Html::beginTag('div', [
+                    'class' => ['status-badge', AttributeStatus::Modified->value],
+                    'title' => $statusLabel,
+                ]) .
+                Html::tag('span', $statusLabel, [
+                    'class' => 'visually-hidden',
+                ]) .
+                Html::endTag('div');
+        }
+
         $thumb = $element->getThumbHtml(128);
         if ($thumb === null && $element instanceof Iconic) {
             $icon = $element->getIcon();
@@ -646,6 +680,7 @@ class Cp
         }
 
         $html = Html::beginTag('div', $attributes) .
+            ($status ?? '') .
             ($thumb ?? '') .
             Html::beginTag('div', ['class' => 'card-content']) .
             ($headingContent !== '' ? Html::tag('div', $headingContent, ['class' => 'card-heading']) : '') .
@@ -871,6 +906,9 @@ class Cp
                     'id' => $element->isProvisionalDraft ? $element->getCanonicalId() : $element->id,
                     'draft-id' => $element->isProvisionalDraft ? null : $element->draftId,
                     'revision-id' => $element->revisionId,
+                    'field-id' => $element instanceof NestedElementInterface ? $element->getField()?->id : null,
+                    'primary-owner-id' => $element instanceof NestedElementInterface ? $element->getPrimaryOwnerId() : null,
+                    'owner-id' => $element instanceof NestedElementInterface ? $element->getOwnerId() : null,
                     'site-id' => $element->siteId,
                     'status' => $element->getStatus(),
                     'label' => (string)$element,
@@ -1244,6 +1282,7 @@ class Cp
                     'key' => '__IMP__',
                     'label' => Craft::t('app', 'All elements'),
                     'hasThumbs' => $elementType::hasThumbs(),
+                    'defaultViewMode' => $config['defaultViewMode'],
                 ],
             ];
 
@@ -1767,6 +1806,33 @@ JS, [
     }
 
     /**
+     * Renders a range input’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.5.0
+     */
+    public static function rangeHtml(array $config): string
+    {
+        return static::renderTemplate('_includes/forms/range.twig', $config);
+    }
+
+    /**
+     * Renders a lightswitch field’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.5.0
+     */
+    public static function rangeFieldHtml(array $config): string
+    {
+        $config['id'] = $config['id'] ?? 'range' . mt_rand();
+        return static::fieldHtml('template:_includes/forms/range.twig', $config);
+    }
+
+    /**
      * Renders a money input’s HTML.
      *
      * @param array $config
@@ -2090,9 +2156,9 @@ JS, [
             $value = $config['value'] ?? '';
             if (!isset($config['tip']) && (!isset($value[0]) || !in_array($value[0], ['$', '@']))) {
                 if ($config['suggestAliases'] ?? false) {
-                    $config['tip'] = Craft::t('app', 'This can be set to an environment variable, or begin with an alias.');
+                    $config['tip'] = Craft::t('app', 'This can begin with an environment variable or alias.');
                 } else {
-                    $config['tip'] = Craft::t('app', 'This can be set to an environment variable.');
+                    $config['tip'] = Craft::t('app', 'This can begin with an environment variable.');
                 }
                 $config['tip'] .= ' ' .
                     Html::a(Craft::t('app', 'Learn more'), 'https://craftcms.com/docs/5.x/configure.html#control-panel-settings', [
@@ -2113,10 +2179,11 @@ JS, [
      * Returns address fields’ HTML (sans country) for a given address.
      *
      * @param Address $address
+     * @param bool $static
      * @return string
      * @since 4.0.0
      */
-    public static function addressFieldsHtml(Address $address): string
+    public static function addressFieldsHtml(Address $address, bool $static = false): string
     {
         $requiredFields = [];
         $scenario = $address->getScenario();
@@ -2152,10 +2219,11 @@ JS, [
                 'value' => $address->addressLine1,
                 'autocomplete' => $belongsToCurrentUser ? 'address-line1' : 'off',
                 'required' => isset($requiredFields['addressLine1']),
-                'errors' => $address->getErrors('addressLine1'),
+                'errors' => !$static ? $address->getErrors('addressLine1') : [],
                 'data' => [
                     'error-key' => 'addressLine1',
                 ],
+                'disabled' => $static,
             ]) .
             static::textFieldHtml([
                 'status' => $address->getAttributeStatus('addressLine2'),
@@ -2165,10 +2233,11 @@ JS, [
                 'value' => $address->addressLine2,
                 'autocomplete' => $belongsToCurrentUser ? 'address-line2' : 'off',
                 'required' => isset($requiredFields['addressLine2']),
-                'errors' => $address->getErrors('addressLine2'),
+                'errors' => !$static ? $address->getErrors('addressLine2') : [],
                 'data' => [
                     'error-key' => 'addressLine2',
                 ],
+                'disabled' => $static,
             ]) .
             static::textFieldHtml([
                 'status' => $address->getAttributeStatus('addressLine3'),
@@ -2178,10 +2247,11 @@ JS, [
                 'value' => $address->addressLine3,
                 'autocomplete' => $belongsToCurrentUser ? 'address-line3' : 'off',
                 'required' => isset($requiredFields['addressLine3']),
-                'errors' => $address->getErrors('addressLine3'),
+                'errors' => !$static ? $address->getErrors('addressLine3') : [],
                 'data' => [
                     'error-key' => 'addressLine3',
                 ],
+                'disabled' => $static,
             ]) .
             self::_subdivisionField(
                 $address,
@@ -2191,6 +2261,7 @@ JS, [
                 isset($requiredFields['administrativeArea']),
                 [$address->countryCode],
                 true,
+                $static,
             ) .
             self::_subdivisionField(
                 $address,
@@ -2200,6 +2271,7 @@ JS, [
                 isset($requiredFields['locality']),
                 $parents['locality'],
                 true,
+                $static,
             ) .
             self::_subdivisionField(
                 $address,
@@ -2209,6 +2281,7 @@ JS, [
                 isset($requiredFields['dependentLocality']),
                 $parents['dependentLocality'],
                 false,
+                $static,
             ) .
             static::textFieldHtml([
                 'fieldClass' => array_filter([
@@ -2222,10 +2295,11 @@ JS, [
                 'value' => $address->postalCode,
                 'autocomplete' => $belongsToCurrentUser ? 'postal-code' : 'off',
                 'required' => isset($requiredFields['postalCode']),
-                'errors' => $address->getErrors('postalCode'),
+                'errors' => !$static ? $address->getErrors('postalCode') : [],
                 'data' => [
                     'error-key' => 'postalCode',
                 ],
+                'disabled' => $static,
             ]) .
             static::textFieldHtml([
                 'fieldClass' => array_filter([
@@ -2238,10 +2312,11 @@ JS, [
                 'name' => 'sortingCode',
                 'value' => $address->sortingCode,
                 'required' => isset($requiredFields['sortingCode']),
-                'errors' => $address->getErrors('sortingCode'),
+                'errors' => !$static ? $address->getErrors('sortingCode') : [],
                 'data' => [
                     'error-key' => 'sortingCode',
                 ],
+                'disabled' => $static,
             ]);
     }
 
@@ -2296,6 +2371,7 @@ JS, [
         bool $required,
         ?array $parents,
         bool $spinner,
+        bool $static = false,
     ): string {
         $value = $address->$name;
         $options = Craft::$app->getAddresses()->getSubdivisionRepository()->getList($parents, Craft::$app->language);
@@ -2307,7 +2383,7 @@ JS, [
             }
 
             if ($spinner) {
-                $errors = $address->getErrors($name);
+                $errors = !$static ? $address->getErrors($name) : [];
                 $input =
                     Html::beginTag('div', [
                         'class' => ['flex', 'flex-nowrap'],
@@ -2319,6 +2395,7 @@ JS, [
                         'options' => $options,
                         'errors' => $errors,
                         'autocomplete' => $autocomplete,
+                        'disabled' => $static,
                     ]) .
                     Html::tag('div', '', [
                         'id' => "$name-spinner",
@@ -2335,6 +2412,7 @@ JS, [
                     'data' => [
                         'error-key' => $name,
                     ],
+                    'disabled' => $static,
                 ]);
             }
 
@@ -2352,6 +2430,7 @@ JS, [
                 'data' => [
                     'error-key' => $name,
                 ],
+                'disabled' => $static,
             ]);
         }
 
@@ -2365,11 +2444,203 @@ JS, [
             'name' => $name,
             'value' => $value,
             'required' => $required,
-            'errors' => $address->getErrors($name),
+            'errors' => !$static ? $address->getErrors($name) : [],
             'data' => [
                 'error-key' => $name,
             ],
+            'disabled' => $static,
         ]);
+    }
+
+    /**
+     * Renders a card view designer.
+     *
+     * @param FieldLayout $fieldLayout
+     * @param array $config
+     * @return string
+     * @since 5.5.0
+     */
+    public static function cardViewDesignerHtml(FieldLayout $fieldLayout, array $config = []): string
+    {
+        $config += [
+            'id' => 'cvd' . mt_rand(),
+        ];
+
+        // get the attributes that are set to be visible in the card body
+        $selectedCardAttributes = $fieldLayout->getCardBodyAttributes();
+
+        // get remaining attributes
+        $elementType = new ($fieldLayout['type']);
+        $remainingItems = $elementType::cardAttributes();
+        foreach ($remainingItems as $key => $cardAttributes) {
+            if (isset($selectedCardAttributes[$key])) {
+                unset($remainingItems[$key]);
+            } else {
+                $remainingItems[$key]['value'] = $key;
+            }
+        }
+
+        // get all the previewable fields
+        // and split them between those visible in the card's body and remaining ones
+        $fldOptions = [];
+        foreach ($fieldLayout->getAllElements() as $layoutElement) {
+            if (
+                $layoutElement instanceof BaseField &&
+                $layoutElement->previewable()
+            ) {
+                if ($layoutElement->includeInCards) {
+                    $fldOptions['layoutElement:' . $layoutElement->uid] = [
+                        'label' => $layoutElement->label(),
+                        'value' => 'layoutElement:' . $layoutElement->uid,
+                    ];
+                } else {
+                    $remainingItems['layoutElement:' . $layoutElement->uid] = [
+                        'label' => $layoutElement->label(),
+                        'value' => 'layoutElement:' . $layoutElement->uid,
+                    ];
+                }
+            }
+        }
+
+        // merge selected card attributes with selected fields
+        $selectedOptions = array_merge($fldOptions, $selectedCardAttributes);
+
+        // make sure we don't have any cardViewValues that are no longer allowed to show in cards
+        $cardViewValues = $fieldLayout->getCardView();
+        $cardViewValues = array_filter($cardViewValues, function($value) use ($selectedOptions) {
+            return isset($selectedOptions[$value]);
+        });
+
+        // sort all selected options by the cardView order
+        $selectedOptions = array_replace(
+            array_flip($cardViewValues),
+            $selectedOptions
+        );
+
+        // sort the remaining attributes alphabetically, by label
+        $labels = array_column($remainingItems, 'label');
+        array_multisort($labels, SORT_ASC, $remainingItems);
+
+        // and now that both parts are sorted, merge them
+        $options = array_values(array_merge($selectedOptions, $remainingItems));
+
+        $checkboxSelect = self::checkboxSelectFieldHtml([
+            'label' => Craft::t('app', 'Card Attributes'),
+            'id' => $config['id'],
+            'name' => 'cardView',
+            'options' => $options,
+            'values' => array_keys($selectedOptions),
+            'required' => true,
+            //'targetPrefix' => 'cardView-',
+            'sortable' => true,
+        ]);
+
+
+        // js is initiated via Craft.FieldLayoutDesigner
+        $previewHtml = self::cardPreviewHtml($fieldLayout, showThumb: $fieldLayout->getThumbField() !== null);
+
+        return
+            Html::beginTag('div', [
+                'id' => $config['id'] . '-container',
+                'class' => 'card-view-designer',
+            ]) .
+            Html::tag('h2', Craft::t('app', 'Card Layout Editor'), ['class' => 'visually-hidden']) .
+            Html::beginTag('div', ['class' => 'cvd-container']) .
+            Html::beginTag('div', ['class' => 'cvd-library']) .
+            $checkboxSelect .
+            Html::endTag('div') . // .cvd-library
+            Html::beginTag('div', ['class' => 'cvd-preview-container']) .
+            Html::beginTag('div', ['class' => 'cvd-preview']) .
+            Html::tag('h3', Craft::t('app', 'Card Layout Preview'), [
+                'class' => 'visually-hidden',
+            ]) .
+            Html::tag('p', Craft::t('app', 'The following content is for preview only.'), [
+                'class' => 'visually-hidden',
+            ]) .
+            $previewHtml .
+            Html::endTag('div') . // .cvd-preview-container
+            Html::endTag('div') . // .cvd-preview
+            Html::endTag('div') . // .cvd-container
+            Html::endTag('div'); // .card-view-designer
+    }
+
+    /**
+     * Returns HTML for the card preview based on selected fields and attributes.
+     *
+     * @param FieldLayout $fieldLayout
+     * @param array $cardElements
+     * @return string
+     * @throws \Throwable
+     */
+    public static function cardPreviewHtml(FieldLayout $fieldLayout, array $cardElements = [], $showThumb = false): string
+    {
+        // get heading
+        $heading = Html::tag('craft-element-label',
+            Html::tag('a', Html::tag('span', Craft::t('app', 'Title')), [
+                'class' => ['label-link'],
+                'href' => '#',
+                'aria-disabled' => 'true',
+            ]),
+            [
+                'class' => 'label',
+            ]
+        );
+
+        // get status label placeholder
+        /** @var ElementInterface $elementType */
+        $elementType = new ($fieldLayout['type']);
+        $labels = [$elementType::hasStatuses() ? static::componentStatusLabelHtml($elementType) : null];
+
+        $previewHtml =
+            Html::beginTag('div', [
+                'class' => ['element', 'card'],
+            ]);
+
+        // get thumb placeholder
+        if ($showThumb) {
+            $previewThumb = Html::tag('div',
+                Html::tag('div', Cp::iconSvg('image'), ['class' => 'cp-icon']),
+                ['class' => 'cvd-thumbnail']
+            );
+
+            $previewHtml .= Html::tag('div', $previewThumb, ['class' => ['thumb']]);
+        }
+
+
+        $previewHtml .=
+            Html::beginTag('div', [
+                'class' => ['card-content'],
+            ]) .
+            Html::tag('div', $heading, ['class' => 'card-heading']) .
+            Html::beginTag('div', [
+                'class' => 'card-body',
+            ]);
+
+        // get body elements (fields and attributes)
+        $cardElements = $fieldLayout->getCardBodyElements(null, $cardElements);
+
+        foreach ($cardElements as $cardElement) {
+            if ($cardElement instanceof CustomField) {
+                $previewHtml .= Html::tag('div', $cardElement->getField()->previewPlaceholderHtml(null, null));
+            } else {
+                $previewHtml .= Html::tag('div', $elementType::attributePreviewHtml($cardElement));
+            }
+        }
+
+        if (!empty(array_filter($labels))) {
+            $previewHtml .= Html::ul($labels, [
+                'class' => ['flex', 'gap-xs'],
+                'encode' => false,
+            ]);
+        }
+
+        $previewHtml .=
+            Html::endTag('div') . // .card-body
+            Html::endTag('div') . // .card-content
+            Html::tag('div', '', ['class' => 'spinner spinner-absolute']) .
+            Html::endTag('div'); // .element.card
+
+        return $previewHtml;
     }
 
     /**
@@ -2429,6 +2700,7 @@ JS, [
             'elementType' => $fieldLayout->type,
             'customizableTabs' => $config['customizableTabs'],
             'customizableUi' => $config['customizableUi'],
+            'withCardViewDesigner' => $config['withCardViewDesigner'] ?? false,
         ]);
         $namespacedId = $view->namespaceInputId($config['id']);
 

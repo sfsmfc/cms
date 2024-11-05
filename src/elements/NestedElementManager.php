@@ -468,6 +468,7 @@ class NestedElementManager extends Component
             'prevalidate' => false,
             'pageSize' => 50,
             'storageKey' => null,
+            'defaultViewMode' => 'cards',
             'static' => $owner->getIsRevision(),
         ];
 
@@ -513,12 +514,12 @@ class NestedElementManager extends Component
                     'criteria' => array_merge($criteria, $this->criteria),
                     'batchSize' => $config['pageSize'],
                     'actions' => [],
-                    'canHaveDrafts' => $elementType::hasDrafts(),
+                    'canHaveDrafts' => $config['canHaveDrafts'] ?? $elementType::hasDrafts(),
                     'storageKey' => $config['storageKey'],
                     'static' => $config['static'],
                 ];
 
-                if ($config['sortable']) {
+                if (!$config['static'] && $config['sortable']) {
                     $view->startJsBuffer();
                     $actionConfig = ElementHelper::actionConfig(new ChangeSortOrder($owner, $attribute));
                     $actionConfig['bodyHtml'] = $view->clearJsBuffer();
@@ -532,6 +533,7 @@ class NestedElementManager extends Component
                     'sources' => false,
                     'fieldLayouts' => $config['fieldLayouts'],
                     'defaultTableColumns' => $config['defaultTableColumns'],
+                    'defaultViewMode' => $config['defaultViewMode'],
                     'registerJs' => false,
                     'class' => [$config['prevalidate'] ? 'prevalidate' : ''],
                     'prevalidate' => $config['prevalidate'] ?? false,
