@@ -71,6 +71,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
     $updateSpinner: null,
     $viewModeBtnContainer: null,
     viewModeBtns: null,
+    defaultViewMode: null,
     _viewParams: null,
     _previousViewParams: null,
     _viewMode: null,
@@ -81,6 +82,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
     $actionsContainer: null,
     $actionMenuBtn: null,
     page: 1,
+    prevPage: null,
     resultSet: null,
     totalResults: null,
     totalUnfilteredResults: null,
@@ -1637,6 +1639,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         }
 
         if (preservePagination !== true) {
+          this.prevPage = null;
           this.setPage(1);
         }
 
@@ -2224,6 +2227,10 @@ Craft.BaseElementIndex = Garnish.Base.extend(
 
       // Get the new list of view modes
       this.sourceViewModes = this.getViewModesForSource();
+      this.defaultViewMode = this.getSourceData(
+        this.$source,
+        'defaultViewMode'
+      );
 
       // Create the buttons if there's more than one mode available to this source
       if (this.sourceViewModes.length > 1) {
@@ -2265,7 +2272,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
       }
 
       // Figure out which mode we should start with
-      var viewMode = this.getSelectedSourceState('mode');
+      let viewMode = this.getSelectedSourceState('mode', this.defaultViewMode);
 
       // Maintain the structure view for source states that were saved with an older Craft version
       if (
@@ -2468,38 +2475,23 @@ Craft.BaseElementIndex = Garnish.Base.extend(
     },
 
     getViewModesForSource: function () {
-      const viewModes = [];
+      let viewModes = this.$source.data('viewModes');
 
-      if (!Garnish.isMobileBrowser(true)) {
-        if (Garnish.hasAttr(this.$source, 'data-has-structure')) {
-          viewModes.push({
-            mode: 'structure',
-            title: Craft.t('app', 'Display in a structured table'),
-            icon: Craft.orientation === 'rtl' ? 'structurertl' : 'structure',
-          });
-        }
-
-        viewModes.push({
-          mode: 'table',
-          title: Craft.t('app', 'Display in a table'),
-          icon: 'list',
-        });
+      // apply availableOnMobile
+      if (Garnish.isMobileBrowser(true)) {
+        viewModes = viewModes.filter(
+          (viewMode) => viewMode.availableOnMobile ?? true
+        );
       }
 
-      if (this.$source && Garnish.hasAttr(this.$source, 'data-has-thumbs')) {
-        viewModes.push({
-          mode: 'thumbs',
-          title: Craft.t('app', 'Display as thumbnails'),
-          icon: 'grid',
-        });
+      // apply structuresOnly
+      if (!Garnish.hasAttr(this.$source, 'data-has-structure')) {
+        viewModes = viewModes.filter(
+          (viewMode) => !(viewMode.structuresOnly ?? false)
+        );
       }
 
-      viewModes.push({
-        mode: 'cards',
-        title: Craft.t('app', 'Display as cards'),
-        icon: 'element-cards',
-      });
-
+      // filter down to the allowed ones
       if (this.settings.allowedViewModes) {
         return viewModes.filter((mode) =>
           this.settings.allowedViewModes.includes(mode.mode)
@@ -3199,6 +3191,18 @@ Craft.BaseElementIndex = Garnish.Base.extend(
                 title: Craft.t('app', 'Next Page'),
               }).appendTo($paginationNav);
 
+              // Choose pagination button to focus based on user behavior
+              if (this.prevPage) {
+                let $btnToFocus =
+                  this.prevPage > this.page ? $prevBtn : $nextBtn;
+
+                if ($btnToFocus.attr('disabled') === 'disabled') {
+                  $btnToFocus = Garnish.firstFocusableElement($paginationNav);
+                }
+
+                $btnToFocus.focus();
+              }
+
               $('<div/>', {
                 class: 'page-info',
                 text: countLabel,
@@ -3208,6 +3212,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
                 this.addListener($prevBtn, 'click', function () {
                   this.removeListener($prevBtn, 'click');
                   this.removeListener($nextBtn, 'click');
+                  this.prevPage = this.page;
                   this.setPage(this.page - 1);
                   this.updateElements(true);
                 });
@@ -3217,6 +3222,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
                 this.addListener($nextBtn, 'click', function () {
                   this.removeListener($prevBtn, 'click');
                   this.removeListener($nextBtn, 'click');
+                  this.prevPage = this.page;
                   this.setPage(this.page + 1);
                   this.updateElements(true);
                 });
@@ -3625,6 +3631,8 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         var params = this.getViewParams();
         delete params.baseCriteria.offset;
         delete params.baseCriteria.limit;
+        delete params.criteria.offset;
+        delete params.criteria.limit;
         delete params.collapsedElementIds;
 
         params.type = $typeField.find('select').val();
@@ -4019,6 +4027,12 @@ const ViewMenu = Garnish.Base.extend({
       this.$trigger.addClass('active');
       this.updateSortField();
       this.updateTableFieldVisibility();
+      if (
+        this.elementIndex.getSelectedSourceState('mode') !==
+        this.elementIndex.defaultViewMode
+      ) {
+        this._createRevertBtn();
+      }
     });
 
     this.menu.on('hide', () => {
@@ -4051,9 +4065,6 @@ const ViewMenu = Garnish.Base.extend({
         this.$tableColumnsContainer
           .closest('.table-columns-field')
           .addClass('hidden');
-      }
-      if (this.$revertBtn) {
-        this.$revertBtn.addClass('hidden');
       }
     } else {
       if (this.$tableColumnsContainer) {
