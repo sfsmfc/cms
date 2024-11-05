@@ -232,7 +232,7 @@
           );
         }
 
-        this.elementEditor?.queue.push(async () => {
+        Craft.queue.push(async () => {
           if (this.addingEntry) {
             // only one new entry at a time
             return;
