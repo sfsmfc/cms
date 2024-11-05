@@ -305,11 +305,6 @@ class Drafts extends Component
                     'revisionNotes' => $draftNotes ?: Craft::t('app', 'Applied “{name}”', ['name' => $draft->draftName]),
                 ]);
 
-                // Move the new canonical element after the draft?
-                if ($draft->structureId && $draft->root) {
-                    Craft::$app->getStructures()->moveAfter($draft->structureId, $newCanonical, $draft);
-                }
-
                 // Now delete the draft
                 $elementsService->deleteElement($draft, true);
             } else {

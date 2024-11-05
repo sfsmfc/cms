@@ -2145,24 +2145,6 @@ EOD;
 
         if ($section->type == Section::TYPE_STRUCTURE && $section->structureId == $structureId) {
             Craft::$app->getElements()->updateElementSlugAndUri($this, true, true, true);
-
-            // If this is the canonical entry, update its drafts
-            if ($this->getIsCanonical()) {
-                /** @var self[] $drafts */
-                $drafts = self::find()
-                    ->draftOf($this)
-                    ->status(null)
-                    ->site('*')
-                    ->unique()
-                    ->all();
-                $structuresService = Craft::$app->getStructures();
-                $lastElement = $this;
-
-                foreach ($drafts as $draft) {
-                    $structuresService->moveAfter($section->structureId, $draft, $lastElement);
-                    $lastElement = $draft;
-                }
-            }
         }
 
         parent::afterMoveInStructure($structureId);
