@@ -1567,6 +1567,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
       params.viewState.showHeaderColumn = this.settings.showHeaderColumn;
       params.viewState.inlineEditing = this.inlineEditing;
       params.viewState.nestedInputNamespace = this.nestedInputNamespace;
+      params.viewState.static = this.settings.static;
 
       // override viewState.mode in case it's different from what's stored
       params.viewState.mode = this.viewMode;
@@ -3624,6 +3625,8 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         var params = this.getViewParams();
         delete params.baseCriteria.offset;
         delete params.baseCriteria.limit;
+        delete params.criteria.offset;
+        delete params.criteria.limit;
         delete params.collapsedElementIds;
 
         params.type = $typeField.find('select').val();
@@ -3762,6 +3765,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
       referenceElementSiteId: null,
       allowedViewModes: null,
       showHeaderColumn: true,
+      static: false,
       criteria: null,
       batchSize: 100,
       disabledElementIds: [],

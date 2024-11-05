@@ -855,6 +855,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
             },
             'skipOnEmpty' => false,
             'when' => fn() => $this->getIsCanonical(),
+            'on' => self::SCENARIO_LIVE,
         ];
         $rules[] = [['fieldId'], function(string $attribute) {
             if (isset($this->sectionId)) {
@@ -1626,7 +1627,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
             'sectionId' => $this->sectionId,
             'fieldId' => $this->fieldId,
             'primaryOwnerId' => $this->getPrimaryOwnerId(),
-            'ownerId' => $this->getPrimaryOwnerId(),
+            'ownerId' => $this->getOwnerId(),
             'sortOrder' => null,
             'typeId' => $this->typeId,
             'siteId' => $this->siteId,

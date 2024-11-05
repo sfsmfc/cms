@@ -23,6 +23,7 @@ use craft\helpers\UrlHelper;
 use craft\i18n\Locale;
 use craft\models\Section;
 use craft\services\Sites;
+use craft\utilities\QueueManager;
 use craft\validators\UserPasswordValidator;
 use craft\web\AssetBundle;
 use craft\web\assets\axios\AxiosAsset;
@@ -161,8 +162,8 @@ JS;
             'Couldn’t delete “{name}”.',
             'Couldn’t reorder items.',
             'Couldn’t save new order.',
-            'Create',
             'Create {type}',
+            'Create',
             'Customize sources',
             'Default Sort',
             'Default Table Columns',
@@ -235,8 +236,8 @@ JS;
             'Level {num}',
             'License transferred.',
             'Limit',
-            'Loading',
             'Loading complete',
+            'Loading',
             'Make not required',
             'Make optional',
             'Make required',
@@ -415,10 +416,10 @@ JS;
             '{name} active, more info',
             '{name} folder',
             '{name} sorted by {attribute}, {direction}',
-            '{num, number} {num, plural, =1{result} other{results}}',
             '{num, number} {num, plural, =1{Available Update} other{Available Updates}}',
             '{num, number} {num, plural, =1{degree} other{degrees}}',
             '{num, number} {num, plural, =1{notification} other{notifications}}',
+            '{num, number} {num, plural, =1{result} other{results}}',
             '{pct} width',
             '{total, number} {total, plural, =1{error} other{errors}} found in {num, number} {num, plural, =1{tab} other{tabs}}.',
             '{total, number} {total, plural, =1{{item}} other{{items}}}',
@@ -519,7 +520,7 @@ JS;
             'appId' => Craft::$app->id,
             'autofocusPreferred' => $currentUser->getAutofocusPreferred(),
             'autosaveDrafts' => $generalConfig->autosaveDrafts,
-            'canAccessQueueManager' => $userSession->checkPermission('utility:queue-manager'),
+            'canAccessQueueManager' => Craft::$app->getUtilities()->checkAuthorization(QueueManager::class),
             'dataAttributes' => Html::$dataAttributes,
             'defaultIndexCriteria' => [],
             'disableAutofocus' => (bool)($currentUser->getPreference('disableAutofocus') ?? false),

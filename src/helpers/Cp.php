@@ -18,6 +18,7 @@ use craft\base\ElementInterface;
 use craft\base\FieldLayoutElement;
 use craft\base\Grippable;
 use craft\base\Iconic;
+use craft\base\NestedElementInterface;
 use craft\base\Statusable;
 use craft\base\Thumbable;
 use craft\behaviors\DraftBehavior;
@@ -35,6 +36,8 @@ use craft\models\FieldLayout;
 use craft\models\FieldLayoutTab;
 use craft\models\Site;
 use craft\services\ElementSources;
+use craft\utilities\ProjectConfig as ProjectConfigUtility;
+use craft\utilities\Updates;
 use craft\web\twig\TemplateLoaderException;
 use craft\web\View;
 use Illuminate\Support\Collection;
@@ -168,10 +171,12 @@ class Cp
             ]);
         }
 
+        $utilitiesService = Craft::$app->getUtilities();
+
         // Critical update available?
         if (
             $path !== 'utilities/updates' &&
-            $user->can('utility:updates') &&
+            $utilitiesService->checkAuthorization(Updates::class) &&
             Craft::$app->getUpdates()->getIsCriticalUpdateAvailable()
         ) {
             $alerts[] = Craft::t('app', 'A critical update is available.') .
@@ -194,7 +199,7 @@ class Cp
         $projectConfig = Craft::$app->getProjectConfig();
         if (
             $path !== 'utilities/project-config' &&
-            $user->can('utility:project-config') &&
+            $utilitiesService->checkAuthorization(ProjectConfigUtility::class) &&
             $projectConfig->areChangesPending() &&
             ($projectConfig->writeYamlAutomatically || $projectConfig->get('dateModified') <= $projectConfig->get('dateModified', true))
         ) {
@@ -579,6 +584,11 @@ class Cp
             'sortable' => false,
         ];
 
+        if ($element->getIsRevision()) {
+            $config['showActionMenu'] = false;
+            $config['selectable'] = false;
+        }
+
         $color = $element instanceof Colorable ? $element->getColor() : null;
 
         $classes = ['card'];
@@ -862,6 +872,8 @@ class Cp
                     'id' => $element->isProvisionalDraft ? $element->getCanonicalId() : $element->id,
                     'draft-id' => $element->isProvisionalDraft ? null : $element->draftId,
                     'revision-id' => $element->revisionId,
+                    'field-id' => $element instanceof NestedElementInterface ? $element->getField()?->id : null,
+                    'owner-id' => $element instanceof NestedElementInterface ? $element->getOwnerId() : null,
                     'site-id' => $element->siteId,
                     'status' => $element->getStatus(),
                     'label' => (string)$element,
@@ -2104,10 +2116,11 @@ JS, [
      * Returns address fields’ HTML (sans country) for a given address.
      *
      * @param Address $address
+     * @param bool $static
      * @return string
      * @since 4.0.0
      */
-    public static function addressFieldsHtml(Address $address): string
+    public static function addressFieldsHtml(Address $address, bool $static = false): string
     {
         $requiredFields = [];
         $scenario = $address->getScenario();
@@ -2143,10 +2156,11 @@ JS, [
                 'value' => $address->addressLine1,
                 'autocomplete' => $belongsToCurrentUser ? 'address-line1' : 'off',
                 'required' => isset($requiredFields['addressLine1']),
-                'errors' => $address->getErrors('addressLine1'),
+                'errors' => !$static ? $address->getErrors('addressLine1') : [],
                 'data' => [
                     'error-key' => 'addressLine1',
                 ],
+                'disabled' => $static,
             ]) .
             static::textFieldHtml([
                 'status' => $address->getAttributeStatus('addressLine2'),
@@ -2156,10 +2170,11 @@ JS, [
                 'value' => $address->addressLine2,
                 'autocomplete' => $belongsToCurrentUser ? 'address-line2' : 'off',
                 'required' => isset($requiredFields['addressLine2']),
-                'errors' => $address->getErrors('addressLine2'),
+                'errors' => !$static ? $address->getErrors('addressLine2') : [],
                 'data' => [
                     'error-key' => 'addressLine2',
                 ],
+                'disabled' => $static,
             ]) .
             static::textFieldHtml([
                 'status' => $address->getAttributeStatus('addressLine3'),
@@ -2169,10 +2184,11 @@ JS, [
                 'value' => $address->addressLine3,
                 'autocomplete' => $belongsToCurrentUser ? 'address-line3' : 'off',
                 'required' => isset($requiredFields['addressLine3']),
-                'errors' => $address->getErrors('addressLine3'),
+                'errors' => !$static ? $address->getErrors('addressLine3') : [],
                 'data' => [
                     'error-key' => 'addressLine3',
                 ],
+                'disabled' => $static,
             ]) .
             self::_subdivisionField(
                 $address,
@@ -2182,6 +2198,7 @@ JS, [
                 isset($requiredFields['administrativeArea']),
                 [$address->countryCode],
                 true,
+                $static,
             ) .
             self::_subdivisionField(
                 $address,
@@ -2191,6 +2208,7 @@ JS, [
                 isset($requiredFields['locality']),
                 $parents['locality'],
                 true,
+                $static,
             ) .
             self::_subdivisionField(
                 $address,
@@ -2200,6 +2218,7 @@ JS, [
                 isset($requiredFields['dependentLocality']),
                 $parents['dependentLocality'],
                 false,
+                $static,
             ) .
             static::textFieldHtml([
                 'fieldClass' => array_filter([
@@ -2213,10 +2232,11 @@ JS, [
                 'value' => $address->postalCode,
                 'autocomplete' => $belongsToCurrentUser ? 'postal-code' : 'off',
                 'required' => isset($requiredFields['postalCode']),
-                'errors' => $address->getErrors('postalCode'),
+                'errors' => !$static ? $address->getErrors('postalCode') : [],
                 'data' => [
                     'error-key' => 'postalCode',
                 ],
+                'disabled' => $static,
             ]) .
             static::textFieldHtml([
                 'fieldClass' => array_filter([
@@ -2229,10 +2249,11 @@ JS, [
                 'name' => 'sortingCode',
                 'value' => $address->sortingCode,
                 'required' => isset($requiredFields['sortingCode']),
-                'errors' => $address->getErrors('sortingCode'),
+                'errors' => !$static ? $address->getErrors('sortingCode') : [],
                 'data' => [
                     'error-key' => 'sortingCode',
                 ],
+                'disabled' => $static,
             ]);
     }
 
@@ -2287,6 +2308,7 @@ JS, [
         bool $required,
         ?array $parents,
         bool $spinner,
+        bool $static = false,
     ): string {
         $value = $address->$name;
         $options = Craft::$app->getAddresses()->getSubdivisionRepository()->getList($parents, Craft::$app->language);
@@ -2298,7 +2320,7 @@ JS, [
             }
 
             if ($spinner) {
-                $errors = $address->getErrors($name);
+                $errors = !$static ? $address->getErrors($name) : [];
                 $input =
                     Html::beginTag('div', [
                         'class' => ['flex', 'flex-nowrap'],
@@ -2310,6 +2332,7 @@ JS, [
                         'options' => $options,
                         'errors' => $errors,
                         'autocomplete' => $autocomplete,
+                        'disabled' => $static,
                     ]) .
                     Html::tag('div', '', [
                         'id' => "$name-spinner",
@@ -2326,6 +2349,7 @@ JS, [
                     'data' => [
                         'error-key' => $name,
                     ],
+                    'disabled' => $static,
                 ]);
             }
 
@@ -2343,6 +2367,7 @@ JS, [
                 'data' => [
                     'error-key' => $name,
                 ],
+                'disabled' => $static,
             ]);
         }
 
@@ -2356,10 +2381,11 @@ JS, [
             'name' => $name,
             'value' => $value,
             'required' => $required,
-            'errors' => $address->getErrors($name),
+            'errors' => !$static ? $address->getErrors($name) : [],
             'data' => [
                 'error-key' => $name,
             ],
+            'disabled' => $static,
         ]);
     }
 
