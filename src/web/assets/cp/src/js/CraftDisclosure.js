@@ -75,7 +75,7 @@ class CraftDisclosure extends HTMLElement {
     if (this.cookieName) {
       Craft.setCookie(this.cookieName, 'expanded');
     }
-  }
+  };
 
   open() {
     this.setAttribute('state', 'expanded');
@@ -90,7 +90,7 @@ class CraftDisclosure extends HTMLElement {
     if (this.cookieName) {
       Craft.setCookie(this.cookieName, 'collapsed');
     }
-  }
+  };
 
   close() {
     this.setAttribute('state', 'collapsed');

@@ -356,7 +356,10 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
 
           this.hasSidebar = true;
 
-          if (this.showExpandedView && Craft.getCookie('sidebar-slideout') === 'expanded') {
+          if (
+            this.showExpandedView &&
+            Craft.getCookie('sidebar-slideout') === 'expanded'
+          ) {
             this.showSidebar(false);
           } else {
             this.hideSidebar();
