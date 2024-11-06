@@ -2213,10 +2213,17 @@ JS, [
         }
 
         if ($elementUid) {
+            $withDrafts = false;
+            if (!Craft::$app->getConfig()->getGeneral()->autosaveDrafts) {
+                $withDrafts = null;
+            }
             return $this->_elementQuery($elementType)
                 ->uid($elementUid)
                 ->siteId($siteId)
                 ->preferSites($preferSites)
+                // when autosaveDrafts is off, we need search among drafts too
+                // https://github.com/craftcms/cms/issues/15985
+                ->drafts($withDrafts)
                 ->unique()
                 ->status(null)
                 ->one();
@@ -2259,7 +2266,7 @@ JS, [
         if (isset($this->_ownerId) && $element instanceof NestedElementInterface) {
             $element->setOwnerId($this->_ownerId);
         }
-        $element->setAttributesFromRequest($this->_attributes);
+        $element->setAttributesFromRequest($this->_attributes + array_filter(['fieldId' => $this->_fieldId]));
 
         if (!Craft::$app->getElements()->canSave($element)) {
             throw new ForbiddenHttpException('User not authorized to create this element.');
@@ -2338,7 +2345,7 @@ JS, [
 
         $scenario = $element->getScenario();
         $element->setScenario(Element::SCENARIO_LIVE);
-        $element->setAttributesFromRequest($this->_attributes);
+        $element->setAttributesFromRequest($this->_attributes + array_filter(['fieldId' => $this->_fieldId]));
 
         if ($this->_slug !== null) {
             $element->slug = $this->_slug;
