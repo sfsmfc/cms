@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed a bug where changing entry/category drafts weren’t retaining new parent selections.
 - Fixed styling issues. ([#15965](https://github.com/craftcms/cms/issues/15965))
 
 ## 4.12.8 - 2024-10-22
