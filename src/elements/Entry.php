@@ -2005,14 +2005,14 @@ EOD;
 
             $record->save(false);
 
-            if ($this->getIsCanonical() && $section->type == Section::TYPE_STRUCTURE) {
+            if (!$this->duplicateOf && $section->type == Section::TYPE_STRUCTURE) {
                 // Has the parent changed?
                 if ($this->hasNewParent()) {
                     $this->_placeInStructure($isNew, $section);
                 }
 
                 // Update the entry’s descendants, who may be using this entry’s URI in their own URIs
-                if (!$isNew) {
+                if (!$isNew && $this->getIsCanonical()) {
                     Craft::$app->getElements()->updateDescendantSlugsAndUris($this, true, true);
                 }
             }
