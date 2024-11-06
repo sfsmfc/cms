@@ -10,7 +10,6 @@ namespace craft\services;
 use Craft;
 use craft\base\Element;
 use craft\base\ElementContainerFieldInterface;
-use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\base\MemoizableArray;
 use craft\db\Query;
@@ -2012,14 +2011,14 @@ SQL)->execute();
 
                         // remove drafts and revisions from the structure, too
                         foreach (Db::each($draftsQuery) as $draft) {
-                            /** @var ElementInterface $draft */
+                            /** @var Entry $draft */
                             if ($draft->lft) {
                                 $structuresService->remove($oldSection->structureId, $draft);
                             }
                         }
 
                         foreach (Db::each($revisionsQuery) as $revision) {
-                            /** @var ElementInterface $revision */
+                            /** @var Entry $revision */
                             if ($revision->lft) {
                                 $structuresService->remove($oldSection->structureId, $revision);
                             }
