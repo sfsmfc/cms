@@ -1986,34 +1986,55 @@ SQL)->execute();
                     throw new InvalidElementException($entry, 'Element ' . $entry->id . ' could not be moved for site ' . $entry->siteId);
                 }
 
-                $structuresService = Craft::$app->getStructures();
+                $provisionalDraftIds = Entry::find()->draftOf($entry)->provisionalDrafts()->status(null)->site('*')->unique()->ids();
+                $regularDraftIds = Entry::find()->draftOf($entry)->drafts()->status(null)->site('*')->unique()->ids();
+                $revisionIds = Entry::find()->revisionOf($entry)->status(null)->site('*')->unique()->ids();
 
                 if ($entry->getIsCanonical()) {
                     $canonical = $entry->getCanonical(true);
 
-                    // if we're moving it to a Structure section, place it at the root
+                    // if we're moving it to a Structure section, place it at the root;
+                    // it'll move the regular drafts too
                     if ($section->type === Section::TYPE_STRUCTURE && $canonical->structureId) {
-                        if ($section->defaultPlacement === Section::DEFAULT_PLACEMENT_BEGINNING) {
-                            $structuresService->prependToRoot($section->structureId, $canonical, Structures::MODE_INSERT);
-                        } else {
-                            $structuresService->appendToRoot($section->structureId, $canonical, Structures::MODE_INSERT);
+                        $this->moveToStructure($section, $canonical);
+
+                        // now if we have provisional draft IDs, we have to move those too
+                        if (!empty($provisionalDraftIds)) {
+                            $provisionalDrafts = Entry::find()->id($provisionalDraftIds)->provisionalDrafts()->all();
+                            foreach ($provisionalDrafts as $provisionalDraft) {
+                                $this->moveToStructure($section, $provisionalDraft);
+                            }
                         }
                     }
 
                     // if we're moving it from a Structure section, remove it from the structure
                     if ($oldSection->structureId) {
+                        $structuresService = Craft::$app->getStructures();
                         $structuresService->remove($oldSection->structureId, $canonical);
+
+                        // if we have regular or provisional draft ids, we need to remove those from the old structure
+                        $draftIds = array_unique(array_merge($provisionalDraftIds, $regularDraftIds));
+                        if (!empty($draftIds)) {
+                            $drafts = Entry::find()
+                                ->id($draftIds)
+                                ->drafts()
+                                ->provisionalDrafts()
+                                ->unique()
+                                ->collect()
+                                ->keyBy('id')
+                                ->toArray();
+                            foreach ($drafts as $draft) {
+                                $structuresService->remove($oldSection->structureId, $draft);
+                            }
+                        }
                     }
                 }
 
                 $entry->newSiteIds = [];
                 $entry->afterPropagate(false);
 
-                // now update drafts & revisions too
-                $ids = array_merge(
-                    Entry::find()->draftOf($entry)->provisionalDrafts(null)->status(null)->site('*')->unique()->ids(),
-                    Entry::find()->revisionOf($entry)->status(null)->site('*')->unique()->ids(),
-                );
+                // now assign drafts & revisions to the new section too
+                $ids = array_unique(array_merge($provisionalDraftIds, $regularDraftIds, $revisionIds));
                 if (!empty($ids)) {
                     Db::update(Table::ENTRIES, [
                         'sectionId' => $section->id,
@@ -2041,5 +2062,24 @@ SQL)->execute();
         }
 
         return true;
+    }
+
+    /**
+     * Places entry at the beginning or end of the structure
+     *
+     * @param $section
+     * @param $entry
+     * @return void
+     * @throws Exception
+     */
+    private function moveToStructure($section, $entry): void
+    {
+        $structuresService = Craft::$app->getStructures();
+
+        if ($section->defaultPlacement === Section::DEFAULT_PLACEMENT_BEGINNING) {
+            $structuresService->prependToRoot($section->structureId, $entry, Structures::MODE_INSERT);
+        } else {
+            $structuresService->appendToRoot($section->structureId, $entry, Structures::MODE_INSERT);
+        }
     }
 }
