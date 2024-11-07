@@ -64,6 +64,16 @@ abstract class BaseElementSelectConditionRule extends BaseConditionRule
     }
 
     /**
+     * Returns additional config items added to the element select input.
+     *
+     * @return array
+     */
+    protected function elementSelectHtmlConfig(): array
+    {
+        return [];
+    }
+
+    /**
      * @param bool $parse Whether to parse the value for an environment variable
      * @return int|string|null
      */
@@ -127,7 +137,7 @@ abstract class BaseElementSelectConditionRule extends BaseConditionRule
 
         $element = $this->_element();
 
-        return Cp::elementSelectHtml([
+        return Cp::elementSelectHtml(array_merge([
             'name' => 'elementId',
             'elements' => $element ? [$element] : [],
             'elementType' => $this->elementType(),
@@ -135,7 +145,7 @@ abstract class BaseElementSelectConditionRule extends BaseConditionRule
             'criteria' => $this->criteria(),
             'condition' => $this->selectionCondition(),
             'single' => true,
-        ]);
+        ], $this->elementSelectHtmlConfig()));
     }
 
     /**
