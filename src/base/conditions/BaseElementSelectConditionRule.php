@@ -64,13 +64,23 @@ abstract class BaseElementSelectConditionRule extends BaseConditionRule
     }
 
     /**
-     * Override or add items to the config for the element select input.
+     * Defines the element select config.
      *
      * @return array
+     * @since 5.5.0
      */
-    protected function elementSelectHtmlConfig(): array
+    protected function elementSelectConfig(): array
     {
-        return [];
+        $element = $this->_element();
+        return [
+            'name' => 'elementId',
+            'elements' => $element ? [$element] : [],
+            'elementType' => $this->elementType(),
+            'sources' => $this->sources(),
+            'criteria' => $this->criteria(),
+            'condition' => $this->selectionCondition(),
+            'single' => true,
+        ];
     }
 
     /**
@@ -135,17 +145,7 @@ abstract class BaseElementSelectConditionRule extends BaseConditionRule
             ]);
         }
 
-        $element = $this->_element();
-
-        return Cp::elementSelectHtml(array_merge([
-            'name' => 'elementId',
-            'elements' => $element ? [$element] : [],
-            'elementType' => $this->elementType(),
-            'sources' => $this->sources(),
-            'criteria' => $this->criteria(),
-            'condition' => $this->selectionCondition(),
-            'single' => true,
-        ], $this->elementSelectHtmlConfig()));
+        return Cp::elementSelectHtml($this->elementSelectConfig());
     }
 
     /**

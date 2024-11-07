@@ -54,9 +54,9 @@ class RelatedToConditionRule extends BaseElementSelectConditionRule implements E
     /**
      * @inerhitdoc
      */
-    protected function elementSelectHtmlConfig(): array
+    protected function elementSelectConfig(): array
     {
-        return array_merge(parent::elementSelectHtmlConfig(), [
+        return array_merge(parent::elementSelectConfig(), [
             'showSiteMenu' => true,
         ]);
     }
