@@ -2619,14 +2619,14 @@ JS;
 
             $this->saveOwnership($isNew, Table::ENTRIES);
 
-            if ($this->getIsCanonical() && isset($this->sectionId) && $section->type == Section::TYPE_STRUCTURE) {
+            if (!$this->duplicateOf && isset($this->sectionId) && $section->type == Section::TYPE_STRUCTURE) {
                 // Has the parent changed?
                 if ($this->hasNewParent()) {
                     $this->_placeInStructure($isNew, $section);
                 }
 
                 // Update the entry’s descendants, who may be using this entry’s URI in their own URIs
-                if (!$isNew) {
+                if (!$isNew && $this->getIsCanonical()) {
                     Craft::$app->getElements()->updateDescendantSlugsAndUris($this, true, true);
                 }
             }
