@@ -1090,6 +1090,7 @@ class Cp extends Component
      * @param array $config
      * @return string
      * @since 4.0.0
+     * @deprecated in 5.5.0. The `fieldLayoutDesigner()` global CP function should be used instead.
      */
     public function fieldLayoutDesigner(FieldLayout $fieldLayout, array $config = []): string
     {

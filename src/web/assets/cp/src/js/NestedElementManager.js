@@ -410,7 +410,51 @@ Craft.NestedElementManager = Garnish.Base.extend(
             // Let the link/button do its thing
             return;
           }
-          Craft.createElementEditor(this.elementType, $element);
+
+          let ownerId = $element.data('owner-id');
+          if (
+            this.elementEditor.settings.isProvisionalDraft &&
+            $element.data('owner-id') !== this.elementEditor.settings.elementId
+          ) {
+            ownerId = this.elementEditor.settings.elementId;
+          }
+
+          const slideout = Craft.createElementEditor(
+            this.elementType,
+            $element,
+            {
+              ownerId: ownerId,
+              onBeforeSubmit: async () => {
+                // If the nested element is primarily owned by the canonical entry being edited,
+                // then ensure we're working with a draft and save the nested entry changes to the draft
+                if (
+                  $element.data('primary-owner-id') ==
+                  this.elementEditor.settings.canonicalId
+                ) {
+                  await this.markAsDirty();
+                  if (this.elementEditor.settings.draftId) {
+                    if (!slideout.elementEditor.settings.saveParams) {
+                      slideout.elementEditor.settings.saveParams = {};
+                    }
+                    slideout.elementEditor.settings.saveParams.action =
+                      'elements/save-nested-element-for-draft';
+                    slideout.elementEditor.settings.saveParams.ownerId =
+                      this.settings.ownerId;
+                  }
+                }
+              },
+              onSubmit: (ev) => {
+                if (ev.data.id != $element.data('id')) {
+                  // swap the element with the new one
+                  $element
+                    .attr('data-id', ev.data.id)
+                    .data('id', ev.data.id)
+                    .data('owner-id', ev.data.ownerId);
+                  Craft.refreshElementInstances(ev.data.id);
+                }
+              },
+            }
+          );
         });
       }
 

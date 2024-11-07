@@ -580,10 +580,12 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
       if (data.modelClass && data.modelId) {
         Craft.refreshComponentInstances(data.modelClass, data.modelId);
       }
-      this.trigger('submit', {
+      const ev = {
         response: response,
         data: (data.modelName && data[data.modelName]) || {},
-      });
+      };
+      this.trigger('submit', ev);
+      this.settings.onSubmit(ev);
       if (this.settings.closeOnSubmit) {
         this.close();
       }
@@ -793,6 +795,7 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
       requestOptions: {},
       showHeader: null,
       closeOnSubmit: true,
+      onSubmit: () => {},
     },
   }
 );
