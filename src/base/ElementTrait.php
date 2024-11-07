@@ -7,8 +7,11 @@
 
 namespace craft\base;
 
+use craft\attributes\GqlField;
 use craft\elements\db\EagerLoadInfo;
+use craft\gql\types\DateTime as DateTimeType;
 use DateTime;
+use GraphQL\Type\Definition\Type;
 
 /**
  * ElementTrait implements the common methods and properties for element classes.
@@ -67,6 +70,7 @@ trait ElementTrait
      * @var int|null The ID of the element’s record in the `elements_sites` table
      * @since 3.5.2
      */
+    #[GqlField(Type::INT)]
     public ?int $siteSettingsId = null;
 
     /**
@@ -82,41 +86,49 @@ trait ElementTrait
     /**
      * @var bool Whether the element is enabled
      */
+    #[GqlField(Type::BOOLEAN)]
     public bool $enabled = true;
 
     /**
      * @var bool Whether the element is archived
      */
+    #[GqlField(Type::BOOLEAN)]
     public bool $archived = false;
 
     /**
      * @var int|null The site ID the element is associated with
      */
+    #[GqlField(Type::INT)]
     public ?int $siteId = null;
 
     /**
      * @var string|null The element’s title
      */
+    #[GqlField(Type::STRING)]
     public ?string $title = null;
 
     /**
      * @var string|null The element’s slug
      */
+    #[GqlField(Type::STRING)]
     public ?string $slug = null;
 
     /**
      * @var string|null The element’s URI
      */
+    #[GqlField(Type::STRING)]
     public ?string $uri = null;
 
     /**
      * @var DateTime|null The date that the element was created
      */
+    #[GqlField(DateTimeType::class)]
     public ?DateTime $dateCreated = null;
 
     /**
      * @var DateTime|null The date that the element was last updated
      */
+    #[GqlField(DateTimeType::class)]
     public ?DateTime $dateUpdated = null;
 
     /**
@@ -160,11 +172,13 @@ trait ElementTrait
     /**
      * @var int|null The element’s search score, if the [[\craft\elements\db\ElementQuery::search]] parameter was used when querying for the element
      */
+    #[GqlField(Type::INT)]
     public ?int $searchScore = null;
 
     /**
      * @var bool Whether the element has been soft-deleted.
      */
+    #[GqlField(Type::BOOLEAN)]
     public bool $trashed = false;
 
     /**

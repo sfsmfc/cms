@@ -9,6 +9,7 @@ namespace craft\base;
 
 use ArrayIterator;
 use Craft;
+use craft\attributes\GqlField;
 use craft\behaviors\CustomFieldBehavior;
 use craft\behaviors\DraftBehavior;
 use craft\behaviors\RevisionBehavior;
@@ -81,6 +82,7 @@ use craft\validators\SiteIdValidator;
 use craft\validators\SlugValidator;
 use craft\validators\StringValidator;
 use craft\web\UploadedFile;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 use Throwable;
@@ -3988,6 +3990,7 @@ JS, [
     /**
      * @inheritdoc
      */
+    #[GqlField(Type::STRING)]
     public function getStatus(): ?string
     {
         if ($this->getIsDraft() && !$this->isProvisionalDraft) {
@@ -5860,7 +5863,7 @@ JS,
             $this->trigger(self::EVENT_BEFORE_SAVE, $event);
             return $event->isValid;
         }
-        
+
         return true;
     }
 
@@ -6324,6 +6327,7 @@ JS,
      * @inheritdoc
      * @since 3.5.0
      */
+    #[GqlField(Type::STRING)]
     public function getLanguage(): string
     {
         return $this->getSite()->language;
