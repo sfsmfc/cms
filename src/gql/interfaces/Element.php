@@ -8,15 +8,20 @@
 namespace craft\gql\interfaces;
 
 use Craft;
+use craft\attributes\GqlField;
 use craft\gql\base\InterfaceType;
 use craft\gql\base\SingularTypeInterface;
 use craft\gql\GqlEntityRegistry;
 use craft\gql\types\DateTime;
 use craft\gql\types\generators\ElementType;
+use craft\helpers\Attributes;
 use craft\helpers\Gql as GqlHelper;
 use craft\services\Gql;
 use GraphQL\Type\Definition\InterfaceType as GqlInterfaceType;
 use GraphQL\Type\Definition\Type;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 
 /**
  * Class Element
@@ -26,6 +31,12 @@ use GraphQL\Type\Definition\Type;
  */
 class Element extends InterfaceType implements SingularTypeInterface
 {
+    /**
+     * @var string
+     * @since 5.x.x
+     */
+    public static string $element = \craft\base\Element::class;
+
     /**
      * @inheritdoc
      */
@@ -56,11 +67,60 @@ class Element extends InterfaceType implements SingularTypeInterface
     }
 
     /**
+     * @return array
+     * @throws \ReflectionException
+     * @since 5.x.x
+     */
+    public static function getElementFieldDefinitions(): array
+    {
+        // Use to get a nice version of the property description
+        $propertyInfo = new PropertyInfoExtractor(
+            descriptionExtractors: [new PhpDocExtractor()]
+        );
+
+        return Attributes::getPropertiesByAttribute(static::$element, GqlField::class)
+            ->map(function(\ReflectionProperty|\ReflectionMethod $prop) use ($propertyInfo) {
+                /** @var GqlField $attr */
+                $attr = $prop->getAttributes(GqlField::class, \ReflectionAttribute::IS_INSTANCEOF)[0]->newInstance();
+
+                // When dealing with a method as a property, normalise the name if appplicable
+                $name = $prop->getName();
+                if ($prop instanceof \ReflectionMethod && str_starts_with($name, 'get')) {
+                    $name = str_replace('get', '', $name);
+                    $name = lcfirst($name);
+                }
+
+                $definition = [
+                    'name' => $attr->name ?? $name,
+                    'type' => $attr->getType(),
+                    'description' => $attr->description ?? $propertyInfo->getShortDescription($prop->class, $name) ?? $prop->getDocComment(),
+                ];
+
+                if ($attr->complexity) {
+                    $definition['complexity'] = ($attr->complexity)();
+                }
+
+                if ($attr->args) {
+                    $definition['args'] = ($attr->args)();
+                }
+
+                if ($attr->resolve) {
+                    $definition['resolve'] = $attr->resolve;
+                }
+
+                return $definition;
+            })
+            ->keyBy('name')
+            ->all();
+    }
+
+    /**
      * @inheritdoc
      */
     public static function getFieldDefinitions(): array
     {
-        return Craft::$app->getGql()->prepareFieldDefinitions(array_merge(parent::getFieldDefinitions(), [
+        $parentFields = parent::getFieldDefinitions();
+        return Craft::$app->getGql()->prepareFieldDefinitions(array_merge($parentFields, [
             Gql::GRAPHQL_COUNT_FIELD => [
                 'name' => Gql::GRAPHQL_COUNT_FIELD,
                 'type' => Type::int(),

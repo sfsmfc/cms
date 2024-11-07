@@ -8,7 +8,9 @@
 namespace craft\base;
 
 use Craft;
+use craft\attributes\GqlField;
 use craft\nameparsing\CustomLanguage;
+use GraphQL\Type\Definition\Type;
 use TheIconic\NameParser\Language\English;
 use TheIconic\NameParser\Language\German;
 use TheIconic\NameParser\Parser as NameParser;
@@ -25,16 +27,19 @@ trait NameTrait
      * @var string|null Full name
      * @since 4.0.0
      */
+    #[GqlField(Type::STRING)]
     public ?string $fullName = null;
 
     /**
      * @var string|null First name
      */
+    #[GqlField(Type::STRING)]
     public ?string $firstName = null;
 
     /**
      * @var string|null Last name
      */
+    #[GqlField(Type::STRING)]
     public ?string $lastName = null;
 
     /**

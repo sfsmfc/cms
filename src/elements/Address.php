@@ -7,6 +7,7 @@ use CommerceGuys\Addressing\AddressInterface;
 use CommerceGuys\Addressing\Country\Country;
 use CommerceGuys\Addressing\Subdivision\SubdivisionUpdater;
 use Craft;
+use craft\attributes\GqlField;
 use craft\base\Element;
 use craft\base\NameTrait;
 use craft\base\NestedElementInterface;
@@ -24,6 +25,7 @@ use craft\fieldlayoutelements\FullNameField;
 use craft\helpers\Db;
 use craft\models\FieldLayout;
 use craft\records\Address as AddressRecord;
+use GraphQL\Type\Definition\Type;
 use yii\base\InvalidConfigException;
 
 /**
@@ -167,67 +169,80 @@ class Address extends Element implements AddressInterface, NestedElementInterfac
      * @var string Two-letter country code
      * @see https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
      */
+    #[GqlField([[Type::class, 'nonNull'], Type::STRING])]
     public string $countryCode;
 
     /**
      * @var string|null Administrative area
      */
+    #[GqlField(Type::STRING)]
     public ?string $administrativeArea = null;
 
     /**
      * @var string|null Locality
      */
+    #[GqlField(Type::STRING)]
     public ?string $locality = null;
 
     /**
      * @var string|null Dependent locality
      */
+    #[GqlField(Type::STRING)]
     public ?string $dependentLocality = null;
 
     /**
      * @var string|null Postal code
      */
+    #[GqlField(Type::STRING)]
     public ?string $postalCode = null;
 
     /**
      * @var string|null Sorting code
      */
+    #[GqlField(Type::STRING)]
     public ?string $sortingCode = null;
 
     /**
      * @var string|null First line of the address
      */
+    #[GqlField(Type::STRING)]
     public ?string $addressLine1 = null;
 
     /**
      * @var string|null Second line of the address
      */
+    #[GqlField(Type::STRING)]
     public ?string $addressLine2 = null;
 
     /**
      * @var string|null Third line of the address
      * @since 5.0.0
      */
+    #[GqlField(Type::STRING)]
     public ?string $addressLine3 = null;
 
     /**
      * @var string|null Organization name
      */
+    #[GqlField(Type::STRING)]
     public ?string $organization = null;
 
     /**
      * @var string|null Organization tax ID
      */
+    #[GqlField(Type::STRING)]
     public ?string $organizationTaxId = null;
 
     /**
      * @var string|null Latitude
      */
+    #[GqlField(Type::STRING)]
     public ?string $latitude = null;
 
     /**
      * @var string|null Longitude
      */
+    #[GqlField(Type::STRING)]
     public ?string $longitude = null;
 
     /**

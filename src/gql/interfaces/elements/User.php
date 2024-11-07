@@ -28,6 +28,11 @@ class User extends Element
     /**
      * @inheritdoc
      */
+    public static string $element = \craft\elements\User::class;
+
+    /**
+     * @inheritdoc
+     */
     public static function getTypeGenerator(): string
     {
         return UserType::class;
@@ -67,62 +72,7 @@ class User extends Element
      */
     public static function getFieldDefinitions(): array
     {
-        return Craft::$app->getGql()->prepareFieldDefinitions(array_merge(parent::getFieldDefinitions(), self::getConditionalFields(), [
-            'friendlyName' => [
-                'name' => 'friendlyName',
-                'type' => Type::string(),
-                'description' => 'The user’s first name or username.',
-            ],
-            'fullName' => [
-                'name' => 'fullName',
-                'type' => Type::string(),
-                'description' => 'The user’s full name.',
-            ],
-            'name' => [
-                'name' => 'name',
-                'type' => Type::nonNull(Type::string()),
-                'description' => 'The user’s full name or username.',
-            ],
-            'preferences' => [
-                'name' => 'preferences',
-                'type' => Type::nonNull(Type::string()),
-                'description' => 'The user’s preferences.',
-                'complexity' => Gql::nPlus1Complexity(),
-            ],
-            'preferredLanguage' => [
-                'name' => 'preferredLanguage',
-                'type' => Type::string(),
-                'description' => 'The user’s preferred language.',
-                'complexity' => Gql::nPlus1Complexity(),
-            ],
-            'username' => [
-                'name' => 'username',
-                'type' => Type::string(),
-                'description' => 'The username.',
-            ],
-            'firstName' => [
-                'name' => 'firstName',
-                'type' => Type::string(),
-                'description' => 'The user’s first name.',
-            ],
-            'lastName' => [
-                'name' => 'lastName',
-                'type' => Type::string(),
-                'description' => 'The user’s last name.',
-            ],
-            'email' => [
-                'name' => 'email',
-                'type' => Type::string(),
-                'description' => 'The user’s email.',
-            ],
-            'addresses' => [
-                'name' => 'addresses',
-                'args' => AddressArguments::getArguments(),
-                'type' => Type::listOf(Address::getType()),
-                'description' => 'The user’s addresses.',
-                'complexity' => Gql::eagerLoadComplexity(),
-                'resolve' => AddressResolver::class . '::resolve',
-            ],
+        return Craft::$app->getGql()->prepareFieldDefinitions(array_merge(parent::getFieldDefinitions(), self::getElementFieldDefinitions(), self::getConditionalFields(), [
         ]), self::getName());
     }
 

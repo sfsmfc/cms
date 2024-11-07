@@ -8,9 +8,11 @@
 namespace craft\elements;
 
 use Craft;
+use craft\attributes\GqlField;
 use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\base\NameTrait;
+use craft\commerce\helpers\Gql;
 use craft\db\Query;
 use craft\db\Table;
 use craft\elements\actions\DeleteUsers;
@@ -53,6 +55,7 @@ use craft\web\View;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use GraphQL\Type\Definition\Type;
 use Throwable;
 use Webauthn\PublicKeyCredentialRequestOptions;
 use yii\base\ErrorHandler;
@@ -625,11 +628,13 @@ class User extends Element implements IdentityInterface
     /**
      * @var string|null Username
      */
+    #[GqlField(Type::STRING)]
     public ?string $username = null;
 
     /**
      * @var string|null Email
      */
+    #[GqlField(Type::STRING)]
     public ?string $email = null;
 
     /**
@@ -1113,6 +1118,7 @@ class User extends Element implements IdentityInterface
      * @return ElementCollection<Address>
      * @since 4.0.0
      */
+    #[GqlField([[Type::class, 'listOf'], \craft\gql\interfaces\elements\Address::class], args: [\craft\gql\arguments\elements\Address::class, 'getArguments'], complexity: [Gql::class, 'eagerLoadComplexity'], resolve: \craft\gql\resolvers\elements\Address::class . '::resolve')]
     public function getAddresses(): ElementCollection
     {
         if (!isset($this->_addresses)) {
@@ -1392,6 +1398,7 @@ class User extends Element implements IdentityInterface
      *
      * @return string
      */
+    #[GqlField([[Type::class, 'nonNull'], Type::STRING])]
     public function getName(): string
     {
         if (!isset($this->_name)) {
@@ -1434,6 +1441,7 @@ class User extends Element implements IdentityInterface
      *
      * @return string|null
      */
+    #[GqlField(Type::STRING)]
     public function getFriendlyName(): ?string
     {
         if (!isset($this->_friendlyName)) {
@@ -2093,6 +2101,7 @@ JS, [
      *
      * @return array The user’s preferences.
      */
+    #[GqlField([[Type::class, 'nonNull'], Type::STRING], complexity: [Gql::class, 'nPlus1Complexity'])]
     public function getPreferences(): array
     {
         return $this->id ? Craft::$app->getUsers()->getUserPreferences($this->id) : [];
@@ -2117,6 +2126,7 @@ JS, [
      *
      * @return string|null The preferred language
      */
+    #[GqlField(Type::STRING, complexity: [Gql::class, 'nPlus1Complexity'])]
     public function getPreferredLanguage(): ?string
     {
         return $this->_validateLocale($this->getPreference('language'), false);

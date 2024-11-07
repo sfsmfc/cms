@@ -25,6 +25,11 @@ class Address extends Element
     /**
      * @inheritdoc
      */
+    public static string $element = \craft\elements\Address::class;
+
+    /**
+     * @inheritdoc
+     */
     public static function getTypeGenerator(): string
     {
         return AddressType::class;
@@ -64,87 +69,15 @@ class Address extends Element
      */
     public static function getFieldDefinitions(): array
     {
-        return Craft::$app->getGql()->prepareFieldDefinitions(array_merge(parent::getFieldDefinitions(), [
-            'fullName' => [
-                'name' => 'fullName',
-                'type' => Type::string(),
-                'description' => 'The full name on the address.',
-            ],
-            'firstName' => [
-                'name' => 'firstName',
-                'type' => Type::string(),
-                'description' => 'The first name on the address.',
-            ],
-            'lastName' => [
-                'name' => 'lastName',
-                'type' => Type::string(),
-                'description' => 'The last name on the address.',
-            ],
-            'countryCode' => [
-                'name' => 'countryCode',
-                'type' => Type::nonNull(Type::string()),
-                'description' => 'Two-letter country code',
-            ],
-            'administrativeArea' => [
-                'name' => 'administrativeArea',
-                'type' => Type::string(),
-                'description' => 'Administrative area.',
-            ],
-            'locality' => [
-                'name' => 'locality',
-                'type' => Type::string(),
-                'description' => 'Locality',
-            ],
-            'dependentLocality' => [
-                'name' => 'dependentLocality',
-                'type' => Type::string(),
-                'description' => 'Dependent locality',
-            ],
-            'postalCode' => [
-                'name' => 'postalCode',
-                'type' => Type::string(),
-                'description' => 'Postal code',
-            ],
-            'sortingCode' => [
-                'name' => 'sortingCode',
-                'type' => Type::string(),
-                'description' => 'Sorting code',
-            ],
-            'addressLine1' => [
-                'name' => 'addressLine1',
-                'type' => Type::string(),
-                'description' => 'First line of the address',
-            ],
-            'addressLine2' => [
-                'name' => 'addressLine2',
-                'type' => Type::string(),
-                'description' => 'Second line of the address',
-            ],
-            'addressLine3' => [
-                'name' => 'addressLine3',
-                'type' => Type::string(),
-                'description' => 'Third line of the address',
-            ],
-            'organization' => [
-                'name' => 'organization',
-                'type' => Type::string(),
-                'description' => 'Organization name',
-            ],
-            'organizationTaxId' => [
-                'name' => 'organizationTaxId',
-                'type' => Type::string(),
-                'description' => 'Organization tax ID',
-            ],
-            'latitude' => [
-                'name' => 'latitude',
-                'type' => Type::string(),
-                'description' => 'Latitude',
-            ],
-            'longitude' => [
-                'name' => 'longitude',
-                'type' => Type::string(),
-                'description' => 'Longitude',
-            ],
-        ]), self::getName());
+        return Craft::$app->getGql()->prepareFieldDefinitions(array_merge(
+            parent::getFieldDefinitions(),
+
+            /**
+             * @TODO figure out how to move this to the base element class so it doesn't need to be repeated in every element interface
+             * The issue with it currently is that `prepareFieldDefinitions` is called on every extended class and it that call it uses `self::getName()`
+             * this essentially "stacks" the definitions. Ideally the base class would call `static::getName()` instead to memoize the data
+             */
+            self::getElementFieldDefinitions()
+        ), self::getName());
     }
 }
