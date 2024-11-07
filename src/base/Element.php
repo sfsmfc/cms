@@ -4329,11 +4329,8 @@ JS, [
      */
     private function _checkForNewParent(): bool
     {
-        // Make sure this is a structured element, and that it’s either canonical or a provisional draft
-        if (
-            !$this->structureId ||
-            (!$this->getIsCanonical() && !$this->isProvisionalDraft)
-        ) {
+        // Make sure this is a structured element
+        if (!$this->structureId) {
             return false;
         }
 
@@ -4348,7 +4345,7 @@ JS, [
         }
 
         // If this is a provisional draft, but doesn't actually exist in the structure yet, check based on the canonical element
-        if ($this->isProvisionalDraft && !isset($this->lft)) {
+        if ($this->getIsDerivative() && !isset($this->lft)) {
             $element = $this->getCanonical(true);
         } else {
             $element = $this;

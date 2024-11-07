@@ -46,7 +46,6 @@ use craft\events\AssetEvent;
 use craft\events\DefineAssetUrlEvent;
 use craft\events\GenerateTransformEvent;
 use craft\fieldlayoutelements\assets\AltField;
-use craft\fs\Temp;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Assets;
 use craft\helpers\Cp;
@@ -2822,6 +2821,35 @@ JS,[
                 ($userSession->getId() == $this->uploaderId || $userSession->checkPermission("editPeerImages:$volume->uid"))
             );
 
+            switch ($this->kind) {
+                case Asset::KIND_VIDEO:
+                    $previewInner =
+                        Html::tag('video', Html::tag('source', '', [
+                            'type' => $this->getMimeType(),
+                            'src' => $this->url,
+                        ]), [
+                            'class' => 'preview-thumb',
+                            'controls' => true,
+                            'preload' => 'metadata',
+                        ]);
+                    break;
+                case Asset::KIND_AUDIO:
+                    $previewInner =
+                        Html::tag('audio', Html::tag('source', '', [
+                            'src' => $this->url,
+                            'type' => $this->getMimeType(),
+                        ]), [
+                            'controls' => true,
+                            'preload' => 'metadata',
+                        ]);
+                    break;
+                default:
+                    $previewInner =
+                        Html::tag('div', $this->getPreviewThumbImg(350, 190), [
+                            'class' => 'preview-thumb',
+                        ]);
+            }
+
             $previewThumbHtml =
                 Html::beginTag('div', [
                     'id' => 'thumb-container',
@@ -2831,9 +2859,7 @@ JS,[
                         $this->hasCheckeredThumb() ? 'checkered' : null,
                     ]),
                 ]) .
-                Html::tag('div', $this->getPreviewThumbImg(350, 190), [
-                    'class' => 'preview-thumb',
-                ]) .
+                $previewInner .
                 Html::endTag('div'); // .preview-thumb-container
 
             if ($previewable || $editable) {
