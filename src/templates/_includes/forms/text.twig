@@ -66,7 +66,7 @@
 {%- if hasSuffix %}
     {{ tag('span', {
         id: descriptionId,
-        class: 'visually-hidden',
+        hidden: true,
         text: 'Value suffixed by “{suffix}”.'|t('app', {suffix: suffix}),
     }) }}
     <div class="flex">
