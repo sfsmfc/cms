@@ -13,7 +13,8 @@
 - Pressing <kbd>Return</kbd> when an inline-editable field is focused now submits the inline form. (Previously <kbd>Ctrl</kbd>/<kbd>Command</kbd> had to be pressed as well.) ([#15841](https://github.com/craftcms/cms/issues/15841))
 - Improved the styling of element edit page headers, for elements with long titles. ([#16001](https://github.com/craftcms/cms/pull/16001))
 - It’s now possible to preview audio and video assets from Edit Asset screens. ([#16021](https://github.com/craftcms/cms/pull/16021))
-- Sidebar visibility states are now stored in a browser cookie, so they are retained between page/slideout loads. ([#16025](https://github.com/craftcms/cms/pull/16025), [#15982](https://github.com/craftcms/cms/discussions/15982))  
+- Sidebar visibility states are now stored in a browser cookie, so they are retained between page/slideout loads. ([#16025](https://github.com/craftcms/cms/pull/16025), [#15982](https://github.com/craftcms/cms/discussions/15982))
+- “Related To” condition rules now show the site menu in element selector modals. ([#16036](https://github.com/craftcms/cms/pull/16036))
 
 ### Accessibility
 - Improved the control panel for screen readers. ([#15665](https://github.com/craftcms/cms/pull/15665))
@@ -61,6 +62,7 @@
 - Added `craft\base\NestedElementTrait::saveOwnership()`. ([#15894](https://github.com/craftcms/cms/pull/15894))
 - Added `craft\base\PreviewableFieldInterface::previewPlaceholderHtml()`.
 - Added `craft\base\RequestTrait::getIsWebRequest()`. ([#15690](https://github.com/craftcms/cms/pull/15690))
+- Added `craft\base\conditions\BaseElementSelectConditionRule::elementSelectConfig()`.
 - Added `craft\console\Controller::output()`. 
 - Added `craft\console\controllers\ResaveController::hasTheFields()`.
 - Added `craft\elements\db\NestedElementQueryTrait`. ([#15894](https://github.com/craftcms/cms/pull/15894))
