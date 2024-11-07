@@ -84,7 +84,7 @@ class GqlField
             descriptionExtractors: [new PhpDocExtractor()]
         );
 
-        // When dealing with a method as a property, normalise the name if appplicable
+        // When dealing with a method as a property, normalise the name if applicable
         $name = $prop->getName();
         if ($prop instanceof \ReflectionMethod && str_starts_with($name, 'get')) {
             $name = str_replace('get', '', $name);
