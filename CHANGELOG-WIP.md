@@ -13,6 +13,7 @@
 - Pressing <kbd>Return</kbd> when an inline-editable field is focused now submits the inline form. (Previously <kbd>Ctrl</kbd>/<kbd>Command</kbd> had to be pressed as well.) ([#15841](https://github.com/craftcms/cms/issues/15841))
 - Improved the styling of element edit page headers, for elements with long titles. ([#16001](https://github.com/craftcms/cms/pull/16001))
 - It’s now possible to preview audio and video assets from Edit Asset screens. ([#16021](https://github.com/craftcms/cms/pull/16021))
+- Sidebar visibility states are now stored in a browser cookie, so they are retained between page/slideout loads. ([#16025](https://github.com/craftcms/cms/pull/16025), [#15982](https://github.com/craftcms/cms/discussions/15982))  
 
 ### Accessibility
 - Improved the control panel for screen readers. ([#15665](https://github.com/craftcms/cms/pull/15665))
