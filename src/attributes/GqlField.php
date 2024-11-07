@@ -9,6 +9,8 @@ namespace craft\attributes;
 
 use Attribute;
 use GraphQL\Type\Definition\Type;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use yii\base\InvalidConfigException;
 
 /**
@@ -68,5 +70,45 @@ class GqlField
         }
 
         return $returnType;
+    }
+
+    /**
+     * @param \ReflectionProperty|\ReflectionMethod $prop
+     * @return array
+     * @throws InvalidConfigException
+     */
+    public function getFieldDefinition(\ReflectionProperty|\ReflectionMethod $prop): array
+    {
+        // Use to get a nice version of the property description
+        $propertyInfo = new PropertyInfoExtractor(
+            descriptionExtractors: [new PhpDocExtractor()]
+        );
+
+        // When dealing with a method as a property, normalise the name if appplicable
+        $name = $prop->getName();
+        if ($prop instanceof \ReflectionMethod && str_starts_with($name, 'get')) {
+            $name = str_replace('get', '', $name);
+            $name = lcfirst($name);
+        }
+
+        $definition = [
+            'name' => $this->name ?? $name,
+            'type' => $this->getType(),
+            'description' => $this->description ?? $propertyInfo->getShortDescription($prop->class, $name) ?? $prop->getDocComment(),
+        ];
+
+        if ($this->complexity) {
+            $definition['complexity'] = ($this->complexity)();
+        }
+
+        if ($this->args) {
+            $definition['args'] = ($this->args)();
+        }
+
+        if ($this->resolve) {
+            $definition['resolve'] = $this->resolve;
+        }
+
+        return $definition;
     }
 }

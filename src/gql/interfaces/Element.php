@@ -73,42 +73,12 @@ class Element extends InterfaceType implements SingularTypeInterface
      */
     public static function getElementFieldDefinitions(): array
     {
-        // Use to get a nice version of the property description
-        $propertyInfo = new PropertyInfoExtractor(
-            descriptionExtractors: [new PhpDocExtractor()]
-        );
-
         return Attributes::getPropertiesByAttribute(static::$element, GqlField::class)
-            ->map(function(\ReflectionProperty|\ReflectionMethod $prop) use ($propertyInfo) {
+            ->map(function(\ReflectionProperty|\ReflectionMethod $prop) {
                 /** @var GqlField $attr */
                 $attr = $prop->getAttributes(GqlField::class, \ReflectionAttribute::IS_INSTANCEOF)[0]->newInstance();
 
-                // When dealing with a method as a property, normalise the name if appplicable
-                $name = $prop->getName();
-                if ($prop instanceof \ReflectionMethod && str_starts_with($name, 'get')) {
-                    $name = str_replace('get', '', $name);
-                    $name = lcfirst($name);
-                }
-
-                $definition = [
-                    'name' => $attr->name ?? $name,
-                    'type' => $attr->getType(),
-                    'description' => $attr->description ?? $propertyInfo->getShortDescription($prop->class, $name) ?? $prop->getDocComment(),
-                ];
-
-                if ($attr->complexity) {
-                    $definition['complexity'] = ($attr->complexity)();
-                }
-
-                if ($attr->args) {
-                    $definition['args'] = ($attr->args)();
-                }
-
-                if ($attr->resolve) {
-                    $definition['resolve'] = $attr->resolve;
-                }
-
-                return $definition;
+                return $attr->getFieldDefinition($prop);
             })
             ->keyBy('name')
             ->all();
