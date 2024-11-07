@@ -4,6 +4,7 @@
 
 - Fixed a bug where entry/category drafts weren’t retaining new parent selections.
 - Fixed a bug where the “Related To” condition rule would lose track of the selected element if it belonged to a different site. ([#16005](https://github.com/craftcms/cms/pull/16005))
+- Fixed a bug where the GraphQL tokens index was saying tokens never expired. ([#16029](https://github.com/craftcms/cms/issues/16029))
 - Fixed a styling bug.
 - Fixed a bug `craft\services\Categories::saveGroup()` and `craft\services\Tags::saveTagGroup()` weren’t respecting predefined UUID values on new models.
 - Fixed an error that could occur when editing a nested Matrix entry in a slideout or full-page editor, if it was initially edited while the Matrix field was in inline-editable blocks mode.
