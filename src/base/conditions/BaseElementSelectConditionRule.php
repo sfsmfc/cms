@@ -64,7 +64,7 @@ abstract class BaseElementSelectConditionRule extends BaseConditionRule
     }
 
     /**
-     * Returns additional config items added to the element select input.
+     * Override or add items to the config for the element select input.
      *
      * @return array
      */
