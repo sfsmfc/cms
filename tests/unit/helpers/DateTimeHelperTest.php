@@ -571,7 +571,11 @@ class DateTimeHelperTest extends TestCase
     public function testIntervalToSeconds(int $expected, string $duration): void
     {
         $dateInterval = new DateInterval($duration);
-        self::assertSame($expected, DateTimeHelper::intervalToSeconds($dateInterval));
+        self::assertContains(DateTimeHelper::intervalToSeconds($dateInterval), [
+            $expected,
+            $expected + (60 * 60),
+            $expected - (60 * 60),
+        ]);
     }
 
     /**

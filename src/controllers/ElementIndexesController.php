@@ -531,6 +531,7 @@ class ElementIndexesController extends BaseElementsController
             ->id($elementIds)
             ->status(null)
             ->drafts(null)
+            ->provisionalDrafts(null)
             ->siteId($siteId)
             ->all();
 
@@ -570,7 +571,7 @@ class ElementIndexesController extends BaseElementsController
             );
 
             if (!$element->validate($names)) {
-                $errors[$element->id] = $element->getErrors();
+                $errors[$element->getCanonicalId()] = $element->getErrors();
             }
         }
 

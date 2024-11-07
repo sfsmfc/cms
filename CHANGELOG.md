@@ -2,8 +2,23 @@
 
 ## Unreleased
 
+- Fixed a bug where entry/category drafts weren’t retaining new parent selections.
+- Fixed a bug where the “Related To” condition rule would lose track of the selected element if it belonged to a different site. ([#16005](https://github.com/craftcms/cms/pull/16005))
 - Fixed a styling bug.
 - Fixed a bug `craft\services\Categories::saveGroup()` and `craft\services\Tags::saveTagGroup()` weren’t respecting predefined UUID values on new models.
+- Fixed an error that could occur when editing a nested Matrix entry in a slideout or full-page editor, if it was initially edited while the Matrix field was in inline-editable blocks mode.
+- Fixed an error that could occur when editing an address that had provisional changes.
+- Fixed a bug where address cards weren’t showing provisional changes.
+- Fixed a bug where it was possible to edit nested addresses when viewing a revision. ([#15961](https://github.com/craftcms/cms/pull/15961))
+- Fixed a bug where nested elements could have checkboxes and drag handles when viewing a revision. ([#15961](https://github.com/craftcms/cms/pull/15961))
+- Fixed an error that could occur when bulk-editing elements from an element index, if any of them had provisional drafts. ([#15962](https://github.com/craftcms/cms/pull/15962))
+- Fixed a bug where element exporting was only working as intended on the first page of results. ([#15996](https://github.com/craftcms/cms/issues/15996), [#16003](https://github.com/craftcms/cms/pull/16003))
+- Fixed a bug where Number fields weren’t getting sorted properly in PostgreSQL. ([#15973](https://github.com/craftcms/cms/issues/15973))
+- Fixed a bug where field conditions weren’t taking effect within Matrix fields set to inline-editable blocks mode, if `autosaveDrafts` was disabled. ([#15985](https://github.com/craftcms/cms/issues/15985))
+- Fixed an error that occurred when attempting to delete a nested Matrix entry, if it had an entry type that was no longer allowed for the Matrix field. ([#15990](https://github.com/craftcms/cms/issues/15990))
+- Fixed a bug where structure data wasn’t getting deleted for drafts when moving an entry out of a Structure section. ([#15949](https://github.com/craftcms/cms/issues/15949), [#16014](https://github.com/craftcms/cms/pull/16014))
+- Fixed a bug where loading spinners weren’t always centered. ([#16013](https://github.com/craftcms/cms/pull/16013))
+- Updated Axios to 1.7.7. ([#15958](https://github.com/craftcms/cms/issues/15958))
 
 ## 5.4.9 - 2024-10-22
 

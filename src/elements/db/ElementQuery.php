@@ -52,6 +52,7 @@ use yii\db\Connection as YiiConnection;
 use yii\db\Expression;
 use yii\db\ExpressionInterface;
 use yii\db\QueryBuilder;
+use yii\db\Schema;
 
 /**
  * ElementQuery represents a SELECT SQL statement for elements in a way that is independent of DBMS.
@@ -575,6 +576,13 @@ class ElementQuery extends Query implements ElementQueryInterface
      * @see joinElementTable()
      */
     private bool $_joinedElementTable = false;
+
+    /**
+     * @var array<string,string|string[]> Column alias => cast type
+     * @see prepare()
+     * @see _applyOrderByParams()
+     */
+    private array $_columnsToCast = [];
 
     /**
      * Constructor
@@ -1696,6 +1704,14 @@ class ElementQuery extends Query implements ElementQueryInterface
                     $this->_columnMap[$field->handle][] = $valueSql;
                 } else {
                     $this->_columnMap[$field->handle] = $valueSql;
+                }
+
+                // when preparing the query, we sometimes need to prep custom values some more
+                $dbType = $field::dbType();
+                // for mysql, we have to make sure text column type is cast to char, otherwise it won't be sorted correctly
+                // see https://github.com/craftcms/cms/issues/15609
+                if ($db->getIsMysql() && is_string($dbType) && Db::parseColumnType($dbType) === Schema::TYPE_TEXT) {
+                    $this->_columnsToCast[$field->handle] = 'CHAR(255)';
                 }
             }
         }
@@ -3310,7 +3326,11 @@ class ElementQuery extends Query implements ElementQueryInterface
                     $params = [];
                     $orderByColumns[$pos] = (new CoalesceColumnsExpression($columnName))->getSql($params);
                 } else {
-                    $orderByColumns[$pos] = $columnName;
+                    if (isset($this->_columnsToCast[$orderValue])) {
+                        $orderByColumns[$pos] = "CAST($columnName AS {$this->_columnsToCast[$orderValue]})";
+                    } else {
+                        $orderByColumns[$pos] = $columnName;
+                    }
                 }
 
                 $orderBy = array_combine($orderByColumns, $orderBy);
@@ -3379,13 +3399,13 @@ class ElementQuery extends Query implements ElementQueryInterface
             if ($alias === '**') {
                 $includeDefaults = true;
             } else {
-                // Is this a mapped column name (without a custom alias)?
-                if ($alias === $column && isset($this->_columnMap[$alias])) {
-                    $column = $this->_columnMap[$alias];
+                // Is this a mapped column name?
+                if (is_string($column) && isset($this->_columnMap[$column])) {
+                    $column = $this->_columnMap[$column];
 
                     // Completely ditch the mapped name if instantiated elements are going to be returned
-                    if (!$this->asArray && is_string($this->_columnMap[$alias])) {
-                        $alias = $this->_columnMap[$alias];
+                    if (!$this->asArray && is_string($column)) {
+                        $alias = $column;
                     }
                 }
 
