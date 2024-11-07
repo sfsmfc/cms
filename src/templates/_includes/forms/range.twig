@@ -7,6 +7,7 @@
 {% set numberInputId = numberInputId ?? "#{id}-num" %}
 {% set step = step ?? 1 %}
 {% set value = value ?? null %}
+{% set labelledBy = (inputAttributes.aria.label ?? false) ? false : (labelledBy ?? labelId ?? false) %}
 
 {% set orientation = orientation ?? inputAttributes.dir ?? craft.app.locale.getOrientation() %}
 
@@ -23,7 +24,7 @@
     max: max,
     dir: orientation,
     aria: {
-        labelledby: (inputAttributes.aria.label ?? false) ? false : (labelledBy ?? false),
+        labelledby: labelledBy,
         describedby: describedBy ?? false,
     },
 }|merge(inputAttributes ?? [], recursive=true) %}
@@ -54,6 +55,7 @@
             step: step,
             size: numberInputSize ?? null,
             suffix: suffix ?? null,
+            labelledBy: labelledBy,
         }) }}
     </div>
 </div>
