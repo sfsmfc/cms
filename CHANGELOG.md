@@ -19,6 +19,7 @@
 - Fixed a bug where structure data wasn’t getting deleted for drafts when moving an entry out of a Structure section. ([#15949](https://github.com/craftcms/cms/issues/15949), [#16014](https://github.com/craftcms/cms/pull/16014))
 - Fixed a bug where loading spinners weren’t always centered. ([#16013](https://github.com/craftcms/cms/pull/16013))
 - Fixed a race condition that could break default entry creation for Matrix fields. ([#15999](https://github.com/craftcms/cms/pull/15999))
+- Fixed a JavaScript error that occurred when sorting nested elements in an embedded element index, if the index was paginated. ([#16026](https://github.com/craftcms/cms/issues/16026))
 - Updated Axios to 1.7.7. ([#15958](https://github.com/craftcms/cms/issues/15958))
 
 ## 5.4.9 - 2024-10-22
