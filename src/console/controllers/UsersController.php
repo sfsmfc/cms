@@ -119,6 +119,15 @@ class UsersController extends Controller
         return $options;
     }
 
+    protected function defineActions(): array
+    {
+        return parent::defineActions() + [
+
+            // Fix sluggification of the action ID
+            'remove-2fa' => [$this, 'remove2fa'],
+        ];
+    }
+
     /**
      * Lists admin users.
      *
@@ -499,7 +508,7 @@ class UsersController extends Controller
      * @return int
      * @since 5.5.0
      */
-    public function actionRemove2fa(string $user): int
+    private function remove2fa(string $user): int
     {
         try {
             $user = $this->_user($user);
