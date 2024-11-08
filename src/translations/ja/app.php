@@ -1861,7 +1861,6 @@ return [
     'User suspended.' => 'ユーザーアカウントを停止しました。',
     'User unlocked.' => 'ユーザーをアンロックしました。',
     'User unsuspended.' => 'ユーザーアカウントの停止を解除しました。',
-    'User {page}' => 'User {page}',
     'User' => 'ユーザー',
     'Username or Email' => 'ユーザー名またはメールアドレス',
     'Username or email is required.' => 'ユーザー名もしくはメールアドレスが必要です。',
