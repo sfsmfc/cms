@@ -1697,7 +1697,7 @@ return [
     'This field was updated in the Current revision.' => 'Dit veld werd bijgewerkt in de Huidige revisie.',
     'This field’s target subfolder path is invalid: {path}' => 'De doel submap voor dit veld is ongeldig: {path}',
     'This field’s values are used as search keywords.' => 'De waarden van dit veld worden gebruikt als trefwoorden voor zoekopdrachten.',
-    'This field’s {attributes} {totalAttributes, plural, =1{has} other{have}} been overridden.' => 'De {attributes} van dit veld {totalAttributes, plural, one {}=1{is} other{zijn}} overschreven.',
+    'This field’s {attributes} {totalAttributes, plural, =1{has} other{have}} been overridden.' => '{totalAttributes, plural, =1{Het} other {De}} {attributes} van dit veld {totalAttributes, plural, one {}=1{is} other{zijn}} overschreven.',
     'This filesystem has been reserved for temporary asset uploads. Please choose a different one for your volume.' => 'Dit bestandssysteem is gereserveerd voor het uploaden van tijdelijke bestanden. Kies een ander bestandssysteem voor uw volume.',
     'This global set doesn’t have any fields assigned to it in its field layout.' => 'Aan deze globale set zijn geen velden gekoppeld in zijn velden lay-out.',
     'This is a new {type}.' => 'Dit is een nieuw(e) {type}.',
