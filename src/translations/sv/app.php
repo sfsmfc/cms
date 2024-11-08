@@ -1861,7 +1861,6 @@ return [
     'User suspended.' => 'Användaren är avstängd.',
     'User unlocked.' => 'Användare upplåst.',
     'User unsuspended.' => 'Suspenderingen av användaren avaktiverad.',
-    'User {page}' => 'User {page}',
     'User' => 'Användare',
     'Username or Email' => 'Användarnamn eller e-postadress',
     'Username or email is required.' => 'Användarnamn eller e-postadress krävs.',
