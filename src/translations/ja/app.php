@@ -1120,7 +1120,7 @@ return [
     'Organization' => '組織',
     'Orientation' => '向き',
     'Origin' => '原因',
-    'Original' => 'Original',
+    'Original' => 'オリジナル',
     'Our site is temporarily unavailable. Please try again later.' => 'サイトが一時的に使用できない状態になっています。後ほど再試行してください。',
     'Overview' => '概要',
     'PHP Info' => 'PHP情報',
