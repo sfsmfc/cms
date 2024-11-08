@@ -1861,7 +1861,6 @@ return [
     'User suspended.' => 'Gebruiker geschorst.',
     'User unlocked.' => 'Gebruiker ontgrendeld.',
     'User unsuspended.' => 'Schorsing van gebruiker opgeheven.',
-    'User {page}' => 'Gebruiker {page}',
     'User' => 'Gebruiker',
     'Username or Email' => 'Gebruikersnaam of E-mail',
     'Username or email is required.' => 'Gebruikersnaam of e-mail is verplicht.',
