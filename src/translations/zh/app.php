@@ -1861,7 +1861,6 @@ return [
     'User suspended.' => '用户已被暂停。',
     'User unlocked.' => '已解锁用户。',
     'User unsuspended.' => '用户已被取消暂停。',
-    'User {page}' => '用户 {page}',
     'User' => '用户',
     'Username or Email' => '用户名或电子邮件',
     'Username or email is required.' => '必须输入用户名和密码。',
