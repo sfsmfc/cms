@@ -131,6 +131,13 @@ class Gc extends Component
         $this->deletePartialElements(Tag::class, Table::CONTENT, 'elementId');
         $this->deletePartialElements(User::class, Table::CONTENT, 'elementId');
 
+        $this->deleteOrphanedFieldLayouts(Asset::class, Table::VOLUMES);
+        $this->deleteOrphanedFieldLayouts(Category::class, Table::CATEGORYGROUPS);
+        $this->deleteOrphanedFieldLayouts(Entry::class, Table::ENTRYTYPES);
+        $this->deleteOrphanedFieldLayouts(GlobalSet::class, Table::GLOBALSETS);
+        $this->deleteOrphanedFieldLayouts(MatrixBlock::class, Table::MATRIXBLOCKTYPES);
+        $this->deleteOrphanedFieldLayouts(Tag::class, Table::TAGGROUPS);
+
         $this->_deleteUnsupportedSiteEntries();
 
         // Fire a 'run' event
@@ -515,6 +522,34 @@ class Gc extends Component
 
         if (!empty($ids)) {
             Db::delete(Table::STRUCTUREELEMENTS, ['id' => $ids]);
+        }
+
+        $this->_stdout("done\n", Console::FG_GREEN);
+    }
+
+    /**
+     * Deletes field layouts that are no longer used.
+     *
+     * @param string $elementType The element type
+     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param string $table The  table name that contains a foreign key to `fieldlayouts.id`
+     * @param string $fk The column name that contains the foreign key to `fieldlayouts.id`
+     * @since 4.13.0
+     */
+    public function deleteOrphanedFieldLayouts(string $elementType, string $table, string $fk = 'fieldLayoutId'): void
+    {
+        /** @var string|ElementInterface $elementType */
+        $this->_stdout(sprintf('    > deleting orphaned %s field layouts ... ', $elementType::lowerDisplayName()));
+
+        $ids = (new Query())
+            ->select('fl.id')
+            ->from(['fl' => Table::FIELDLAYOUTS])
+            ->leftJoin(['t' => $table], "[[t.$fk]] = [[fl.id]]")
+            ->where(['fl.type' => $elementType, "t.$fk" => null])
+            ->column();
+
+        if (!empty($ids)) {
+            Db::delete(Table::FIELDLAYOUTS, ['id' => $ids]);
         }
 
         $this->_stdout("done\n", Console::FG_GREEN);
