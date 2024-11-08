@@ -243,6 +243,11 @@ class UsersController extends Controller
             return $this->runAction('auth-form');
         }
 
+        // if we're impersonating, pass the user we're impersonating to the complete method
+        if (Session::get(User::IMPERSONATE_KEY) !== null) {
+            $user = Craft::$app->getUser()->getIdentity() ?? $user;
+        }
+
         return $this->_completeLogin($user, $duration);
     }
 
@@ -275,6 +280,11 @@ class UsersController extends Controller
 
         if (!$user->authenticateWithPasskey($requestOptions, $response)) {
             return $this->_handleLoginFailure($user->authError, $user);
+        }
+
+        // if we're impersonating, pass the user we're impersonating to the complete method
+        if (Session::get(User::IMPERSONATE_KEY) !== null) {
+            $user = Craft::$app->getUser()->getIdentity();
         }
 
         return $this->_completeLogin($user, $duration);
@@ -506,10 +516,23 @@ class UsersController extends Controller
         $this->requirePostRequest();
         $this->requireCpRequest();
 
+        $forElevatedSession = (bool)$this->request->getBodyParam('forElevatedSession');
+
+        // If the current user is being impersonated get the "original" user instead
+        if ($forElevatedSession && $previousUserId = Session::get(User::IMPERSONATE_KEY)) {
+            /** @var User $user */
+            $user = User::find()
+                ->id($previousUserId)
+                ->one();
+            $staticEmail = $user->email;
+        } else {
+            $staticEmail = $this->request->getRequiredBodyParam('email');
+        }
+
         $view = $this->getView();
         $html = $view->renderTemplate('_special/login-modal.twig', [
-            'staticEmail' => $this->request->getRequiredBodyParam('email'),
-            'forElevatedSession' => (bool)$this->request->getBodyParam('forElevatedSession'),
+            'staticEmail' => $staticEmail,
+            'forElevatedSession' => $forElevatedSession,
         ]);
 
         return $this->asJson([
@@ -2321,7 +2344,16 @@ JS);
 
     public function actionAuthForm(): Response
     {
-        $activeMethods = Craft::$app->getAuth()->getActiveMethods();
+        $user = null;
+        // If the current user is being impersonated get the "original" user instead
+        if ($previousUserId = Session::get(User::IMPERSONATE_KEY)) {
+            /** @var User $user */
+            $user = User::find()
+                ->id($previousUserId)
+                ->one();
+        }
+
+        $activeMethods = Craft::$app->getAuth()->getActiveMethods($user);
         $methodClass = $this->request->getParam('method');
 
         if ($methodClass) {
