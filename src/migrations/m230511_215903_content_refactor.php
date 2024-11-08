@@ -24,12 +24,14 @@ class m230511_215903_content_refactor extends BaseContentRefactorMigration
         $uids = [];
         $fieldsService = Craft::$app->getFields();
         foreach ($fieldsService->getAllLayouts() as $fieldLayout) {
+            $typeLabel = class_exists($fieldLayout->type) ? $fieldLayout->type::lowerDisplayName() : $fieldLayout->type;
+            $a = in_array(mb_strtolower($typeLabel[0] ?? ''), ['a', 'e', 'i', 'o', 'u']) ? 'An' : 'A';
             foreach ($fieldLayout->getCustomFieldElements() as $layoutElement) {
                 if (!isset($layoutElement->uid)) {
-                    throw new Exception('A field layout element is missing its UUID. Reinstall Craft CMS ^4.4.14 and run `utils/fix-field-layout-uids` before upgrading to Craft CMS 5.');
+                    throw new Exception("$a $typeLabel field layout element is missing its UUID. Reinstall Craft CMS ^4.4.14 and run `utils/fix-field-layout-uids` before upgrading to Craft CMS 5.");
                 }
                 if (isset($uids[$layoutElement->uid])) {
-                    throw new Exception('A field layout element has a duplicate UUID. Reinstall Craft CMS ^4.4.14 and run `utils/fix-field-layout-uids` before upgrading to Craft CMS 5.');
+                    throw new Exception("$a $typeLabel field layout element has a duplicate UUID. Reinstall Craft CMS ^4.4.14 and run `utils/fix-field-layout-uids` before upgrading to Craft CMS 5.");
                 }
                 $uids[$layoutElement->uid] = true;
             }
