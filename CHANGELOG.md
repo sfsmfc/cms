@@ -1,6 +1,6 @@
 # Release Notes for Craft CMS 5
 
-## Unreleased
+## 5.4.10.1 - 2024-11-07
 
 - Fixed a bug where it wasn’t possible to create new nested Matrix entries for global sets. ([#16041](https://github.com/craftcms/cms/issues/16041))
 
