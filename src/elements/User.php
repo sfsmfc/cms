@@ -567,7 +567,7 @@ class User extends Element implements IdentityInterface
             return $user;
         }
 
-        // If the current user is being impersonated by an admin, ignore their status
+        // If the current user is being impersonated, ignore their status
         if ($previousUserId = Session::get(self::IMPERSONATE_KEY)) {
             /** @var self|null $previousUser */
             $previousUser = self::find()
@@ -1931,6 +1931,7 @@ XML;
                         'params' => [
                             'userId' => $this->id,
                         ],
+                        'requireElevatedSession' => true,
                     ];
 
                     $copyImpersonationUrlId = sprintf('action-copy-impersonation-url-%s', mt_rand());
@@ -1942,13 +1943,15 @@ XML;
 
                     $view->registerJsWithVars(fn($id, $userId, $message) => <<<JS
 $('#' + $id).on('activate', () => {
-  Craft.sendActionRequest('POST', 'users/get-impersonation-url', {
-    data: {userId: $userId},
-  }).then((response) => {
-    Craft.ui.createCopyTextPrompt({
-      label: $message,
-      value: response.data.url,
-    });
+  Craft.elevatedSessionManager.requireElevatedSession(() => {
+      Craft.sendActionRequest('POST', 'users/get-impersonation-url', {
+        data: {userId: $userId},
+      }).then((response) => {
+        Craft.ui.createCopyTextPrompt({
+          label: $message,
+          value: response.data.url,
+        });
+      });
   });
 });
 JS, [

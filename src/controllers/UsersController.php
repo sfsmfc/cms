@@ -340,6 +340,7 @@ class UsersController extends Controller
     public function actionImpersonate(): ?Response
     {
         $this->requirePostRequest();
+        $this->requireElevatedSession();
 
         $userSession = Craft::$app->getUser();
         $userId = $this->request->getRequiredBodyParam('userId');
@@ -378,6 +379,7 @@ class UsersController extends Controller
     public function actionGetImpersonationUrl(): Response
     {
         $this->requirePostRequest();
+        $this->requireElevatedSession();
 
         $userId = $this->request->getBodyParam('userId');
         $user = Craft::$app->getUsers()->getUserById($userId);
