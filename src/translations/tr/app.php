@@ -1861,7 +1861,6 @@ return [
     'User suspended.' => 'Kullanıcı askıya alındı.',
     'User unlocked.' => 'Kullanıcı kilidi açıldı.',
     'User unsuspended.' => 'Kullanıcı tekrar aktifleştirildi.',
-    'User {page}' => 'User {page}',
     'User' => 'Kullanıcı',
     'Username or Email' => 'Kullanıcı Adı veya Eposta',
     'Username or email is required.' => 'Kullanıcı adı veya eposta gereklidir.',
