@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 5
 
+## 5.4.10.1 - 2024-11-07
+
+- Fixed a bug where it wasn’t possible to create new nested Matrix entries for global sets. ([#16041](https://github.com/craftcms/cms/issues/16041))
+
 ## 5.4.10 - 2024-11-06
 
 - Fixed a bug where entry/category drafts weren’t retaining new parent selections.
