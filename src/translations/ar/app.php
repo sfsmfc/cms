@@ -1861,7 +1861,6 @@ return [
     'User suspended.' => 'تم إيقاف المستخدم.',
     'User unlocked.' => 'تم إلغاء قفل المستخدم.',
     'User unsuspended.' => 'تم إلغاء إيقاف للمستخدم.',
-    'User {page}' => 'User {page}',
     'User' => 'المستخدم',
     'Username or Email' => 'اسم المستخدم أو البريد الإلكتروني',
     'Username or email is required.' => 'مطلوب اسم المستخدم أو البريد الإلكتروني.',
