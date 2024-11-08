@@ -1,5 +1,7 @@
 # Release Notes for Craft CMS 4
 
+Fixed a bug where the `utils/fix-field-layout-uids` command was misidentifying missing/duplicate UUID issues.
+
 ## 4.12.9 - 2024-11-06
 
 - Fixed a bug where entry/category drafts weren’t retaining new parent selections.
