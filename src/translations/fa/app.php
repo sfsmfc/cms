@@ -1861,7 +1861,6 @@ return [
     'User suspended.' => 'کاربر معلق گردید.',
     'User unlocked.' => 'کاربر از حالت قفل خارج شد.',
     'User unsuspended.' => 'کاربر از تعلیق خارج گردید.',
-    'User {page}' => '{page} کاربر',
     'User' => 'کاربر',
     'Username or Email' => 'نام کاربری یا پست الکترونیکی',
     'Username or email is required.' => 'حساب کاربری یا پست الکترونیکی مورد نیاز است.',
