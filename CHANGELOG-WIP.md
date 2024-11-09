@@ -40,6 +40,8 @@
 - It’s now possible to control whether entry types’ Title fields are required. ([#15942](https://github.com/craftcms/cms/pull/15942))
 - Added the “Step Size” Number field setting.
 - Added the “Default View Mode” element source setting. ([#15824](https://github.com/craftcms/cms/pull/15824))
+- User impersonation now requires an elevated session. ([#16052](https://github.com/craftcms/cms/pull/16052))
+- Elevated session prompts now authenticate against the original user, when impersonating a user. ([#16052](https://github.com/craftcms/cms/pull/16052))
 - Added several new icons.
 - Added `pc/*` commands as an alias of `project-config/*`.
 - Added the `resave/all` command.
