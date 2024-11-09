@@ -29,14 +29,7 @@ input.range:focus {
   outline: none;
 }
 
-input.range::-webkit-slider-runnable-track {
-  width: 100%;
-  height: $trackHeight;
-  cursor: pointer;
-  background: $upperTrackColor;
-  border-radius: $trackBorderRadius;
-  border: none;
-}
+// Thumb styles
 
 input.range::-webkit-slider-thumb {
   border: none;
@@ -47,6 +40,35 @@ input.range::-webkit-slider-thumb {
   cursor: pointer;
   appearance: none;
   margin-block-start: calc((#{$thumbSize} / 2) * -1 + (#{$trackHeight} / 2));
+}
+
+input.range::-moz-range-thumb {
+  border: none;
+  height: $thumbSize;
+  width: $thumbSize;
+  border-radius: $thumbBorderRadius;
+  background: $thumbColor;
+  cursor: pointer;
+}
+
+input.range::-ms-thumb {
+  border: none;
+  height: $thumbSize;
+  width: $thumbSize;
+  border-radius: $thumbBorderRadius;
+  background: $thumbColor;
+  cursor: pointer;
+}
+
+// Track styles
+
+input.range::-webkit-slider-runnable-track {
+  width: 100%;
+  height: $trackHeight;
+  cursor: pointer;
+  background: $upperTrackColor;
+  border-radius: $trackBorderRadius;
+  border: none;
 }
 
 input.range:focus::-webkit-slider-runnable-track {
@@ -65,15 +87,6 @@ input.range::-moz-range-track {
 input.range::-moz-range-progress {
   background: $lowerTrackColor;
   border-radius: $trackBorderRadius;
-}
-
-input.range::-moz-range-thumb {
-  border: none;
-  height: $thumbSize;
-  width: $thumbSize;
-  border-radius: $thumbBorderRadius;
-  background: $thumbColor;
-  cursor: pointer;
 }
 
 input.range::-ms-track {
@@ -96,15 +109,6 @@ input.range::-ms-fill-upper {
   background: $upperTrackColor;
   border: none;
   border-radius: $trackBorderRadius;
-}
-
-input.range::-ms-thumb {
-  border: none;
-  height: $thumbSize;
-  width: $thumbSize;
-  border-radius: $thumbBorderRadius;
-  background: $thumbColor;
-  cursor: pointer;
 }
 
 input.range:focus::-ms-fill-lower {
