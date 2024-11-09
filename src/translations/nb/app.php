@@ -1861,7 +1861,6 @@ return [
     'User suspended.' => 'Bruker er suspendert.',
     'User unlocked.' => 'Bruker låst opp.',
     'User unsuspended.' => 'Brukerens suspensasjon er opphevet.',
-    'User {page}' => 'Bruker {page}',
     'User' => 'Bruker',
     'Username or Email' => 'Brukernavn eller e-postadresse',
     'Username or email is required.' => 'Brukernavn eller e-postadresse er påkrevd.',

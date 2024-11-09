@@ -1862,7 +1862,6 @@ return [
     'User suspended.' => 'Utilisateur suspendu.',
     'User unlocked.' => 'Utilisateur déverrouillé.',
     'User unsuspended.' => 'Utilisateur réactivé.',
-    'User {page}' => 'User {page}',
     'User' => 'Utilisateur',
     'Username or Email' => 'Nom d’utilisateur ou courriel',
     'Username or email is required.' => 'Le nom d’utilisateur ou courriel est nécessaire.',

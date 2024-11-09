@@ -1861,7 +1861,6 @@ return [
     'User suspended.' => '사용자가 사용 중지됨.',
     'User unlocked.' => '사용자 잠금 해제됨.',
     'User unsuspended.' => '사용자 중지가 해제됨.',
-    'User {page}' => 'User {page}',
     'User' => '사용자',
     'Username or Email' => '사용자 이름 또는 이메일',
     'Username or email is required.' => '사용자 이름 또는 이메일이 필요합니다.',

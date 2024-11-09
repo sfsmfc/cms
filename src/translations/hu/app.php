@@ -1861,7 +1861,6 @@ return [
     'User suspended.' => 'Felhasználó felfüggesztve.',
     'User unlocked.' => 'Felhasználó zárolása feloldva.',
     'User unsuspended.' => 'Felhasználó tiltás feloldva.',
-    'User {page}' => 'User {page}',
     'User' => 'Felhasználó',
     'Username or Email' => 'Felhasználónév vagy Email',
     'Username or email is required.' => 'Felhasználónév vagy email megadása kötelező.',
