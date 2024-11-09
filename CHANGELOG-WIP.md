@@ -45,6 +45,7 @@
 - Added several new icons.
 - Added `pc/*` commands as an alias of `project-config/*`.
 - Added the `resave/all` command.
+- Added the `users/remove-2fa` command. ([#16053](https://github.com/craftcms/cms/pull/16053))
 - Added the `--except`, `--minor-only`, and `--patch-only` options to the `update` command. ([#15829](https://github.com/craftcms/cms/pull/15829))
 - Added the `--with-fields` option to all native `resave/*` commands.
 - The `fields/merge` and `fields/auto-merge` commands now prompt to resave elements that include relational fields before merging them, and provide a CLI command that should be run on other environments before the changes are deployed to them. ([#15869](https://github.com/craftcms/cms/issues/15869))
