@@ -209,6 +209,7 @@ class Range extends Field implements InlineEditableFieldInterface, SortableField
             'max' => $this->max,
             'numberInputSize' => $this->numberInputSize,
             'value' => $value,
+            'labelId' => $this->getLabelId(),
         ]);
     }
 
