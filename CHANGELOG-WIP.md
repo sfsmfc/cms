@@ -40,9 +40,12 @@
 - It’s now possible to control whether entry types’ Title fields are required. ([#15942](https://github.com/craftcms/cms/pull/15942))
 - Added the “Step Size” Number field setting.
 - Added the “Default View Mode” element source setting. ([#15824](https://github.com/craftcms/cms/pull/15824))
+- User impersonation now requires an elevated session. ([#16052](https://github.com/craftcms/cms/pull/16052))
+- Elevated session prompts now authenticate against the original user, when impersonating a user. ([#16052](https://github.com/craftcms/cms/pull/16052))
 - Added several new icons.
 - Added `pc/*` commands as an alias of `project-config/*`.
 - Added the `resave/all` command.
+- Added the `users/remove-2fa` command. ([#16053](https://github.com/craftcms/cms/pull/16053))
 - Added the `--except`, `--minor-only`, and `--patch-only` options to the `update` command. ([#15829](https://github.com/craftcms/cms/pull/15829))
 - Added the `--with-fields` option to all native `resave/*` commands.
 - The `fields/merge` and `fields/auto-merge` commands now prompt to resave elements that include relational fields before merging them, and provide a CLI command that should be run on other environments before the changes are deployed to them. ([#15869](https://github.com/craftcms/cms/issues/15869))
@@ -110,6 +113,7 @@
 - Added `craft\services\Addresses::EVENT_DEFINE_ADDRESS_COUNTRIES`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\services\Addresses::getCountryList()`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\services\Fields::EVENT_BEFORE_APPLY_FIELD_SAVE`. ([#15872](https://github.com/craftcms/cms/discussions/15872))
+- Added `craft\services\Gc::deleteOrphanedFieldLayouts()`.
 - Added `craft\services\Users::getMaxUsers()`.
 - Added `craft\web\View::registerCpTwigExtension()`.
 - Added `craft\web\View::registerSiteTwigExtension()`.
@@ -127,6 +131,7 @@
 
 ### System
 - `Location` headers added via `craft\web\Response::redirect()` are now set to encoded URLs. ([#15838](https://github.com/craftcms/cms/issues/15838))
+- Fixed a bug where orphaned field layouts weren’t getting garbage collected. ([#16032](https://github.com/craftcms/cms/issues/16032))
 - Fixed a bug where the Recovery Codes slideout content overflowed its container on small screens. ([#15665](https://github.com/craftcms/cms/pull/15665))
 - Fixed a bug where entries that were soft-deleted along with their section weren’t getting restored if the section was restored. 
 - Fixed a bug where field types weren’t getting a chance to normalize their values when propagated to a new site for a freshly-created element, if they were marked as translatable.

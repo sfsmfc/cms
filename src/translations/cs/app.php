@@ -1861,7 +1861,6 @@ return [
     'User suspended.' => 'Uživatel pozastaven.',
     'User unlocked.' => 'Uživatel byl odemčen.',
     'User unsuspended.' => 'Uživatel byl pozastaven.',
-    'User {page}' => 'User {page}',
     'User' => 'Uživatel',
     'Username or Email' => 'Uživatelské jméno nebo email',
     'Username or email is required.' => 'Uživatelské jméno nebo email je povinné.',
