@@ -9,7 +9,6 @@ namespace craft\fields;
 
 use Craft;
 use craft\base\ElementInterface;
-use craft\base\ThumbableFieldInterface;
 use craft\elements\Asset;
 use craft\elements\conditions\ElementCondition;
 use craft\elements\db\AssetQuery;
@@ -47,7 +46,7 @@ use yii\base\InvalidConfigException;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 3.0.0
  */
-class Assets extends BaseRelationField implements ThumbableFieldInterface
+class Assets extends BaseRelationField
 {
     /**
      * @since 3.5.11
@@ -490,15 +489,22 @@ class Assets extends BaseRelationField implements ThumbableFieldInterface
     /**
      * @inheritdoc
      */
-    public function getThumbHtml(mixed $value, ElementInterface $element, int $size): ?string
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
-        /** @var AssetQuery|ElementCollection $value */
-        if ($value instanceof AssetQuery) {
-            $handle = sprintf('%s-%s-%s', preg_replace('/:+/', '-', __METHOD__), $this->id, $size);
-            $value = (clone $value)->eagerly($handle);
+        $asset = new Asset();
+        $asset->title = Craft::t('app', 'Related {type} Title', ['type' => $asset->displayName()]);
+
+        if ($this->restrictFiles) {
+            $extensions = $this->_getAllowedExtensions();
+            $filename = 'test.' . $extensions[0];
+        } else {
+            $filename = 'test.txt';
         }
 
-        return $value->one()?->getThumbHtml($size);
+        $asset->filename = $filename;
+        $collection = new ElementCollection([$asset]);
+
+        return $this->previewHtml($collection);
     }
 
     // Events

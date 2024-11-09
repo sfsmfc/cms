@@ -137,7 +137,7 @@
                 {% include '_includes/disclosure-toggle' with {
                     id: 'sidebar-trigger',
                     controls: 'global-sidebar',
-                    expanded: sidebarState == 'expanded' ? 'true' : 'false',
+                    state: sidebarState,
                     content: toggleContent,
                     attributes: {
                         class: 'sidebar-action',

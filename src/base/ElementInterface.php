@@ -482,6 +482,33 @@ interface ElementInterface extends
     public static function sortOptions(): array;
 
     /**
+     * Returns the view modes available for the element type.
+     *
+     * This method should return an array, where each item is a sub-array with the following keys:
+     *
+     * - `mode` – Name of the view mode
+     * - `title` – How this mode should be described to the user
+     * - `icon` – Icon representing this view mode
+     * - `availableOnMobile` - Whether the view mode is available on mobile devices (defaults to `true`)
+     * - `structuresOnly` – Whether the view mode should only be available for structured sources (defaults to `false`)
+     *
+     * ```php
+     * return [
+     *     [
+     *         'mode' => 'table',
+     *         'title' => Craft::t('app', 'Display in a table'),
+     *         'icon' => 'list',
+     *         'availableOnMobile' => false,
+     *     ],
+     * ];
+     *  ```
+     *
+     * @return array The view modes.
+     * @since 5.5.0
+     */
+    public static function indexViewModes(): array;
+
+    /**
      * Defines all of the available columns that can be shown in table views.
      *
      * This method should return an array whose keys represent element attribute names, and whose values make
@@ -501,6 +528,26 @@ interface ElementInterface extends
      * @return string[] The table attribute keys
      */
     public static function defaultTableAttributes(string $source): array;
+
+    /**
+     * Defines all the available attributes that can be shown in card views.
+     *
+     * This method should return an array whose keys represent element attribute names, and whose values make
+     * up the table’s column headers.
+     *
+     * @return array The card attributes.
+     * @since 5.5.0
+     */
+    public static function cardAttributes(): array;
+
+    /**
+     * Return HTML for the attribute in the card preview.
+     *
+     * @param array $attribute
+     * @return mixed
+     * @since 5.5.0
+     */
+    public static function attributePreviewHtml(array $attribute): mixed;
 
     /**
      * Returns an array that maps source-to-target element IDs based on the given sub-property handle.

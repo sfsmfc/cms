@@ -356,7 +356,10 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
 
           this.hasSidebar = true;
 
-          if (this.showExpandedView) {
+          if (
+            this.showExpandedView &&
+            (Craft.getCookie('sidebar-slideout') || 'expanded') === 'expanded'
+          ) {
             this.showSidebar(false);
           } else {
             this.hideSidebar();
@@ -465,6 +468,7 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
         this.hideSidebarIfOverlapping() || ev.bubbleShortcut();
       });
 
+      Craft.setCookie('sidebar-slideout', 'expanded');
       this.showingSidebar = true;
     },
 
@@ -498,6 +502,7 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
 
       Garnish.uiLayerManager.removeLayer();
 
+      Craft.setCookie('sidebar-slideout', 'collapsed');
       this.showingSidebar = false;
     },
 
@@ -575,10 +580,12 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
       if (data.modelClass && data.modelId) {
         Craft.refreshComponentInstances(data.modelClass, data.modelId);
       }
-      this.trigger('submit', {
+      const ev = {
         response: response,
         data: (data.modelName && data[data.modelName]) || {},
-      });
+      };
+      this.trigger('submit', ev);
+      this.settings.onSubmit(ev);
       if (this.settings.closeOnSubmit) {
         this.close();
       }
@@ -774,10 +781,6 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
     },
 
     close: function () {
-      if (this.showingSidebar) {
-        this.hideSidebar();
-      }
-
       this.base();
 
       if (this.cancelToken) {
@@ -792,6 +795,7 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
       requestOptions: {},
       showHeader: null,
       closeOnSubmit: true,
+      onSubmit: () => {},
     },
   }
 );

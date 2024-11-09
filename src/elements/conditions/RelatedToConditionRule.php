@@ -52,6 +52,16 @@ class RelatedToConditionRule extends BaseElementSelectConditionRule implements E
     }
 
     /**
+     * @inerhitdoc
+     */
+    protected function elementSelectConfig(): array
+    {
+        return array_merge(parent::elementSelectConfig(), [
+            'showSiteMenu' => true,
+        ]);
+    }
+
+    /**
      * @inheritdoc
      */
     public function modifyQuery(ElementQueryInterface $query): void
