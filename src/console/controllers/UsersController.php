@@ -122,7 +122,6 @@ class UsersController extends Controller
     protected function defineActions(): array
     {
         return parent::defineActions() + [
-
             // Fix sluggification of the action ID
             'remove-2fa' => [$this, 'remove2fa'],
         ];
