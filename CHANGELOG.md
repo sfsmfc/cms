@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed a bug where the `utils/fix-field-layout-uids` command was misidentifying missing/duplicate UUID issues.
+- Fixed an error that could occur when upgrading to Craft 5, if unused field layouts contained duplicate UUIDs. ([#16032](https://github.com/craftcms/cms/issues/16032))
 
 ## 5.4.10.1 - 2024-11-07
 
