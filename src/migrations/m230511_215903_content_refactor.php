@@ -3,10 +3,10 @@
 namespace craft\migrations;
 
 use Craft;
-use craft\db\Migration;
 use craft\db\Query;
 use craft\db\Table;
 use craft\elements\User;
+use craft\fieldlayoutelements\CustomField;
 use craft\helpers\ArrayHelper;
 use yii\console\Exception;
 
@@ -22,18 +22,26 @@ class m230511_215903_content_refactor extends BaseContentRefactorMigration
     {
         // Before anything else, be absolutely certain that all custom fields' layout elements have unique UUIDs
         $uids = [];
-        $fieldsService = Craft::$app->getFields();
-        foreach ($fieldsService->getAllLayouts() as $fieldLayout) {
-            $typeLabel = class_exists($fieldLayout->type) ? $fieldLayout->type::lowerDisplayName() : $fieldLayout->type;
-            $a = in_array(mb_strtolower($typeLabel[0] ?? ''), ['a', 'e', 'i', 'o', 'u']) ? 'An' : 'A';
-            foreach ($fieldLayout->getCustomFieldElements() as $layoutElement) {
-                if (!isset($layoutElement->uid)) {
-                    throw new Exception("$a $typeLabel field layout element is missing its UUID. Reinstall Craft CMS ^4.4.14 and run `utils/fix-field-layout-uids` before upgrading to Craft CMS 5.");
+
+        $projectConfigService = Craft::$app->getProjectConfig();
+        $layoutConfigs = array_merge(
+            array_values($projectConfigService->find(fn(array $item, string $itemPath) => str_ends_with($itemPath, '.fieldLayout'))),
+            ...array_values($projectConfigService->find(fn(array $item, string $itemPath) => str_ends_with($itemPath, '.fieldLayouts'))),
+        );
+
+        foreach ($layoutConfigs as $layoutConfig) {
+            foreach ($layoutConfig['tabs'] ?? [] as $tabConfig) {
+                foreach ($tabConfig['elements'] ?? [] as $elementConfig) {
+                    if (($elementConfig['type'] ?? null) === CustomField::class) {
+                        if (empty($elementConfig['uid'])) {
+                            throw new Exception('A field layout element is missing its UUID. Reinstall Craft CMS ^4.4.14 and run `utils/fix-field-layout-uids` before upgrading to Craft CMS 5.');
+                        }
+                        if (isset($uids[$elementConfig['uid']])) {
+                            throw new Exception('A field layout element has a duplicate UUID. Reinstall Craft CMS ^4.4.14 and run `utils/fix-field-layout-uids` before upgrading to Craft CMS 5.');
+                        }
+                        $uids[$elementConfig['uid']] = true;
+                    }
                 }
-                if (isset($uids[$layoutElement->uid])) {
-                    throw new Exception("$a $typeLabel field layout element has a duplicate UUID. Reinstall Craft CMS ^4.4.14 and run `utils/fix-field-layout-uids` before upgrading to Craft CMS 5.");
-                }
-                $uids[$layoutElement->uid] = true;
             }
         }
 
@@ -99,6 +107,7 @@ class m230511_215903_content_refactor extends BaseContentRefactorMigration
             }
             $indexedMatrixFieldConfigs[$matrixFieldUid] = $matrixFieldConfig;
         }
+        $fieldsService = Craft::$app->getFields();
         foreach ($projectConfig->get('matrixBlockTypes') ?? [] as $blockTypeUid => $blockTypeConfig) {
             if (!isset($indexedMatrixFieldConfigs[$blockTypeConfig['field']])) {
                 continue;
