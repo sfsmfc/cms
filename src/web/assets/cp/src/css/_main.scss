@@ -5448,7 +5448,7 @@ table.data tbody tr:not(.disabled).active-drop-target {
   margin-block: calc(var(--xl) * -1) var(--xl);
   margin-inline: var(--neg-padding);
   padding-block: 5px 6px;
-  padding-inline: var(--xl);
+  padding-inline: var(--padding);
   min-height: 45px;
   box-sizing: border-box;
   box-shadow: inset 0 -1px 0 0 color.adjust(mixins.$grey300, $alpha: -0.75);
