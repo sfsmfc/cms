@@ -1647,7 +1647,7 @@ return [
     'Unable to find the template “{template}”.' => 'No se puede encontrar la plantilla “{template}”.',
     'Unauthorized' => 'Sin autorización',
     'Uncheck for {offLabel}.' => 'Desmarcar {offLabel}.',
-    'Unconstrained' => 'Unconstrained',
+    'Unconstrained' => 'Sin restricciones',
     'Underline links' => 'Subrayar enlaces',
     'Undo' => 'Deshacer',
     'Unformatted' => 'Sin formato',
