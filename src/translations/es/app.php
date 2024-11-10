@@ -1503,7 +1503,7 @@ return [
     'Source' => 'Fuente',
     'Sources' => 'Almacenes',
     'Square SVG file recommended. The logo will be displayed at {size} by {size}.' => 'Se recomienda el archivo SVG cuadrado. El logotipo aparecerá con un tamaño de {size} por {size}.',
-    'Square' => 'Square',
+    'Square' => 'Cuadrado',
     'Stack Trace' => 'Seguimiento de la pila',
     'State' => 'Estado',
     'Static Rows' => 'Filas estáticas',
