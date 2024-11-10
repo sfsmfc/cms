@@ -1772,7 +1772,7 @@ return [
     'Unable to initiate an auth request.' => 'Unable to initiate an auth request.',
     'Unauthorized' => 'Sin autorización',
     'Uncheck for {offLabel}.' => 'Desmarcar {offLabel}.',
-    'Unconstrained' => 'Unconstrained',
+    'Unconstrained' => 'Sin restricciones',
     'Underline links' => 'Subrayar enlaces',
     'Undo' => 'Deshacer',
     'Unformatted' => 'Sin formato',
