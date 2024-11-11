@@ -1096,7 +1096,6 @@ return [
     'Notice' => '알림',
     'Notification Duration' => '알림 기간',
     'Notifications' => '알림',
-    'Number Input Size' => '숫자 입력 크기',
     'Number of columns' => '열 수',
     'Number' => '수',
     'OFF Label' => '끄기 라벨',
