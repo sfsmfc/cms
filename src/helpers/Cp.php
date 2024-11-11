@@ -658,7 +658,6 @@ class Cp
             $status = Html::beginTag('div', [
                     'class' => ['status-badge', AttributeStatus::Modified->value],
                     'title' => $statusLabel,
-                    'aria-hidden' => 'true',
                 ]) .
                 Html::tag('span', $statusLabel, [
                     'class' => 'visually-hidden',
