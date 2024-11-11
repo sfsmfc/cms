@@ -352,19 +352,17 @@ trait NestedElementTrait
             $this->sortOrder = $max ? $max + 1 : 1;
         }
 
-        if ($isNew) {
-            Db::insert(Table::ELEMENTS_OWNERS, [
-                'elementId' => $this->id,
-                'ownerId' => $ownerId,
-                'sortOrder' => $this->sortOrder,
-            ]);
-        } else {
-            Db::update(Table::ELEMENTS_OWNERS, [
-                'sortOrder' => $this->sortOrder,
-            ], [
+        if (!$isNew) {
+            Db::delete(Table::ELEMENTS_OWNERS, [
                 'elementId' => $this->id,
                 'ownerId' => $ownerId,
             ]);
         }
+
+        Db::insert(Table::ELEMENTS_OWNERS, [
+            'elementId' => $this->id,
+            'ownerId' => $ownerId,
+            'sortOrder' => $this->sortOrder,
+        ]);
     }
 }

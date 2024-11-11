@@ -411,34 +411,29 @@ Craft.NestedElementManager = Garnish.Base.extend(
             return;
           }
 
-          let ownerId = $element.data('owner-id');
-          if (
-            this.elementEditor.settings.isProvisionalDraft &&
-            $element.data('owner-id') !== this.elementEditor.settings.elementId
-          ) {
-            ownerId = this.elementEditor.settings.elementId;
-          }
-
           const slideout = Craft.createElementEditor(
             this.elementType,
             $element,
             {
-              ownerId: ownerId,
               onBeforeSubmit: async () => {
-                // If the nested element is primarily owned by the canonical entry being edited,
+                // If the nested element is primarily owned by the same owner element it was queried for,
                 // then ensure we're working with a draft and save the nested entry changes to the draft
                 if (
-                  $element.data('primary-owner-id') ==
-                  this.elementEditor.settings.canonicalId
+                  $element.data('primary-owner-id') ===
+                  $element.data('owner-id')
                 ) {
+                  await slideout.elementEditor.checkForm(true, true);
                   await this.markAsDirty();
-                  if (this.elementEditor.settings.draftId) {
+                  if (
+                    this.elementEditor.settings.draftId &&
+                    slideout.elementEditor.settings.draftId
+                  ) {
                     if (!slideout.elementEditor.settings.saveParams) {
                       slideout.elementEditor.settings.saveParams = {};
                     }
                     slideout.elementEditor.settings.saveParams.action =
-                      'elements/save-nested-element-for-draft';
-                    slideout.elementEditor.settings.saveParams.ownerId =
+                      'elements/save-nested-element-for-derivative';
+                    slideout.elementEditor.settings.saveParams.newOwnerId =
                       this.settings.ownerId;
                   }
                 }

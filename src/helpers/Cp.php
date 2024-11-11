@@ -641,7 +641,7 @@ class Cp
             $element->getOwnerId() === $element->getPrimaryOwnerId() &&
             !$element->getIsDraft() &&
             !$element->getIsRevision() &&
-            $element->getOwner()->getIsDraft()
+            $element->getOwner()->getIsDerivative()
         ) {
             if ($element->getIsCanonical()) {
                 // this element was created for the owner

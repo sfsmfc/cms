@@ -78,6 +78,7 @@ class ElementsController extends Controller
     private ?int $_revisionId = null;
     private ?int $_fieldId = null;
     private ?int $_ownerId = null;
+    private ?int $_newOwnerId = null;
     private ?int $_siteId = null;
 
     private ?bool $_enabled = null;
@@ -121,6 +122,7 @@ class ElementsController extends Controller
         $this->_revisionId = $this->_param('revisionId');
         $this->_fieldId = $this->_param('fieldId') ?: null;
         $this->_ownerId = $this->_param('ownerId') ?: null;
+        $this->_newOwnerId = $this->_param('newOwnerId') ?: null;
         $this->_siteId = $this->_param('siteId');
         $this->_enabled = $this->_param('enabled', $this->_param('setEnabled', true) ? true : null);
         $this->_enabledForSite = $this->_param('enabledForSite');
@@ -1303,7 +1305,7 @@ JS, [
     }
 
     /**
-     * Saves a nested element for a draft of its owner.
+     * Saves a nested element for a derivative of its owner.
      *
      * @return Response|null
      * @throws BadRequestHttpException
@@ -1311,19 +1313,24 @@ JS, [
      * @throws ServerErrorHttpException
      * @since 5.5.0
      */
-    public function actionSaveNestedElementForDraft(): ?Response
+    public function actionSaveNestedElementForDerivative(): ?Response
     {
         $this->requirePostRequest();
         $this->requireAcceptsJson();
 
-        if (!isset($this->_ownerId)) {
+        if (!isset($this->_newOwnerId)) {
             throw new BadRequestHttpException('No new owner was identified by the request.');
         }
 
         /** @var Element|null $element */
         $element = $this->_element();
 
-        if (!$element instanceof NestedElementInterface || $element->getIsRevision()) {
+        if (
+            !$element instanceof NestedElementInterface ||
+            !$element->getOwnerId() ||
+            !$element->getIsDraft() ||
+            $element->getIsCanonical()
+        ) {
             throw new BadRequestHttpException('No element was identified by the request.');
         }
 
@@ -1337,11 +1344,10 @@ JS, [
             throw new ForbiddenHttpException('User not authorized to save this element.');
         }
 
-        // Get the owner and make sure it's a draft,
+        // Get the new owner and make sure it's a derivative element,
         // and that its canonical element is the nested element's primary owner
-        $owner = $elementsService->getElementById($this->_ownerId, siteId: $element->siteId);
+        $owner = $elementsService->getElementById($this->_newOwnerId, siteId: $element->siteId);
         if (
-            !$owner->getIsDraft() ||
             $owner->getIsCanonical() ||
             $owner->getCanonicalId() !== $element->getPrimaryOwnerId() ||
             !$elementsService->canSave($owner, $user)
@@ -1355,7 +1361,7 @@ JS, [
             ->from(Table::ELEMENTS_OWNERS)
             ->where([
                 'elementId' => $element->id,
-                'ownerId' => $owner->id,
+                'ownerId' => $element->getOwnerId(),
             ])
             ->scalar() ?: null;
         $element->setSortOrder($sortOrder);
@@ -1365,26 +1371,23 @@ JS, [
 
         try {
             // Remove existing ownership data for the element within the canonical owner,
-            // and for its canonical element within the draft
+            // and for its canonical element within the derivative
             Db::delete(Table::ELEMENTS_OWNERS, [
                 'or',
                 ['elementId' => $element->id, 'ownerId' => $owner->getCanonicalId()],
                 ['elementId' => $element->getCanonicalId(), 'ownerId' => $owner->id],
             ]);
 
-            if ($element->getIsDraft()) {
-                // Just remove the draft data, but preserve the canonicalId
-                $element->setPrimaryOwner($owner);
-                $element->setOwner($owner);
-                $elementsService->saveElement($element);
-            } else {
-                // Duplicate it
-                $element = $elementsService->duplicateElement($element, [
-                    'canonicalId' => $element->id,
-                    'primaryOwner' => $owner,
-                    'owner' => $owner,
-                ]);
-            }
+            // Remove existing ownership data for the element within the canonical owner
+            Db::delete(Table::ELEMENTS_OWNERS, [
+                'elementId' => $element->id,
+                'ownerId' => $owner->getCanonicalId(),
+            ]);
+
+            // Remove the draft data, but preserve the canonicalId
+            $element->setPrimaryOwner($owner);
+            $element->setOwner($owner);
+            $elementsService->saveElement($element);
 
             $this->_applyParamsToElement($element);
 
