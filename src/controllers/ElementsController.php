@@ -1347,11 +1347,13 @@ JS, [
         // Get the new owner and make sure it's a derivative element,
         // and that its canonical element is the nested element's primary owner
         $owner = $elementsService->getElementById($this->_newOwnerId, siteId: $element->siteId);
-        if (
-            $owner->getIsCanonical() ||
-            $owner->getCanonicalId() !== $element->getPrimaryOwnerId() ||
-            !$elementsService->canSave($owner, $user)
-        ) {
+        if ($owner->getIsCanonical()) {
+            throw new BadRequestHttpException('The owner element must be a derivative.');
+        }
+        if ($owner->getCanonicalId() !== $element->getPrimaryOwnerId()) {
+            throw new BadRequestHttpException('The canonical owner element must be the primary owner of the nested element.');
+        }
+        if (!$elementsService->canSave($owner, $user)) {
             throw new ForbiddenHttpException('User not authorized to save the owner element.');
         }
 

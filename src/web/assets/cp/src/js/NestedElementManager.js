@@ -420,7 +420,8 @@ Craft.NestedElementManager = Garnish.Base.extend(
                 // then ensure we're working with a draft and save the nested entry changes to the draft
                 if (
                   $element.data('primary-owner-id') ===
-                  $element.data('owner-id')
+                    $element.data('owner-id') &&
+                  !this.elementEditor.settings.isUnpublishedDraft
                 ) {
                   await slideout.elementEditor.checkForm(true, true);
                   await this.markAsDirty();
