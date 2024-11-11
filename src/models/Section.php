@@ -110,7 +110,7 @@ class Section extends Model implements Chippable, CpEditable, Iconic
      *  - [[PropagationMethod::None]] – Only save entries in the site they were created in
      *  - [[PropagationMethod::SiteGroup]] – Save  entries to other sites in the same site group
      *  - [[PropagationMethod::Language]] – Save entries to other sites with the same language
-     *  - [[PropagationMethod::Custom]] – Save entries to other sites based on a custom [[$propagationKeyFormat|propagation key format]]
+     *  - [[PropagationMethod::Custom]] – Let each entry choose which sites it should be saved to
      *  - [[PropagationMethod::All]] – Save entries to all sites supported by the owner element
      *
      * @since 3.2.0

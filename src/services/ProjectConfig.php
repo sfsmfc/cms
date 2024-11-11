@@ -487,7 +487,7 @@ class ProjectConfig extends Component
         foreach ($config as $key => $item) {
             if (is_array($item)) {
                 $itemPath = sprintf('%s%s', ($path !== null) ? "$path." : '', $key);
-                if ($callback($item)) {
+                if ($callback($item, $itemPath)) {
                     $items[$itemPath] = $item;
                 } else {
                     $this->findInternal($item, $callback, $itemPath, $items);

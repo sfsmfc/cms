@@ -243,7 +243,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
       this.$srStatusContainer = this.$container.find('[data-status-message]');
 
       this.$elements = this.$container.find('.elements:first');
-      this.$updateSpinner = this.$elements.find('.spinner');
+      this.$updateSpinner = this.$elements.find('.update-spinner');
 
       if (!this.$updateSpinner.length) {
         this.$updateSpinner = $('<div/>', {
@@ -1875,6 +1875,9 @@ Craft.BaseElementIndex = Garnish.Base.extend(
           this._resetCount();
           this._updateView(viewParams, response.data);
 
+          // Refresh Live Preview
+          Craft.Preview.refresh();
+
           if (typeof response.data.badgeCounts !== 'undefined') {
             this._updateBadgeCounts(response.data.badgeCounts);
           }
@@ -2725,10 +2728,9 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         let positionTop = Math.floor(scrollTop + windowHeight / 2) - 100;
         positionTop = Math.floor((positionTop / elementsHeight) * 100);
 
-        document.documentElement.style.setProperty(
-          '--elements-busy-top-position',
-          positionTop + '%'
-        );
+        this.$updateSpinner.css({
+          insetBlockStart: `${positionTop}%`,
+        });
       }
       this.updateLiveRegion(Craft.t('app', 'Loading'));
     },
