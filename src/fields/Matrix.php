@@ -981,7 +981,7 @@ JS;
 
     private function validateEntries(ElementInterface $element): void
     {
-        /** @var EntryQuery|ElementCollection $value */
+        /** @var EntryQuery|ElementCollection|null $value */
         $value = $element->getFieldValue($this->handle);
         $new = 0;
 
@@ -1033,7 +1033,7 @@ JS;
                 }
             }
         } else {
-            $entries = $value->all();
+            $entries = $value?->all();
         }
 
         if (
