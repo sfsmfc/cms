@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Opmerking',
     'Notification Duration' => 'Meldingsduur',
     'Notifications' => 'Meldingen',
-    'Number Input Size' => 'Grootte getalinvoer',
     'Number of columns' => 'Aantal kolommen',
     'Number' => 'Nummer',
     'OFF Label' => 'Label OFF',
