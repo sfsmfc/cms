@@ -18,7 +18,6 @@ use craft\gql\types\Number as NumberType;
 use craft\helpers\Cp;
 use craft\helpers\Db;
 use craft\helpers\Localization;
-use craft\i18n\Locale;
 use GraphQL\Type\Definition\Type;
 use yii\db\Schema;
 
