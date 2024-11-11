@@ -6385,21 +6385,13 @@ JS,
     }
 
     /**
-     * Return memoized fields that implement ElementContainerFieldInterface from _fieldsByHandle
-     * and unset them from the memoized _fieldsByHandle array.
+     * Unsets handle from the memoized _fieldsByHandle array.
      *
-     * @return array
+     * @param string $handle
+     * @return void
      */
-    protected function resetElementContainerFieldsByHandle(): array
+    protected function unsetFromFieldByHandle(string $handle): void
     {
-        $nestedFields = [];
-        foreach ($this->_fieldsByHandle as $handle => $field) {
-            if ($field instanceof ElementContainerFieldInterface) {
-                $nestedFields[$handle] = $field;
-                unset($this->_fieldsByHandle[$handle]);
-            }
-        }
-
-        return $nestedFields;
+        unset($this->_fieldsByHandle[$handle]);
     }
 }

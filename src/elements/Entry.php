@@ -2831,12 +2831,41 @@ JS;
     public function handleChangedTypeId(): void
     {
         if ($this->getTypeId() !== $this->_oldTypeId) {
-            $nestedFields = $this->resetElementContainerFieldsByHandle();
+            $oldEntryType = Craft::$app->getEntries()->getEntryTypeById($this->_oldTypeId);
+            $newEntryType = $this->getType();
 
-            $behavior = $this->getBehavior('customFields');
-            foreach ($nestedFields as $fieldHandle => $field) {
-                CustomFieldBehavior::$fieldHandles[$fieldHandle] = false;
-                $behavior->$fieldHandle = null;
+            $oldLayout = $oldEntryType?->getFieldLayout();
+            if (!$oldLayout) {
+                throw new InvalidConfigException("Invalid entry type ID: $this->_oldTypeId");
+            }
+            $newLayout = $newEntryType->getFieldLayout();
+
+            // get all custom field elements - keyed by handles
+            $oldCustomElements = Collection::make($oldLayout->getCustomFieldElements())->keyBy(fn($element) => $element->attribute())->toArray();
+            $newCustomElements = Collection::make($newLayout->getCustomFieldElements())->keyBy(fn($element) => $element->attribute())->toArray();
+
+            // we only want to check the field where the handle exists in old and new layout
+            $fieldsToCheck = array_intersect_key($newCustomElements, $oldCustomElements);
+
+            // check if old and new field types are compatible
+            $incompatibleFields = [];
+            foreach ($fieldsToCheck as $handle => $field) {
+                if (!Craft::$app->getFields()->areFieldTypesCompatible(
+                    $newCustomElements[$handle]->getField()::class,
+                    $oldCustomElements[$handle]->getField()::class)
+                ) {
+                    $incompatibleFields[$handle] = $field;
+                }
+            }
+
+            // if we have any incompatible fields, un-normalize them and remove from _fieldsByHandle
+            if (!empty($incompatibleFields)) {
+                $behavior = $this->getBehavior('customFields');
+                foreach ($incompatibleFields as $fieldHandle => $field) {
+                    CustomFieldBehavior::$fieldHandles[$fieldHandle] = false;
+                    $behavior->$fieldHandle = null;
+                    $this->unsetFromFieldByHandle($fieldHandle);
+                }
             }
         }
     }
