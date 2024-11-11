@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Oznámení',
     'Notification Duration' => 'Doba trvání oznámení',
     'Notifications' => 'Oznámení',
-    'Number Input Size' => 'Velikost vstupního čísla',
     'Number of columns' => 'Počet sloupců',
     'Number' => 'Číslo',
     'OFF Label' => 'Nálepka OFF (VYP.)',
