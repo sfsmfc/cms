@@ -6383,4 +6383,23 @@ JS,
     {
         return ElementHelper::renderElements([$this], $variables);
     }
+
+    /**
+     * Return memoized fields that implement ElementContainerFieldInterface from _fieldsByHandle
+     * and unset them from the memoized _fieldsByHandle array.
+     *
+     * @return array
+     */
+    protected function resetElementContainerFieldsByHandle(): array
+    {
+        $nestedFields = [];
+        foreach ($this->_fieldsByHandle as $handle => $field) {
+            if ($field instanceof ElementContainerFieldInterface) {
+                $nestedFields[$handle] = $field;
+                unset($this->_fieldsByHandle[$handle]);
+            }
+        }
+
+        return $nestedFields;
+    }
 }

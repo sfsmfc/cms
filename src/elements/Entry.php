@@ -15,6 +15,7 @@ use craft\base\Field;
 use craft\base\Iconic;
 use craft\base\NestedElementInterface;
 use craft\base\NestedElementTrait;
+use craft\behaviors\CustomFieldBehavior;
 use craft\behaviors\DraftBehavior;
 use craft\controllers\ElementIndexesController;
 use craft\db\Connection;
@@ -2817,5 +2818,26 @@ JS;
         }
 
         return in_array($this->typeId, array_map(fn($entryType) => $entryType->id, $entryTypes));
+    }
+
+    /**
+     * When entry type id was changed, discard of any normalizes field values
+     * for fields that implement ElementContainerFieldInterface
+     * and unset those fields from the memoized field handles.
+     *
+     * @return void
+     * @since 5.5.0
+     */
+    public function handleChangedTypeId(): void
+    {
+        if ($this->getTypeId() !== $this->_oldTypeId) {
+            $nestedFields = $this->resetElementContainerFieldsByHandle();
+
+            $behavior = $this->getBehavior('customFields');
+            foreach ($nestedFields as $fieldHandle => $field) {
+                CustomFieldBehavior::$fieldHandles[$fieldHandle] = false;
+                $behavior->$fieldHandle = null;
+            }
+        }
     }
 }
