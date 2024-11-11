@@ -864,12 +864,12 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
         this.modal = null;
       }
 
-      // If can add more elements, do default behavior of focus on "Add" button
-      if (this.canAddMoreElements()) return;
-
-      setTimeout(() => {
-        this.focusNextLogicalElement();
-      }, 200);
+      // If we can't add any more elements, don't focus on the “Add” button
+      if (!this.canAddMoreElements()) {
+        setTimeout(() => {
+          this.focusNextLogicalElement();
+        }, 200);
+      }
     },
 
     selectElements: async function (elements) {
