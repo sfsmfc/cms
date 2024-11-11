@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Upozornenie',
     'Notification Duration' => 'Trvanie oznámenia',
     'Notifications' => 'Oznámenia',
-    'Number Input Size' => 'Veľkosť vstupného čísla',
     'Number of columns' => 'Počet stĺpcov',
     'Number' => 'Číslo',
     'OFF Label' => 'Štítok VYPNUTÝ',
