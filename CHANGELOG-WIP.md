@@ -119,7 +119,7 @@
 - Added `craft\web\View::registerSiteTwigExtension()`.
 - `craft\fields\data\LinkData::getLabel()` now has a `$custom` argument.
 - `craft\helpers\Console::output()` now prepends an indent to each line of the passed-in string, if `indent()` had been called prior.
-- Added the `elements/save-nested-element-for-draft` action. ([#16002](https://github.com/craftcms/cms/pull/16002))
+- Added the `elements/save-nested-element-for-derivative` action. ([#16002](https://github.com/craftcms/cms/pull/16002))
 - Improved support for creating log targets for third party logging services. ([#14974](https://github.com/craftcms/cms/pull/14974))
 - Deprecated the `enableBasicHttpAuth` config setting. `craft\filters\BasicHttpAuthLogin` should be used instead. ([#15720](https://github.com/craftcms/cms/pull/15720))
 - Added the `serializeForm` event to `Craft.ElementEditor`. ([#15794](https://github.com/craftcms/cms/discussions/15794))
