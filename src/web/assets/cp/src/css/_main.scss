@@ -8034,6 +8034,14 @@ fieldset {
   }
 }
 
+.checkboxfield__custom-wrapper {
+  display: inline-block;
+}
+
+.checkboxfield__custom-input {
+  margin-inline-start: var(--xs);
+}
+
 /* radio */
 input.radio {
   opacity: 0;

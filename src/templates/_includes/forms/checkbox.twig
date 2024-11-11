@@ -3,6 +3,7 @@
 
 {% set id = id ?? "checkbox#{random()}" %}
 {% set label = checkboxLabel ?? label ?? null %}
+{% set labelId = custom ?? false ? id ~ '-label' : false %}
 
 {% set aria = (inputAttributes.aria ?? {})|merge(aria ?? {}) %}
 {% set inputAttributes = {
@@ -25,6 +26,11 @@
     }),
 }|merge(inputAttributes ?? [], recursive=true) %}
 
+{% set labelAttributes = {
+    for: id,
+    id: labelId,
+} %}
+
 {% if block('attr') is defined %}
     {%- set inputAttributes = inputAttributes|merge(('<div ' ~ block('attr') ~ '>')|parseAttr, recursive=true) %}
 {% endif %}
@@ -35,18 +41,24 @@
 
 {{ input('checkbox', name ?? null, value ?? 1, inputAttributes) }}
 
-<label for="{{ id }}">
+{% tag 'label' with labelAttributes %}
     {% if custom ?? false %}
-        {{ text({
-            value: value ?? null,
-            class: 'small',
-        }) }}
+        {{ 'Custom option:'|t('app') }}
     {% else %}
         {{ label }}
     {% endif %}
     {% if info ?? null %}
         <span class="info">{{ info|md|raw }}</span>
     {% endif %}
-</label>
+{% endtag %}
 
+{% if custom ?? false %}
+    <div class="checkboxfield__custom-wrapper">
+        {{ text({
+            value: value ?? null,
+            class: 'small checkboxfield__custom-input',
+            labelledBy: labelId,
+        }) }}
+    </div>
+{% endif %}
 {% endapply -%}

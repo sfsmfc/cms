@@ -472,6 +472,7 @@ return [
     'Currently SVG images do not support focal point.' => 'Currently SVG images do not support focal point.',
     'Custom Fields' => 'Custom Fields',
     'Custom' => 'Custom',
+    'Custom option:' => 'Custom option:',
     'Customize sources' => 'Customize sources',
     'Custom…' => 'Custom…',
     'Cyan' => 'Cyan',
