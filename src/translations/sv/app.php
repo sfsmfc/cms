@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Meddelande',
     'Notification Duration' => 'Aviseringarnas varaktighet',
     'Notifications' => 'Aviseringar',
-    'Number Input Size' => 'Storlek på sifferinmatning',
     'Number of columns' => 'Antal kolumner',
     'Number' => 'Nummer',
     'OFF Label' => 'AV-etikett',
