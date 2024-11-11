@@ -419,8 +419,7 @@ Craft.NestedElementManager = Garnish.Base.extend(
                 // If the nested element is primarily owned by the same owner element it was queried for,
                 // then ensure we're working with a draft and save the nested entry changes to the draft
                 if (
-                  $element.data('primary-owner-id') ===
-                    $element.data('owner-id') &&
+                  Garnish.hasAttr($element, 'data-owner-is-canonical') &&
                   !this.elementEditor.settings.isUnpublishedDraft
                 ) {
                   await slideout.elementEditor.checkForm(true, true);

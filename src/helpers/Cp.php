@@ -909,6 +909,7 @@ class Cp
                     'field-id' => $element instanceof NestedElementInterface ? $element->getField()?->id : null,
                     'primary-owner-id' => $element instanceof NestedElementInterface ? $element->getPrimaryOwnerId() : null,
                     'owner-id' => $element instanceof NestedElementInterface ? $element->getOwnerId() : null,
+                    'owner-is-canonical' => $element instanceof NestedElementInterface ? $element->getOwner()?->getIsCanonical() : null,
                     'site-id' => $element->siteId,
                     'status' => $element->getStatus(),
                     'label' => (string)$element,
