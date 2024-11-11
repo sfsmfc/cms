@@ -16,6 +16,13 @@ use yii\base\InvalidConfigException;
 /**
  * Class GqlField
  *
+ * @param string|array $type The type of the field. Can be a standard type, a custom type, or a callable that returns a type.
+ * @param string|null $name The name of the field. If not provided, the property name will be used.
+ * @param string|null $description The description of the field. If not provided, the property's PHPDoc comment will be used.
+ * @param array|null $args Arguments that the field accepts. If provided, should be a callable.
+ * @param array|null $complexity The complexity of the field. If provided, should be a callable.
+ * @param string|null $resolve The method to call to resolve the field. If not provided, the property's value will be used.
+ *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 5.x.x
  */
@@ -28,7 +35,8 @@ class GqlField
         public ?string $description = null,
         public ?array $args = null,
         public ?array $complexity = null,
-        public ?string $resolve = null) {}
+        public ?string $resolve = null,
+        public ?array $when = null) {}
 
     /**
      * @return Type
@@ -74,11 +82,15 @@ class GqlField
 
     /**
      * @param \ReflectionProperty|\ReflectionMethod $prop
-     * @return array
+     * @return array|null
      * @throws InvalidConfigException
      */
-    public function getFieldDefinition(\ReflectionProperty|\ReflectionMethod $prop): array
+    public function getFieldDefinition(\ReflectionProperty|\ReflectionMethod $prop): ?array
     {
+        if ($this->when && !($this->when)()) {
+            return null;
+        }
+
         // Use to get a nice version of the property description
         $propertyInfo = new PropertyInfoExtractor(
             descriptionExtractors: [new PhpDocExtractor()]

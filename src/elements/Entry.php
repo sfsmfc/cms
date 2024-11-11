@@ -8,6 +8,7 @@
 namespace craft\elements;
 
 use Craft;
+use craft\attributes\GqlField;
 use craft\base\Colorable;
 use craft\base\Element;
 use craft\base\ExpirableElementInterface;
@@ -47,6 +48,7 @@ use craft\helpers\Cp;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\ElementHelper;
+use craft\helpers\Gql;
 use craft\helpers\Html;
 use craft\helpers\UrlHelper;
 use craft\models\EntryType;
@@ -61,6 +63,7 @@ use craft\validators\ArrayValidator;
 use craft\validators\DateCompareValidator;
 use craft\validators\DateTimeValidator;
 use DateTime;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
 use Throwable;
 use yii\base\Exception;
@@ -1434,6 +1437,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
      * @return int|null
      * @since 4.0.0
      */
+    #[GqlField(Type::INT, when: [Gql::class, 'canQueryUsers'])]
     public function getAuthorId(): ?int
     {
         return $this->getAuthorIds()[0] ?? null;
@@ -1457,6 +1461,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
      * @return int[]
      * @since 5.0.0
      */
+    #[GqlField([[Type::class, 'listOf'], Type::INT], when: [Gql::class, 'canQueryUsers'])]
     public function getAuthorIds(): array
     {
         if (!isset($this->_authorIds)) {
@@ -1519,6 +1524,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
      * @return User|null
      * @throws InvalidConfigException if [[authorId]] is set but invalid
      */
+    #[GqlField([[Type::class, 'listOf'], \craft\gql\interfaces\elements\User::class], complexity: [Gql::class, 'eagerLoadComplexity'], when: [Gql::class, 'canQueryUsers'])]
     public function getAuthor(): ?User
     {
         return $this->getAuthors()[0] ?? null;
@@ -1550,6 +1556,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
      * @return User[]
      * @since 5.0.0
      */
+    #[GqlField([[Type::class, 'listOf'], \craft\gql\interfaces\elements\User::class], complexity: [Gql::class, 'eagerLoadComplexity'], when: [Gql::class, 'canQueryUsers'])]
     public function getAuthors(): array
     {
         if (!isset($this->_authors)) {

@@ -30,6 +30,11 @@ class Entry extends Structure
     /**
      * @inheritdoc
      */
+    public static string $element = \craft\elements\Entry::class;
+
+    /**
+     * @inheritdoc
+     */
     public static function getTypeGenerator(): string
     {
         return EntryType::class;
@@ -69,7 +74,12 @@ class Entry extends Structure
      */
     public static function getFieldDefinitions(): array
     {
-        return Craft::$app->getGql()->prepareFieldDefinitions(array_merge(parent::getFieldDefinitions(), static::getDraftFieldDefinitions(), self::getConditionalFields(), [
+        return Craft::$app->getGql()->prepareFieldDefinitions(array_merge(
+            parent::getFieldDefinitions(),
+            static::getElementFieldDefinitions(),
+            static::getDraftFieldDefinitions(),
+            self::getConditionalFields(),
+            [
             'canonicalId' => [
                 'name' => 'canonicalId',
                 'type' => Type::int(),
