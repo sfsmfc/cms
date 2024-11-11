@@ -10,6 +10,7 @@ namespace craft\elements;
 use Craft;
 use craft\base\Colorable;
 use craft\base\Element;
+use craft\base\ElementContainerFieldInterface;
 use craft\base\ExpirableElementInterface;
 use craft\base\Field;
 use craft\base\Iconic;
@@ -2841,18 +2842,30 @@ JS;
             $newLayout = $newEntryType->getFieldLayout();
 
             // get all custom field elements - keyed by handles
-            $oldCustomElements = Collection::make($oldLayout->getCustomFieldElements())->keyBy(fn($element) => $element->attribute())->toArray();
-            $newCustomElements = Collection::make($newLayout->getCustomFieldElements())->keyBy(fn($element) => $element->attribute())->toArray();
+            $oldCustomElements = Collection::make($oldLayout->getCustomFieldElements())
+                ->keyBy(fn($element) => $element->attribute())
+                ->toArray();
+            $newCustomElements = Collection::make($newLayout->getCustomFieldElements())
+                ->keyBy(fn($element) => $element->attribute())
+                ->toArray();
 
             // we only want to check the field where the handle exists in old and new layout
             $fieldsToCheck = array_intersect_key($newCustomElements, $oldCustomElements);
 
             // check if old and new field types are compatible
+            // if both old and new fields are not the exact same ElementContainerFieldInterface field - mark it as incompatible
             $incompatibleFields = [];
             foreach ($fieldsToCheck as $handle => $field) {
-                if (!Craft::$app->getFields()->areFieldTypesCompatible(
-                    $newCustomElements[$handle]->getField()::class,
-                    $oldCustomElements[$handle]->getField()::class)
+                if (
+                    !Craft::$app->getFields()->areFieldTypesCompatible(
+                        $newCustomElements[$handle]->getField()::class,
+                        $oldCustomElements[$handle]->getField()::class
+                    ) ||
+                    (
+                        $newCustomElements[$handle]->getField() instanceof ElementContainerFieldInterface &&
+                        $oldCustomElements[$handle]->getField() instanceof ElementContainerFieldInterface &&
+                        $newCustomElements[$handle]->getField()->uid !== $oldCustomElements[$handle]->getField()->uid
+                    )
                 ) {
                     $incompatibleFields[$handle] = $field;
                 }
