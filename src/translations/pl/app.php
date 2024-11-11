@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Powiadomienie',
     'Notification Duration' => 'Czas trwania powiadomienia',
     'Notifications' => 'Powiadomienia',
-    'Number Input Size' => 'Rozmiar wejściowy liczby',
     'Number of columns' => 'Liczba kolumn',
     'Number' => 'Numer',
     'OFF Label' => 'Etykieta WYŁ.',
