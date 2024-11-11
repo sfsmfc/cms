@@ -89,8 +89,14 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
         ev.preventDefault();
         if (!this.showingSidebar) {
           this.showSidebar();
+          if (this.showExpandedView) {
+            Craft.setCookie('sidebar-slideout', 'expanded');
+          }
         } else {
           this.hideSidebar();
+          if (this.showExpandedView) {
+            Craft.setCookie('sidebar-slideout', 'collapsed');
+          }
         }
       });
 
@@ -468,7 +474,6 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
         this.hideSidebarIfOverlapping() || ev.bubbleShortcut();
       });
 
-      Craft.setCookie('sidebar-slideout', 'expanded');
       this.showingSidebar = true;
     },
 
@@ -502,7 +507,6 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
 
       Garnish.uiLayerManager.removeLayer();
 
-      Craft.setCookie('sidebar-slideout', 'collapsed');
       this.showingSidebar = false;
     },
 
@@ -781,6 +785,10 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
     },
 
     close: function () {
+      if (this.showingSidebar) {
+        this.hideSidebar();
+      }
+
       this.base();
 
       if (this.cancelToken) {
