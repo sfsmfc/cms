@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'הערה',
     'Notification Duration' => 'משך ההודעה',
     'Notifications' => 'הודעות',
-    'Number Input Size' => 'גודל קלט מספרים',
     'Number of columns' => 'מספר העמודות',
     'Number' => 'מספר',
     'OFF Label' => 'תווית OFF',
