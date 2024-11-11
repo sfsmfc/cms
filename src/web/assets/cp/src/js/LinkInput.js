@@ -1,5 +1,7 @@
 /** global: Craft */
 /** global: Garnish */
+const punycode = require('punycode/');
+
 /**
  * Handle Generator
  */
@@ -148,6 +150,7 @@ Craft.LinkInput = Garnish.Base.extend(
     },
 
     validate: function (value) {
+      value = punycode.toASCII(value);
       return !!value.match(new RegExp(this.settings.pattern, 'i'));
     },
 
