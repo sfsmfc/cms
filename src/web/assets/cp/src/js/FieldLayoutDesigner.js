@@ -1324,6 +1324,15 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
   },
 
   destroy: function () {
+    if (
+      this.tab.designer.settings.withCardViewDesigner &&
+      this.config.providesThumbs
+    ) {
+      let cvd = this.tab.designer.$cvd?.data('cvd');
+      cvd.showThumb = false;
+      cvd.updatePreview();
+    }
+
     this.tab.updateConfig((config) => {
       const index = this.index;
       if (index === -1) {
