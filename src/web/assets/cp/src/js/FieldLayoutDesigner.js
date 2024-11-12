@@ -2004,6 +2004,7 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
 
     let $draggable = this.findCheckboxByUid(element.uid);
     if ($draggable !== null) {
+      $draggable.find('input[type="checkbox"]').prop('checked', false);
       $draggable.remove();
     }
 
