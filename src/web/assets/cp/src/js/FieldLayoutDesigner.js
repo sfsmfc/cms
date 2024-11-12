@@ -1956,6 +1956,7 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
       let element = {
         value: $(checkedItems[i]).val(),
         fieldId: $(checkedItems[i]).data('fieldId') ?? null,
+        fieldLabel: $(checkedItems[i]).data('fieldLabel') ?? null,
       };
 
       cardElements.push(element);
@@ -1981,6 +1982,7 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
         checked: false,
         data: {
           'field-id': element.fieldId,
+          'field-label': element.$container.find('.fld-element-label').text(),
         },
       })
       .appendTo($draggable);
