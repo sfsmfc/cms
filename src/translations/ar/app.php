@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'ملاحظة',
     'Notification Duration' => 'مدة الإشعارات',
     'Notifications' => 'الإشعارات',
-    'Number Input Size' => 'حجم إدخال الرقم',
     'Number of columns' => 'عدد الأعمدة',
     'Number' => 'رقم',
     'OFF Label' => 'تسمية إيقاف التشغيل',

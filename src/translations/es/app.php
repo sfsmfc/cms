@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Aviso',
     'Notification Duration' => 'Duración de la notificación',
     'Notifications' => 'Notificaciones',
-    'Number Input Size' => 'Tamaño de entrada numérica',
     'Number of columns' => 'Número de columnas',
     'Number' => 'Número',
     'OFF Label' => 'Etiqueta DESACTIVADO',

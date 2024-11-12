@@ -1096,7 +1096,6 @@ return [
     'Notice' => '通知',
     'Notification Duration' => '通知时长',
     'Notifications' => '通知',
-    'Number Input Size' => '数值输入大小',
     'Number of columns' => '列数',
     'Number' => '数字',
     'OFF Label' => '关闭标签',

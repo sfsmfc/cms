@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'توجه',
     'Notification Duration' => 'مدت اعلان',
     'Notifications' => 'اعلان‌ها',
-    'Number Input Size' => 'اندازه ورودی عدد',
     'Number of columns' => 'تعداد ستون‌ها',
     'Number' => 'عدد',
     'OFF Label' => 'برچسب «خاموش»',

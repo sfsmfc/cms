@@ -9,6 +9,7 @@ namespace craft\fields\linktypes;
 
 use Craft;
 use craft\helpers\Cp;
+use League\Uri\Uri;
 
 /**
  * URL link type.
@@ -71,6 +72,12 @@ class Url extends BaseTextLinkType
             'type' => 'url',
             'inputmode' => 'url',
         ];
+    }
+
+    public function validateValue(string $value, ?string &$error = null): bool
+    {
+        // Leveraging Uri package to convert domains to punycode
+        return parent::validateValue(Uri::new($value), $error);
     }
 
     protected function pattern(): string

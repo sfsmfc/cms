@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Notice',
     'Notification Duration' => 'ระยะเวลาการแจ้งเตือน',
     'Notifications' => 'การแจ้งเตือน',
-    'Number Input Size' => 'ขนาดการป้อนตัวเลข',
     'Number of columns' => 'จำนวนคอลัมน์',
     'Number' => 'Number',
     'OFF Label' => 'OFF Label',

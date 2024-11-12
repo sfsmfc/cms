@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Bildir',
     'Notification Duration' => 'Bildirim Süresi',
     'Notifications' => 'Bildirimler',
-    'Number Input Size' => 'Sayı Girişi Boyutu',
     'Number of columns' => 'Sütun sayısı',
     'Number' => 'Sayı',
     'OFF Label' => 'KAPALI Etiketi',

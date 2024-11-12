@@ -1096,7 +1096,6 @@ return [
     'Notice' => '通知',
     'Notification Duration' => '通知期間',
     'Notifications' => '通知',
-    'Number Input Size' => '数値入力サイズ',
     'Number of columns' => '列数',
     'Number' => '数字',
     'OFF Label' => 'オフのラベル',
