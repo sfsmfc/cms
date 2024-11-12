@@ -1970,6 +1970,10 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
       return null;
     }
 
+    if (!Garnish.hasAttr(element.$container, 'data-previewable')) {
+      return null;
+    }
+
     let $draggable = $('<div class="checkbox-select-item"/>');
     let $moveIcon = $(
       '<a class="move icon draggable-handle disabled"/>'
@@ -1994,6 +1998,10 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
   },
 
   removeCheckbox: function (element) {
+    if (!Garnish.hasAttr(element.$container, 'data-previewable')) {
+      return null;
+    }
+
     let $draggable = this.findCheckboxByUid(element.uid);
     if ($draggable !== null) {
       $draggable.remove();

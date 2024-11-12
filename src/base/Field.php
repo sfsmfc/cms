@@ -817,6 +817,10 @@ JS, [
      */
     public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
     {
+        if (!$this instanceof PreviewableFieldInterface) {
+            return '';
+        }
+
         if ($value !== null) {
             return $value;
         }
