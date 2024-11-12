@@ -1548,6 +1548,7 @@ JS, [
                     'id' => $statusId,
                     'class' => ['status-badge', StringHelper::toString($status[0])],
                     'title' => $status[1],
+                    'aria-hidden' => 'true',
                 ]) .
                 Html::tag('span', $status[1], [
                     'class' => 'visually-hidden',
