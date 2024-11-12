@@ -2624,6 +2624,8 @@ JS, [
         foreach ($cardElements as $cardElement) {
             if ($cardElement instanceof CustomField) {
                 $previewHtml .= Html::tag('div', $cardElement->getField()->previewPlaceholderHtml(null, null));
+            } elseif ($cardElement instanceof BaseField) {
+                $previewHtml .= Html::tag('div', $cardElement->previewPlaceholderHtml(null, null));
             } else {
                 $previewHtml .= Html::tag('div', $elementType::attributePreviewHtml($cardElement));
             }

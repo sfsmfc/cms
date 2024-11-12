@@ -1324,6 +1324,15 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
   },
 
   destroy: function () {
+    if (
+      this.tab.designer.settings.withCardViewDesigner &&
+      this.config.providesThumbs
+    ) {
+      let cvd = this.tab.designer.$cvd?.data('cvd');
+      cvd.showThumb = false;
+      cvd.updatePreview();
+    }
+
     this.tab.updateConfig((config) => {
       const index = this.index;
       if (index === -1) {
@@ -1956,6 +1965,7 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
       let element = {
         value: $(checkedItems[i]).val(),
         fieldId: $(checkedItems[i]).data('fieldId') ?? null,
+        fieldLabel: $(checkedItems[i]).data('fieldLabel') ?? null,
       };
 
       cardElements.push(element);
@@ -1966,6 +1976,10 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
 
   addCheckbox: function (element) {
     if (this.$libraryContainer.length == 0) {
+      return null;
+    }
+
+    if (!Garnish.hasAttr(element.$container, 'data-previewable')) {
       return null;
     }
 
@@ -1981,6 +1995,7 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
         checked: false,
         data: {
           'field-id': element.fieldId,
+          'field-label': this.getCheckboxLabel(element.$container),
         },
       })
       .appendTo($draggable);
@@ -1992,8 +2007,13 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
   },
 
   removeCheckbox: function (element) {
+    if (!Garnish.hasAttr(element.$container, 'data-previewable')) {
+      return null;
+    }
+
     let $draggable = this.findCheckboxByUid(element.uid);
     if ($draggable !== null) {
+      $draggable.find('input[type="checkbox"]').prop('checked', false);
       $draggable.remove();
     }
 
