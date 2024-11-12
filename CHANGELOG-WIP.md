@@ -59,9 +59,12 @@
 
 ### Extensibility
 - Added `craft\base\Element::EVENT_REGISTER_CARD_ATTRIBUTES`.
+- Added `craft\base\Element::EVENT_REGISTER_DEFAULT_CARD_ATTRIBUTES`.
 - Added `craft\base\Element::defineCardAttributes()`.
+- Added `craft\base\Element::defineDefaultCardAttributes()`.
 - Added `craft\base\ElementInterface::attributePreviewHtml()`.
 - Added `craft\base\ElementInterface::cardAttributes()`.
+- Added `craft\base\ElementInterface::defaultCardAttributes()`.
 - Added `craft\base\ElementInterface::indexViewModes()`.
 - Added `craft\base\NestedElementTrait::saveOwnership()`. ([#15894](https://github.com/craftcms/cms/pull/15894))
 - Added `craft\base\PreviewableFieldInterface::previewPlaceholderHtml()`.
@@ -73,6 +76,7 @@
 - Added `craft\events\ApplyFieldSaveEvent`. ([#15872](https://github.com/craftcms/cms/discussions/15872))
 - Added `craft\events\DefineAddressCountriesEvent`. ([#15711](https://github.com/craftcms/cms/pull/15711))
 - Added `craft\events\RegisterElementCardAttributesEvent`.
+- Added `craft\events\RegisterElementDefaultCardAttributesEvent`.
 - Added `craft\fieldlayoutelements\Template::$templateMode`. ([#15932](https://github.com/craftcms/cms/pull/15932))
 - Added `craft\fields\data\LinkData::$target`.
 - Added `craft\fields\data\LinkData::setLabel()`.
