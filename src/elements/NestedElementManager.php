@@ -468,6 +468,7 @@ class NestedElementManager extends Component
             'prevalidate' => false,
             'pageSize' => 50,
             'storageKey' => null,
+            'defaultViewMode' => 'cards',
             'static' => $owner->getIsRevision(),
         ];
 
@@ -532,6 +533,7 @@ class NestedElementManager extends Component
                     'sources' => false,
                     'fieldLayouts' => $config['fieldLayouts'],
                     'defaultTableColumns' => $config['defaultTableColumns'],
+                    'defaultViewMode' => $config['defaultViewMode'],
                     'registerJs' => false,
                     'class' => [$config['prevalidate'] ? 'prevalidate' : ''],
                     'prevalidate' => $config['prevalidate'] ?? false,
@@ -1113,11 +1115,12 @@ JS, [
             ->all();
 
         $revisionsService = Craft::$app->getRevisions();
+        $elementRevisionIds = [];
         $ownershipData = [];
         $map = [];
 
         foreach ($elements as $element) {
-            $elementRevisionId = $revisionsService->createRevision($element, null, null, [
+            $elementRevisionId = $elementRevisionIds[] = $revisionsService->createRevision($element, null, null, [
                 'primaryOwnerId' => $revision->id,
                 'saveOwnership' => false,
             ]);
@@ -1125,6 +1128,10 @@ JS, [
             $map[$element->id] = $elementRevisionId;
         }
 
+        Db::delete(Table::ELEMENTS_OWNERS, [
+            'ownerId' => $revision->id,
+            'elementId' => $elementRevisionIds,
+        ]);
         Db::batchInsert(Table::ELEMENTS_OWNERS, ['elementId', 'ownerId', 'sortOrder'], $ownershipData);
 
         // Fire a 'afterDuplicateNestedElements' event

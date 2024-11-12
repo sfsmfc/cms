@@ -812,6 +812,23 @@ JS, [
     }
 
     /**
+     * @see PreviewableFieldInterface::previewPlaceholderHtml()
+     * @since 5.5.0
+     */
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
+    {
+        if ($value !== null) {
+            return $value;
+        }
+
+        if ($element !== null) {
+            return $element->getFieldValue($this->handle);
+        }
+
+        return $this->getUiLabel();
+    }
+
+    /**
      * @see SortableFieldInterface::getSortOption()
      * @since 3.2.0
      */
