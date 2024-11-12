@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Varsel',
     'Notification Duration' => 'Varslingsvarighet',
     'Notifications' => 'Varslinger',
-    'Number Input Size' => 'Inngangsstørrelse i antall',
     'Number of columns' => 'Antall kolonner',
     'Number' => 'Tall',
     'OFF Label' => 'AV-merkelapp',

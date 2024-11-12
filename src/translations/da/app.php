@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Bemærk',
     'Notification Duration' => 'Notifikationsvarighed',
     'Notifications' => 'Notifikationer',
-    'Number Input Size' => 'Antal inputstørrelse',
     'Number of columns' => 'Antal kolonner',
     'Number' => 'Nummer',
     'OFF Label' => 'FRA-etiket',
