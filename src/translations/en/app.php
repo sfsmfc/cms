@@ -1097,7 +1097,6 @@ return [
     'Notice' => 'Notice',
     'Notification Duration' => 'Notification Duration',
     'Notifications' => 'Notifications',
-    'Number Input Size' => 'Number Input Size',
     'Number of columns' => 'Number of columns',
     'Number' => 'Number',
     'OFF Label' => 'OFF Label',

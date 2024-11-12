@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Értesítés',
     'Notification Duration' => 'Értesítés időtartama',
     'Notifications' => 'Értesítések',
-    'Number Input Size' => 'Számbemenet méret',
     'Number of columns' => 'Oszlopok száma',
     'Number' => 'Szám',
     'OFF Label' => 'KI címke',

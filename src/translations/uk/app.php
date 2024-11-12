@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Сповіщення',
     'Notification Duration' => 'Тривалість сповіщення',
     'Notifications' => 'Сповіщення',
-    'Number Input Size' => 'Розмір числового вводу',
     'Number of columns' => 'Число стовпців',
     'Number' => 'Число',
     'OFF Label' => 'Мітка ВИМК.',

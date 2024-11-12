@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Примечание',
     'Notification Duration' => 'Время показа уведомлений',
     'Notifications' => 'Уведомления',
-    'Number Input Size' => 'Входной размер числа',
     'Number of columns' => 'Число столбцов',
     'Number' => 'Число',
     'OFF Label' => 'Метка ВЫКЛ',

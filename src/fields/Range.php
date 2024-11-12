@@ -18,7 +18,6 @@ use craft\gql\types\Number as NumberType;
 use craft\helpers\Cp;
 use craft\helpers\Db;
 use craft\helpers\Localization;
-use craft\i18n\Locale;
 use GraphQL\Type\Definition\Type;
 use yii\db\Schema;
 
@@ -87,11 +86,6 @@ class Range extends Field implements InlineEditableFieldInterface, SortableField
     public int|float $step = 1;
 
     /**
-     * @var int The size of the number input
-     */
-    public int $numberInputSize = 5;
-
-    /**
      * @var int|float|null The default value for new elements
      */
     public int|float|null $defaultValue = null;
@@ -106,6 +100,8 @@ class Range extends Field implements InlineEditableFieldInterface, SortableField
      */
     public function __construct($config = [])
     {
+        unset($config['numberInputSize']);
+
         // Config normalization
         foreach (['min', 'max', 'step', 'defaultValue'] as $name) {
             if (isset($config[$name])) {
@@ -123,7 +119,6 @@ class Range extends Field implements InlineEditableFieldInterface, SortableField
     {
         $rules = parent::defineRules();
         $rules[] = [['min', 'max', 'step', 'defaultValue'], 'number'];
-        $rules[] = [['numberInputSize'], 'integer', 'min' => 1];
 
         $rules[] = [
             ['max'],
@@ -207,7 +202,6 @@ class Range extends Field implements InlineEditableFieldInterface, SortableField
             'step' => $this->step,
             'min' => $this->min,
             'max' => $this->max,
-            'numberInputSize' => $this->numberInputSize,
             'value' => $value,
             'labelId' => $this->getLabelId(),
         ]);

@@ -1096,7 +1096,6 @@ return [
     'Notice' => 'Hinweis',
     'Notification Duration' => 'Benachrichtigungsdauer',
     'Notifications' => 'Benachrichtigungen',
-    'Number Input Size' => 'Zahleneingabegrösse',
     'Number of columns' => 'Anzahl der Spalten',
     'Number' => 'Zahl',
     'OFF Label' => 'OFF-Beschriftung',
