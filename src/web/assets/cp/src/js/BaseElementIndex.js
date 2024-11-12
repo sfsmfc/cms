@@ -2534,7 +2534,12 @@ Craft.BaseElementIndex = Garnish.Base.extend(
 
     selectViewMode: function (viewMode, force) {
       // Make sure that the current source supports it
-      if (!force && !this.doesSourceHaveViewMode(viewMode) && this.sourceViewModes && this.sourceViewModes.length) {
+      if (
+        !force &&
+        !this.doesSourceHaveViewMode(viewMode) &&
+        this.sourceViewModes &&
+        this.sourceViewModes.length
+      ) {
         viewMode = this.sourceViewModes[0].mode;
       }
 
