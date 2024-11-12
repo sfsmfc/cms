@@ -2598,7 +2598,7 @@ JS, [
             ]);
 
         // get thumb placeholder
-        if ($showThumb) {
+        if ($showThumb ?? $fieldLayout->getThumbField() !== null) {
             $previewThumb = Html::tag('div',
                 Html::tag('div', Cp::iconSvg('image'), ['class' => 'cp-icon']),
                 ['class' => 'cvd-thumbnail']
