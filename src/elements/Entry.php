@@ -694,6 +694,14 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
     /**
      * @inheritdoc
      */
+    protected static function defineDefaultCardAttributes(): array
+    {
+        return ['type'];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function attributePreviewHtml(array $attribute): mixed
     {
         return match ($attribute['value']) {
