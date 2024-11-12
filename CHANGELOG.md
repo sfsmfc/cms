@@ -7,7 +7,7 @@
 - Fixed an error that could occur when upgrading to Craft 5, if unused field layouts contained duplicate UUIDs. ([#16032](https://github.com/craftcms/cms/issues/16032))
 - Fixed a bug where Live Preview wasn’t reloading after performing bulk actions in embedded element indexes. ([#16057](https://github.com/craftcms/cms/discussions/16057))
 - Fixed a bug where restoring a soft-deleted element would restore any nested elements that had been explicitly soft-deleted. ([#16059](https://github.com/craftcms/cms/issues/16059))
-- Fixed a mobile styling bug.
+- Fixed styling bugs. ([#16061](https://github.com/craftcms/cms/issues/16061))
 
 ## 5.4.10.1 - 2024-11-07
 
