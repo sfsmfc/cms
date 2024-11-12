@@ -92,6 +92,7 @@ class Section extends Model
      * - `siteGroup` – Save entries to other sites in the same site group
      * - `language` – Save entries to other sites with the same language
      * - `all` – Save entries to all sites enabled for this section
+     * - `custom` – Let each entry choose which sites it should be saved to
      *
      * @since 3.2.0
      */
