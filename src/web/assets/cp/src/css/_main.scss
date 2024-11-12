@@ -5744,7 +5744,11 @@ table.data tbody tr:not(.disabled).active-drop-target {
     }
   }
 
-  & > fieldset {
+  /*
+  When there's no .meta container (which can occur when editing a matrix block)
+  make sure the sidebar aligns with the top of the content area.
+   */
+  & > fieldset:not(:first-child) {
     margin-block: var(--spacing) !important;
     margin-inline: 0 !important;
   }
