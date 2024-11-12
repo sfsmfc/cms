@@ -1986,7 +1986,7 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
         checked: false,
         data: {
           'field-id': element.fieldId,
-          'field-label': element.$container.find('.fld-element-label').text(),
+          'field-label': this.getCheckboxLabel(element.$container),
         },
       })
       .appendTo($draggable);
