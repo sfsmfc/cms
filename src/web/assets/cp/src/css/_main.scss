@@ -76,7 +76,6 @@
     inset 0 0 0 3px hsl(var(--dark-focus-hsl) / var(--focus-ring-alpha));
   --touch-target-size: calc(24rem / 16);
   --icon-size: 1rem;
-  --elements-busy-top-position: calc(50% - var(--size, 20px) / 2);
   --lh: 1.42em;
 }
 
@@ -1632,15 +1631,20 @@ td.right {
 
 .checkbox-select-item {
   display: flex;
+  gap: var(--xs);
   align-items: flex-start;
   align-content: stretch;
-  margin-block-end: 4px;
+  padding-block: 4px;
 
   .move {
-    margin-block-start: -3px;
-    margin-inline-end: 10px;
+    margin-block-start: -4px;
+    margin-inline-end: var(--xs);
     position: relative;
     z-index: 1;
+  }
+
+  .action-btn {
+    margin-block: -4px;
   }
 }
 
@@ -2324,9 +2328,14 @@ ul.icons {
     position: absolute;
     width: var(--size, 20px);
     height: var(--size, 20px);
-    inset-block-start: var(--elements-busy-top-position);
-    inset-inline-start: var(--elements-busy-top-position);
+    transform: translateX(-50%) translateY(-50%);
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
     z-index: 101;
+
+    .rtl & {
+      transform: translateX(50%) translateY(-50%);
+    }
   }
 }
 
@@ -3622,6 +3631,7 @@ table {
   cursor: default;
   user-select: none;
   width: 100%;
+  overflow: hidden;
 
   &::after {
     border-radius: var(--large-border-radius);
@@ -5438,7 +5448,7 @@ table.data tbody tr:not(.disabled).active-drop-target {
   margin-block: calc(var(--xl) * -1) var(--xl);
   margin-inline: var(--neg-padding);
   padding-block: 5px 6px;
-  padding-inline: var(--xl);
+  padding-inline: var(--padding);
   min-height: 45px;
   box-sizing: border-box;
   box-shadow: inset 0 -1px 0 0 color.adjust(mixins.$grey300, $alpha: -0.75);
@@ -5734,7 +5744,11 @@ table.data tbody tr:not(.disabled).active-drop-target {
     }
   }
 
-  & > fieldset {
+  /*
+  When there's no .meta container (which can occur when editing a matrix block)
+  make sure the sidebar aligns with the top of the content area.
+   */
+  & > fieldset:not(:first-child) {
     margin-block: var(--spacing) !important;
     margin-inline: 0 !important;
   }
@@ -6574,6 +6588,7 @@ $min2ColWidth: 400px;
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   height: 190px;
   background-color: var(--gray-900);
   margin-block: 0 var(--spacing);
@@ -7716,28 +7731,31 @@ fieldset {
   }
 }
 
+.status-badge {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: 2px;
+  height: 100%;
+  content: '';
+  cursor: help;
+
+  &.modified {
+    background-color: var(--blue-600);
+    box-shadow: 0 0 5px hsl(221deg 83% 53% / 15%);
+  }
+
+  &.outdated {
+    background-color: var(--pending-color);
+    box-shadow: 0 0 5px hsl(27deg 96% 61% / 15%);
+  }
+}
+
 .field {
   min-inline-size: initial;
 
   & > .status-badge {
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    width: 2px;
-    height: 100%;
     border-radius: 1px;
-    content: '';
-    cursor: help;
-
-    &.modified {
-      background-color: var(--blue-600);
-      box-shadow: 0 0 5px hsl(221deg 83% 53% / 15%);
-    }
-
-    &.outdated {
-      background-color: var(--pending-color);
-      box-shadow: 0 0 5px hsl(27deg 96% 61% / 15%);
-    }
   }
 
   & > .heading {
@@ -7867,6 +7885,12 @@ input.checkbox {
   position: absolute;
   width: var(--checkbox-size);
   height: var(--checkbox-size);
+
+  & + label:has(> .text) {
+    &::before {
+      inset-block-start: 6px;
+    }
+  }
 }
 
 input.checkbox + label,

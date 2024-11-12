@@ -18,6 +18,7 @@ use craft\helpers\Cp;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Html;
 use craft\helpers\Json;
+use craft\helpers\Session;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\i18n\Locale;
@@ -164,11 +165,12 @@ JS;
             'Couldn’t delete “{name}”.',
             'Couldn’t reorder items.',
             'Couldn’t save new order.',
-            'Create',
             'Create {type}',
+            'Create',
             'Customize sources',
             'Default Sort',
             'Default Table Columns',
+            'Default View Mode',
             'Delete custom source',
             'Delete folder',
             'Delete heading',
@@ -238,8 +240,8 @@ JS;
             'Level {num}',
             'License transferred.',
             'Limit',
-            'Loading',
             'Loading complete',
+            'Loading',
             'Make not required',
             'Make optional',
             'Make required',
@@ -386,6 +388,7 @@ JS;
             'User Groups',
             'View in a new tab',
             'View in a new tab',
+            'View mode options',
             'View settings',
             'View',
             'Volume path',
@@ -419,10 +422,10 @@ JS;
             '{name} active, more info',
             '{name} folder',
             '{name} sorted by {attribute}, {direction}',
-            '{num, number} {num, plural, =1{result} other{results}}',
             '{num, number} {num, plural, =1{Available Update} other{Available Updates}}',
             '{num, number} {num, plural, =1{degree} other{degrees}}',
             '{num, number} {num, plural, =1{notification} other{notifications}}',
+            '{num, number} {num, plural, =1{result} other{results}}',
             '{pct} width',
             '{total, number} {total, plural, =1{error} other{errors}} found in {num, number} {num, plural, =1{tab} other{tabs}}.',
             '{total, number} {total, plural, =1{{item}} other{{items}}}',
@@ -515,6 +518,15 @@ JS;
             ];
         }
 
+        $impersonator = null;
+        // if we're impersonating, we need to check if the original user has passkey
+        if ($previousUserId = Session::get(User::IMPERSONATE_KEY)) {
+            /** @var User|null $impersonator */
+            $impersonator = User::find()
+                ->id($previousUserId)
+                ->one();
+        }
+
         $data += [
             'allowAdminChanges' => $generalConfig->allowAdminChanges,
             'allowUpdates' => $generalConfig->allowUpdates,
@@ -550,7 +562,7 @@ JS;
             'siteToken' => $generalConfig->siteToken,
             'slugWordSeparator' => $generalConfig->slugWordSeparator,
             'userEmail' => $currentUser->email,
-            'userHasPasskeys' => Craft::$app->getAuth()->hasPasskeys($currentUser),
+            'userHasPasskeys' => Craft::$app->getAuth()->hasPasskeys($impersonator ?? $currentUser),
             'userIsAdmin' => $currentUser->admin,
             'username' => $currentUser->username,
         ];

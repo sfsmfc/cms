@@ -64,6 +64,26 @@ abstract class BaseElementSelectConditionRule extends BaseConditionRule
     }
 
     /**
+     * Defines the element select config.
+     *
+     * @return array
+     * @since 5.5.0
+     */
+    protected function elementSelectConfig(): array
+    {
+        $element = $this->_element();
+        return [
+            'name' => 'elementId',
+            'elements' => $element ? [$element] : [],
+            'elementType' => $this->elementType(),
+            'sources' => $this->sources(),
+            'criteria' => $this->criteria(),
+            'condition' => $this->selectionCondition(),
+            'single' => true,
+        ];
+    }
+
+    /**
      * @param bool $parse Whether to parse the value for an environment variable
      * @return int|string|null
      */
@@ -125,17 +145,7 @@ abstract class BaseElementSelectConditionRule extends BaseConditionRule
             ]);
         }
 
-        $element = $this->_element();
-
-        return Cp::elementSelectHtml([
-            'name' => 'elementId',
-            'elements' => $element ? [$element] : [],
-            'elementType' => $this->elementType(),
-            'sources' => $this->sources(),
-            'criteria' => $this->criteria(),
-            'condition' => $this->selectionCondition(),
-            'single' => true,
-        ]);
+        return Cp::elementSelectHtml($this->elementSelectConfig());
     }
 
     /**
@@ -152,6 +162,9 @@ abstract class BaseElementSelectConditionRule extends BaseConditionRule
         /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
         $elementType = $this->elementType();
         return $elementType::find()
+            ->site('*')
+            ->preferSites(array_filter([Cp::requestedSite()?->id]))
+            ->unique()
             ->id($elementId)
             ->status(null)
             ->one();

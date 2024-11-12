@@ -19,6 +19,7 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
     $spinner: null,
 
     _initialized: false,
+    _$replaceElement: null,
 
     get thumbLoader() {
       console.warn(
@@ -468,7 +469,7 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
           icon: 'arrows-rotate',
           label: Craft.t('app', 'Replace'),
           callback: () => {
-            this.removeElement($element);
+            this._$replaceElement = $element;
             this.showModal();
           },
         });
@@ -702,7 +703,7 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
 
     showModal: function () {
       // Make sure we haven't reached the limit
-      if (!this.canAddMoreElements()) {
+      if (!this._$replaceElement && !this.canAddMoreElements()) {
         return;
       }
 
@@ -782,6 +783,11 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
       this.modal.disableCancelBtn();
       this.modal.disableSelectBtn();
       this.modal.showFooterSpinner();
+
+      if (this._$replaceElement) {
+        this.removeElement(this._$replaceElement);
+        this._$replaceElement = null;
+      }
 
       // re-render the elements even if the view modes match, to be sure we have all the correct settings
       const [inputUiType, inputUiSize] = (() => {
@@ -864,12 +870,14 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
         this.modal = null;
       }
 
-      // If can add more elements, do default behavior of focus on "Add" button
-      if (this.canAddMoreElements()) return;
+      this._$replaceElement = null;
 
-      setTimeout(() => {
-        this.focusNextLogicalElement();
-      }, 200);
+      // If we can't add any more elements, don't focus on the “Add” button
+      if (!this.canAddMoreElements()) {
+        setTimeout(() => {
+          this.focusNextLogicalElement();
+        }, 200);
+      }
     },
 
     selectElements: async function (elements) {

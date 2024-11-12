@@ -187,7 +187,10 @@ Craft.ElementTableSorter = Garnish.DragSort.extend(
       this._setTargetLevelBounds();
 
       // Check to see if we should load more elements now
-      this.tableView.maybeLoadMore();
+
+      if (!this.tableView.elementIndex.paginated) {
+        this.tableView.maybeLoadMore();
+      }
 
       this.base();
     },
