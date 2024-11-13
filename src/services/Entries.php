@@ -961,7 +961,21 @@ class Entries extends Component
             ->status(null)
             ->one();
 
-        // Otherwise create a new one
+        // if we didn't find any, try without the typeId,
+        // in case that changed to something completely new
+        if ($entry === null) {
+            $entry = Entry::find()
+                ->sectionId($section->id)
+                ->siteId($siteIds)
+                ->status(null)
+                ->one();
+
+            if ($entry !== null) {
+                $entry->setTypeId($entryTypeIds[0]);
+            }
+        }
+
+        // Finally, if we still don't have an entry, create a new one
         if ($entry === null) {
             // Create one
             $entry = new Entry();
