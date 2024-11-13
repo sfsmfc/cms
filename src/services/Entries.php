@@ -953,23 +953,21 @@ class Entries extends Component
         // Get/save the entry with updated title, slug, and URI format
         // ---------------------------------------------------------------------
 
-        // If there are any existing entries, find the first one with a valid typeId
-        /** @var Entry|null $entry */
-        $entry = Entry::find()
-            ->typeId($entryTypeIds)
+        $baseEntryQuery = Entry::find()
             ->sectionId($section->id)
             ->siteId($siteIds)
-            ->status(null)
+            ->status(null);
+
+        // If there are any existing entries, find the first one with a valid typeId
+        /** @var Entry|null $entry */
+        $entry = $baseEntryQuery
+            ->typeId($entryTypeIds)
             ->one();
 
         // if we didn't find any, try without the typeId,
         // in case that changed to something completely new
         if ($entry === null) {
-            $entry = Entry::find()
-                ->sectionId($section->id)
-                ->siteId($siteIds)
-                ->status(null)
-                ->one();
+            $entry = $baseEntryQuery->one();
 
             if ($entry !== null) {
                 $entry->setTypeId($entryTypeIds[0]);
@@ -979,10 +977,7 @@ class Entries extends Component
         // if we still don't have any,
         // try without the typeId with trashed where they were deleted with entry type
         if ($entry === null) {
-            $entry = Entry::find()
-                ->sectionId($section->id)
-                ->siteId($siteIds)
-                ->status(null)
+            $entry = $baseEntryQuery
                 ->trashed(null)
                 ->where([EntryRecord::tableName() . '.[[deletedWithEntryType]]' => 1])
                 ->one();
