@@ -264,10 +264,10 @@ class FieldLayout extends Model
         }
 
         if (!isset($this->_cardView)) {
-            if (!$this->type) {
-                $this->setCardView([]);
-            } else {
+            if ($this->type && class_exists($this->type)) {
                 $this->setCardView($this->type::defaultCardAttributes());
+            } else {
+                $this->setCardView([]);
             }
         }
     }
