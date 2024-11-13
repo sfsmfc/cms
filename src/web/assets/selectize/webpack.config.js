@@ -1,7 +1,6 @@
 /* jshint esversion: 6 */
 /* globals module, require, __dirname */
 const {getConfig} = require('@craftcms/webpack');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MergeIntoSingleFilePlugin = require('webpack-merge-and-include-globally');
 
 module.exports = getConfig({
@@ -15,17 +14,10 @@ module.exports = getConfig({
             require.resolve('@selectize/selectize/dist/js/selectize.js'),
             require.resolve('selectize-plugin-a11y/selectize-plugin-a11y.js'),
           ],
+          'css/selectize.css': [
+            require.resolve('@selectize/selectize/dist/css/selectize.css'),
+          ],
         },
-      }),
-      new CopyWebpackPlugin({
-        patterns: [
-          {
-            from: require.resolve(
-              '@selectize/selectize/dist/css/selectize.css'
-            ),
-            to: './css/selectize.css',
-          },
-        ],
       }),
     ],
   },
