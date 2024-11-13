@@ -78,8 +78,11 @@ Craft.ElementTableSorter = Garnish.DragSort.extend(
 
       // Are we dragging the last elements on the page?
       this.draggingLastElements = !$nextRow.length;
-      
-      if (this.tableView.elementIndex.paginated && this.settings.structureId == null) {
+
+      if (
+        this.tableView.elementIndex.paginated &&
+        this.settings.structureId == null
+      ) {
         return $draggee;
       }
 
@@ -347,7 +350,11 @@ Craft.ElementTableSorter = Garnish.DragSort.extend(
       // If we were dragging the last elements on the page (and it's not a paginated view) and ended up loading any additional elements in,
       // there could be a gap between the last draggee item and whatever now comes after it.
       // So remove the post-draggee elements and possibly load up the next batch.
-      if (this.draggingLastElements && !this.tableView.elementIndex.paginated && this.tableView.getMorePending()) {
+      if (
+        this.draggingLastElements &&
+        !this.tableView.elementIndex.paginated &&
+        this.tableView.getMorePending()
+      ) {
         // Update the element index's record of how many items are actually visible
         this.tableView._totalVisible +=
           this.newDraggeeIndexes[0] - this.oldDraggeeIndexes[0];
