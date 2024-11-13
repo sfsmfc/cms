@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 5
 
+## Unreleased
+
+- Fixed an error that prevented custom fields from loading on the Settings → Fields.
+
 ## 5.5.0 - 2024-11-12
 
 ### Content Management
