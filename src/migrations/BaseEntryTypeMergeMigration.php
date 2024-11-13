@@ -8,6 +8,7 @@ use craft\db\Table;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use craft\helpers\Json;
+use craft\models\Section;
 use craft\records\EntryType as EntryTypeRecord;
 
 /**
@@ -48,8 +49,18 @@ class BaseEntryTypeMergeMigration extends Migration
             ->select(['es.id', 'es.content'])
             ->from(['es' => Table::ELEMENTS_SITES])
             ->innerJoin(['e' => Table::ENTRIES], '[[e.id]] = [[es.elementId]]')
-            ->where(['e.typeId' => $outgoingEntryTypeRecord->id])
-            ->andWhere(['not', ['es.content' => null]]);
+            ->leftJoin(['s' => Table::SECTIONS], '[[e.sectionId]] = [[s.id]]')
+            ->where([
+                'and',
+                ['e.typeId' => $outgoingEntryTypeRecord->id],
+                ['not', ['es.content' => null]],
+            ])
+            ->orWhere([
+                'and',
+                ['e.typeId' => $persistingEntryTypeRecord->id],
+                ['not', ['es.content' => null]],
+                ['s.type' => Section::TYPE_SINGLE],
+            ]);
 
         $total = (string)$query->count();
         $totalLen = strlen($total);
