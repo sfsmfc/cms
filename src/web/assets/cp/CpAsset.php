@@ -39,7 +39,6 @@ use craft\web\assets\jquerytouchevents\JqueryTouchEventsAsset;
 use craft\web\assets\jqueryui\JqueryUiAsset;
 use craft\web\assets\picturefill\PicturefillAsset;
 use craft\web\assets\selectize\SelectizeAsset;
-use craft\web\assets\selectizeplugina11y\SelectizePluginA11yAsset;
 use craft\web\assets\tailwindreset\TailwindResetAsset;
 use craft\web\assets\velocity\VelocityAsset;
 use craft\web\assets\xregexp\XregexpAsset;
@@ -71,7 +70,6 @@ class CpAsset extends AssetBundle
         DatepickerI18nAsset::class,
         PicturefillAsset::class,
         SelectizeAsset::class,
-        SelectizePluginA11yAsset::class,
         VelocityAsset::class,
         FileUploadAsset::class,
         XregexpAsset::class,
