@@ -252,7 +252,8 @@ class Console extends \yii\helpers\Console
         foreach (array_merge($data, [$headers]) as $row) {
             foreach ($keys as $key) {
                 $cell = $row[$key];
-                $cellSizes[$key][] = mb_strlen(is_array($cell) ? reset($cell) : $cell);
+                $value = is_array($cell) ? reset($cell) : $cell;
+                $cellSizes[$key][] = mb_strlen(static::stripAnsiFormat($value));
             }
         }
 
@@ -285,23 +286,22 @@ class Console extends \yii\helpers\Console
         foreach ($sizes as $key => $size) {
             $cell = $row[$key] ?? '';
             $value = is_array($cell) ? reset($cell) : $cell;
-            $len = strlen($value);
+            $len = mb_strlen(static::stripAnsiFormat($value));
 
             if ($len < $size) {
-                if (isset($cell['align'])) {
-                    $padType = match ($cell['align']) {
-                        'left' => STR_PAD_RIGHT,
-                        'right' => STR_PAD_LEFT,
-                        'center' => STR_PAD_BOTH,
-                        default => throw new InvalidValueException("Invalid align value: {$cell['align']}"),
-                    };
-                } else {
-                    $padType = STR_PAD_RIGHT;
-                }
-
-                $value = str_pad($value, $size, ' ', $padType);
+                $padSize = $size - $len;
+                $value = match ($cell['align'] ?? null) {
+                    'right' => sprintf('%s%s', str_repeat(' ', $padSize), $value),
+                    'center' => sprintf(
+                        '%s%s%s',
+                        str_repeat(' ', (int)floor($padSize / 2)),
+                        $value,
+                        str_repeat(' ', (int)ceil($padSize / 2)),
+                    ),
+                    default => sprintf('%s%s', $value, str_repeat(' ', $padSize)),
+                };
             } elseif ($len > $size) {
-                $value = substr($value, 0, $size - 1) . '…';
+                $value = mb_substr($value, 0, $size - 1) . '…';
             }
 
             if (isset($cell['format']) && $options['colors']) {

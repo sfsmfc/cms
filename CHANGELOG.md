@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 5
 
+## Unreleased
+
+- Fixed a bug where `craft\helpers\Console::table()` wasn’t handling multi-byte characters and ANSI-formatted strings properly.
+
 ## 5.5.0.1 - 2024-11-13
 
 - Fixed an error that prevented custom fields from loading on the Settings → Fields.
