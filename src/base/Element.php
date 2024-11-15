@@ -49,6 +49,8 @@ use craft\events\ElementIndexTableAttributeEvent;
 use craft\events\ElementStructureEvent;
 use craft\events\ModelEvent;
 use craft\events\RegisterElementActionsEvent;
+use craft\events\RegisterElementCardAttributesEvent;
+use craft\events\RegisterElementDefaultCardAttributesEvent;
 use craft\events\RegisterElementDefaultTableAttributesEvent;
 use craft\events\RegisterElementExportersEvent;
 use craft\events\RegisterElementFieldLayoutsEvent;
@@ -276,6 +278,19 @@ abstract class Element extends Component implements ElementInterface
      * @since 3.7.14
      */
     public const EVENT_PREP_QUERY_FOR_TABLE_ATTRIBUTE = 'prepQueryForTableAttribute';
+
+
+    /**
+     * @event RegisterElementCardAttributesEvent The event that is triggered when registering the card attributes for the element type.
+     * @since 5.5.0
+     */
+    public const EVENT_REGISTER_CARD_ATTRIBUTES = 'registerCardAttributes';
+
+    /**
+     * @event RegisterElementCardAttributesEvent The event that is triggered when registering the card attributes for the element type.
+     * @since 5.5.0
+     */
+    public const EVENT_REGISTER_DEFAULT_CARD_ATTRIBUTES = 'registerDefaultCardAttributes';
 
     /**
      * @event DefineEagerLoadingMapEvent The event that is triggered when defining an eager-loading map.
@@ -1354,6 +1369,44 @@ abstract class Element extends Component implements ElementInterface
     /**
      * @inheritdoc
      */
+    public static function indexViewModes(): array
+    {
+        $viewModes = [
+            [
+                'mode' => 'structure',
+                'title' => Craft::t('app', 'Display in a structured table'),
+                'icon' => Craft::$app->getLocale()->getOrientation() === 'rtl' ? 'structurertl' : 'structure',
+                'availableOnMobile' => false,
+                'structuresOnly' => true,
+            ],
+            [
+                'mode' => 'table',
+                'title' => Craft::t('app', 'Display in a table'),
+                'icon' => 'list',
+                'availableOnMobile' => false,
+            ],
+        ];
+
+        if (static::hasThumbs()) {
+            $viewModes[] = [
+                'mode' => 'thumbs',
+                'title' => Craft::t('app', 'Display as thumbnails'),
+                'icon' => 'grid',
+            ];
+        }
+
+        $viewModes[] = [
+            'mode' => 'cards',
+            'title' => Craft::t('app', 'Display as cards'),
+            'icon' => 'element-cards',
+        ];
+
+        return $viewModes;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function sortOptions(): array
     {
         $sortOptions = static::defineSortOptions();
@@ -1468,6 +1521,116 @@ abstract class Element extends Component implements ElementInterface
         $availableTableAttributes = static::tableAttributes();
 
         return array_keys($availableTableAttributes);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function cardAttributes(): array
+    {
+        $cardAttributes = static::defineCardAttributes();
+
+        // Fire a 'registerCardAttributes' event
+        if (Event::hasHandlers(static::class, self::EVENT_REGISTER_CARD_ATTRIBUTES)) {
+            $event = new RegisterElementCardAttributesEvent(['cardAttributes' => $cardAttributes]);
+            Event::trigger(static::class, self::EVENT_REGISTER_CARD_ATTRIBUTES, $event);
+            return $event->cardAttributes;
+        }
+
+        return $cardAttributes;
+    }
+
+    /**
+     * Defines all the available attributes that can be shown in card views along with their default placeholder values.
+     *
+     * @return array The card attributes.
+     * @see cardAttributes()
+     * @since 5.5.0
+     */
+    protected static function defineCardAttributes(): array
+    {
+        // we're intentionally not including statuses as those already show in cards
+        $attributes = [
+            'dateCreated' => [
+                'label' => Craft::t('app', 'Date Created'),
+                'placeholder' => (new \DateTime())->sub(new \DateInterval('P16D')),
+            ],
+            'dateUpdated' => [
+                'label' => Craft::t('app', 'Date Updated'),
+                'placeholder' => (new \DateTime())->sub(new \DateInterval('P15D')),
+            ],
+            'id' => [
+                'label' => Craft::t('app', 'ID'),
+                'placeholder' => 4321,
+            ],
+            'uid' => [
+                'label' => Craft::t('app', 'UID'),
+                'placeholder' => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+            ],
+        ];
+
+        if (static::hasUris()) {
+            $attributes = array_merge($attributes, [
+                'link' => [
+                    'label' => Craft::t('app', 'Link'),
+                    'icon' => 'world',
+                    'placeholder' => ElementHelper::linkAttributeHtml('#'),
+                ],
+                'slug' => [
+                    'label' => Craft::t('app', 'Slug'),
+                    'placeholder' => Craft::t('app', 'Slug'),
+                ],
+                'uri' => [
+                    'label' => Craft::t('app', 'URI'),
+                    'placeholder' => ElementHelper::uriAttributeHtml(Craft::t('app', 'link/to/something'), '#'),
+                ],
+            ]);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function attributePreviewHtml(array $attribute): mixed
+    {
+        return match ($attribute['value']) {
+            'link', 'uri' => $attribute['placeholder'],
+            default => ElementHelper::attributeHtml($attribute['placeholder'] ?? $attribute['label']),
+        };
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function defaultCardAttributes(): array
+    {
+        $cardAttributes = static::defineDefaultCardAttributes();
+
+        // Fire a 'registerDefaultCardAttributes' event
+        if (Event::hasHandlers(static::class, self::EVENT_REGISTER_DEFAULT_CARD_ATTRIBUTES)) {
+            $event = new RegisterElementDefaultCardAttributesEvent([
+                'cardAttributes' => $cardAttributes,
+            ]);
+            Event::trigger(static::class, self::EVENT_REGISTER_DEFAULT_CARD_ATTRIBUTES, $event);
+            return $event->cardAttributes;
+        }
+
+        return $cardAttributes;
+    }
+
+    /**
+     * Returns the list of card attribute keys that should be shown by default.
+     *
+     * @return string[] The card attributes.
+     * @see defaultCardAttributes()
+     * @see cardAttributes()
+     * @since 5.5.0
+     */
+    protected static function defineDefaultCardAttributes(): array
+    {
+        return [];
     }
 
     // Methods for customizing element queries
@@ -2607,12 +2770,7 @@ abstract class Element extends Component implements ElementInterface
         $rules[] = [['dateCreated', 'dateUpdated'], DateTimeValidator::class, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_LIVE]];
         $rules[] = [['isFresh'], BooleanValidator::class];
 
-        $rules[] = [
-            ['title'],
-            'trim',
-            'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_LIVE],
-            'when' => fn() => $this->shouldValidateTitle(),
-        ];
+        $rules[] = [['title'], 'trim'];
         $rules[] = [
             ['title'],
             StringValidator::class,
@@ -3307,8 +3465,14 @@ abstract class Element extends Component implements ElementInterface
     public function getCardBodyHtml(): ?string
     {
         $previews = array_filter(array_map(
-            fn(BaseField $layoutElement) => $layoutElement->previewHtml($this),
-            $this->getFieldLayout()?->getCardBodyFields($this) ?? [],
+            function(BaseField|array $item) {
+                if ($item instanceof BaseField) {
+                    return $item->previewHtml($this);
+                }
+
+                return $this->getAttributeHtml($item['value']);
+            },
+            $this->getFieldLayout()?->getCardBodyElements($this) ?? [],
         ));
 
         return implode("\n", array_map(fn(string $preview) => Html::tag('div', $preview), $previews));
@@ -5354,17 +5518,7 @@ JS, [
                 $url = $element->getUrl();
 
                 if ($url !== null) {
-                    return Html::beginTag('a', [
-                        'href' => $url,
-                        'rel' => 'noopener',
-                        'target' => '_blank',
-                        'title' => Craft::t('app', 'Visit webpage'),
-                        'aria-label' => Craft::t('app', 'View'),
-                    ]) .
-                        Html::tag('span', Cp::iconSvg('world'), [
-                            'class' => ['cp-icon', 'small', 'inline-flex'],
-                        ]) .
-                        Html::endTag('a');
+                    return ElementHelper::linkAttributeHtml($url);
                 }
 
                 return '';
@@ -5398,13 +5552,7 @@ JS, [
                         $value = str_replace($find, $replace, $element->uri);
                     }
 
-                    return Html::a(Html::tag('span', $value, ['dir' => 'ltr']), $url, [
-                        'href' => $url,
-                        'rel' => 'noopener',
-                        'target' => '_blank',
-                        'class' => 'go',
-                        'title' => Craft::t('app', 'Visit webpage'),
-                    ]);
+                    return ElementHelper::uriAttributeHtml($value, $url);
                 }
 
                 return '';

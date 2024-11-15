@@ -12,7 +12,14 @@
     {% set tableColumns = tableColumns ?? craft.app.elementSources.getAvailableTableAttributes(elementType) %}
 {% endif %}
 
-{% macro sourceLink(key, source, isTopLevel, elementType, baseSortOptions, tableColumns, defaultTableColumns) %}
+{% if viewModes is not defined %}
+    {% if elementInstance is not defined %}
+        {% set elementInstance = craft.app.elements.createElement(elementType) %}
+    {% endif %}
+    {% set viewModes = elementInstance.indexViewModes() %}
+{% endif %}
+
+{% macro sourceLink(key, source, isTopLevel, elementType, baseSortOptions, tableColumns, defaultTableColumns, viewModes) %}
     {{ tag('a', {
         role: 'button',
         tabindex: '0',
@@ -48,6 +55,8 @@
             criteria: source.criteria ?? {},
             disabled: source.disabled ?? false,
             'default-filter': source.defaultFilter ?? false,
+            'default-view-mode': source.defaultViewMode ?? false,
+            'view-modes': viewModes ?? [],
         }|merge(source.data ?? {}),
         html: _self.sourceInnerHtml(source)
     }) }}
@@ -108,7 +117,7 @@
                     (source.disabled ?? false) ? 'hidden' : null,
                 ]|filter,
             } %}
-                {{ _self.sourceLink(key, source, isTopLevel, elementType, baseSortOptions ?? null, tableColumns ?? null, defaultTableColumns ?? null) }}
+                {{ _self.sourceLink(key, source, isTopLevel, elementType, baseSortOptions ?? null, tableColumns ?? null, defaultTableColumns ?? null, viewModes ?? null) }}
                 {% if source.nested is defined and source.nested is not empty %}
                     <button class="toggle" aria-expanded="false" aria-label="{{ 'Show nested sources'|t('app') }}"></button>
                     {% include "_elements/sources" with {

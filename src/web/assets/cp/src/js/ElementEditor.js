@@ -129,17 +129,14 @@ Craft.ElementEditor = Garnish.Base.extend(
 
       const $spinnerContainer =
         this.settings.$spinnerContainer ??
-        (this.isFullPage ? $('#page-title') : $());
+        (this.isFullPage ? $('#revision-indicators') : $());
+
       this.$spinner = $('<div/>', {
         class: 'revision-spinner spinner hidden',
         title: Craft.t('app', 'Saving'),
       }).appendTo($spinnerContainer);
       this.$statusIcon = $('<div/>', {
         class: `revision-status ${this.isFullPage ? 'invisible' : 'hidden'}`,
-      }).appendTo($spinnerContainer);
-      this.$statusMessage = $('<div/>', {
-        class: 'revision-status-message visually-hidden',
-        'aria-live': 'polite',
       }).appendTo($spinnerContainer);
 
       this.$expandSiteStatusesBtn = this.$container.find('.expand-status-btn');
@@ -827,10 +824,6 @@ Craft.ElementEditor = Garnish.Base.extend(
       return this.$statusIcon;
     },
 
-    statusMessage: function () {
-      return this.$statusMessage;
-    },
-
     createEditMetaAction: function () {
       if (!this.isFullPage) {
         return;
@@ -1175,7 +1168,16 @@ Craft.ElementEditor = Garnish.Base.extend(
       // remove embedded element index names
       data = data.replace(/&elementindex-[^&]*/g, '');
 
-      return data;
+      // Give other things the ability to customize the serialized data
+      // (need to be passed via a nested object so changes persist upstream)
+      const eventData = {
+        serialized: data,
+      };
+      this.trigger('serializeForm', {
+        data: eventData,
+      });
+
+      return eventData.serialized;
     },
 
     /**
@@ -1300,9 +1302,6 @@ Craft.ElementEditor = Garnish.Base.extend(
           .removeClass('hidden invisible checkmark-icon alert-icon fade-out')
           .addClass('hidden');
 
-        // Clear previous status message
-        this.statusMessage().empty();
-
         if (this.$saveMetaBtn) {
           this.$saveMetaBtn.addClass('active');
         }
@@ -1392,6 +1391,7 @@ Craft.ElementEditor = Garnish.Base.extend(
               $modifiedFields.eq(i).prepend(
                 $('<div/>', {
                   class: 'status-badge modified',
+                  'aria-hidden': 'true',
                   title: Craft.t('app', 'This field has been modified.'),
                 }).append(
                   $('<span/>', {
@@ -1907,14 +1907,7 @@ Craft.ElementEditor = Garnish.Base.extend(
 
     setStatusMessage: function (message) {
       this.statusIcons().attr('title', message);
-      this.statusMessage()
-        .empty()
-        .append(
-          $('<span/>', {
-            class: 'visually-hidden',
-            text: message,
-          })
-        );
+      Craft.cp.announce(message);
     },
 
     showMetaModal: function () {

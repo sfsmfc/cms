@@ -152,6 +152,11 @@ Craft.ElementEditorSlideout = Craft.CpScreenSlideout.extend(
         await this.elementEditor.saveDraft();
       }
 
+      ev.preventDefault();
+      ev.stopPropagation();
+      ev.stopImmediatePropagation();
+
+      await this.settings.onBeforeSubmit();
       this.elementEditor.handleSubmit(ev);
     },
 
@@ -205,6 +210,7 @@ Craft.ElementEditorSlideout = Craft.CpScreenSlideout.extend(
       validators: [],
       expandData: [],
       isStatic: false,
+      onBeforeSubmit: async () => {},
     },
   }
 );
