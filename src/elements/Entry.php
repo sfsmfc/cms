@@ -17,7 +17,6 @@ use craft\base\FieldInterface;
 use craft\base\Iconic;
 use craft\base\NestedElementInterface;
 use craft\base\NestedElementTrait;
-use craft\behaviors\CustomFieldBehavior;
 use craft\behaviors\DraftBehavior;
 use craft\controllers\ElementIndexesController;
 use craft\db\Connection;
@@ -2887,7 +2886,6 @@ JS;
         $newFields = $this->getType()->getFieldLayout()->getCustomFields();
         $oldFields = Arr::keyBy($oldLayout->getCustomFields(), fn(FieldInterface $field) => $field->handle);
         $fieldsService = Craft::$app->getFields();
-        $incompatibleFieldHandles = [];
 
         foreach ($newFields as $newField) {
             if (isset($oldFields[$newField->handle])) {
@@ -2902,16 +2900,8 @@ JS;
                         $newField->id !== $oldField->id
                     )
                 ) {
-                    $incompatibleFieldHandles[] = $newField->handle;
+                    $this->setFieldValue($newField->handle, null);
                 }
-            }
-        }
-
-        // if we have any incompatible fields, remove their values from CustomFieldBehavior
-        if (!empty($incompatibleFieldHandles)) {
-            $behavior = $this->getBehavior('customFields');
-            foreach ($incompatibleFieldHandles as $fieldHandle) {
-                $behavior->$fieldHandle = null;
             }
         }
     }
