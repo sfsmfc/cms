@@ -1193,6 +1193,7 @@ class Cp
             'defaultTableColumns' => null,
             'registerJs' => true,
             'jsSettings' => [],
+            'defaultViewMode' => 'table',
         ];
 
         if ($config['showStatusMenu'] !== 'auto') {
