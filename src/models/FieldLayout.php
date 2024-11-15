@@ -264,7 +264,11 @@ class FieldLayout extends Model
         }
 
         if (!isset($this->_cardView)) {
-            $this->setCardView([]);
+            if ($this->type && class_exists($this->type)) {
+                $this->setCardView($this->type::defaultCardAttributes());
+            } else {
+                $this->setCardView([]);
+            }
         }
     }
 
@@ -841,6 +845,13 @@ class FieldLayout extends Model
                             $field = Craft::$app->getFields()->getFieldById($fieldId);
                             $layoutElement = new CustomField();
                             $layoutElement->setField($field);
+                        } else {
+                            // this will kick in for native field that have just been dragged into the field layout designer
+                            $fieldLabel = $cardElement['fieldLabel'];
+                            if ($fieldLabel) {
+                                $layoutElement['value'] = $layoutElement;
+                                $layoutElement['label'] = $fieldLabel;
+                            }
                         }
                     }
 

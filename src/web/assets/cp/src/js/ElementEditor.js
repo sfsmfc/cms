@@ -1391,6 +1391,7 @@ Craft.ElementEditor = Garnish.Base.extend(
               $modifiedFields.eq(i).prepend(
                 $('<div/>', {
                   class: 'status-badge modified',
+                  'aria-hidden': 'true',
                   title: Craft.t('app', 'This field has been modified.'),
                 }).append(
                   $('<span/>', {

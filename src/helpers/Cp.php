@@ -1548,6 +1548,7 @@ JS, [
                     'id' => $statusId,
                     'class' => ['status-badge', StringHelper::toString($status[0])],
                     'title' => $status[1],
+                    'aria-hidden' => 'true',
                 ]) .
                 Html::tag('span', $status[1], [
                     'class' => 'visually-hidden',
@@ -2598,7 +2599,7 @@ JS, [
             ]);
 
         // get thumb placeholder
-        if ($showThumb) {
+        if ($showThumb ?? $fieldLayout->getThumbField() !== null) {
             $previewThumb = Html::tag('div',
                 Html::tag('div', Cp::iconSvg('image'), ['class' => 'cp-icon']),
                 ['class' => 'cvd-thumbnail']
@@ -2623,6 +2624,8 @@ JS, [
         foreach ($cardElements as $cardElement) {
             if ($cardElement instanceof CustomField) {
                 $previewHtml .= Html::tag('div', $cardElement->getField()->previewPlaceholderHtml(null, null));
+            } elseif ($cardElement instanceof BaseField) {
+                $previewHtml .= Html::tag('div', $cardElement->previewPlaceholderHtml(null, null));
             } else {
                 $previewHtml .= Html::tag('div', $elementType::attributePreviewHtml($cardElement));
             }

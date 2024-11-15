@@ -541,6 +541,17 @@ interface ElementInterface extends
     public static function cardAttributes(): array;
 
     /**
+     * Returns the list of card attribute keys that should be shown by default, if the field layout hasn't been customised.
+     *
+     * This method should return an array where each element in the array maps to one of the keys of the array returned
+     * by [[cardAttributes()]].
+     *
+     * @return string[] The card attribute keys
+     * @since 5.5.0
+     */
+    public static function defaultCardAttributes(): array;
+
+    /**
      * Return HTML for the attribute in the card preview.
      *
      * @param array $attribute
