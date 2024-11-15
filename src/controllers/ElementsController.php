@@ -2480,11 +2480,6 @@ JS, [
         if ($this->_slug !== null) {
             $element->slug = $this->_slug;
         }
-        
-        if ($element->hasMethod('handleChangedTypeId')) {
-            /** @phpstan-ignore-next-line */
-            $element->handleChangedTypeId();
-        }
 
         $element->setScenario($scenario);
 

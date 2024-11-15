@@ -13,6 +13,7 @@ use craft\base\Element;
 use craft\base\ElementContainerFieldInterface;
 use craft\base\ExpirableElementInterface;
 use craft\base\Field;
+use craft\base\FieldInterface;
 use craft\base\Iconic;
 use craft\base\NestedElementInterface;
 use craft\base\NestedElementTrait;
@@ -63,6 +64,7 @@ use craft\validators\ArrayValidator;
 use craft\validators\DateCompareValidator;
 use craft\validators\DateTimeValidator;
 use DateTime;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Throwable;
 use yii\base\Exception;
@@ -971,6 +973,19 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
         }
 
         return $rules;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAttributesFromRequest(array $values): void
+    {
+        parent::setAttributesFromRequest($values);
+
+        // Did the entry type just change?
+        if (isset($this->_typeId, $this->_oldTypeId) && $this->_typeId !== $this->_oldTypeId) {
+            $this->handleChangedTypeId();
+        }
     }
 
     /**
@@ -2862,64 +2877,41 @@ JS;
         return in_array($this->typeId, array_map(fn($entryType) => $entryType->id, $entryTypes));
     }
 
-    /**
-     * When entry type id was changed, discard of any normalizes field values
-     * for fields that implement ElementContainerFieldInterface
-     * and unset those fields from the memoized field handles.
-     *
-     * @return void
-     * @since 5.5.0
-     */
-    public function handleChangedTypeId(): void
+    private function handleChangedTypeId(): void
     {
-        if ($this->getTypeId() !== $this->_oldTypeId) {
-            $oldEntryType = Craft::$app->getEntries()->getEntryTypeById($this->_oldTypeId);
-            $newEntryType = $this->getType();
+        $oldLayout = Craft::$app->getEntries()->getEntryTypeById($this->_oldTypeId)?->getFieldLayout();
+        if (!$oldLayout) {
+            return;
+        }
 
-            $oldLayout = $oldEntryType?->getFieldLayout();
-            if (!$oldLayout) {
-                throw new InvalidConfigException("Invalid entry type ID: $this->_oldTypeId");
-            }
-            $newLayout = $newEntryType->getFieldLayout();
+        $newFields = $this->getType()->getFieldLayout()->getCustomFields();
+        $oldFields = Arr::keyBy($oldLayout->getCustomFields(), fn(FieldInterface $field) => $field->handle);
+        $fieldsService = Craft::$app->getFields();
+        $incompatibleFieldHandles = [];
 
-            // get all custom field elements - keyed by handles
-            $oldCustomElements = Collection::make($oldLayout->getCustomFieldElements())
-                ->keyBy(fn($element) => $element->attribute())
-                ->toArray();
-            $newCustomElements = Collection::make($newLayout->getCustomFieldElements())
-                ->keyBy(fn($element) => $element->attribute())
-                ->toArray();
-
-            // we only want to check the field where the handle exists in old and new layout
-            $fieldsToCheck = array_intersect_key($newCustomElements, $oldCustomElements);
-
-            // check if old and new field types are compatible
-            // if both old and new fields are not the exact same ElementContainerFieldInterface field - mark it as incompatible
-            $incompatibleFields = [];
-            foreach ($fieldsToCheck as $handle => $field) {
+        foreach ($newFields as $newField) {
+            if (isset($oldFields[$newField->handle])) {
+                $oldField = $oldFields[$newField->handle];
                 if (
-                    !Craft::$app->getFields()->areFieldTypesCompatible(
-                        $newCustomElements[$handle]->getField()::class,
-                        $oldCustomElements[$handle]->getField()::class
-                    ) ||
+                    !$fieldsService->areFieldTypesCompatible($newField::class, $oldField::class) ||
                     (
-                        $newCustomElements[$handle]->getField() instanceof ElementContainerFieldInterface &&
-                        $oldCustomElements[$handle]->getField() instanceof ElementContainerFieldInterface &&
-                        $newCustomElements[$handle]->getField()->uid !== $oldCustomElements[$handle]->getField()->uid
+                        (
+                            $newField instanceof ElementContainerFieldInterface ||
+                            $oldField instanceof ElementContainerFieldInterface
+                        ) &&
+                        $newField->id !== $oldField->id
                     )
                 ) {
-                    $incompatibleFields[$handle] = $field;
+                    $incompatibleFieldHandles[] = $newField->handle;
                 }
             }
+        }
 
-            // if we have any incompatible fields, un-normalize them and remove from _fieldsByHandle
-            if (!empty($incompatibleFields)) {
-                $behavior = $this->getBehavior('customFields');
-                foreach ($incompatibleFields as $fieldHandle => $field) {
-                    CustomFieldBehavior::$fieldHandles[$fieldHandle] = false;
-                    $behavior->$fieldHandle = null;
-                    $this->unsetFromFieldByHandle($fieldHandle);
-                }
+        // if we have any incompatible fields, remove their values from CustomFieldBehavior
+        if (!empty($incompatibleFieldHandles)) {
+            $behavior = $this->getBehavior('customFields');
+            foreach ($incompatibleFieldHandles as $fieldHandle) {
+                $behavior->$fieldHandle = null;
             }
         }
     }
