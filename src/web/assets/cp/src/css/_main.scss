@@ -7818,6 +7818,15 @@ fieldset {
     margin-block: 5px 0;
     margin-inline: 0;
   }
+
+  /* radio and checkbox */
+  .custom-option-wrapper {
+    display: inline-block;
+  }
+
+  .custom-option-input {
+    margin-inline-start: var(--xs);
+  }
 }
 
 .field > .instructions,
@@ -8036,6 +8045,10 @@ fieldset {
     margin-block-start: 2px;
     padding-inline-start: calc(1rem + 5px);
   }
+}
+
+.checkboxfield__custom-wrapper {
+  display: inline-block;
 }
 
 /* radio */
