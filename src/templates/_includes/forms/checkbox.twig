@@ -3,7 +3,7 @@
 
 {% set id = id ?? "checkbox#{random()}" %}
 {% set label = checkboxLabel ?? label ?? null %}
-{% set labelId = labelId ?? (custom ?? false) ? id ~ '-label' : false %}
+{% set labelId = labelId ?? "#{id}-label" %}
 
 {% set aria = (inputAttributes.aria ?? {})|merge(aria ?? {}) %}
 {% set inputAttributes = {
@@ -26,11 +26,6 @@
     }),
 }|merge(inputAttributes ?? [], recursive=true) %}
 
-{% set labelAttributes = {
-    for: id,
-    id: labelId,
-} %}
-
 {% if block('attr') is defined %}
     {%- set inputAttributes = inputAttributes|merge(('<div ' ~ block('attr') ~ '>')|parseAttr, recursive=true) %}
 {% endif %}
@@ -41,7 +36,10 @@
 
 {{ input('checkbox', name ?? null, value ?? 1, inputAttributes) }}
 
-{% tag 'label' with labelAttributes %}
+{% tag 'label' with {
+    for: id,
+    id: labelId,
+} %}
     {% if custom ?? false %}
         {{ 'Custom option:'|t('app') }}
     {% else %}

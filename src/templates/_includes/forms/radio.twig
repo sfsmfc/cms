@@ -2,7 +2,7 @@
 
 {% set id = id ?? "radio#{random()}" %}
 {% set label = radioLabel ?? label ?? null %}
-{% set labelId = labelId ?? (custom ?? false) ? id ~ '-label' : false %}
+{% set labelId = labelId ?? "#{id}-label" %}
 
 {% set containerAttributes = {
     for: id,
@@ -50,11 +50,11 @@
 
     {% js %}
         (() => {
-        const $radio = $('#{{ id|namespaceInputId }}');
-        const $text = $('#{{ textId|namespaceInputId }}');
-        $text.on('input', () => {
-        $radio.val($text.val());
-        });
+            const $radio = $('#{{ id|namespaceInputId }}');
+            const $text = $('#{{ textId|namespaceInputId }}');
+            $text.on('input', () => {
+                $radio.val($text.val());
+            });
         })();
     {% endjs %}
 {% endif %}
