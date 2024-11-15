@@ -37,7 +37,7 @@
     {% set crumbs = (crumbs ?? [])|unshift({
         id: 'site-crumb',
         icon: 'world',
-        iconLabel: 'Site'|t('app'),
+        iconAltText: 'Site'|t('app'),
         label: selectedSite.name|t('site'),
         menu: {
             items: siteMenuItems(selectableSites, selectedSite),

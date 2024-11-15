@@ -3226,7 +3226,7 @@ JS;
      * @return string
      * @since 5.0.0
      */
-    public static function iconSvg(string $icon, ?string $fallbackLabel = null, ?string $accessibleName = null): string
+    public static function iconSvg(string $icon, ?string $fallbackLabel = null, ?string $altText = null): string
     {
         $locale = Craft::$app->getLocale();
         $orientation = $locale->getOrientation();
@@ -3321,8 +3321,8 @@ JS;
             return self::fallbackIconSvg($fallbackLabel);
         }
 
-        if ($accessibleName) {
-            $attributes['aria'] = ['label' => $accessibleName];
+        if ($altText) {
+            $attributes['aria'] = ['label' => $altText];
             $attributes['role'] = 'img';
         } else {
             $attributes['aria'] = [
