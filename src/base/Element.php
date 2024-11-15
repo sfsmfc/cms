@@ -2258,11 +2258,6 @@ abstract class Element extends Component implements ElementInterface
     private bool $_initialized = false;
 
     /**
-     * @var FieldInterface[]|null[]
-     */
-    private array $_fieldsByHandle = [];
-
-    /**
      * @var string|null
      */
     private ?string $_fieldParamNamePrefix = null;
@@ -6406,28 +6401,18 @@ JS,
             return null;
         }
 
-        if (array_key_exists($handle, $this->_fieldsByHandle)) {
-            return $this->_fieldsByHandle[$handle];
-        }
-
-        $fieldsService = Craft::$app->getFields();
-        $originalFieldContext = $fieldsService->fieldContext;
-        $fieldsService->fieldContext = $this->getFieldContext();
-        $fieldLayout = $this->getFieldLayout();
-        $this->_fieldsByHandle[$handle] = $fieldLayout?->getFieldByHandle($handle);
+        $field = $this->getFieldLayout()?->getFieldByHandle($handle);
 
         // nullify values for custom fields that are not part of this layout
         // https://github.com/craftcms/cms/issues/12539
-        if ($fieldLayout && $this->_fieldsByHandle[$handle] === null) {
+        if (!$field) {
             $behavior = $this->getBehavior('customFields');
             if (isset($behavior->$handle)) {
                 $behavior->$handle = null;
             }
         }
 
-        $fieldsService->fieldContext = $originalFieldContext;
-
-        return $this->_fieldsByHandle[$handle];
+        return $field;
     }
 
     /**

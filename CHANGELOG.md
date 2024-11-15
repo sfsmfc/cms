@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed a bug where `craft\helpers\Console::table()` wasn’t handling multi-byte characters and ANSI-formatted strings properly.
+- Fixed a bug where entries could appear to retain old field values when switching entry types, even if the new type’s fields weret’t compatible with the original type’s fields. ([#16056](https://github.com/craftcms/cms/issues/16056))
 
 ## 5.5.0.1 - 2024-11-13
 
