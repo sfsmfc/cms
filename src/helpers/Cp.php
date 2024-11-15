@@ -3223,10 +3223,11 @@ JS;
      *
      * @param string $icon
      * @param string|null $fallbackLabel
+     * @param string|null $altText
      * @return string
      * @since 5.0.0
      */
-    public static function iconSvg(string $icon, ?string $fallbackLabel = null, ?string $altText = null): string
+    public static function iconSvg(string $icon, ?string $fallbackLabel = null, string $altText = null): string
     {
         $locale = Craft::$app->getLocale();
         $orientation = $locale->getOrientation();
