@@ -23,6 +23,8 @@ You can learn more about it at [craftcms.com](https://craftcms.com), and documen
 
 Craft is a self-hosted PHP application. It can connect to MySQL and PostgreSQL for content storage. See [Server Requirements](https://craftcms.com/docs/3.x/requirements.html) for more details.
 
+## Resources
+
 ### Official
 
 - **[Website](https://craftcms.com)** — Welcome to Craft!
