@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Fixed a JavaScript error that could occur on element edit pages. ([#16102](https://github.com/craftcms/cms/pull/16102))
+- Fixed a JavaScript error that could occur on element edit pages. ([#16055](https://github.com/craftcms/cms/issues/16055))
 - Fixed a bug where `craft\helpers\Console::table()` wasn’t handling multi-byte characters and ANSI-formatted strings properly.
 - Fixed a bug where entries could appear to retain old field values when switching entry types, even if the new type’s fields weret’t compatible with the original type’s fields. ([#16056](https://github.com/craftcms/cms/issues/16056))
 - Fixed a bug where Link field query params weren’t working for elements that hadn’t been saved since updating to Craft 5.5.0+. ([#16113](https://github.com/craftcms/cms/issues/16113))
