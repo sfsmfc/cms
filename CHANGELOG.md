@@ -1,5 +1,8 @@
 # Release Notes for Craft CMS 4
 
+## Unreleased
+- Fixed a JavaScript error that could occur on element edit pages. ([#16102](https://github.com/craftcms/cms/pull/16102))
+
 ## 4.13.0 - 2024-11-12
 
 ### Administration
