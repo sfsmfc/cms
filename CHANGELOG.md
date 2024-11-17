@@ -10,6 +10,7 @@
 - Fixed a bug where Live Preview wasn’t reloading after reordering nested entries or addresses. ([#16122](https://github.com/craftcms/cms/issues/16122))
 - Fixed a JavaScript error that could occur when reordering structured elements within an embedded element index. ([#16103](https://github.com/craftcms/cms/issues/16103))
 - Fixed a bug where changes to nested entries/addresses in card view were getting published immediately on save, if the parent element was a draft.
+- Fixed a bug where element cards could bleed out of their containers. ([#16112](https://github.com/craftcms/cms/issues/16112))
 
 ## 5.5.0.1 - 2024-11-13
 
