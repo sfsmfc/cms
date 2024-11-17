@@ -1,7 +1,9 @@
 # Release Notes for Craft CMS 4
 
 ## Unreleased
+
 - Fixed a JavaScript error that could occur on element edit pages. ([#16055](https://github.com/craftcms/cms/issues/16055))
+- Fixed a Twig deprecation error. ([#16107](https://github.com/craftcms/cms/issues/16107))
 
 ## 4.13.0 - 2024-11-12
 
