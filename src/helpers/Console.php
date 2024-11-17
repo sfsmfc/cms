@@ -240,7 +240,7 @@ class Console extends \yii\helpers\Console
     {
         $options += [
             'maxSize' => 80,
-            'rowPrefix' => '    ',
+            'rowPrefix' => '   ',
             'rowSuffix' => '',
             'colors' => static::streamSupportsAnsiColors(STDOUT),
         ];

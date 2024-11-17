@@ -1122,7 +1122,7 @@ Craft.ElementEditor = Garnish.Base.extend(
           `${encodeURIComponent(name)}=${encodeURIComponent(value)}`
         )
       ) {
-        return;
+        return false;
       }
 
       $('<input/>', {
@@ -1133,6 +1133,8 @@ Craft.ElementEditor = Garnish.Base.extend(
       if (this.settings.canCreateDrafts) {
         await this.saveDraft();
       }
+
+      return true;
     },
 
     async markDeltaNameAsModified(name) {
