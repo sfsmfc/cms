@@ -498,7 +498,7 @@
         isEmpty: false,
         isLoading: true,
         searchClearTitle: Craft.escapeHtml(Craft.t('app', 'Clear')),
-        searchTerm: new URL(window.location.href).searchParams.get('q'),
+        searchTerm: new URL(window.location.href).searchParams.get('q') || '',
         selectAll: null,
         sortable: null,
         tableBodySelector: '.vuetable-body',
