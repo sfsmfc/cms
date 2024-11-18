@@ -26,7 +26,11 @@ use yii\base\InvalidConfigException;
  */
 class Html extends \yii\helpers\Html
 {
+    /**
+     * @since 5.6.0
+     */
     public const TITLE_TAG_RE = '/<title(\s+([\s\S]*?))?>.*?<\/title>\s*/is';
+
     /**
      * @var array List of tag attributes that should be specially handled when their values are of array type.
      * In particular, if the value of the `data` attribute is `['name' => 'xyz', 'age' => 13]`, two attributes
