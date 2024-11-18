@@ -1121,6 +1121,16 @@ Craft.ui = {
     return $btn;
   },
 
+  updateTimeInputA11y: function ($input) {
+    $input.on('showTimepicker', () => {
+      $input.attr('aria-expanded', 'true');
+    });
+
+    $input.on('hideTimepicker', () => {
+      $input.attr('aria-expanded', 'false');
+    });
+  },
+
   createTimeInput: function (config) {
     const isMobile = Garnish.isMobileBrowser();
     const id =
