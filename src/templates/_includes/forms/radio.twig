@@ -42,7 +42,6 @@
                 const $text = $('#{{ textId|namespaceInputId }}');
                 $text.on('input', () => {
                     $radio.val($text.val());
-                    console.log('input');
                 });
             })();
         {% endjs %}
