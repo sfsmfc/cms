@@ -977,18 +977,19 @@ JS, [
             throw new InvalidArgumentException(sprintf('%s doesn’t store values under the key “%s”.', __CLASS__, $key));
         }
 
-        $jsonPath = [$this->layoutElement->uid];
+        $db = Craft::$app->getDb();
+        $qb = $db->getQueryBuilder();
+        $sql = $qb->jsonExtract('elements_sites.content', [$this->layoutElement->uid]);
 
         if (is_array($dbType)) {
             // Get the primary value by default
             $key ??= array_key_first($dbType);
-            $jsonPath[] = $key;
             $dbType = $dbType[$key];
+            $sql = sprintf('COALESCE(%s, %s)', $qb->jsonExtract(
+                'elements_sites.content',
+                [$this->layoutElement->uid, $key],
+            ), $sql);
         }
-
-        $db = Craft::$app->getDb();
-        $qb = $db->getQueryBuilder();
-        $sql = $qb->jsonExtract('elements_sites.content', $jsonPath);
 
         $castType = null;
         if ($db->getIsMysql()) {

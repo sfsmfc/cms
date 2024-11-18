@@ -214,9 +214,13 @@ Craft.NestedElementManager = Garnish.Base.extend(
     },
 
     async markAsDirty() {
-      if (this.elementEditor && this.settings.baseInputName) {
-        await this.elementEditor.setFormValue(this.settings.baseInputName, '*');
+      if (!this.elementEditor || !this.settings.baseInputName) {
+        return false;
       }
+      return await this.elementEditor.setFormValue(
+        this.settings.baseInputName,
+        '*'
+      );
     },
 
     async getBaseActionData() {
@@ -251,7 +255,10 @@ Craft.NestedElementManager = Garnish.Base.extend(
         Craft.cp.displayError(e?.response?.data?.message);
       }
 
-      await this.markAsDirty();
+      if (!(await this.markAsDirty())) {
+        // Refresh Live Preview
+        Craft.Preview.refresh();
+      }
     },
 
     updateCreateBtn() {
