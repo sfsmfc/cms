@@ -177,7 +177,7 @@ class FieldsController extends Controller
             ->addCrumb(Craft::t('app', 'Settings'), 'settings')
             ->addCrumb(Craft::t('app', 'Fields'), 'settings/fields')
             ->action('fields/save-field')
-            ->redirectUrl('settings/fields')
+            ->redirectUrl(UrlHelper::cpReferralUrl() ?? 'settings/fields')
             ->addAltAction(Craft::t('app', 'Save and continue editing'), [
                 'redirect' => 'settings/fields/edit/{id}',
                 'shortcut' => true,
