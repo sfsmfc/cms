@@ -15,6 +15,9 @@
 - Fixed a bug where nested entries could get deleted when restoring revisions. ([#16116](https://github.com/craftcms/cms/issues/16116))
 - Fixed a bug where reordering nested addresses or entries would cause any provisional drafts to be fully created. ([#16094](https://github.com/craftcms/cms/issues/16094))
 - Fixed a PHP error that could occur on element indexes. ([craftcms/commerce#3774](https://github.com/craftcms/commerce/issues/3774))
+- Fixed a bug where an existing Single section entry could be deleted when the section’s Entry Types setting changed. ([#16102](https://github.com/craftcms/cms/pull/16102))
+- Fixed a bug where Single section entries’ content could be lost after running the `entry-types/merge` command. ([#16102](https://github.com/craftcms/cms/pull/16102))
+- Fixed a bug where Single section entries could be duplicated after running the `entry-types/merge` command. ([#16087](https://github.com/craftcms/cms/issues/16087), [#16102](https://github.com/craftcms/cms/pull/16102))
 
 ## 5.5.0.1 - 2024-11-13
 
