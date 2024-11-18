@@ -57,30 +57,28 @@ class EntryTypesController extends Controller
         $usagesA = $entryTypeA->findUsages();
         $usagesB = $entryTypeB->findUsages();
 
-        $queryA = Entry::find()->typeId($entryTypeA->id)->status(null);
-        $queryB = Entry::find()->typeId($entryTypeB->id)->status(null);
+        if ($this->interactive) {
+            $queryA = Entry::find()->typeId($entryTypeA->id)->status(null);
+            $queryB = Entry::find()->typeId($entryTypeB->id)->status(null);
 
-        $totalEntriesA = $queryA->count();
-        $totalEntriesB = $queryB->count();
+            $totalEntriesA = $queryA->count();
+            $totalEntriesB = $queryB->count();
 
-        $infoA = sprintf(
-            '%s %s, %s %s',
-            count($usagesA),
-            count($usagesA) === 1 ? 'usage' : 'usages',
-            $totalEntriesA,
-            $totalEntriesA === 1 ? 'entry' : 'entries',
-        );
-        $infoB = sprintf(
-            '%s %s, %s %s',
-            count($usagesB),
-            count($usagesB) === 1 ? 'usage' : 'usages',
-            $totalEntriesB,
-            $totalEntriesB === 1 ? 'entry' : 'entries',
-        );
+            $infoA = sprintf(
+                '%s %s, %s %s',
+                count($usagesA),
+                count($usagesA) === 1 ? 'usage' : 'usages',
+                $totalEntriesA,
+                $totalEntriesA === 1 ? 'entry' : 'entries',
+            );
+            $infoB = sprintf(
+                '%s %s, %s %s',
+                count($usagesB),
+                count($usagesB) === 1 ? 'usage' : 'usages',
+                $totalEntriesB,
+                $totalEntriesB === 1 ? 'entry' : 'entries',
+            );
 
-        if (!$this->interactive) {
-            $choice = $entryTypeA->handle;
-        } else {
             $this->stdout("\n" . $this->markdownToAnsi(<<<MD
 **Which entry type should persist?**
 
@@ -91,6 +89,8 @@ MD) . "\n\n");
                 $entryTypeA->handle => $entryTypeA->name,
                 $entryTypeB->handle => $entryTypeB->name,
             ], $totalEntriesA >= $totalEntriesB ? $entryTypeA->handle : $entryTypeB->handle);
+        } else {
+            $choice = $entryTypeA->handle;
         }
 
         /** @var EntryType $persistingEntryType */
