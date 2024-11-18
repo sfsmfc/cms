@@ -3048,8 +3048,7 @@ abstract class Element extends Component implements ElementInterface
 
             if ($this instanceof NestedElementInterface && $query instanceof NestedElementQueryInterface) {
                 $query
-                    ->fieldId($this->getField()?->id)
-                    ->ownerId($this->getOwnerId());
+                    ->fieldId($this->getField()?->id);
             }
 
             $this->$prop = $query->one();
