@@ -40,11 +40,6 @@ class EntryTypesController extends Controller
      */
     public function actionMerge(string $handleA, string $handleB): int
     {
-        if (!$this->interactive) {
-            $this->stderr("The entry-types/merge command must be run interactively.\n");
-            return ExitCode::UNSPECIFIED_ERROR;
-        }
-
         $entriesService = Craft::$app->getEntries();
         $fieldsService = Craft::$app->getFields();
 
@@ -83,17 +78,20 @@ class EntryTypesController extends Controller
             $totalEntriesB === 1 ? 'entry' : 'entries',
         );
 
-        $this->stdout("\n" . $this->markdownToAnsi(<<<MD
+        if (!$this->interactive) {
+            $choice = $entryTypeA->handle;
+        } else {
+            $this->stdout("\n" . $this->markdownToAnsi(<<<MD
 **Which entry type should persist?**
 
  - `$entryTypeA->handle` ($infoA)
  - `$entryTypeB->handle` ($infoB)
 MD) . "\n\n");
-
-        $choice = $this->select('Choose:', [
-            $entryTypeA->handle => $entryTypeA->name,
-            $entryTypeB->handle => $entryTypeB->name,
-        ], $totalEntriesA >= $totalEntriesB ? $entryTypeA->handle : $entryTypeB->handle);
+            $choice = $this->select('Choose:', [
+                $entryTypeA->handle => $entryTypeA->name,
+                $entryTypeB->handle => $entryTypeB->name,
+            ], $totalEntriesA >= $totalEntriesB ? $entryTypeA->handle : $entryTypeB->handle);
+        }
 
         /** @var EntryType $persistingEntryType */
         /** @var EntryType $outgoingEntryType */
