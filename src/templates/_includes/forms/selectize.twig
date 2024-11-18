@@ -1,7 +1,7 @@
 {% set id = id ?? "selectize#{random()}" %}
 {% set selectizeOptions = {
     dropdownParent: 'body',
-    plugins: ['auto_position'],
+    plugins: ['auto_position', 'selectize-plugin-a11y'],
 }|merge(selectizeOptions ?? []) %}
 
 {% set multi = multi ?? false %}
@@ -175,7 +175,7 @@
                 if (data.value === '') {
                     classes.push('selectize-dropdown-emptyoptionlabel');
                 }
-                return `<div class="${classes.join(' ')}">${label(data, true)}</div>`;
+                return `<div class="${classes.join(' ')}" role="option" id="${data.text.replace(' ', '')}">${label(data, true)}</div>`;
             },
             item: data => {
                 const attrs = ['class="item"'];

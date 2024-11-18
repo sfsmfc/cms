@@ -6,6 +6,7 @@
 ### Accessibility
 - Improved the accessibility of Checkboxes and Radio Buttons fields that allow custom options. ([#16080](https://github.com/craftcms/cms/pull/16080))
 - Improved the accessibility of control panel icons. ([#16128](https://github.com/craftcms/cms/pull/16128))
+- Improved the accessibility of Selectize inputs. ([#16110](https://github.com/craftcms/cms/pull/16110))
 
 ### Administration
 - Added the “Show the ‘URL Suffix’ field” setting to Link fields. ([#15813](https://github.com/craftcms/cms/discussions/15813))
