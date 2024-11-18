@@ -2,6 +2,7 @@
 
 ### Content Management
 - “Related To”, “Not Related To”, “Author”, and relational field condition rules now allow multiple elements to be specified. ([#16121](https://github.com/craftcms/cms/discussions/16121))
+- Improved the styling of inline code fragments. ([#16141](https://github.com/craftcms/cms/pull/16141))
 
 ### Accessibility
 - Improved the accessibility of Checkboxes and Radio Buttons fields that allow custom options. ([#16080](https://github.com/craftcms/cms/pull/16080))
