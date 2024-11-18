@@ -4,6 +4,7 @@
 
 - Fixed a JavaScript error that could occur on element edit pages. ([#16055](https://github.com/craftcms/cms/issues/16055))
 - Fixed a Twig deprecation error. ([#16107](https://github.com/craftcms/cms/issues/16107))
+- Fixed a bug where `craft\services\Structures::fillGapsInElements()` wasn’t working properly if the elements weren’t passed in hierarchical order. ([#16085](https://github.com/craftcms/cms/issues/16085))
 - Fixed a bug where `craft\helpers\Console::table()` wasn’t handling multi-byte characters and ANSI-formatted strings properly.
 - Fixed a bug where entries could appear to retain old field values when switching entry types, even if the new type’s fields weret’t compatible with the original type’s fields. ([#16056](https://github.com/craftcms/cms/issues/16056))
 - Fixed a bug where Link field query params weren’t working for elements that hadn’t been saved since updating to Craft 5.5.0+. ([#16113](https://github.com/craftcms/cms/issues/16113))
@@ -11,6 +12,12 @@
 - Fixed a JavaScript error that could occur when reordering structured elements within an embedded element index. ([#16103](https://github.com/craftcms/cms/issues/16103))
 - Fixed a bug where changes to nested entries/addresses in card view were getting published immediately on save, if the parent element was a draft.
 - Fixed a bug where element cards could bleed out of their containers. ([#16112](https://github.com/craftcms/cms/issues/16112))
+- Fixed a bug where nested entries could get deleted when restoring revisions. ([#16116](https://github.com/craftcms/cms/issues/16116))
+- Fixed a bug where reordering nested addresses or entries would cause any provisional drafts to be fully created. ([#16094](https://github.com/craftcms/cms/issues/16094))
+- Fixed a PHP error that could occur on element indexes. ([craftcms/commerce#3774](https://github.com/craftcms/commerce/issues/3774))
+- Fixed a bug where an existing Single section entry could be deleted when the section’s Entry Types setting changed. ([#16102](https://github.com/craftcms/cms/pull/16102))
+- Fixed a bug where Single section entries’ content could be lost after running the `entry-types/merge` command. ([#16102](https://github.com/craftcms/cms/pull/16102))
+- Fixed a bug where Single section entries could be duplicated after running the `entry-types/merge` command. ([#16087](https://github.com/craftcms/cms/issues/16087), [#16102](https://github.com/craftcms/cms/pull/16102))
 
 ## 5.5.0.1 - 2024-11-13
 
