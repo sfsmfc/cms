@@ -498,7 +498,7 @@
         isEmpty: false,
         isLoading: true,
         searchClearTitle: Craft.escapeHtml(Craft.t('app', 'Clear')),
-        searchTerm: '',
+        searchTerm: new URL(window.location.href).searchParams.get('q'),
         selectAll: null,
         sortable: null,
         tableBodySelector: '.vuetable-body',
@@ -717,6 +717,10 @@
           }
           this.reload();
         }
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('q', this.searchTerm);
+        window.history.replaceState({}, '', url);
       }, 500),
 
       resetSearch: function () {
