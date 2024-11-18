@@ -13,6 +13,7 @@
 - Fixed a bug where changes to nested entries/addresses in card view were getting published immediately on save, if the parent element was a draft.
 - Fixed a bug where element cards could bleed out of their containers. ([#16112](https://github.com/craftcms/cms/issues/16112))
 - Fixed a bug where nested entries could get deleted when restoring revisions. ([#16116](https://github.com/craftcms/cms/issues/16116))
+- Fixed a bug where reordering nested addresses or entries would cause any provisional drafts to be fully created. ([#16094](https://github.com/craftcms/cms/issues/16094))
 
 ## 5.5.0.1 - 2024-11-13
 
