@@ -43,6 +43,7 @@ use craft\models\Site;
 use craft\models\Structure;
 use craft\queue\jobs\ApplyNewPropagationMethod;
 use craft\queue\jobs\ResaveElements;
+use craft\records\Entry as EntryRecord;
 use craft\records\EntryType as EntryTypeRecord;
 use craft\records\Section as SectionRecord;
 use craft\records\Section_SiteSettings as Section_SiteSettingsRecord;
@@ -952,16 +953,41 @@ class Entries extends Component
         // Get/save the entry with updated title, slug, and URI format
         // ---------------------------------------------------------------------
 
-        // If there are any existing entries, find the first one with a valid typeId
-        /** @var Entry|null $entry */
-        $entry = Entry::find()
-            ->typeId($entryTypeIds)
+        $baseEntryQuery = Entry::find()
             ->sectionId($section->id)
             ->siteId($siteIds)
-            ->status(null)
+            ->status(null);
+
+        // If there are any existing entries, find the first one with a valid typeId
+        /** @var Entry|null $entry */
+        $entry = $baseEntryQuery
+            ->typeId($entryTypeIds)
             ->one();
 
-        // Otherwise create a new one
+        // if we didn't find any, try without the typeId,
+        // in case that changed to something completely new
+        if ($entry === null) {
+            $entry = $baseEntryQuery->one();
+
+            if ($entry !== null) {
+                $entry->setTypeId($entryTypeIds[0]);
+            }
+        }
+
+        // if we still don't have any,
+        // try without the typeId with trashed where they were deleted with entry type
+        if ($entry === null) {
+            $entry = $baseEntryQuery
+                ->trashed(null)
+                ->where([EntryRecord::tableName() . '.[[deletedWithEntryType]]' => 1])
+                ->one();
+
+            if ($entry !== null) {
+                $entry->setTypeId($entryTypeIds[0]);
+            }
+        }
+
+        // Finally, if we still don't have an entry, create a new one
         if ($entry === null) {
             // Create one
             $entry = new Entry();
