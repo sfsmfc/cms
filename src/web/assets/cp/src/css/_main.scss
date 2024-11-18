@@ -823,6 +823,26 @@ code,
   &.smalltext {
     font-size: 0.8em !important;
   }
+
+  .instructions &,
+  .pane &,
+  .note & {
+    background-color: var(--gray-100);
+    padding-block: 0.0625em;
+    padding-inline: 0.25em;
+    border-radius: var(--small-border-radius);
+    border: 1px solid var(--hairline-color);
+  }
+
+  .warning & {
+    background-color: var(--warning-background);
+    border-color: var(--warning-border-color);
+  }
+
+  .tip & {
+    background-color: var(--notice-background);
+    border-color: var(--notice-border-color);
+  }
 }
 
 .code {
