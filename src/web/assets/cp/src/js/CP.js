@@ -111,9 +111,9 @@ Craft.CP = Garnish.Base.extend(
       //this.updateContentHeading();
 
       // Swap any instruction text with info icons
-      let $allInstructions = this.$details.find(
-        '.meta > .field > .instructions'
-      );
+      let $allInstructions = this.$details
+        .find('.meta > .field > .instructions')
+        .add($('.field.info-icon-instructions > .instructions'));
 
       for (let i = 0; i < $allInstructions.length; i++) {
         let $instructions = $allInstructions.eq(i);

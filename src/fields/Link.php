@@ -32,6 +32,7 @@ use craft\helpers\ArrayHelper;
 use craft\helpers\Component;
 use craft\helpers\Cp;
 use craft\helpers\Html;
+use craft\helpers\StringHelper;
 use craft\validators\ArrayValidator;
 use craft\validators\StringValidator;
 use Illuminate\Support\Collection;
@@ -96,6 +97,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
             'value' => Schema::TYPE_STRING,
             'type' => Schema::TYPE_STRING,
             'label' => Schema::TYPE_STRING,
+            'urlSuffix' => Schema::TYPE_STRING,
             'target' => Schema::TYPE_STRING,
         ];
     }
@@ -143,6 +145,12 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
      * @since 5.5.0
      */
     public bool $showLabelField = false;
+
+    /**
+     * @var bool Whether the “URL Suffix” field should be shown.
+     * @since 5.6.0
+     */
+    public bool $showUrlSuffixField = false;
 
     /**
      * @var bool Whether the “Open in a new tab” field should be shown.
@@ -359,6 +367,12 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'on' => $this->showLabelField,
             ]) .
             Cp::lightswitchFieldHtml([
+                'label' => Craft::t('app', 'Show the “URL Suffix” field'),
+                'id' => 'show-url-suffix-field',
+                'name' => 'showUrlSuffixField',
+                'on' => $this->showUrlSuffixField,
+            ]) .
+            Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Show the “Open in a new tab” field'),
                 'id' => 'show-target-field',
                 'name' => 'showTargetField',
@@ -420,12 +434,17 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
             $typeId = $value['type'] ?? UrlType::id();
             $config = array_filter([
                 'label' => $this->showLabelField ? ($value['label'] ?? null) : null,
+                'urlSuffix' => $this->showUrlSuffixField ? ($value['urlSuffix'] ?? null) : null,
                 'target' => $this->showTargetField ? ($value['target'] ?? null) : null,
             ]);
             $value = trim($value['value'] ?? $value[$typeId]['value'] ?? '');
 
             if (!$value) {
                 return null;
+            }
+
+            if (isset($config['urlSuffix']) && !str_starts_with($config['urlSuffix'], '#')) {
+                $config['urlSuffix'] = StringHelper::ensureLeft($config['urlSuffix'], '?');
             }
 
             if (isset($linkTypes[$typeId])) {
@@ -561,7 +580,7 @@ JS;
                 Html::endTag('div');
         }
 
-        $pane = $this->showLabelField || $this->showTargetField;
+        $pane = $this->showLabelField || $this->showUrlSuffixField || $this->showTargetField;
         $html =
             Html::beginTag('div', [
                 'id' => $id,
@@ -587,6 +606,20 @@ JS;
                 'name' => "$this->handle[label]",
                 'value' => $value?->getLabel(true),
                 'placeholder' => $value?->getLabel(false),
+            ]);
+        }
+
+        if ($this->showUrlSuffixField) {
+            $html .= Cp::textFieldHtml([
+                'fieldClass' => ['my-m', 'info-icon-instructions'],
+                'label' => Craft::t('app', 'URL Suffix'),
+                'instructions' => Craft::t('app', 'Query params (e.g. {ex1}) or a URI fragment (e.g. {ex2}) that should be appended to the URL.', [
+                    'ex1' => '`?p1=foo&p2=bar`',
+                    'ex2' => '`#anchor`',
+                ]),
+                'id' => "$id-url-suffix",
+                'name' => "$this->handle[urlSuffix]",
+                'value' => $value?->urlSuffix,
             ]);
         }
 

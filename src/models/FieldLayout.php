@@ -29,6 +29,7 @@ use craft\helpers\ArrayHelper;
 use craft\helpers\Html;
 use craft\helpers\StringHelper;
 use Generator;
+use Illuminate\Support\Arr;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 
@@ -241,6 +242,12 @@ class FieldLayout extends Model
     private ?array $_customFields = null;
 
     /**
+     * @var array<string,FieldInterface>|null
+     * @see getFieldByHandle()
+     */
+    private ?array $_indexedCustomFields = null;
+
+    /**
      * @var array
      * @see getCardView()
      * @see setCardView()
@@ -264,10 +271,10 @@ class FieldLayout extends Model
         }
 
         if (!isset($this->_cardView)) {
-            if (!$this->type) {
-                $this->setCardView([]);
-            } else {
+            if ($this->type && class_exists($this->type)) {
                 $this->setCardView($this->type::defaultCardAttributes());
+            } else {
+                $this->setCardView([]);
             }
         }
     }
@@ -936,13 +943,8 @@ class FieldLayout extends Model
      */
     public function getFieldByHandle(string $handle): ?FieldInterface
     {
-        foreach ($this->getCustomFields() as $field) {
-            if ($field->handle === $handle) {
-                return $field;
-            }
-        }
-
-        return null;
+        $this->_indexedCustomFields ??= Arr::keyBy($this->getCustomFields(), fn(FieldInterface $field) => $field->handle);
+        return $this->_indexedCustomFields[$handle] ?? null;
     }
 
     /**
@@ -1103,6 +1105,6 @@ class FieldLayout extends Model
      */
     public function reset(): void
     {
-        $this->_customFields = null;
+        $this->_customFields = $this->_indexedCustomFields = null;
     }
 }

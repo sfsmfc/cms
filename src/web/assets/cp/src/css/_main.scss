@@ -1463,6 +1463,8 @@ td.right {
 }
 
 .info-hud {
+  max-width: 550px;
+
   table {
     max-width: 280px;
     table-layout: auto;
@@ -3759,7 +3761,7 @@ table {
 .card-grid {
   display: grid !important;
   gap: var(--s) !important;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 
   & > li {
     border-radius: var(--large-border-radius);
@@ -7818,6 +7820,15 @@ fieldset {
     margin-block: 5px 0;
     margin-inline: 0;
   }
+
+  /* radio and checkbox */
+  .custom-option-wrapper {
+    display: inline-block;
+  }
+
+  .custom-option-input {
+    margin-inline-start: var(--xs);
+  }
 }
 
 .field > .instructions,
@@ -8036,6 +8047,10 @@ fieldset {
     margin-block-start: 2px;
     padding-inline-start: calc(1rem + 5px);
   }
+}
+
+.checkboxfield__custom-wrapper {
+  display: inline-block;
 }
 
 /* radio */

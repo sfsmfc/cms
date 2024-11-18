@@ -10,8 +10,10 @@ namespace craft\elements;
 use Craft;
 use craft\base\Colorable;
 use craft\base\Element;
+use craft\base\ElementContainerFieldInterface;
 use craft\base\ExpirableElementInterface;
 use craft\base\Field;
+use craft\base\FieldInterface;
 use craft\base\Iconic;
 use craft\base\NestedElementInterface;
 use craft\base\NestedElementTrait;
@@ -61,6 +63,7 @@ use craft\validators\ArrayValidator;
 use craft\validators\DateCompareValidator;
 use craft\validators\DateTimeValidator;
 use DateTime;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Throwable;
 use yii\base\Exception;
@@ -969,6 +972,19 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
         }
 
         return $rules;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAttributesFromRequest(array $values): void
+    {
+        parent::setAttributesFromRequest($values);
+
+        // Did the entry type just change?
+        if (isset($this->_typeId, $this->_oldTypeId) && $this->_typeId !== $this->_oldTypeId) {
+            $this->handleChangedTypeId();
+        }
     }
 
     /**
@@ -2858,5 +2874,35 @@ JS;
         }
 
         return in_array($this->typeId, array_map(fn($entryType) => $entryType->id, $entryTypes));
+    }
+
+    private function handleChangedTypeId(): void
+    {
+        $oldLayout = Craft::$app->getEntries()->getEntryTypeById($this->_oldTypeId)?->getFieldLayout();
+        if (!$oldLayout) {
+            return;
+        }
+
+        $newFields = $this->getType()->getFieldLayout()->getCustomFields();
+        $oldFields = Arr::keyBy($oldLayout->getCustomFields(), fn(FieldInterface $field) => $field->handle);
+        $fieldsService = Craft::$app->getFields();
+
+        foreach ($newFields as $newField) {
+            if (isset($oldFields[$newField->handle])) {
+                $oldField = $oldFields[$newField->handle];
+                if (
+                    !$fieldsService->areFieldTypesCompatible($newField::class, $oldField::class) ||
+                    (
+                        (
+                            $newField instanceof ElementContainerFieldInterface ||
+                            $oldField instanceof ElementContainerFieldInterface
+                        ) &&
+                        $newField->id !== $oldField->id
+                    )
+                ) {
+                    $this->setFieldValue($newField->handle, null);
+                }
+            }
+        }
     }
 }
