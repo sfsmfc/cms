@@ -1193,6 +1193,7 @@ class Cp
             'defaultTableColumns' => null,
             'registerJs' => true,
             'jsSettings' => [],
+            'defaultViewMode' => 'table',
         ];
 
         if ($config['showStatusMenu'] !== 'auto') {
@@ -3223,13 +3224,17 @@ JS;
      *
      * @param string $icon
      * @param string|null $fallbackLabel
+     * @param string|null $altText
      * @return string
      * @since 5.0.0
      */
-    public static function iconSvg(string $icon, ?string $fallbackLabel = null): string
+    public static function iconSvg(string $icon, ?string $fallbackLabel = null, ?string $altText = null): string
     {
         $locale = Craft::$app->getLocale();
         $orientation = $locale->getOrientation();
+        $attributes = [
+            'focusable' => 'false',
+        ];
 
         // BC support for some legacy icon names
         $icon = match ($icon) {
@@ -3318,11 +3323,22 @@ JS;
             return self::fallbackIconSvg($fallbackLabel);
         }
 
-        // Add aria-hidden="true"
+        if ($altText !== null) {
+            $attributes['aria'] = ['label' => $altText];
+            $attributes['role'] = 'img';
+        } else {
+            $attributes['aria'] = [
+                'hidden' => 'true',
+                'labelledby' => false,
+            ];
+        }
+
+        // Remove title tag
+        $svg = preg_replace(Html::TITLE_TAG_RE, '', $svg);
+
+        // Add attributes for accessibility
         try {
-            $svg = Html::modifyTagAttributes($svg, [
-                'aria' => ['hidden' => 'true'],
-            ]);
+            $svg = Html::modifyTagAttributes($svg, $attributes);
         } catch (InvalidArgumentException) {
         }
 
