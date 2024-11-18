@@ -16,6 +16,7 @@ use craft\enums\Color;
 use craft\fieldlayoutelements\entries\EntryTitleField;
 use craft\helpers\Cp;
 use craft\helpers\Html;
+use craft\helpers\UrlHelper;
 use craft\models\EntryType;
 use craft\models\Section;
 use craft\web\Controller;
@@ -92,7 +93,7 @@ class EntryTypesController extends Controller
             ->addCrumb(Craft::t('app', 'Settings'), 'settings')
             ->addCrumb(Craft::t('app', 'Entry Types'), 'settings/entry-types')
             ->action('entry-types/save')
-            ->redirectUrl('settings/entry-types')
+            ->redirectUrl(UrlHelper::cpReferralUrl() ?? 'settings/entry-types')
             ->addAltAction(Craft::t('app', 'Save and continue editing'), [
                 'redirect' => 'settings/entry-types/{id}',
                 'shortcut' => true,
