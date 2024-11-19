@@ -1410,7 +1410,7 @@ class Fields extends Component
         // Tell the current CustomFieldBehavior class about the field
         CustomFieldBehavior::$fieldHandles[$fieldRecord->handle] = true;
 
-        if ($isNewField) {
+        if ($isNewField || $field === null) {
             // Try fetching the field again, if it didn’t exist to begin with
             $field ??= $this->getFieldById($fieldRecord->id);
             $field->id = $fieldRecord->id;
