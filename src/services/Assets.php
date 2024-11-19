@@ -310,9 +310,13 @@ class Assets extends Component
 
         foreach ((array)$folderIds as $folderId) {
             $folder = $this->getFolderById((int)$folderId);
+            if (!$folder) {
+                continue;
+            }
+
             $folders[] = $folder;
 
-            if ($folder && $deleteDir) {
+            if ($folder->path && $deleteDir) {
                 $volume = $folder->getVolume();
                 try {
                     $volume->deleteDirectory($folder->path);
