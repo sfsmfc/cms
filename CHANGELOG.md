@@ -1,6 +1,18 @@
 # Release Notes for Craft CMS 5
 
-## Unreleased
+## 5.5.2 - 2024-11-19
+
+- Fixed an error that could occur if an invalid folder ID was passed to `craft\services\Assets::deleteFoldersByIds()`. ([#16147](https://github.com/craftcms/cms/pull/16147))
+- Fixed a SQL error that occurred when creating a new Single section. ([#16145](https://github.com/craftcms/cms/issues/16145))
+- Fixed an error that occurred when running the `resave/all` command, if any of the options passed weren’t supported by other `resave/*` commands. ([#16148](https://github.com/craftcms/cms/pull/16148))
+- Fixed an error that occurred when restoring a soft-deleted custom field. ([#16150](https://github.com/craftcms/cms/issues/16150))
+- Fixed an RCE vulnerability.
+
+## 5.5.1.1 - 2024-11-18
+
+- Fixed a PHP error. ([#16142](https://github.com/craftcms/cms/issues/16142))
+
+## 5.5.1 - 2024-11-18
 
 - The `entry-types/merge` command can now be run non-interactively. ([#16135](https://github.com/craftcms/cms/pull/16135))
 - Fixed a JavaScript error that could occur on element edit pages. ([#16055](https://github.com/craftcms/cms/issues/16055))

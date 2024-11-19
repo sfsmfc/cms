@@ -23,6 +23,7 @@ use craft\errors\InvalidElementException;
 use craft\events\MultiElementActionEvent;
 use craft\helpers\Console;
 use craft\helpers\ElementHelper;
+use craft\helpers\Inflector;
 use craft\helpers\Queue;
 use craft\helpers\StringHelper;
 use craft\models\CategoryGroup;
@@ -373,11 +374,41 @@ class ResaveController extends Controller
         array_push($actions, ...array_keys($this->actions()));
 
         $params = $this->getPassedOptionValues();
+        $actionsToSkip = [];
 
+        // check if all actions support all the params
+        foreach ($actions as $key => $id) {
+            if (!$this->doesActionSupportsAllOptions($id, $params)) {
+                $actionsToSkip[] = $id;
+                unset($actions[$key]);
+            }
+        }
+
+        // ask for confirmation
+        if ($this->interactive && !empty($actionsToSkip)) {
+            $this->output('The following commands don’t support the provided options, and will be skipped:', Console::FG_YELLOW);
+            foreach ($actionsToSkip as $id) {
+                $invalidParams = array_map(
+                    fn($param) => sprintf('`--%s`', StringHelper::toKebabCase($param)),
+                    $this->getUnsupportedOptions($id, $params)
+                );
+                $this->output(' ' . $this->markdownToAnsi(sprintf(
+                    '- `resave/%s` doesn’t support %s',
+                    $id,
+                    Inflector::sentence($invalidParams)
+                )));
+            }
+            Console::outdent();
+            if (!$this->confirm('Continue?', true)) {
+                return ExitCode::OK;
+            }
+        }
+
+        // run the actions which support all the params
         foreach ($actions as $id) {
             try {
+                $this->output();
                 $this->do("Running `resave/$id`", function() use ($id, $params) {
-                    $this->output();
                     Console::indent();
                     try {
                         $this->runAction($id, $params);
@@ -802,7 +833,46 @@ class ResaveController extends Controller
 
         $label = isset($this->propagateTo) ? 'propagating' : 'resaving';
         $this->output("Done $label $elementsText.", Console::FG_YELLOW);
-        $this->output();
         return $fail ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
+    /**
+     * Returns whether all options passed to an action are supported.
+     * Used by resave/all command.
+     *
+     * @param string $actionId
+     * @param array $params
+     * @return bool
+     */
+    private function doesActionSupportsAllOptions(string $actionId, array $params): bool
+    {
+        $options = $this->options($actionId);
+        foreach ($params as $param => $value) {
+            if (!in_array($param, $options)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns an array of options that are not supported by the action.
+     *
+     * @param string $actionId
+     * @param array $params
+     * @return array
+     */
+    private function getUnsupportedOptions(string $actionId, array $params): array
+    {
+        $unsupportedParams = [];
+        $options = $this->options($actionId);
+        foreach ($params as $param => $value) {
+            if (!in_array($param, $options)) {
+                $unsupportedParams[] = $param;
+            }
+        }
+
+        return $unsupportedParams;
     }
 }
