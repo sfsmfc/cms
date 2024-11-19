@@ -1,6 +1,6 @@
 # Release Notes for Craft CMS 5
 
-## Unreleased
+## 5.5.1.1 - 2024-11-18
 
 - Fixed a PHP error. ([#16142](https://github.com/craftcms/cms/issues/16142))
 
