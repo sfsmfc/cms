@@ -9,6 +9,8 @@ namespace crafttests\unit\helpers;
 
 use Craft;
 use craft\config\GeneralConfig;
+use craft\console\Application as ConsoleApplication;
+use craft\console\Request as ConsoleRequest;
 use craft\enums\CmsEdition;
 use craft\helpers\App;
 use craft\mail\transportadapters\Sendmail;
@@ -128,6 +130,19 @@ class AppHelperTest extends TestCase
         ];
         $length = count($_SERVER['argv']);
 
+        // super hacky but no other choice
+        $app = Craft::$app;
+        Craft::$app = new ConsoleApplication([
+            'id' => $app->id,
+            'basePath' => $app->basePath,
+            'components' => [
+                'config' => fn() => $app->getConfig(),
+                'projectConfig' => fn() => $app->getProjectConfig(),
+                'request' => ConsoleRequest::class,
+                'plugins' => fn() => $app->getPlugins(),
+            ],
+        ]);
+
         self::assertSame('foo.sql', App::cliOption('--file-path'));
         self::assertSame('bar.sql', App::cliOption('-f', true));
         self::assertSame(true, App::cliOption('--zip'));
@@ -143,6 +158,8 @@ class AppHelperTest extends TestCase
         } else {
             unset($_SERVER['argv']);
         }
+
+        Craft::$app = $app;
 
         self::expectException(InvalidArgumentException::class);
         App::cliOption('no-dash');
