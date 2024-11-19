@@ -1,6 +1,6 @@
 # Release Notes for Craft CMS 5
 
-## Unreleased
+## 5.5.1 - 2024-11-18
 
 - The `entry-types/merge` command can now be run non-interactively. ([#16135](https://github.com/craftcms/cms/pull/16135))
 - Fixed a JavaScript error that could occur on element edit pages. ([#16055](https://github.com/craftcms/cms/issues/16055))
