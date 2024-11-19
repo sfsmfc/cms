@@ -978,7 +978,7 @@ class Entries extends Component
         if ($entry === null) {
             $entry = $baseEntryQuery
                 ->trashed(null)
-                ->where(['entries.deletedWithEntryType' => 1])
+                ->where(['entries.deletedWithEntryType' => true])
                 ->one();
 
             if ($entry !== null) {
