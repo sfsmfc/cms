@@ -23,6 +23,7 @@ use craft\errors\InvalidElementException;
 use craft\events\MultiElementActionEvent;
 use craft\helpers\Console;
 use craft\helpers\ElementHelper;
+use craft\helpers\Inflector;
 use craft\helpers\Queue;
 use craft\helpers\StringHelper;
 use craft\models\CategoryGroup;
@@ -383,31 +384,24 @@ class ResaveController extends Controller
             }
         }
 
-        $proceed = true;
         // ask for confirmation
         if ($this->interactive && !empty($actionsToSkip)) {
-            $this->output('Following commands, don’t support all the provided options:', Console::FG_YELLOW);
+            $this->output('The following commands don’t support the provided options, and will be skipped:', Console::FG_YELLOW);
             foreach ($actionsToSkip as $id) {
                 $invalidParams = array_map(
-                    fn($param) => '--' . StringHelper::toKebabCase($param),
+                    fn($param) => sprintf('`--%s`', StringHelper::toKebabCase($param)),
                     $this->getUnsupportedOptions($id, $params)
                 );
-                $count = count($invalidParams);
-                $invalidParams = implode(', ', $invalidParams);
-                Console::indent();
-                $this->output(
-                    $this->markdownToAnsi(
-                        "- `resave/$id` action doesn’t support `$invalidParams` option" . ($count > 1 ? 's.' : '.')
-                    )
-                );
-                Console::outdent();
+                $this->output(' ' . $this->markdownToAnsi(sprintf(
+                    '- `resave/%s` doesn’t support %s',
+                    $id,
+                    Inflector::sentence($invalidParams)
+                )));
             }
-            $this->output();
-            $proceed = $this->confirm('Do you want to run all other actions?');
-        }
-
-        if (!$proceed) {
-            return ExitCode::OK;
+            Console::outdent();
+            if (!$this->confirm('Continue?', true)) {
+                return ExitCode::OK;
+            }
         }
 
         // run the actions which support all the params
@@ -415,7 +409,6 @@ class ResaveController extends Controller
             try {
                 $this->output();
                 $this->do("Running `resave/$id`", function() use ($id, $params) {
-                    $this->output();
                     Console::indent();
                     try {
                         $this->runAction($id, $params);
@@ -840,7 +833,6 @@ class ResaveController extends Controller
 
         $label = isset($this->propagateTo) ? 'propagating' : 'resaving';
         $this->output("Done $label $elementsText.", Console::FG_YELLOW);
-        $this->output();
         return $fail ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
     }
 
