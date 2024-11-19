@@ -373,9 +373,47 @@ class ResaveController extends Controller
         array_push($actions, ...array_keys($this->actions()));
 
         $params = $this->getPassedOptionValues();
+        $actionsToSkip = [];
 
+        // check if all actions support all the params
+        foreach ($actions as $key => $id) {
+            if (!$this->doesActionSupportsAllOptions($id, $params)) {
+                $actionsToSkip[] = $id;
+                unset($actions[$key]);
+            }
+        }
+
+        $proceed = true;
+        // ask for confirmation
+        if ($this->interactive && !empty($actionsToSkip)) {
+            $this->output('Following commands, don’t support all the provided parameters:', Console::FG_YELLOW);
+            foreach ($actionsToSkip as $id) {
+                $invalidParams = array_map(
+                    fn($param) => '--' . StringHelper::toKebabCase($param),
+                    $this->getUnsupportedParams($id, $params)
+                );
+                $count = count($invalidParams);
+                $invalidParams = implode(', ', $invalidParams);
+                Console::indent();
+                $this->output(
+                    $this->markdownToAnsi(
+                        "- `resave/$id` action doesn’t support `$invalidParams` option" . ($count > 1 ? 's.' : '.')
+                    )
+                );
+                Console::outdent();
+            }
+            $this->output();
+            $proceed = $this->confirm('Do you want to run all other actions?');
+        }
+
+        if (!$proceed) {
+            return ExitCode::OK;
+        }
+
+        // run the actions which support all the params
         foreach ($actions as $id) {
             try {
+                $this->output();
                 $this->do("Running `resave/$id`", function() use ($id, $params) {
                     $this->output();
                     Console::indent();
@@ -804,5 +842,45 @@ class ResaveController extends Controller
         $this->output("Done $label $elementsText.", Console::FG_YELLOW);
         $this->output();
         return $fail ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
+    /**
+     * Returns whether all options passed to an action are supported.
+     * Used by resave/all command.
+     *
+     * @param string $actionId
+     * @param array $params
+     * @return bool
+     */
+    private function doesActionSupportsAllOptions(string $actionId, array $params): bool
+    {
+        $options = $this->options($actionId);
+        foreach ($params as $param => $value) {
+            if (!in_array($param, $options)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns an array of options that are not supported by the action.
+     *
+     * @param string $actionId
+     * @param array $params
+     * @return array
+     */
+    private function getUnsupportedParams(string $actionId, array $params): array
+    {
+        $unsupportedParams = [];
+        $options = $this->options($actionId);
+        foreach ($params as $param => $value) {
+            if (!in_array($param, $options)) {
+                $unsupportedParams[] = $param;
+            }
+        }
+
+        return $unsupportedParams;
     }
 }
