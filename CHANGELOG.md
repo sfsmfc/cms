@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 4
 
+## 4.13.1.1 - 2024-11-18
+
+- Fixed a PHP error. ([#16142](https://github.com/craftcms/cms/issues/16142))
+
 ## 4.13.1 - 2024-11-18
 
 - Fixed a JavaScript error that could occur on element edit pages. ([#16055](https://github.com/craftcms/cms/issues/16055))
