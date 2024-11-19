@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 5
 
+## Unreleased
+
+- Fixed a SQL error that occurred when creating a new Single section. ([#16145](https://github.com/craftcms/cms/issues/16145))
+
 ## 5.5.1.1 - 2024-11-18
 
 - Fixed a PHP error. ([#16142](https://github.com/craftcms/cms/issues/16142))
