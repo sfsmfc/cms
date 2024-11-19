@@ -2,7 +2,9 @@
 
 ## Unreleased
 
+- Fixed an error that could occur if an invalid folder ID was passed to `craft\services\Assets::deleteFoldersByIds()`. ([#16147](https://github.com/craftcms/cms/pull/16147))
 - Fixed a SQL error that occurred when creating a new Single section. ([#16145](https://github.com/craftcms/cms/issues/16145))
+- Fixed an RCE vulnerability.
 
 ## 5.5.1.1 - 2024-11-18
 
