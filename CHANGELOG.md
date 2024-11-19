@@ -5,7 +5,6 @@
 - Fixed a JavaScript error that could occur on element edit pages. ([#16055](https://github.com/craftcms/cms/issues/16055))
 - Fixed a Twig deprecation error. ([#16107](https://github.com/craftcms/cms/issues/16107))
 - Fixed a bug where `craft\services\Structures::fillGapsInElements()` wasn’t working properly if the elements weren’t passed in hierarchical order. ([#16085](https://github.com/craftcms/cms/issues/16085))
-- Fixed an RCE vulnerability.
 
 ## 4.13.0 - 2024-11-12
 
