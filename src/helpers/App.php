@@ -12,7 +12,6 @@ use Craft;
 use craft\behaviors\SessionBehavior;
 use craft\cache\FileCache;
 use craft\config\DbConfig;
-use craft\console\Application as ConsoleApplication;
 use craft\db\Command;
 use craft\db\Connection;
 use craft\db\mysql\Schema as MysqlSchema;
@@ -284,7 +283,7 @@ class App
             throw new InvalidArgumentException("Invalid CLI option name: $name");
         }
 
-        if (!Craft::$app instanceof ConsoleApplication || empty($_SERVER['argv'])) {
+        if (empty($_SERVER['argv'])) {
             return null;
         }
 
