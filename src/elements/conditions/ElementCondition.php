@@ -26,8 +26,7 @@ class ElementCondition extends BaseCondition implements ElementConditionInterfac
     public bool $sortable = false;
 
     /**
-     * @var string|null The element type being queried.
-     * @phpstan-var class-string<ElementInterface>|null
+     * @var class-string<ElementInterface>|null The element type being queried.
      */
     public ?string $elementType = null;
 
@@ -65,8 +64,7 @@ class ElementCondition extends BaseCondition implements ElementConditionInterfac
     /**
      * Constructor.
      *
-     * @param string|null $elementType
-     * @phpstan-param class-string<ElementInterface>|null $elementType
+     * @param class-string<ElementInterface>|null $elementType
      * @param array $config
      */
     public function __construct(?string $elementType = null, array $config = [])
@@ -173,11 +171,7 @@ class ElementCondition extends BaseCondition implements ElementConditionInterfac
             SlugConditionRule::class,
         ];
 
-        /** @var string|ElementInterface|null $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface|null $elementType */
-        $elementType = $this->elementType;
-
-        if (Craft::$app->getIsMultiSite() && (!$elementType || $elementType::isLocalized())) {
+        if (Craft::$app->getIsMultiSite() && ($this->elementType === null || $this->elementType::isLocalized())) {
             $types[] = SiteConditionRule::class;
             $types[] = LanguageConditionRule::class;
 
@@ -186,17 +180,17 @@ class ElementCondition extends BaseCondition implements ElementConditionInterfac
             }
         }
 
-        if ($elementType !== null) {
-            if ($elementType::hasUris()) {
+        if ($this->elementType !== null) {
+            if ($this->elementType::hasUris()) {
                 $types[] = HasUrlConditionRule::class;
                 $types[] = UriConditionRule::class;
             }
 
-            if ($elementType::hasStatuses()) {
+            if ($this->elementType::hasStatuses()) {
                 $types[] = StatusConditionRule::class;
             }
 
-            if ($elementType::hasTitles()) {
+            if ($this->elementType::hasTitles()) {
                 $types[] = TitleConditionRule::class;
             }
 

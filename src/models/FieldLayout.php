@@ -194,8 +194,7 @@ class FieldLayout extends Model
     public ?int $id = null;
 
     /**
-     * @var string|null The element type
-     * @phpstan-var class-string<ElementInterface>|null
+     * @var class-string<ElementInterface>|null The element type
      */
     public ?string $type = null;
 
@@ -627,8 +626,7 @@ class FieldLayout extends Model
      * Returns the layout elements of a given type.
      *
      * @template T
-     * @param string $class
-     * @phpstan-param class-string<T> $class
+     * @param class-string<T> $class
      * @return T[]
      * @since 4.0.0
      */
@@ -642,8 +640,7 @@ class FieldLayout extends Model
      * Returns the visible layout elements of a given type, taking conditions into account.
      *
      * @template T
-     * @param string $class
-     * @phpstan-param class-string<T> $class
+     * @param class-string<T> $class
      * @param ElementInterface $element
      * @return T[]
      * @since 4.0.0
@@ -658,8 +655,7 @@ class FieldLayout extends Model
      * Returns the first layout element of a given type.
      *
      * @template T of FieldLayoutElement
-     * @param string $class
-     * @phpstan-param class-string<T> $class
+     * @param class-string<T> $class
      * @return T|null The layout element, or `null` if none were found
      * @since 4.0.0
      */
@@ -673,8 +669,7 @@ class FieldLayout extends Model
      * Returns the first visible layout element of a given type, taking conditions into account.
      *
      * @template T of FieldLayoutElement
-     * @param string $class
-     * @phpstan-param class-string<T> $class
+     * @param class-string<T> $class
      * @param ElementInterface $element
      * @return T|null The layout element, or `null` if none were found
      * @since 4.0.0
