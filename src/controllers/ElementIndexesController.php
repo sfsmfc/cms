@@ -39,8 +39,7 @@ use yii\web\Response;
 class ElementIndexesController extends BaseElementsController
 {
     /**
-     * @var string
-     * @phpstan-var class-string<ElementInterface>
+     * @var class-string<ElementInterface>
      */
     protected string $elementType;
 
@@ -144,10 +143,8 @@ class ElementIndexesController extends BaseElementsController
      */
     public function actionSourcePath(): Response
     {
-        /** @var string|ElementInterface $elementType */
-        $elementType = $this->elementType;
         $stepKey = $this->request->getRequiredBodyParam('stepKey');
-        $sourcePath = $elementType::sourcePath($this->sourceKey, $stepKey, $this->context);
+        $sourcePath = $this->elementType::sourcePath($this->sourceKey, $stepKey, $this->context);
 
         return $this->asJson([
             'sourcePath' => $sourcePath,
@@ -185,11 +182,9 @@ class ElementIndexesController extends BaseElementsController
      */
     public function actionCountElements(): Response
     {
-        /** @var string|ElementInterface $elementType */
-        $elementType = $this->elementType;
         return $this->asJson([
             'resultSet' => $this->request->getParam('resultSet'),
-            'count' => $elementType::indexElementCount($this->elementQuery, $this->sourceKey),
+            'count' => $this->elementType::indexElementCount($this->elementQuery, $this->sourceKey),
         ]);
     }
 
@@ -284,11 +279,8 @@ class ElementIndexesController extends BaseElementsController
         $responseData = $this->elementResponseData(true, true);
 
         // Send updated badge counts
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
-        $elementType = $this->elementType;
         $formatter = Craft::$app->getFormatter();
-        foreach (Craft::$app->getElementSources()->getSources($elementType, $this->context) as $source) {
+        foreach (Craft::$app->getElementSources()->getSources($this->elementType, $this->context) as $source) {
             if (isset($source['key'])) {
                 if (isset($source['badgeCount'])) {
                     $responseData['badgeCounts'][$source['key']] = $formatter->asDecimal($source['badgeCount'], 0);
@@ -359,10 +351,7 @@ class ElementIndexesController extends BaseElementsController
                     break;
                 case Response::FORMAT_XML:
                     Craft::$app->language = 'en-US';
-                    /** @var string|ElementInterface $elementType */
-                    /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
-                    $elementType = $this->elementType;
-                    $this->response->formatters[Response::FORMAT_XML]['rootTag'] = $elementType::pluralLowerDisplayName();
+                    $this->response->formatters[Response::FORMAT_XML]['rootTag'] = $this->elementType::pluralLowerDisplayName();
                     break;
             }
         } elseif (
@@ -415,9 +404,6 @@ class ElementIndexesController extends BaseElementsController
      */
     public function actionFilterHud(): Response
     {
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
-        $elementType = $this->elementType();
         $id = $this->request->getRequiredBodyParam('id');
         $conditionConfig = $this->request->getBodyParam('conditionConfig');
         $serialized = $this->request->getBodyParam('serialized');
@@ -434,7 +420,7 @@ class ElementIndexesController extends BaseElementsController
             $condition = $conditionsService->createCondition($conditionConfig['condition']);
         } else {
             /** @var ElementConditionInterface $condition */
-            $condition = $elementType::createCondition();
+            $condition = $this->elementType()::createCondition();
         }
 
         $condition->mainTag = 'div';
@@ -565,10 +551,7 @@ class ElementIndexesController extends BaseElementsController
      */
     protected function elementQuery(): ElementQueryInterface
     {
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
-        $elementType = $this->elementType;
-        $query = $elementType::find();
+        $query = $this->elementType::find();
         $conditionsService = Craft::$app->getConditions();
 
         if (!$this->source) {
@@ -679,9 +662,6 @@ class ElementIndexesController extends BaseElementsController
      */
     protected function elementResponseData(bool $includeContainer, bool $includeActions): array
     {
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
-        $elementType = $this->elementType;
         $responseData = [];
         $view = $this->getView();
 
@@ -697,7 +677,7 @@ class ElementIndexesController extends BaseElementsController
         $showCheckboxes = !empty($this->actions);
 
         if ($this->sourceKey) {
-            $responseData['html'] = $elementType::indexHtml(
+            $responseData['html'] = $this->elementType::indexHtml(
                 $this->elementQuery,
                 $disabledElementIds,
                 $this->viewState,
@@ -727,22 +707,19 @@ class ElementIndexesController extends BaseElementsController
             return null;
         }
 
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
-        $elementType = $this->elementType;
-        $actions = $elementType::actions($this->sourceKey);
+        $actions = $this->elementType::actions($this->sourceKey);
 
         foreach ($actions as $i => $action) {
             // $action could be a string or config array
             if ($action instanceof ElementActionInterface) {
-                $action->setElementType($elementType);
+                $action->setElementType($this->elementType);
             } else {
                 if (is_string($action)) {
                     $action = ['type' => $action];
                 }
                 /** @var array $action */
                 /** @phpstan-var array{type:class-string<ElementActionInterface>} $action */
-                $action['elementType'] = $elementType;
+                $action['elementType'] = $this->elementType;
                 $actions[$i] = $action = Craft::$app->getElements()->createAction($action);
             }
 
@@ -785,20 +762,17 @@ class ElementIndexesController extends BaseElementsController
             return null;
         }
 
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
-        $elementType = $this->elementType;
-        $exporters = $elementType::exporters($this->sourceKey);
+        $exporters = $this->elementType::exporters($this->sourceKey);
 
         foreach ($exporters as $i => $exporter) {
             // $action could be a string or config array
             if ($exporter instanceof ElementExporterInterface) {
-                $exporter->setElementType($elementType);
+                $exporter->setElementType($this->elementType);
             } else {
                 if (is_string($exporter)) {
                     $exporter = ['type' => $exporter];
                 }
-                $exporter['elementType'] = $elementType;
+                $exporter['elementType'] = $this->elementType;
                 $exporters[$i] = Craft::$app->getElements()->createExporter($exporter);
             }
         }
@@ -875,8 +849,6 @@ class ElementIndexesController extends BaseElementsController
             throw new BadRequestHttpException("Request missing required body param");
         }
 
-        /** @var string|ElementInterface $elementType */
-        $elementType = $this->elementType;
         $id = $this->request->getRequiredBodyParam('id');
         $siteId = $this->request->getRequiredBodyParam('siteId');
         $site = $siteId ? Craft::$app->getSites()->getSiteById($siteId) : null;
@@ -894,7 +866,7 @@ class ElementIndexesController extends BaseElementsController
         }
 
         /** @var ElementInterface|null $element */
-        $element = $elementType::find()
+        $element = $this->elementType::find()
             ->id($id)
             ->drafts(null)
             ->provisionalDrafts(null)

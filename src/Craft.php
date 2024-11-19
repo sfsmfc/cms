@@ -45,7 +45,7 @@ class Craft extends Yii
     /**
      * @inheritdoc
      * @template T
-     * @param string|array|callable $type
+     * @param class-string<T>|array|callable $type
      * @phpstan-param class-string<T>|array{class:class-string<T>}|callable():T $type
      * @param array $params
      * @return T
@@ -185,8 +185,7 @@ class Craft extends Yii
     /**
      * Class autoloader.
      *
-     * @param string $className
-     * @phpstan-param class-string $className
+     * @param class-string $className
      */
     public static function autoload($className): void
     {

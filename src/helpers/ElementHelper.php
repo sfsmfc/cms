@@ -621,8 +621,7 @@ class ElementHelper
     /**
      * Returns an element type's source definition based on a given source key/path and context.
      *
-     * @param string $elementType The element type class
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The element type class
      * @param string $sourceKey The source key/path
      * @param string $context The context
      * @return array|null The source definition, or null if it cannot be found

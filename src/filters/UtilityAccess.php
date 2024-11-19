@@ -25,8 +25,7 @@ class UtilityAccess extends ActionFilter
     use ConditionalFilterTrait;
 
     /**
-     * @var string The utility class
-     * @phpstan-var class-string<UtilityInterface>
+     * @var class-string<UtilityInterface> The utility class
      */
     public string $utility;
 

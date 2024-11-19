@@ -284,8 +284,7 @@ class Gc extends Component
     /**
      * Deletes elements that are missing data in the given element extension table.
      *
-     * @param string $elementType The element type
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The element type
      * @param string $table The extension table name
      * @param string $fk The column name that contains the foreign key to `elements.id`
      * @since 3.6.6
@@ -530,8 +529,7 @@ class Gc extends Component
     /**
      * Deletes field layouts that are no longer used.
      *
-     * @param string $elementType The element type
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The element type
      * @param string $table The  table name that contains a foreign key to `fieldlayouts.id`
      * @param string $fk The column name that contains the foreign key to `fieldlayouts.id`
      * @since 4.13.0

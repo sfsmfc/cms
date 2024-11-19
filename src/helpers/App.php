@@ -139,8 +139,7 @@ class App
      * For example, if an object has a `fooBar` property, and `X`/`X_` is passed as the prefix, the resulting array
      * may contain a `fooBar` key set to an `X_FOO_BAR` environment variable value, if it exists.
      *
-     * @param string $class The class name
-     * @phpstan-param class-string $class
+     * @param class-string $class The class name
      * @param string|null $envPrefix The environment variable name prefix
      * @return array
      * @phpstan-return array<string, mixed>
@@ -719,8 +718,7 @@ class App
     /**
      * Returns a humanized class name.
      *
-     * @param string $class
-     * @phpstan-param class-string $class
+     * @param class-string $class
      * @return string
      */
     public static function humanizeClass(string $class): string

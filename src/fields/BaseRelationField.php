@@ -82,8 +82,7 @@ abstract class BaseRelationField extends Field implements PreviewableFieldInterf
     /**
      * Returns the element class associated with this field type.
      *
-     * @return string The Element class name
-     * @phpstan-return class-string<ElementInterface>
+     * @return class-string<ElementInterface> The Element class name
      */
     abstract public static function elementType(): string;
 
@@ -601,8 +600,6 @@ JS, [
             return $value;
         }
 
-        /** @var string|ElementInterface $class */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $class */
         $class = static::elementType();
         /** @var ElementQuery $query */
         $query = $class::find()
@@ -983,12 +980,8 @@ JS, [
 
             if ($this->maintainHierarchy) {
                 $structuresService = Craft::$app->getStructures();
-
-                /** @var ElementInterface $class */
-                $class = static::elementType();
-
                 /** @var ElementInterface[] $structureElements */
-                $structureElements = $class::find()
+                $structureElements = static::elementType()::find()
                     ->id($targetIds)
                     ->drafts(null)
                     ->revisions(null)
@@ -1087,7 +1080,6 @@ JS, [
      */
     public function getTargetSiteFieldHtml(): ?string
     {
-        /** @var ElementInterface|string $class */
         $class = static::elementType();
 
         if (!Craft::$app->getIsMultiSite() || !$class::isLocalized()) {

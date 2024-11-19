@@ -1896,8 +1896,7 @@ JS, [
             throw new BadRequestHttpException('Request missing required param.');
         }
 
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
+        /** @var class-string<ElementInterface> $elementType */
         $this->_validateElementType($elementType);
 
         if ($elementType::isLocalized()) {
@@ -2035,8 +2034,7 @@ JS, [
     /**
      * Ensures the given element type is valid.
      *
-     * @param string $elementType
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType
      * @throws BadRequestHttpException
      */
     private function _validateElementType(string $elementType): void
