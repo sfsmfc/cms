@@ -43,7 +43,6 @@ use craft\models\Site;
 use craft\models\Structure;
 use craft\queue\jobs\ApplyNewPropagationMethod;
 use craft\queue\jobs\ResaveElements;
-use craft\records\Entry as EntryRecord;
 use craft\records\EntryType as EntryTypeRecord;
 use craft\records\Section as SectionRecord;
 use craft\records\Section_SiteSettings as Section_SiteSettingsRecord;
@@ -979,7 +978,7 @@ class Entries extends Component
         if ($entry === null) {
             $entry = $baseEntryQuery
                 ->trashed(null)
-                ->where([EntryRecord::tableName() . '.[[deletedWithEntryType]]' => 1])
+                ->where(['entries.deletedWithEntryType' => 1])
                 ->one();
 
             if ($entry !== null) {
