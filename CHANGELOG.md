@@ -1,6 +1,6 @@
 # Release Notes for Craft CMS 5
 
-## Unreleased
+## 5.5.2 - 2024-11-19
 
 - Fixed an error that could occur if an invalid folder ID was passed to `craft\services\Assets::deleteFoldersByIds()`. ([#16147](https://github.com/craftcms/cms/pull/16147))
 - Fixed a SQL error that occurred when creating a new Single section. ([#16145](https://github.com/craftcms/cms/issues/16145))
