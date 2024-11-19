@@ -1122,9 +1122,8 @@ Craft.ui = {
   },
 
   updateTimeInputA11y: function ($input) {
-    const wrapperId = `${$input.attr('id')}-${Math.floor(
-      Math.random() * 1000000000
-    )}`;
+    const id = $input.attr('id');
+    const wrapperId = `${id}-wrapper-${Math.floor(Math.random() * 1000000000)}`;
     this.$listWrapper = null;
     const getInstance = () => {
       return $input[0].timepickerObj;
@@ -1152,6 +1151,22 @@ Craft.ui = {
         this.$listWrapper.attr({
           role: 'listbox',
           id: wrapperId,
+        });
+
+        // Apply option roles to child elements
+        this.$listWrapper.find('li').each(function (index) {
+          const isSelected = $(this).hasClass('ui-timepicker-selected');
+          const optionId = `${id}-option-${index}`;
+
+          $(this).attr({
+            id: optionId,
+            role: 'option',
+            'aria-selected': isSelected,
+          });
+
+          if (isSelected) {
+            $input.attr('aria-activedescendant', optionId);
+          }
         });
       }, 0);
     });
