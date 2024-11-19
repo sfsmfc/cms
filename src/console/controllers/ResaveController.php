@@ -386,11 +386,11 @@ class ResaveController extends Controller
         $proceed = true;
         // ask for confirmation
         if ($this->interactive && !empty($actionsToSkip)) {
-            $this->output('Following commands, don’t support all the provided parameters:', Console::FG_YELLOW);
+            $this->output('Following commands, don’t support all the provided options:', Console::FG_YELLOW);
             foreach ($actionsToSkip as $id) {
                 $invalidParams = array_map(
                     fn($param) => '--' . StringHelper::toKebabCase($param),
-                    $this->getUnsupportedParams($id, $params)
+                    $this->getUnsupportedOptions($id, $params)
                 );
                 $count = count($invalidParams);
                 $invalidParams = implode(', ', $invalidParams);
@@ -871,7 +871,7 @@ class ResaveController extends Controller
      * @param array $params
      * @return array
      */
-    private function getUnsupportedParams(string $actionId, array $params): array
+    private function getUnsupportedOptions(string $actionId, array $params): array
     {
         $unsupportedParams = [];
         $options = $this->options($actionId);
