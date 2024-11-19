@@ -1122,8 +1122,38 @@ Craft.ui = {
   },
 
   updateTimeInputA11y: function ($input) {
+    const wrapperId = `${$input.attr('id')}-${Math.floor(
+      Math.random() * 1000000000
+    )}`;
+    this.$listWrapper = null;
+    const getInstance = () => {
+      return $input[0].timepickerObj;
+    };
+
+    const getList = (instance) => {
+      return $(instance.list);
+    };
+
+    // const observerOptions = {
+    //   attributes: true,
+    //   childList: false,
+    //   subtree: false,
+    // };
+
+    // Add aria-controls to input
+    $input.attr('aria-controls', wrapperId);
+
     $input.on('showTimepicker', () => {
       $input.attr('aria-expanded', 'true');
+      const instance = getInstance();
+      this.$listWrapper = getList(instance);
+
+      setTimeout(() => {
+        this.$listWrapper.attr({
+          role: 'listbox',
+          id: wrapperId,
+        });
+      }, 0);
     });
 
     $input.on('hideTimepicker', () => {
