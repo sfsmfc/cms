@@ -2882,8 +2882,6 @@ class ElementQuery extends Query implements ElementQueryInterface
             throw new QueryAbortedException();
         }
 
-        /** @var string|ElementInterface $class */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $class */
         if ($element instanceof ElementInterface && !$element->lft) {
             $element = $element->getCanonicalId();
 

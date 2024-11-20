@@ -106,7 +106,7 @@ class Utilities extends Component
         $disabledUtilities = array_flip($generalConfig->disabledUtilities);
 
         return array_values(array_filter($event->types, function(string $class) use ($disabledUtilities) {
-            /** @var string|UtilityInterface $class */
+            /** @var class-string<UtilityInterface> $class */
             return !isset($disabledUtilities[$class::id()]);
         }));
     }

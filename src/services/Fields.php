@@ -503,7 +503,7 @@ class Fields extends Component
         $fieldTypes = [];
 
         foreach ($this->getAllFieldTypes() as $fieldType) {
-            /** @var FieldInterface|string $fieldType */
+            /** @var class-string<FieldInterface> $fieldType */
             if ($fieldType::hasContentColumn()) {
                 $fieldTypes[] = $fieldType;
             }

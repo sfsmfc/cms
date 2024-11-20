@@ -1966,6 +1966,16 @@ JS, [
         return $element;
     }
 
+    /**
+     * @param int|null $elementId
+     * @param string|null $elementUid
+     * @param bool $checkForProvisionalDraft
+     * @param class-string<ElementInterface> $elementType
+     * @param User $user
+     * @param int|array|null $siteId
+     * @param array|null $preferSites
+     * @return ElementInterface|null
+     */
     private function _elementById(
         ?int $elementId,
         ?string $elementUid,
@@ -1975,7 +1985,6 @@ JS, [
         int|array|null $siteId,
         ?array $preferSites,
     ): ?ElementInterface {
-        /** @var string|ElementInterface $elementType */
         if ($elementId) {
             // First check for a provisional draft, if we're open to it
             if ($checkForProvisionalDraft) {
