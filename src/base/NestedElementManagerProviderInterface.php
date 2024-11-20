@@ -11,7 +11,7 @@ use craft\elements\NestedElementManager;
 
 /**
  * NestedElementManagerProviderInterface defines the common interface to be implemented by elements that provide
- * one or more nested element providers for their elements that can be owned by them.
+ * one or more nested element providers for the elements that can be owned by them.
  *
  *
  * @mixin ElementTrait
