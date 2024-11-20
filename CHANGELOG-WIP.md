@@ -21,3 +21,4 @@
 - Added `craft\base\conditions\BaseElementSelectConditionRule::setElementIds()`.
 - Added `craft\fields\data\LinkData::$urlSuffix`.
 - Added `craft\fields\data\LinkData::getUrl()`.
+- `craft\models\Site` now implements `craft\base\Chippable`.
