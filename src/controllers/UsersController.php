@@ -1584,14 +1584,17 @@ JS);
             $user->passwordResetRequired = (bool)$this->request->getBodyParam('passwordResetRequired', $user->passwordResetRequired);
         }
 
-        // If this is public registration and it's a Pro version,
-        // set the default group on the user, so that any content
-        // based on user group condition can be validated and saved against them
         if ($isPublicRegistration) {
+            // set the default group on the user, so that any content
+            // based on user group condition can be validated and saved against them
             $groups = Craft::$app->getUsers()->getDefaultUserGroups($user);
             if (!empty($groups)) {
                 $user->setGroups($groups);
             }
+            
+            // keep track of which site they registered from
+            // (do this even if it's not a multi-site install, in case it becomes one later.)
+            $user->affiliatedSiteId = Craft::$app->getSites()->getCurrentSite()->id;
         }
 
         // If this is Craft Pro, grab any profile content from post
