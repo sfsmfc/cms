@@ -1229,14 +1229,12 @@ class Gql extends Component
      * Returns the content arguments for an element class based on the given contexts.
      *
      * @param array $contexts
-     * @param string $elementType
-     * @phpstan-param class-string<BaseElementInterface> $elementType
+     * @param class-string<BaseElementInterface> $elementType
      * @return array
      */
     public function getContentArguments(array $contexts, string $elementType): array
     {
         /** @var FieldLayoutBehavior[] $contexts */
-        /** @var string|BaseElementInterface $elementType */
         return $this->getOrSetContentArguments($elementType, function() use ($contexts, $elementType): array {
             $fields = [];
             foreach ($contexts as $context) {
@@ -1391,8 +1389,7 @@ class Gql extends Component
         }
 
         foreach ($types as $type) {
-            /** @var string|SingularTypeInterface $type */
-            /** @phpstan-var class-string<SingularTypeInterface>|SingularTypeInterface $type */
+            /** @var class-string<SingularTypeInterface> $type */
             TypeLoader::registerType($type::getName(), "$type::getType");
         }
 
@@ -1468,6 +1465,7 @@ class Gql extends Component
      */
     private function _loadGqlDirectives(): array
     {
+        /** @var class-string<Directive>[] $directiveClasses */
         $directiveClasses = [
             // Directives
             FormatDateTime::class,
@@ -1492,7 +1490,7 @@ class Gql extends Component
         $directives = GraphQL::getStandardDirectives();
 
         foreach ($directiveClasses as $class) {
-            /** @var Directive|string $class */
+            /** @var class-string<Directive> $class */
             $directives[] = $class::create();
         }
 

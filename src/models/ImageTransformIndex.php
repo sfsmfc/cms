@@ -34,8 +34,7 @@ class ImageTransformIndex extends Model
     public ?int $assetId = null;
 
     /**
-     * @var string The image transformer
-     * @phpstan-var class-string<ImageTransformerInterface>
+     * @var class-string<ImageTransformerInterface> The image transformer
      */
     public string $transformer = ImageTransform::DEFAULT_TRANSFORMER;
 
