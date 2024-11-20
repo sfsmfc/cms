@@ -1579,11 +1579,17 @@ class Fields extends Component
             $field = null;
         }
 
+        $oldField = null;
+        if (!$isNewField) {
+            $oldField = $this->createField($fieldRecord->getAttributes());
+        }
+
         // Fire a 'beforeApplyFieldSave' event
         if ($this->hasEventHandlers(self::EVENT_BEFORE_APPLY_FIELD_SAVE)) {
             $this->trigger(self::EVENT_BEFORE_APPLY_FIELD_SAVE, new ApplyFieldSaveEvent([
                 'field' => $field,
                 'config' => $data,
+                'oldConfig' => $oldField ? $this->createFieldConfig($oldField) : null,
             ]));
         }
 

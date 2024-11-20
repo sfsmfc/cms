@@ -28,4 +28,10 @@ class ApplyFieldSaveEvent extends Event
      * @var array New field config data that is about to be applied.
      */
     public array $config;
+
+    /**
+     * @var null|array Old field config data that is about to be overwritten.
+     * @since 4.13.3
+     */
+    public ?array $oldConfig;
 }
