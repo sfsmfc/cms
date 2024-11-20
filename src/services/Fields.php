@@ -265,7 +265,7 @@ class Fields extends Component
     {
         return ArrayHelper::where(
             $this->getAllFieldTypes(),
-            fn(string $class) => /** @var string|FieldInterface $class */ $class::dbType() !== null,
+            fn(string $class) => /** @var class-string<FieldInterface> $class */ $class::dbType() !== null,
             keepKeys: false,
         );
     }

@@ -589,7 +589,6 @@ JS, [
         }
 
         if ($errorCount) {
-            /** @var ElementInterface|string $elementType */
             $elementType = static::elementType();
             $element->addError($this->handle, Craft::t('app', 'Validation errors found in {attribute} {type}; please fix them.', [
                 'type' => $errorCount === 1 ? $elementType::lowerDisplayName() : $elementType::pluralLowerDisplayName(),
@@ -1318,7 +1317,6 @@ JS, [
      */
     protected function settingsTemplateVariables(): array
     {
-        /** @var ElementInterface|string $elementType */
         $elementType = $this->elementType();
 
         $selectionCondition = $this->getSelectionCondition() ?? $this->createSelectionCondition();

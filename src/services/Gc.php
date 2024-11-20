@@ -311,7 +311,6 @@ class Gc extends Component
      */
     public function deletePartialElements(string $elementType, string $table, string $fk): void
     {
-        /** @var string|ElementInterface $elementType */
         $this->_stdout(sprintf('    > deleting partial %s data ... ', $elementType::lowerDisplayName()));
 
         $ids = (new Query())
@@ -615,7 +614,6 @@ class Gc extends Component
      */
     public function deleteOrphanedFieldLayouts(string $elementType, string $table, string $fk = 'fieldLayoutId'): void
     {
-        /** @var string|ElementInterface $elementType */
         $this->_stdout(sprintf('    > deleting orphaned %s field layouts ... ', $elementType::lowerDisplayName()));
 
         $ids = (new Query())

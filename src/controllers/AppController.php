@@ -759,7 +759,7 @@ class AppController extends Controller
         $elementHtml = [];
 
         foreach ($criteria as $criterion) {
-            /** @var string|ElementInterface $elementType */
+            /** @var class-string<ElementInterface> $elementType */
             $elementType = $criterion['type'];
             $id = $criterion['id'];
             $fieldId = $criterion['fieldId'] ?? null;
