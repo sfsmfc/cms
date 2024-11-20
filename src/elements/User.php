@@ -2417,7 +2417,7 @@ JS, [
             }
         } else {
             $record = new UserRecord();
-            $record->id = (int)$this->id;
+            $record->id = $this->id;
             $record->active = $this->active;
             $record->pending = $this->pending;
             $record->locked = $this->locked;
@@ -2426,7 +2426,7 @@ JS, [
 
         $this->prepareNamesForSave();
 
-        $record->photoId = (int)$this->photoId ?: null;
+        $record->photoId = $this->photoId;
         $record->admin = $this->admin;
         $record->username = $this->username;
         $record->fullName = $this->fullName;
