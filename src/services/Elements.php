@@ -1676,7 +1676,6 @@ class Elements extends Component
                     $supportedSites = ArrayHelper::index(ElementHelper::supportedSitesForElement($element), 'siteId');
                     $supportedSiteIds = array_keys($supportedSites);
                     $elementSiteIds = $siteIds !== null ? array_intersect($siteIds, $supportedSiteIds) : $supportedSiteIds;
-                    /** @var string|ElementInterface $elementType */
                     $elementType = get_class($element);
 
                     $e = null;

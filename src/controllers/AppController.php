@@ -832,7 +832,7 @@ class AppController extends Controller
         $menuItemHtml = [];
 
         foreach ($components as $componentInfo) {
-            /** @var string|Chippable $componentType */
+            /** @var class-string<Chippable> $componentType */
             $componentType = $componentInfo['type'];
             $id = $componentInfo['id'];
 

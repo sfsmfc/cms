@@ -241,7 +241,7 @@ JS, [
                         // re-fetch as many of these as we can from the element types,
                         // so they have a chance to supply the layout providers
                         foreach ($layoutsByType as $type => &$typeLayouts) {
-                            /** @var string|ElementInterface $type */
+                            /** @var class-string<ElementInterface> $type */
                             /** @phpstan-ignore-next-line */
                             foreach ($type::fieldLayouts(null) as $layout) {
                                 if (isset($typeLayouts[$layout->uid]) && $layout->provider instanceof Chippable) {
@@ -289,7 +289,7 @@ JS, [
                         foreach ($layoutsByType as $type => $typeLayouts) {
                             // any remaining layouts for this type?
                             if (!empty($typeLayouts)) {
-                                /** @var string|ElementInterface $type */
+                                /** @var class-string<ElementInterface> $type */
                                 $items[] = Craft::t('app', '{total, number} {type} {total, plural, =1{field layout} other{field layouts}}', [
                                     'total' => count($typeLayouts),
                                     'type' => $type::lowerDisplayName(),

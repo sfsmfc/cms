@@ -490,15 +490,13 @@ class Gc extends Component
      * Deletes elements which have a `fieldId` value, but it’s set to an invalid field ID,
      * or they're missing a row in the `elements_owners` table.
      *
-     * @param string $elementType The element type
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The element type
      * @param string $table The extension table name
      * @param string $fieldFk The column name that contains the foreign key to `fields.id`
      * @since 5.4.2
      */
     public function deleteOrphanedNestedElements(string $elementType, string $table, string $fieldFk = 'fieldId'): void
     {
-        /** @var string|ElementInterface $elementType */
         $this->_stdout(sprintf('    > deleting orphaned nested %s ... ', $elementType::pluralLowerDisplayName()));
 
         $ids1 = (new Query())

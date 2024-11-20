@@ -322,10 +322,8 @@ class Fields extends Component
     /**
      * Returns whether the two given field types are considered compatible with each other.
      *
-     * @param string|FieldInterface $fieldA
-     * @param string|FieldInterface $fieldB
-     * @phpstan-param class-string<FieldInterface> $fieldA
-     * @phpstan-param class-string<FieldInterface> $fieldB
+     * @param class-string<FieldInterface> $fieldA
+     * @param class-string<FieldInterface> $fieldB
      * @return bool
      * @since 5.3.0
      */

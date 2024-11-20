@@ -2370,9 +2370,12 @@ JS, [
         return null;
     }
 
+    /**
+     * @param class-string<ElementInterface> $elementType
+     * @return ElementQueryInterface
+     */
     private function _elementQuery(string $elementType): ElementQueryInterface
     {
-        /** @var string|ElementInterface $elementType */
         $query = $elementType::find();
         if ($query instanceof NestedElementQueryInterface) {
             $query
