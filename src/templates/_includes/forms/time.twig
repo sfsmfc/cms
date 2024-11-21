@@ -70,7 +70,7 @@
     {%- js -%}
         var $timePicker = $('#{{ id|namespaceInputId|e('js') }}');
         $timePicker.timepicker($.extend({{ options|json_encode(jsonOptions)|raw }}, Craft.timepickerOptions));
-        Craft.ui.updateTimeInputA11y($timePicker);
+        Craft.ui.remediateTimepickerA11y($timePicker);
 
         {%- if value and value.format is defined -%}
             $timePicker.timepicker('setTime', {{ value.format('G') }}*3600 + {{ value.format('i') }}*60 + {{ value.format('s') }});

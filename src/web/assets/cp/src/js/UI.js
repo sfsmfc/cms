@@ -1121,40 +1121,58 @@ Craft.ui = {
     return $btn;
   },
 
-  updateTimeInputA11y: function ($input) {
+  /**
+   * Updates an input using the timepicker plugin for accessibility.
+   *
+   * @param {Object} $input - The input element
+   */
+  remediateTimepickerA11y: function (input) {
+    const $input = $(input);
+    let $listWrapper = null;
+    let listboxObserver = null;
     const id = $input.attr('id');
     const wrapperId = `${id}-wrapper-${Math.floor(Math.random() * 1000000000)}`;
-    this.$listWrapper = null;
+
     const getInstance = () => {
       return $input[0].timepickerObj;
     };
 
-    const getList = (instance) => {
+    const getTimepickerListbox = () => {
+      const instance = getInstance();
       return $(instance.list);
     };
 
-    // const observerOptions = {
-    //   attributes: true,
-    //   childList: false,
-    //   subtree: false,
-    // };
+    const callback = (mutationList, observer) => {
+      for (const mutation of mutationList) {
+        const {target} = mutation;
+
+        if ($(target).hasClass('ui-timepicker-selected')) {
+          const optionId = target.id;
+          $input.attr('aria-activedescendant', optionId);
+          $(target).attr('aria-selected', 'true');
+        } else {
+          $(target).attr('aria-selected', 'false');
+        }
+      }
+    };
+
+    if (!getInstance()) return;
 
     // Add aria-controls to input
     $input.attr('aria-controls', wrapperId);
 
     $input.on('showTimepicker', () => {
       $input.attr('aria-expanded', 'true');
-      const instance = getInstance();
-      this.$listWrapper = getList(instance);
+      $listWrapper = getTimepickerListbox();
 
       setTimeout(() => {
-        this.$listWrapper.attr({
+        $listWrapper.attr({
           role: 'listbox',
           id: wrapperId,
         });
 
         // Apply option roles to child elements
-        this.$listWrapper.find('li').each(function (index) {
+        $listWrapper.find('li').each(function (index) {
           const isSelected = $(this).hasClass('ui-timepicker-selected');
           const optionId = `${id}-option-${index}`;
 
@@ -1168,11 +1186,24 @@ Craft.ui = {
             $input.attr('aria-activedescendant', optionId);
           }
         });
+
+        // Watch for updates to the listbox
+        if (!listboxObserver) {
+          listboxObserver = new MutationObserver(callback);
+        }
+
+        listboxObserver.observe($listWrapper[0], {
+          subtree: true,
+          attributeFilter: ['class'],
+        });
       }, 0);
     });
 
     $input.on('hideTimepicker', () => {
       $input.attr('aria-expanded', 'false');
+      if (listboxObserver) {
+        listboxObserver.disconnect();
+      }
     });
   },
 
