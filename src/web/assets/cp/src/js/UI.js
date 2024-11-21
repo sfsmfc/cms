@@ -1257,6 +1257,7 @@ Craft.ui = {
       $input.datetimeinput();
     } else {
       $input.timepicker(Craft.timepickerOptions);
+      this.remediateTimepickerA11y($input);
       if (value) {
         $input.timepicker(
           'setTime',
