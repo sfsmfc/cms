@@ -42,6 +42,7 @@ use craft\helpers\UrlHelper;
 use craft\helpers\User as UserHelper;
 use craft\i18n\Formatter;
 use craft\models\FieldLayout;
+use craft\models\Site;
 use craft\models\UserGroup;
 use craft\records\User as UserRecord;
 use craft\records\WebAuthn as WebAuthnRecord;
@@ -457,17 +458,18 @@ class User extends Element implements IdentityInterface
      */
     protected static function defineTableAttributes(): array
     {
-        return array_merge(parent::defineTableAttributes(), [
+        return array_merge(parent::defineTableAttributes(), array_filter([
             'email' => ['label' => Craft::t('app', 'Email')],
             'username' => ['label' => Craft::t('app', 'Username')],
             'fullName' => ['label' => Craft::t('app', 'Full Name')],
             'firstName' => ['label' => Craft::t('app', 'First Name')],
             'lastName' => ['label' => Craft::t('app', 'Last Name')],
             'groups' => ['label' => Craft::t('app', 'Groups')],
+            'affiliatedSite' => Craft::$app->getIsMultiSite() ? ['label' => Craft::t('app', 'Affiliated Site')] : null,
             'preferredLanguage' => ['label' => Craft::t('app', 'Preferred Language')],
             'preferredLocale' => ['label' => Craft::t('app', 'Preferred Locale')],
             'lastLoginDate' => ['label' => Craft::t('app', 'Last Login')],
-        ]);
+        ]));
     }
 
     /**
@@ -524,6 +526,10 @@ class User extends Element implements IdentityInterface
             'groups' => [
                 'label' => Craft::t('app', 'Groups'),
                 'placeholder' => Craft::t('app', 'Group Name'),
+            ],
+            'affiliatedSite' => [
+                'label' => Craft::t('app', 'Affiliated Site'),
+                'placeholder' => Craft::t('app', 'Site Name'),
             ],
             'preferredLanguage' => [
                 'label' => Craft::t('app', 'Preferred Language'),
@@ -679,6 +685,12 @@ class User extends Element implements IdentityInterface
      * @var string|null Password
      */
     public ?string $password = null;
+
+    /**
+     * @var int|null Affiliated site ID
+     * @since 5.6.0
+     */
+    public ?int $affiliatedSiteId = null;
 
     /**
      * @var DateTime|null Last login date
@@ -961,7 +973,7 @@ class User extends Element implements IdentityInterface
         ]);
 
         $rules[] = [['lastLoginDate', 'lastInvalidLoginDate', 'lockoutDate', 'lastPasswordChangeDate', 'verificationCodeIssuedDate'], DateTimeValidator::class];
-        $rules[] = [['invalidLoginCount', 'photoId'], 'number', 'integerOnly' => true];
+        $rules[] = [['invalidLoginCount', 'photoId', 'affiliatedSiteId'], 'number', 'integerOnly' => true];
         $rules[] = [['username', 'email', 'unverifiedEmail', 'fullName', 'firstName', 'lastName'], 'trim', 'skipOnEmpty' => true];
         $rules[] = [['email', 'unverifiedEmail'], 'email', 'enableIDN' => App::supportsIdn(), 'enableLocalIDN' => false];
         $rules[] = [['email', 'username', 'fullName', 'firstName', 'lastName', 'password', 'unverifiedEmail'], 'string', 'max' => 255];
@@ -1512,6 +1524,21 @@ class User extends Element implements IdentityInterface
     public function setFriendlyName(string $friendlyName): void
     {
         $this->_friendlyName = $friendlyName;
+    }
+
+    /**
+     * Returns the user’s affiliated site, if they have one.
+     *
+     * @return Site|null
+     * @since 5.6.0
+     */
+    public function getAffiliatedSite(): ?Site
+    {
+        if ($this->affiliatedSiteId === null || !Craft::$app->getIsMultiSite()) {
+            return null;
+        }
+
+        return Craft::$app->getSites()->getSiteById($this->affiliatedSiteId, true);
     }
 
     /**
@@ -2427,6 +2454,7 @@ JS, [
         $this->prepareNamesForSave();
 
         $record->photoId = $this->photoId;
+        $record->affiliatedSiteId = $this->affiliatedSiteId;
         $record->admin = $this->admin;
         $record->username = $this->username;
         $record->fullName = $this->fullName;

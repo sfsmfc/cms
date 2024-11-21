@@ -95,67 +95,89 @@ class Mailer extends \yii\symfonymailer\Mailer
         $generalConfig = Craft::$app->getConfig()->getGeneral();
 
         if ($message instanceof Message && $message->key !== null) {
-            if ($message->language === null) {
-                // Default to the current language
-                $message->language = Craft::$app->getRequest()->getIsSiteRequest()
-                    ? Craft::$app->language
-                    : Craft::$app->getSites()->getPrimarySite()->language;
+            $sitesService = Craft::$app->getSites();
+            $currentSite = $messageSite = null;
+
+            if (isset($message->siteId)) {
+                $messageSite = $sitesService->getSiteById($message->siteId);
+                if ($messageSite) {
+                    $currentSite = $sitesService->getCurrentSite();
+                    $sitesService->setCurrentSite($messageSite);
+                }
             }
 
-            $systemMessage = Craft::$app->getSystemMessages()->getMessage($message->key, $message->language);
+            if ($message->language === null) {
+                // If a site was specified, go with its language
+                if ($messageSite) {
+                    $message->language = $messageSite->language;
+                } else {
+                    // Default to the current language
+                    $message->language = Craft::$app->getRequest()->getIsSiteRequest()
+                        ? Craft::$app->language
+                        : Craft::$app->getSites()->getPrimarySite()->language;
+                }
+            }
 
             // Use the message language
             $language = Craft::$app->language;
             Craft::$app->language = $message->language;
 
-            $settings = App::mailSettings();
-            $variables = ($message->variables ?: []) + [
-                    'emailKey' => $message->key,
-                    'fromEmail' => App::parseEnv($settings->fromEmail),
-                    'replyToEmail' => App::parseEnv($settings->replyToEmail),
-                    'fromName' => App::parseEnv($settings->fromName),
-                    'language' => $message->language,
-                ];
-
             // Temporarily disable lazy transform generation
             $generateTransformsBeforePageLoad = $generalConfig->generateTransformsBeforePageLoad;
             $generalConfig->generateTransformsBeforePageLoad = true;
 
-            // Render the subject and body text
-            $view = Craft::$app->getView();
-            $subject = $view->renderString($systemMessage->subject, $variables, View::TEMPLATE_MODE_SITE);
-            $textBody = $view->renderString($systemMessage->body, $variables, View::TEMPLATE_MODE_SITE);
-            $htmlBody = $view->renderString($systemMessage->body, $variables, View::TEMPLATE_MODE_SITE, true);
-
-            // Remove </> from around URLs, so they’re not interpreted as HTML tags
-            $textBody = preg_replace('/<(https?:\/\/.+?)>/', '$1', $textBody);
-
-            $message->setSubject($subject);
-            $message->setTextBody($textBody);
-
-            // Is there a custom HTML template set?
-            if (Craft::$app->edition->value >= CmsEdition::Pro->value && $this->template) {
-                $template = $this->template;
-                $templateMode = View::TEMPLATE_MODE_SITE;
-            } else {
-                // Default to the _special/email.html template
-                $template = '_special/email.twig';
-                $templateMode = View::TEMPLATE_MODE_CP;
-            }
-
             try {
-                $message->setHtmlBody($view->renderTemplate($template, array_merge($variables, [
-                    'body' => Template::raw(Markdown::process($htmlBody)),
-                ]), $templateMode));
-            } catch (Throwable $e) {
-                // Just log it and don't worry about the HTML body
-                Craft::warning('Error rendering email template: ' . $e->getMessage(), __METHOD__);
-                Craft::$app->getErrorHandler()->logException($e);
-            }
+                $systemMessage = Craft::$app->getSystemMessages()->getMessage($message->key, $message->language);
 
-            // Set things back to normal
-            Craft::$app->language = $language;
-            $generalConfig->generateTransformsBeforePageLoad = $generateTransformsBeforePageLoad;
+                $settings = App::mailSettings();
+                $variables = ($message->variables ?: []) + [
+                        'emailKey' => $message->key,
+                        'fromEmail' => App::parseEnv($settings->fromEmail),
+                        'replyToEmail' => App::parseEnv($settings->replyToEmail),
+                        'fromName' => App::parseEnv($settings->fromName),
+                        'language' => $message->language,
+                    ];
+
+                // Render the subject and body text
+                $view = Craft::$app->getView();
+                $subject = $view->renderString($systemMessage->subject, $variables, View::TEMPLATE_MODE_SITE);
+                $textBody = $view->renderString($systemMessage->body, $variables, View::TEMPLATE_MODE_SITE);
+                $htmlBody = $view->renderString($systemMessage->body, $variables, View::TEMPLATE_MODE_SITE, true);
+
+                // Remove </> from around URLs, so they’re not interpreted as HTML tags
+                $textBody = preg_replace('/<(https?:\/\/.+?)>/', '$1', $textBody);
+
+                $message->setSubject($subject);
+                $message->setTextBody($textBody);
+
+                // Is there a custom HTML template set?
+                if (Craft::$app->edition->value >= CmsEdition::Pro->value && $this->template) {
+                    $template = $this->template;
+                    $templateMode = View::TEMPLATE_MODE_SITE;
+                } else {
+                    // Default to the _special/email.html template
+                    $template = '_special/email.twig';
+                    $templateMode = View::TEMPLATE_MODE_CP;
+                }
+
+                try {
+                    $message->setHtmlBody($view->renderTemplate($template, array_merge($variables, [
+                        'body' => Template::raw(Markdown::process($htmlBody)),
+                    ]), $templateMode));
+                } catch (Throwable $e) {
+                    // Just log it and don't worry about the HTML body
+                    Craft::warning('Error rendering email template: ' . $e->getMessage(), __METHOD__);
+                    Craft::$app->getErrorHandler()->logException($e);
+                }
+            } finally {
+                // Set things back to normal
+                Craft::$app->language = $language;
+                $generalConfig->generateTransformsBeforePageLoad = $generateTransformsBeforePageLoad;
+
+                if ($currentSite) {
+                    $sitesService->setCurrentSite($currentSite);
+                }
+            }
         }
 
         // Set the default sender if there isn't one already
