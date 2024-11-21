@@ -1142,6 +1142,10 @@ Craft.ui = {
       return $(instance.list);
     };
 
+    getAccessibleName = () => {
+      return $input.attr('aria-label');
+    };
+
     const callback = (mutationList, observer) => {
       for (const mutation of mutationList) {
         const {target} = mutation;
@@ -1169,6 +1173,7 @@ Craft.ui = {
         $listWrapper.attr({
           role: 'listbox',
           id: wrapperId,
+          'aria-label': getAccessibleName(),
         });
 
         // Apply option roles to child elements
