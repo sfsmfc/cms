@@ -12,6 +12,7 @@ use craft\elements\User;
 use craft\enums\CmsEdition;
 use craft\helpers\App;
 use craft\helpers\Template;
+use craft\models\Site;
 use craft\web\View;
 use Throwable;
 use yii\base\InvalidConfigException;
@@ -48,6 +49,12 @@ class Mailer extends \yii\symfonymailer\Mailer
      * @since 3.4.0
      */
     public User|string|array|null $replyTo = null;
+
+    /**
+     * @var array Site overrides
+     * @since 5.6.0
+     */
+    public array $siteOverrides = [];
 
     /**
      * Composes a new email based on a given key.
@@ -93,12 +100,14 @@ class Mailer extends \yii\symfonymailer\Mailer
         ]));
 
         $generalConfig = Craft::$app->getConfig()->getGeneral();
+        $sitesService = Craft::$app->getSites();
+        $currentSite = $messageSite = null;
+        $language = Craft::$app->language;
+        $generateTransformsBeforePageLoad = $generalConfig->generateTransformsBeforePageLoad;
+        $originalSettings = [];
 
-        if ($message instanceof Message && $message->key !== null) {
-            $sitesService = Craft::$app->getSites();
-            $currentSite = $messageSite = null;
-
-            if (isset($message->siteId)) {
+        try {
+            if ($message instanceof Message && isset($message->siteId)) {
                 $messageSite = $sitesService->getSiteById($message->siteId);
                 if ($messageSite) {
                     $currentSite = $sitesService->getCurrentSite();
@@ -106,27 +115,44 @@ class Mailer extends \yii\symfonymailer\Mailer
                 }
             }
 
-            if ($message->language === null) {
-                // If a site was specified, go with its language
-                if ($messageSite) {
-                    $message->language = $messageSite->language;
-                } else {
-                    // Default to the current language
-                    $message->language = Craft::$app->getRequest()->getIsSiteRequest()
-                        ? Craft::$app->language
-                        : Craft::$app->getSites()->getPrimarySite()->language;
-                }
+            $overrides = $this->siteOverrides[$sitesService->getCurrentSite()->uid] ?? [];
+            if (isset($overrides['fromEmail']) || isset($overrides['fromName'])) {
+                $originalSettings['from'] = $this->from;
+                $fromEmail = $overrides['fromEmail'] ?? array_key_first($this->from);
+                $fromName = $overrides['fromName'] ?? reset($this->from);
+                /** @phpstan-ignore-next-line */
+                $this->from = [
+                    App::parseEnv($fromEmail) => App::parseEnv($fromName),
+                ];
+            }
+            if (isset($overrides['replyToEmail'])) {
+                $originalSettings['replyTo'] = $this->replyTo;
+                $this->replyTo = App::parseEnv($overrides['replyToEmail']);
+            }
+            if (isset($overrides['template'])) {
+                $originalSettings['template'] = $this->template;
+                $this->template = App::parseEnv($overrides['template']);
             }
 
-            // Use the message language
-            $language = Craft::$app->language;
-            Craft::$app->language = $message->language;
+            if ($message instanceof Message && $message->key !== null) {
+                if ($message->language === null) {
+                    // If a site was specified, go with its language
+                    if ($messageSite) {
+                        $message->language = $messageSite->language;
+                    } else {
+                        // Default to the current language
+                        $message->language = Craft::$app->getRequest()->getIsSiteRequest()
+                            ? Craft::$app->language
+                            : Craft::$app->getSites()->getPrimarySite()->language;
+                    }
+                }
 
-            // Temporarily disable lazy transform generation
-            $generateTransformsBeforePageLoad = $generalConfig->generateTransformsBeforePageLoad;
-            $generalConfig->generateTransformsBeforePageLoad = true;
+                // Use the message language
+                Craft::$app->language = $message->language;
 
-            try {
+                // Temporarily disable lazy transform generation
+                $generalConfig->generateTransformsBeforePageLoad = true;
+
                 $systemMessage = Craft::$app->getSystemMessages()->getMessage($message->key, $message->language);
 
                 $settings = App::mailSettings();
@@ -169,34 +195,36 @@ class Mailer extends \yii\symfonymailer\Mailer
                     Craft::warning('Error rendering email template: ' . $e->getMessage(), __METHOD__);
                     Craft::$app->getErrorHandler()->logException($e);
                 }
-            } finally {
-                // Set things back to normal
-                Craft::$app->language = $language;
-                $generalConfig->generateTransformsBeforePageLoad = $generateTransformsBeforePageLoad;
-
-                if ($currentSite) {
-                    $sitesService->setCurrentSite($currentSite);
-                }
             }
-        }
 
-        // Set the default sender if there isn't one already
-        if (!$message->getFrom()) {
-            $message->setFrom($this->from);
-        }
+            // Set the default sender if there isn't one already
+            if (!$message->getFrom()) {
+                $message->setFrom($this->from);
+            }
 
-        if ($this->replyTo && !$message->getReplyTo()) {
-            $message->setReplyTo($this->replyTo);
-        }
+            if ($this->replyTo && !$message->getReplyTo()) {
+                $message->setReplyTo($this->replyTo);
+            }
 
-        // Apply the testToEmailAddress config setting
-        $testToEmailAddress = $generalConfig->getTestToEmailAddress();
-        if (!empty($testToEmailAddress)) {
-            $message->setTo($testToEmailAddress);
-            $message->setCc([]);
-            $message->setBcc([]);
-        }
+            // Apply the testToEmailAddress config setting
+            $testToEmailAddress = $generalConfig->getTestToEmailAddress();
+            if (!empty($testToEmailAddress)) {
+                $message->setTo($testToEmailAddress);
+                $message->setCc([]);
+                $message->setBcc([]);
+            }
 
-        return parent::send($message);
+            return parent::send($message);
+        } finally {
+            // Set things back to normal
+            Craft::$app->language = $language;
+            $generalConfig->generateTransformsBeforePageLoad = $generateTransformsBeforePageLoad;
+
+            if ($currentSite) {
+                $sitesService->setCurrentSite($currentSite);
+            }
+
+            Craft::configure($this, $originalSettings);
+        }
     }
 }

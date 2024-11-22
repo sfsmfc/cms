@@ -13,6 +13,8 @@ use craft\behaviors\EnvAttributeParserBehavior;
 use craft\mail\transportadapters\Sendmail;
 use craft\mail\transportadapters\TransportAdapterInterface;
 use craft\validators\TemplateValidator;
+use Illuminate\Support\Collection;
+use yii\validators\EmailValidator;
 
 /**
  * MailSettings Model class.
@@ -42,6 +44,12 @@ class MailSettings extends Model
      * @var string|null The template that emails should be sent with
      */
     public ?string $template = null;
+
+    /**
+     * @var array Site-specific overrides
+     * @since 5.6.0
+     */
+    private array $siteOverrides = [];
 
     /**
      * @var class-string<TransportAdapterInterface>|null The transport type that should be used
@@ -74,6 +82,27 @@ class MailSettings extends Model
     /**
      * @inheritdoc
      */
+    public function attributes()
+    {
+        return [
+            ...parent::attributes(),
+            'siteOverrides',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function fields(): array
+    {
+        $fields = parent::fields();
+        $fields['siteOverrides'] = fn() => $this->siteOverrides;
+        return $fields;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function attributeLabels(): array
     {
         return [
@@ -82,6 +111,7 @@ class MailSettings extends Model
             'fromName' => Craft::t('app', 'Sender Name'),
             'template' => Craft::t('app', 'HTML Email Template'),
             'transportType' => Craft::t('app', 'Transport Type'),
+            'siteOverrides' => Craft::t('app', 'Site Overrides'),
         ];
     }
 
@@ -95,6 +125,53 @@ class MailSettings extends Model
         $rules[] = [['fromEmail', 'replyToEmail'], 'email'];
         $rules[] = [['template'], TemplateValidator::class];
 
+        $rules[] = [['siteOverrides'], function() {
+            $sitesService = Craft::$app->getSites();
+            foreach ($this->siteOverrides as $siteUid => $overrides) {
+                foreach (['fromEmail', 'replyToEmail'] as $key) {
+                    if (isset($overrides[$key])) {
+                        $validator = new EmailValidator([
+                            'message' => Craft::t('yii', '{attribute} is not a valid email address.', [
+                                'attribute' => sprintf(
+                                    '%s - %s',
+                                    $sitesService->getSiteByUid($siteUid)->getUiLabel(),
+                                    $this->attributeLabels()[$key],
+                                ),
+                            ]),
+                        ]);
+                        if (!$validator->validate($overrides[$key], $error)) {
+                            $this->addError('siteOverrides', $error);
+                        }
+                    }
+                }
+            }
+        }];
+
         return $rules;
+    }
+
+    /**
+     * Returns the site overrides.
+     *
+     * @return array
+     * @since 5.6.0
+     */
+    public function getSiteOverrides(): array
+    {
+        return Collection::make(Craft::$app->getSites()->getAllSites())
+            ->keyBy(fn(Site $site) => $site->uid)
+            ->map(fn(Site $site) => $this->siteOverrides[$site->uid] ?? [])
+            ->all();
+    }
+
+    /**
+     * Sets the site overrides.
+     *
+     * @param array $siteOverrides
+     * @since 5.6.0
+     */
+    public function setSiteOverrides(array $siteOverrides): void
+    {
+        $this->siteOverrides = array_filter(array_map(fn(array $overrides) => array_filter($overrides), $siteOverrides));
     }
 }
