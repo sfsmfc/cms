@@ -228,6 +228,16 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
             return null;
         }
 
+        // ensure we only store the selected number of decimals and that the result is the same as in v4
+        // https://github.com/craftcms/cms/issues/16181
+        if (isset($this->decimals)) {
+            if ($this->decimals === 0) {
+                $value = (int)$value;
+            } else {
+                $value = number_format($value, $this->decimals, '.');
+            }
+        }
+
         if (is_string($value) && is_numeric($value)) {
             if ((int)$value == $value) {
                 return (int)$value;
