@@ -1692,24 +1692,38 @@ class ElementQuery extends Query implements ElementQueryInterface
         }
 
         // Map custom field handles to their content values
+        $isMysql = $db->getIsMysql();
         foreach ($this->customFields as $field) {
-            $valueSql = $field->getValueSql();
-            if ($valueSql !== null) {
-                if (isset($this->_columnMap[$field->handle])) {
-                    if (!is_array($this->_columnMap[$field->handle])) {
-                        $this->_columnMap[$field->handle] = [$this->_columnMap[$field->handle]];
-                    }
-                    $this->_columnMap[$field->handle][] = $valueSql;
+            $dbTypes = $field::dbType();
+
+            if ($dbTypes !== null) {
+                if (is_string($dbTypes)) {
+                    $dbTypes = ['*' => $dbTypes];
                 } else {
-                    $this->_columnMap[$field->handle] = $valueSql;
+                    $dbTypes = [
+                        '*' => reset($dbTypes),
+                        ...$dbTypes,
+                    ];
                 }
 
-                // when preparing the query, we sometimes need to prep custom values some more
-                $dbType = $field::dbType();
-                // for mysql, we have to make sure text column type is cast to char, otherwise it won't be sorted correctly
-                // see https://github.com/craftcms/cms/issues/15609
-                if ($db->getIsMysql() && is_string($dbType) && Db::parseColumnType($dbType) === Schema::TYPE_TEXT) {
-                    $this->_columnsToCast[$field->handle] = 'CHAR(255)';
+                foreach ($dbTypes as $key => $dbType) {
+                    $alias = $field->handle . ($key !== '*' ? ".$key" : '');
+                    $resolver = fn() => $field->getValueSql($key !== '*' ? $key : null);
+
+                    if (isset($this->_columnMap[$alias])) {
+                        if (!is_array($this->_columnMap[$alias])) {
+                            $this->_columnMap[$alias] = [$this->_columnMap[$alias]];
+                        }
+                        $this->_columnMap[$alias][] = $resolver;
+                    } else {
+                        $this->_columnMap[$alias] = $resolver;
+                    }
+
+                    // for mysql, we have to make sure text column type is cast to char, otherwise it won't be sorted correctly
+                    // see https://github.com/craftcms/cms/issues/15609
+                    if ($isMysql && Db::parseColumnType($dbType) === Schema::TYPE_TEXT) {
+                        $this->_columnsToCast[$alias] = 'CHAR(255)';
+                    }
                 }
             }
         }
@@ -3306,11 +3320,13 @@ class ElementQuery extends Query implements ElementQueryInterface
         // (yes this is awkward but we need to preserve the order of the keys!)
         $orderByColumns = array_keys($orderBy);
 
-        foreach ($this->_columnMap as $orderValue => $columnName) {
+        foreach (array_keys($this->_columnMap) as $orderValue) {
             // Are we ordering by this column name?
             $pos = array_search($orderValue, $orderByColumns, true);
 
             if ($pos !== false) {
+                $columnName = $this->_resolveColumnMapping($orderValue);
+
                 // Swap it with the mapped column name
                 if (is_array($columnName)) {
                     $params = [];
@@ -3391,7 +3407,7 @@ class ElementQuery extends Query implements ElementQueryInterface
             } else {
                 // Is this a mapped column name?
                 if (is_string($column) && isset($this->_columnMap[$column])) {
-                    $column = $this->_columnMap[$column];
+                    $column = $this->_resolveColumnMapping($column);
 
                     // Completely ditch the mapped name if instantiated elements are going to be returned
                     if (!$this->asArray && is_string($column)) {
@@ -3576,5 +3592,25 @@ class ElementQuery extends Query implements ElementQueryInterface
         }
 
         return $elements;
+    }
+
+    private function _resolveColumnMapping(string $key): string|array
+    {
+        if (!isset($this->_columnMap[$key])) {
+            throw new InvalidArgumentException("Invalid column map key: $key");
+        }
+
+        // make sure it's not still a callback
+        if (is_callable($this->_columnMap[$key])) {
+            $this->_columnMap[$key] = $this->_columnMap[$key]();
+        } elseif (is_array($this->_columnMap[$key])) {
+            foreach ($this->_columnMap[$key] as $i => $mapping) {
+                if (is_callable($mapping)) {
+                    $this->_columnMap[$key][$i] = $mapping();
+                }
+            }
+        }
+
+        return $this->_columnMap[$key];
     }
 }
