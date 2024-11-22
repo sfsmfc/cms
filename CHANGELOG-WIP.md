@@ -30,7 +30,7 @@
 - Added `craft\fields\data\LinkData::getUrl()`.
 - Added `craft\mail\Mailer::$siteId`.
 - Added `craft\mail\Mailer::$siteOverrides`.
-- Added `craft\models\MailSettings::setSiteOverrides()`.
+- Added `craft\models\MailSettings::$siteOverrides`.
 - `craft\models\Site` now implements `craft\base\Chippable`.
 
 ### System

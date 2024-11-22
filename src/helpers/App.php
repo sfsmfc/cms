@@ -1045,7 +1045,7 @@ class App
             ],
             'replyTo' => App::parseEnv($settings->replyToEmail),
             'template' => App::parseEnv($settings->template),
-            'siteOverrides' => $settings->getSiteOverrides(),
+            'siteOverrides' => $settings->siteOverrides,
             'transport' => $adapter->defineTransport(),
         ];
     }

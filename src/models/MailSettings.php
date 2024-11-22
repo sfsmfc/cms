@@ -13,7 +13,6 @@ use craft\behaviors\EnvAttributeParserBehavior;
 use craft\mail\transportadapters\Sendmail;
 use craft\mail\transportadapters\TransportAdapterInterface;
 use craft\validators\TemplateValidator;
-use Illuminate\Support\Collection;
 use yii\validators\EmailValidator;
 
 /**
@@ -49,7 +48,7 @@ class MailSettings extends Model
      * @var array Site-specific overrides
      * @since 5.6.0
      */
-    private array $siteOverrides = [];
+    public array $siteOverrides = [];
 
     /**
      * @var class-string<TransportAdapterInterface>|null The transport type that should be used
@@ -77,27 +76,6 @@ class MailSettings extends Model
                 ],
             ],
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function attributes()
-    {
-        return [
-            ...parent::attributes(),
-            'siteOverrides',
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function fields(): array
-    {
-        $fields = parent::fields();
-        $fields['siteOverrides'] = fn() => $this->siteOverrides;
-        return $fields;
     }
 
     /**
@@ -148,20 +126,6 @@ class MailSettings extends Model
         }];
 
         return $rules;
-    }
-
-    /**
-     * Returns the site overrides.
-     *
-     * @return array
-     * @since 5.6.0
-     */
-    public function getSiteOverrides(): array
-    {
-        return Collection::make(Craft::$app->getSites()->getAllSites())
-            ->keyBy(fn(Site $site) => $site->uid)
-            ->map(fn(Site $site) => $this->siteOverrides[$site->uid] ?? [])
-            ->all();
     }
 
     /**

@@ -133,9 +133,13 @@
                     code: true,
                 }
             }|filter,
-            rows: settings.siteOverrides|map((overrides, siteUid) => overrides|merge({
-                heading: craft.app.sites.getSiteByUid(siteUid).getUiLabel(),
-            })),
+            rows: collect(craft.app.sites.getAllSites())
+                .keyBy(site => site.uid)
+                .map(site => {
+                    heading: site.getUiLabel(),
+                    ...(settings.siteOverrides[site.uid] ?? {})
+                })
+                .all(),
             fullWidth: true,
             allowAdd: false,
             allowDelete: false,
