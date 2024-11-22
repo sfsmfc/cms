@@ -35,3 +35,4 @@
 
 ### System
 - Craft now keeps track of which site users registered from. When sending an email from the control panel, the current site is now set to the user’s affiliated site, if known. ([#16174](https://github.com/craftcms/cms/pull/16174)) 
+- Updated Twig to 3.15.
