@@ -19,8 +19,8 @@ use craft\base\FieldInterface;
 class ApplyFieldSaveEvent extends Event
 {
     /**
-     * @var FieldInterface|null The field associated with this event, if it already exists
-     * in the database or in memory.
+     * @var FieldInterface|null The field associated with this event, as
+     * configured before the changes are applied to it (if it already exists).
      */
     public ?FieldInterface $field;
 
