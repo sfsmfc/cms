@@ -315,7 +315,6 @@ class Category extends Element
                 'orderBy' => 'dateUpdated',
                 'defaultDir' => 'desc',
             ],
-            'id ' => Craft::t('app', 'ID'),
         ];
     }
 

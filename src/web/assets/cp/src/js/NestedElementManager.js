@@ -425,7 +425,9 @@ Craft.NestedElementManager = Garnish.Base.extend(
               onBeforeSubmit: async () => {
                 // If the nested element is primarily owned by the same owner element it was queried for,
                 // then ensure we're working with a draft and save the nested entry changes to the draft
+                // note: this workflow doesn't apply to entries nested directly in global sets as globals don't use element editor
                 if (
+                  typeof this.elementEditor !== 'undefined' &&
                   Garnish.hasAttr($element, 'data-owner-is-canonical') &&
                   !this.elementEditor.settings.isUnpublishedDraft
                 ) {

@@ -1411,6 +1411,12 @@ abstract class Element extends Component implements ElementInterface
     {
         $sortOptions = static::defineSortOptions();
 
+        // Make sure ID is listed first
+        $sortOptions = [
+            'id' => Craft::t('app', 'ID'),
+            ...ArrayHelper::without($sortOptions, 'id'),
+        ];
+
         // Fire a 'registerSortOptions' event
         if (Event::hasHandlers(static::class, self::EVENT_REGISTER_SORT_OPTIONS)) {
             $event = new RegisterElementSortOptionsEvent(['sortOptions' => $sortOptions]);

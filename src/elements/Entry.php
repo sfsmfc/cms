@@ -580,7 +580,6 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
                 'orderBy' => 'dateUpdated',
                 'defaultDir' => 'desc',
             ],
-            'id' => Craft::t('app', 'ID'),
         ];
     }
 
