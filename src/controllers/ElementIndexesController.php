@@ -507,13 +507,11 @@ class ElementIndexesController extends BaseElementsController
         $user = static::currentUser();
 
         // get all the elements
-        /** @var string|ElementInterface $elementType */
-        $elementType = $this->elementType();
         $elementIds = array_map(
             fn(string $key) => (int)StringHelper::removeLeft($key, 'element-'),
             array_keys($data),
         );
-        $elements = $elementType::find()
+        $elements = $this->elementType()::find()
             ->id($elementIds)
             ->status(null)
             ->drafts(null)
@@ -612,14 +610,11 @@ class ElementIndexesController extends BaseElementsController
         }
 
         if ($this->sourceKey === '__IMP__') {
-            /** @var ElementInterface|string $elementType */
-            $elementType = $this->elementType;
-
             return [
                 'type' => ElementSources::TYPE_NATIVE,
                 'key' => '__IMP__',
                 'label' => Craft::t('app', 'All elements'),
-                'hasThumbs' => $elementType::hasThumbs(),
+                'hasThumbs' => $this->elementType::hasThumbs(),
             ];
         }
 

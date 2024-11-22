@@ -101,14 +101,12 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
     }
 
     /**
-     * @return array<string,BaseLinkType|string>
-     * @phpstan-return array<string,class-string<BaseLinkType>>
+     * @return array<string,class-string<BaseLinkType>>
      */
     private static function types(): array
     {
         if (!isset(self::$_types)) {
-            /** @var array<BaseLinkType|string> $types */
-            /** @phpstan-var class-string<BaseLinkType>[] $types */
+            /** @var class-string<BaseLinkType>[] $types */
             $types = [
                 Asset::class,
                 Category::class,
@@ -295,10 +293,8 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 })
                 // and sort them by label, with URL at the top
                 ->sort(function(string $a, string $b) {
-                    /** @var string|BaseLinkType $a */
-                    /** @var string|BaseLinkType $b */
-                    /** @phpstan-var class-string<BaseLinkType> $a */
-                    /** @phpstan-var class-string<BaseLinkType> $b */
+                    /** @var class-string<BaseLinkType> $a */
+                    /** @var class-string<BaseLinkType> $b */
                     if ($a === UrlType::class) {
                         return -1;
                     }
