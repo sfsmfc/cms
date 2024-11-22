@@ -1571,27 +1571,16 @@ class Fields extends Component
         $groupRecord = $groupUid ? $this->_getGroupRecord($groupUid) : null;
         $isNewField = $fieldRecord->getIsNewRecord();
         $oldSettings = $fieldRecord->getOldAttribute('settings');
+        $oldField = !$isNewField ? $this->getFieldById($fieldRecord->id) : null;
 
         // For control panel save requests, make sure we have all the custom data already saved on the object.
-        if (isset($this->_savingFields[$fieldUid])) {
-            $field = $this->_savingFields[$fieldUid];
-        } elseif (!$isNewField) {
-            $field = $this->getFieldById($fieldRecord->id);
-        } else {
-            $field = null;
-        }
-
-        $oldField = null;
-        if (!$isNewField) {
-            $oldField = $this->createField($fieldRecord->getAttributes());
-        }
+        $field = $this->_savingFields[$fieldUid] ?? $oldField;
 
         // Fire a 'beforeApplyFieldSave' event
         if ($this->hasEventHandlers(self::EVENT_BEFORE_APPLY_FIELD_SAVE)) {
             $this->trigger(self::EVENT_BEFORE_APPLY_FIELD_SAVE, new ApplyFieldSaveEvent([
-                'field' => $field,
+                'field' => $oldField,
                 'config' => $data,
-                'oldConfig' => $oldField ? $this->createFieldConfig($oldField) : null,
             ]));
         }
 
