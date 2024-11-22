@@ -5,6 +5,7 @@
 - Element indexes now sort by ID by default, for sources that don’t define a default sort option.
 - Fixed a bug where element indexes were sorting by the first sortable attribute alphabetically by default, rather than the first sortable attribute defined by the element type.
 - Fixed a bug where `craft\events\ApplyFieldSaveEvent::$field` wasn’t being set consistently by `craft\services\Fields::EVENT_BEFORE_APPLY_FIELD_SAVE`. ([#16156](https://github.com/craftcms/cms/issues/16156))
+- Fixed a bug where the address field layout’s project config data wasn’t getting recreated when running `project-config/rebuild`. ([#16189](https://github.com/craftcms/cms/issues/16189))
 - Fixed an error that could occur when creating a nested element. ([#16162](https://github.com/craftcms/cms/pull/16162))
 - Fixed a bug where custom fields weren’t being displayed at 25% width when they should have. ([#16165](https://github.com/craftcms/cms/pull/16170))
 - Fixed a bug where the “Default Table Columns” element source settings could contain duplicate checkbox options. ([#16177](https://github.com/craftcms/cms/issues/16177))
