@@ -243,7 +243,7 @@ class Craft extends Yii
             // Now generate it again, this time with the correct field value types
             $fieldHandles = [];
             foreach ($fields as $field) {
-                /** @var FieldInterface|string $fieldClass */
+                /** @var class-string<FieldInterface> $fieldClass */
                 $fieldClass = $field['type'];
                 if (Component::validateComponentClass($fieldClass, FieldInterface::class)) {
                     $types = explode('|', $fieldClass::valueType());
