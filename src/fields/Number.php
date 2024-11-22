@@ -259,7 +259,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
                         $value = Craft::$app->getFormatter()->asDecimal($value, $this->decimals);
                     } catch (InvalidArgumentException) {
                     }
-                } elseif (isset($this->decimals)) {
+                } elseif ($this->decimals !== 0) {
                     // Just make sure we're using the right decimal symbol
                     $decimalSeparator = Craft::$app->getFormattingLocale()->getNumberSymbol(Locale::SYMBOL_DECIMAL_SEPARATOR);
                     try {
