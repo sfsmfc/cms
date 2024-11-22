@@ -563,7 +563,6 @@ class Asset extends Element
                 'orderBy' => 'dateUpdated',
                 'defaultDir' => 'desc',
             ],
-            'id' => Craft::t('app', 'ID'),
             'width' => Craft::t('app', 'Width'),
             'height' => Craft::t('app', 'Height'),
         ];

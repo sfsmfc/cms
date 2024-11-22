@@ -1,8 +1,12 @@
 # Release Notes for Craft CMS 4
 
-## Unreleased
+## 4.13.3 - 2024-11-22
 
+- Element indexes now sort by ID by default, for sources that don’t define a default sort option.
 - Fixed a bug where element indexes were sorting by the first sortable attribute alphabetically by default, rather than the first sortable attribute defined by the element type.
+- Fixed a bug where bulk asset actions where shown as available when subfolders were selected, when they shouldn’t have. ([#16151](https://github.com/craftcms/cms/issues/16151))
+- Fixed a bug where `craft\events\ApplyFieldSaveEvent::$field` wasn’t being set consistently by `craft\services\Fields::EVENT_BEFORE_APPLY_FIELD_SAVE`. ([#16156](https://github.com/craftcms/cms/issues/16156))
+- Fixed a bug where the address field layout’s project config data wasn’t getting recreated when running `project-config/rebuild`. ([#16189](https://github.com/craftcms/cms/issues/16189))
 
 ## 4.13.2 - 2024-11-19
 
