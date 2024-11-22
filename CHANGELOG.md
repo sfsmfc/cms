@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Element indexes now sort by ID by default, for sources that don’t define a default sort option.
 - Fixed a bug where element indexes were sorting by the first sortable attribute alphabetically by default, rather than the first sortable attribute defined by the element type.
 
 ## 4.13.2 - 2024-11-19
