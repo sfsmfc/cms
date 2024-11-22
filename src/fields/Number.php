@@ -228,13 +228,11 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
             return null;
         }
 
-        if (is_string($value) && is_numeric($value)) {
-            if ((int)$value == $value) {
-                return (int)$value;
-            }
-            if ((float)$value == $value) {
-                return (float)$value;
-            }
+        if (is_numeric($value)) {
+            // ensure we only store the selected number of decimals and that the result is the same as in v4
+            // https://github.com/craftcms/cms/issues/16181
+            $value = round((float)$value, $this->decimals);
+            return $this->decimals === 0 ? (int)$value : $value;
         }
 
         return $value;
@@ -261,7 +259,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
                         $value = Craft::$app->getFormatter()->asDecimal($value, $this->decimals);
                     } catch (InvalidArgumentException) {
                     }
-                } elseif ($this->decimals) {
+                } elseif ($this->decimals !== 0) {
                     // Just make sure we're using the right decimal symbol
                     $decimalSeparator = Craft::$app->getFormattingLocale()->getNumberSymbol(Locale::SYMBOL_DECIMAL_SEPARATOR);
                     try {
