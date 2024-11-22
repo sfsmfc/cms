@@ -422,7 +422,6 @@ class User extends Element implements IdentityInterface
                     'orderBy' => 'dateUpdated',
                     'defaultDir' => 'desc',
                 ],
-                'id' => Craft::t('app', 'ID'),
             ];
         } else {
             $attributes = [
@@ -446,7 +445,6 @@ class User extends Element implements IdentityInterface
                     'orderBy' => 'dateUpdated',
                     'defaultDir' => 'desc',
                 ],
-                'id' => Craft::t('app', 'ID'),
             ];
         }
 

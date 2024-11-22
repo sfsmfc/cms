@@ -991,7 +991,15 @@ Craft.CustomizeSourcesModal.CustomSource =
     availableTableAttributes: function () {
       const attributes = this.base();
       if (this.isNew) {
-        attributes.push(...this.modal.customFieldAttributes);
+        let existingFieldAttributes = [];
+        let customFieldAttributes = [];
+        this.modal.customFieldAttributes.forEach((item) => {
+          if (existingFieldAttributes.indexOf(item[0]) == -1) {
+            existingFieldAttributes.push(item[0]);
+            customFieldAttributes.push(item);
+          }
+        });
+        attributes.push(...customFieldAttributes);
       }
       return attributes;
     },

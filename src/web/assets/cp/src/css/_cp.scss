@@ -1879,8 +1879,8 @@ li.breadcrumb-toggle-wrapper {
   & > :not(h2, hr, .line-break) {
     &,
     &:last-child {
-      // 4 cols for >= 1536px
-      @media only screen and (min-width: $minXlUiWidth) {
+      // 4 cols for container width >= 888px
+      @container (min-width: 55.5em) {
         &.width-25 {
           width: 25%;
         }
@@ -1894,8 +1894,8 @@ li.breadcrumb-toggle-wrapper {
         }
       }
 
-      // 2 cols when container is > 720px
-      @container (min-width: 45em) {
+      // 2 cols when container width > 584px and < 887px
+      @container (min-width: 36.5em) and (max-width: 55.4375em) {
         &.width-25,
         &.width-50 {
           width: 50%;

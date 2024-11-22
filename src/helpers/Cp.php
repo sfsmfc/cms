@@ -44,6 +44,7 @@ use craft\web\View;
 use Illuminate\Support\Collection;
 use yii\base\Event;
 use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\helpers\Markdown;
 use yii\validators\RequiredValidator;
 
@@ -892,6 +893,12 @@ class Cp
         $user = Craft::$app->getUser()->getIdentity();
         $editable = $user && $elementsService->canView($element, $user);
 
+        $primaryOwner = null;
+        try {
+            $primaryOwner = $element instanceof NestedElementInterface ? $element->getPrimaryOwner() : null;
+        } catch (InvalidConfigException $e) {
+        }
+        
         return ArrayHelper::merge(
             Html::normalizeTagAttributes($element->getHtmlAttributes($config['context'])),
             [
@@ -909,7 +916,7 @@ class Cp
                     'field-id' => $element instanceof NestedElementInterface ? $element->getField()?->id : null,
                     'primary-owner-id' => $element instanceof NestedElementInterface ? $element->getPrimaryOwnerId() : null,
                     'owner-id' => $element instanceof NestedElementInterface ? $element->getOwnerId() : null,
-                    'owner-is-canonical' => $element instanceof NestedElementInterface ? $element->getPrimaryOwner()?->getIsCanonical() : null,
+                    'owner-is-canonical' => $primaryOwner?->getIsCanonical(),
                     'site-id' => $element->siteId,
                     'status' => $element->getStatus(),
                     'label' => (string)$element,
