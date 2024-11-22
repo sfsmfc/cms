@@ -29,7 +29,7 @@ abstract class BaseElementSelectConditionRule extends BaseConditionRule
     /**
      * Returns the element type that can be selected.
      *
-     * @return string
+     * @return class-string<ElementInterface>
      */
     abstract protected function elementType(): string;
 
@@ -148,10 +148,7 @@ abstract class BaseElementSelectConditionRule extends BaseConditionRule
             return null;
         }
 
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
-        $elementType = $this->elementType();
-        return $elementType::find()
+        return $this->elementType()::find()
             ->site('*')
             ->preferSites(array_filter([Cp::requestedSite()?->id]))
             ->unique()

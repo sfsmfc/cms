@@ -621,8 +621,7 @@ class ElementHelper
     /**
      * Returns an element type's source definition based on a given source key/path and context.
      *
-     * @param string $elementType The element type class
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The element type class
      * @param string $sourceKey The source key/path
      * @param string $context The context
      * @return array|null The source definition, or null if it cannot be found
@@ -668,7 +667,6 @@ class ElementHelper
 
         if (!str_starts_with($sourceKey, 'custom:')) {
             // Let the element get involved
-            /** @var string|ElementInterface $elementType */
             $source = $elementType::findSource($sourceKey, $context);
             if ($source) {
                 $source['type'] = ElementSources::TYPE_NATIVE;

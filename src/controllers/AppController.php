@@ -751,11 +751,9 @@ class AppController extends Controller
         $this->requireCpRequest();
         $this->requireAcceptsJson();
 
-        /** @var string|ElementInterface $elementType */
+        /** @var class-string<ElementInterface> $elementType */
         $elementType = $this->request->getRequiredBodyParam('type');
         $id = $this->request->getRequiredBodyParam('id');
-        $draftId = $this->request->getBodyParam('draftId');
-        $revisionId = $this->request->getBodyParam('revisionId');
         $instances = $this->request->getRequiredBodyParam('instances');
 
         if (!$id || !is_numeric($id)) {

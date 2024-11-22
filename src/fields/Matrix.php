@@ -1202,7 +1202,7 @@ class Matrix extends Field implements EagerLoadingFieldInterface, GqlInlineFragm
         $fieldTypes = [];
 
         foreach (Craft::$app->getFields()->getAllFieldTypes() as $class) {
-            /** @var FieldInterface|string $class */
+            /** @var class-string<FieldInterface> $class */
             // No Matrix-Inception, sorry buddy.
             if ($class === self::class) {
                 continue;

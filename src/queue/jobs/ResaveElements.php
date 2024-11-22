@@ -28,8 +28,7 @@ use Throwable;
 class ResaveElements extends BaseBatchedJob
 {
     /**
-     * @var string The element type that should be resaved
-     * @phpstan-var class-string<ElementInterface>
+     * @var class-string<ElementInterface> The element type that should be resaved
      */
     public string $elementType;
 
@@ -79,10 +78,7 @@ class ResaveElements extends BaseBatchedJob
      */
     protected function loadData(): Batchable
     {
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
-        $elementType = $this->elementType;
-        $query = $elementType::find()
+        $query = $this->elementType::find()
             ->orderBy(['elements.id' => SORT_ASC]);
 
         if (!empty($this->criteria)) {
@@ -140,11 +136,8 @@ class ResaveElements extends BaseBatchedJob
      */
     protected function defaultDescription(): ?string
     {
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
-        $elementType = $this->elementType;
         return Translation::prep('app', 'Resaving {type}', [
-            'type' => $elementType::pluralLowerDisplayName(),
+            'type' => $this->elementType::pluralLowerDisplayName(),
         ]);
     }
 }

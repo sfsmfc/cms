@@ -1143,15 +1143,12 @@ class Gql extends Component
      * Return the content arguments based on an element class and contexts for it.
      *
      * @param array $contexts
-     * @param string $elementType
-     * @phpstan-param class-string<\craft\base\ElementInterface> $elementType
+     * @param class-string<BaseElementInterface> $elementType
      * @return array
      */
     public function getContentArguments(array $contexts, string $elementType): array
     {
         /** @var FieldLayoutBehavior[] $contexts */
-        /** @var string|BaseElementInterface $elementType */
-        /** @phpstan-var class-string<BaseElementInterface>|BaseElementInterface $elementType */
         if (!array_key_exists($elementType, $this->_contentFieldCache)) {
             $elementQuery = Craft::$app->getElements()->createElementQuery($elementType);
             $contentArguments = [];
@@ -1314,8 +1311,7 @@ class Gql extends Component
         $this->trigger(self::EVENT_REGISTER_GQL_TYPES, $event);
 
         foreach ($event->types as $type) {
-            /** @var string|SingularTypeInterface $type */
-            /** @phpstan-var class-string<SingularTypeInterface>|SingularTypeInterface $type */
+            /** @var class-string<SingularTypeInterface> $type */
             TypeLoader::registerType($type::getName(), "$type::getType");
         }
 
@@ -1384,6 +1380,7 @@ class Gql extends Component
      */
     private function _loadGqlDirectives(): array
     {
+        /** @var class-string<Directive>[] $directiveClasses */
         $directiveClasses = [
             // Directives
             FormatDateTime::class,
@@ -1407,7 +1404,7 @@ class Gql extends Component
         $directives = GraphQL::getStandardDirectives();
 
         foreach ($event->directives as $directive) {
-            /** @var Directive $directive */
+            /** @var class-string<Directive> $directive */
             $directives[] = $directive::create();
         }
 
