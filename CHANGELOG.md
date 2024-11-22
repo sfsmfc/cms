@@ -7,6 +7,7 @@
 - Fixed a bug where `craft\events\ApplyFieldSaveEvent::$field` wasn’t being set consistently by `craft\services\Fields::EVENT_BEFORE_APPLY_FIELD_SAVE`. ([#16156](https://github.com/craftcms/cms/issues/16156))
 - Fixed an error that could occur when creating a nested element. ([#16162](https://github.com/craftcms/cms/pull/16162))
 - Fixed a bug where custom fields weren’t being displayed at 25% width when they should have. ([#16165](https://github.com/craftcms/cms/pull/16170))
+- Fixed a bug where the “Default Table Columns” element source settings could contain duplicate checkbox options. ([#16177](https://github.com/craftcms/cms/issues/16177))
 
 ## 5.5.2 - 2024-11-19
 
