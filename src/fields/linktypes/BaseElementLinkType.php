@@ -32,8 +32,7 @@ abstract class BaseElementLinkType extends BaseLinkType
     /**
      * Returns the element type this link type is for.
      *
-     * @return ElementInterface|string
-     * @phpstan-return class-string<ElementInterface>
+     * @return class-string<ElementInterface>
      */
     abstract protected static function elementType(): string;
 

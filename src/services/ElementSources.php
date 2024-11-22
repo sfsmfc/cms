@@ -79,7 +79,6 @@ class ElementSources extends Component
      */
     public function getSources(string $elementType, string $context = self::CONTEXT_INDEX, bool $withDisabled = false): array
     {
-        /** @var string|ElementInterface $elementType */
         $nativeSources = $this->_nativeSources($elementType, $context);
         $sourceConfigs = $this->_sourceConfigs($elementType);
 
@@ -218,15 +217,13 @@ class ElementSources extends Component
     /**
      * Returns the attributes that should be shown for a given element type source.
      *
-     * @param string $elementType The element type class
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The element type class
      * @param string $sourceKey The element type source key
      * @param string[]|null $customAttributes Custom attributes to show rather than the defaults
      * @return array[]
      */
     public function getTableAttributes(string $elementType, string $sourceKey, ?array $customAttributes = null): array
     {
-        /** @var ElementInterface|string $elementType */
         // If this is a source path, use the first segment
         if (($slash = strpos($sourceKey, '/')) !== false) {
             $sourceKey = substr($sourceKey, 0, $slash);

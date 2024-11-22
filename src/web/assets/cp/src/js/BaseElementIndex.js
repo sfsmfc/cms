@@ -2358,7 +2358,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
      * @returns {Object[]}
      */
     getSortOptions: function ($source) {
-      const sortOptions = this.getSourceData($source, 'sort-opts') || [];
+      const sortOptions = [...(this.getSourceData($source, 'sort-opts') || [])];
 
       // Make sure there's at least one attribute
       if (!sortOptions.length) {

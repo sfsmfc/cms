@@ -8,7 +8,6 @@
 namespace craft\console\controllers;
 
 use Craft;
-use craft\base\ElementInterface;
 use craft\base\FieldInterface;
 use craft\base\MergeableFieldInterface;
 use craft\console\Controller;
@@ -381,9 +380,7 @@ MD));
 
     private function layoutDescriptor(FieldLayout $layout): string
     {
-        /** @var string|ElementInterface $elementType */
-        $elementType = $layout->type;
-        $elementDisplayName = $elementType::lowerDisplayName();
+        $elementDisplayName = $layout->type::lowerDisplayName();
         $providerHandle = $layout->provider?->getHandle();
         return $providerHandle
             ? "the `$providerHandle` $elementDisplayName layout"

@@ -270,25 +270,22 @@ class NestedElementManager extends Component
             return null;
         }
 
-        /** @var NestedElementInterface|string $elementType */
-        $elementType = $this->elementType;
-
         switch ($this->propagationMethod) {
             case PropagationMethod::None:
                 return Craft::t('app', '{type} will only be saved in the {site} site.', [
-                    'type' => $elementType::pluralDisplayName(),
+                    'type' => $this->elementType::pluralDisplayName(),
                     'site' => Craft::t('site', $owner->getSite()->getName()),
                 ]);
             case PropagationMethod::SiteGroup:
                 return Craft::t('app', '{type} will be saved across all sites in the {group} site group.', [
-                    'type' => $elementType::pluralDisplayName(),
+                    'type' => $this->elementType::pluralDisplayName(),
                     'group' => Craft::t('site', $owner->getSite()->getGroup()->getName()),
                 ]);
             case PropagationMethod::Language:
                 $language = Craft::$app->getI18n()->getLocaleById($owner->getSite()->language)
                     ->getDisplayName(Craft::$app->language);
                 return Craft::t('app', '{type} will be saved across all {language}-language sites.', [
-                    'type' => $elementType::pluralDisplayName(),
+                    'type' => $this->elementType::pluralDisplayName(),
                     'language' => $language,
                 ]);
             default:
@@ -371,15 +368,12 @@ class NestedElementManager extends Component
             $config,
             self::VIEW_MODE_CARDS,
             function(string $id, array $config, $attribute, &$settings) use ($owner) {
-                /** @var NestedElementInterface|string $elementType */
-                $elementType = $this->elementType;
-
                 $settings += [
                     'deleteLabel' => Craft::t('app', 'Delete {type}', [
-                        'type' => $elementType::lowerDisplayName(),
+                        'type' => $this->elementType::lowerDisplayName(),
                     ]),
                     'deleteConfirmationMessage' => Craft::t('app', 'Are you sure you want to delete the selected {type}?', [
-                        'type' => $elementType::lowerDisplayName(),
+                        'type' => $this->elementType::lowerDisplayName(),
                     ]),
                     'showInGrid' => $config['showInGrid'],
                 ];
@@ -491,8 +485,6 @@ class NestedElementManager extends Component
             $config,
             self::VIEW_MODE_INDEX,
             function(string $id, array $config, string $attribute, array &$settings) use ($owner): string {
-                /** @var NestedElementInterface|string $elementType */
-                $elementType = $this->elementType;
                 $view = Craft::$app->getView();
 
                 $criteria = [
@@ -514,7 +506,7 @@ class NestedElementManager extends Component
                     'criteria' => array_merge($criteria, $this->criteria),
                     'batchSize' => $config['pageSize'],
                     'actions' => [],
-                    'canHaveDrafts' => $config['canHaveDrafts'] ?? $elementType::hasDrafts(),
+                    'canHaveDrafts' => $config['canHaveDrafts'] ?? $this->elementType::hasDrafts(),
                     'storageKey' => $config['storageKey'],
                     'static' => $config['static'],
                 ];
@@ -544,12 +536,9 @@ class NestedElementManager extends Component
 
     private function createView(?ElementInterface $owner, array $config, string $mode, callable $renderHtml): string
     {
-        /** @var NestedElementInterface|string $elementType */
-        $elementType = $this->elementType;
-
         if (!$owner?->id) {
             $message = Craft::t('app', '{nestedType} can only be created after the {ownerType} has been saved.', [
-                'nestedType' => $elementType::pluralDisplayName(),
+                'nestedType' => $this->elementType::pluralDisplayName(),
                 'ownerType' => $owner ? $owner::lowerDisplayName() : Craft::t('app', 'element'),
             ]);
             return Html::tag('div', $message, ['class' => 'pane no-border zilch small']);
@@ -566,7 +555,7 @@ class NestedElementManager extends Component
 
         if ($config['createButtonLabel'] === null) {
             $config['createButtonLabel'] = Craft::t('app', 'New {type}', [
-                'type' => $elementType::lowerDisplayName(),
+                'type' => $this->elementType::lowerDisplayName(),
             ]);
         }
 
@@ -583,7 +572,6 @@ class NestedElementManager extends Component
         $view = Craft::$app->getView();
         return $view->namespaceInputs(function() use (
             $mode,
-            $elementType,
             $attribute,
             $view,
             $owner,

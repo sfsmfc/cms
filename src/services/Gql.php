@@ -1465,6 +1465,7 @@ class Gql extends Component
      */
     private function _loadGqlDirectives(): array
     {
+        /** @var class-string<Directive>[] $directiveClasses */
         $directiveClasses = [
             // Directives
             FormatDateTime::class,
@@ -1489,7 +1490,7 @@ class Gql extends Component
         $directives = GraphQL::getStandardDirectives();
 
         foreach ($directiveClasses as $class) {
-            /** @var Directive|string $class */
+            /** @var class-string<Directive> $class */
             $directives[] = $class::create();
         }
 

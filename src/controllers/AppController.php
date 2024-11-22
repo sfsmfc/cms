@@ -759,7 +759,7 @@ class AppController extends Controller
         $elementHtml = [];
 
         foreach ($criteria as $criterion) {
-            /** @var string|ElementInterface $elementType */
+            /** @var class-string<ElementInterface> $elementType */
             $elementType = $criterion['type'];
             $id = $criterion['id'];
             $fieldId = $criterion['fieldId'] ?? null;
@@ -832,7 +832,7 @@ class AppController extends Controller
         $menuItemHtml = [];
 
         foreach ($components as $componentInfo) {
-            /** @var string|Chippable $componentType */
+            /** @var class-string<Chippable> $componentType */
             $componentType = $componentInfo['type'];
             $id = $componentInfo['id'];
 
