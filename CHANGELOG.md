@@ -1,5 +1,11 @@
 # Release Notes for Craft CMS 4
 
+## Unreleased
+
+- Element indexes now sort by ID by default, for sources that don’t define a default sort option.
+- Fixed a bug where element indexes were sorting by the first sortable attribute alphabetically by default, rather than the first sortable attribute defined by the element type.
+- Fixed a bug where bulk asset actions where shown as available when subfolders were selected, when they shouldn’t have. ([#16151](https://github.com/craftcms/cms/issues/16151))
+
 ## 4.13.2 - 2024-11-19
 
 - Fixed an error that could occur if an invalid folder ID was passed to `craft\services\Assets::deleteFoldersByIds()`. ([#16147](https://github.com/craftcms/cms/pull/16147))

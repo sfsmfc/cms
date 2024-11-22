@@ -497,13 +497,14 @@ class Fields extends Component
      * Returns all field types that have a column in the content table.
      *
      * @return string[] The field type classes
+     * @phpstan-return class-string<FieldInterface>[]
      */
     public function getFieldTypesWithContent(): array
     {
         $fieldTypes = [];
 
         foreach ($this->getAllFieldTypes() as $fieldType) {
-            /** @var FieldInterface|string $fieldType */
+            /** @var class-string<FieldInterface> $fieldType */
             if ($fieldType::hasContentColumn()) {
                 $fieldTypes[] = $fieldType;
             }
@@ -518,6 +519,7 @@ class Fields extends Component
      * @param FieldInterface $field The current field to base compatible fields on
      * @param bool $includeCurrent Whether $field's class should be included
      * @return string[] The compatible field type classes
+     * @phpstan-return class-string<FieldInterface>[]
      */
     public function getCompatibleFieldTypes(FieldInterface $field, bool $includeCurrent = true): array
     {

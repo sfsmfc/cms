@@ -1259,6 +1259,11 @@ abstract class Element extends Component implements ElementInterface
     {
         $sortOptions = static::defineSortOptions();
 
+        // Make sure ID is listed first
+        $sortOptions = array_merge([
+            'id' => Craft::t('app', 'ID'),
+        ], ArrayHelper::without($sortOptions, 'id'));
+
         // Give plugins a chance to modify them
         $event = new RegisterElementSortOptionsEvent([
             'sortOptions' => $sortOptions,

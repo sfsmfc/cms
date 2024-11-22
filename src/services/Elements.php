@@ -946,7 +946,7 @@ class Elements extends Component
      * Returns the class of an element with a given ID.
      *
      * @param int $elementId The element’s ID
-     * @return string|null The element’s class, or null if it could not be found
+     * @return class-string<ElementInterface>|null The element’s class, or null if it could not be found
      */
     public function getElementTypeById(int $elementId): ?string
     {
@@ -1474,7 +1474,6 @@ class Elements extends Component
                 $supportedSites = ArrayHelper::index(ElementHelper::supportedSitesForElement($element), 'siteId');
                 $supportedSiteIds = array_keys($supportedSites);
                 $elementSiteIds = $siteIds !== null ? array_intersect($siteIds, $supportedSiteIds) : $supportedSiteIds;
-                /** @var string|ElementInterface $elementType */
                 $elementType = get_class($element);
 
                 $e = null;
@@ -2009,7 +2008,6 @@ class Elements extends Component
             }
 
             // Update any reference tags
-            /** @var ElementInterface|null $elementType */
             $elementType = $this->getElementTypeById($prevailingElement->id);
 
             if ($elementType !== null && ($refHandle = $elementType::refHandle()) !== null) {
@@ -2923,7 +2921,6 @@ class Elements extends Component
      */
     public function eagerLoadElements(string $elementType, array $elements, array|string $with): void
     {
-        /** @var ElementInterface|string $elementType */
         // Bail if there aren't even any elements
         if (empty($elements)) {
             return;
@@ -2965,7 +2962,6 @@ class Elements extends Component
                 }
 
                 // Get the eager-loading map from the source element type
-                /** @var ElementInterface|string $elementType */
                 $map = $elementType::eagerLoadingMap($filteredElements, $plan->handle);
 
                 if ($map === null) {

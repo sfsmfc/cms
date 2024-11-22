@@ -552,7 +552,6 @@ class Entry extends Element implements ExpirableElementInterface
                 'orderBy' => 'dateUpdated',
                 'defaultDir' => 'desc',
             ],
-            'id' => Craft::t('app', 'ID'),
         ];
     }
 

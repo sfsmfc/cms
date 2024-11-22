@@ -2007,7 +2007,9 @@ Craft.BaseElementIndex = Garnish.Base.extend(
      */
     getSortOptions: function ($source) {
       $source = $source ? this.getRootSource($source) : this.$rootSource;
-      const sortOptions = ($source ? $source.data('sort-opts') : null) || [];
+      const sortOptions = [
+        ...(($source ? $source.data('sort-opts') : null) || []),
+      ];
 
       // Make sure there's at least one attribute
       if (!sortOptions.length) {
