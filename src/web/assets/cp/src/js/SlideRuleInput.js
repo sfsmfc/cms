@@ -6,6 +6,8 @@ Craft.SlideRuleInput = Garnish.Base.extend({
   $selectedOption: null,
   $input: null,
   value: null,
+  onStartHasRun: false,
+  sensitivity: 5,
 
   startPositionX: null,
 
@@ -24,9 +26,11 @@ Craft.SlideRuleInput = Garnish.Base.extend({
     this.$graduations = $('<div class="graduations"></div>').appendTo(
       this.$container
     );
-    this.$graduationsUl = $('<ul></ul>').attr({
-      'aria-hidden': 'true',
-    }).appendTo(this.$graduations);
+    this.$graduationsUl = $('<ul></ul>')
+      .attr({
+        'aria-hidden': 'true',
+      })
+      .appendTo(this.$graduations);
 
     this.$container.attr({
       role: 'slider',
@@ -131,11 +135,14 @@ Craft.SlideRuleInput = Garnish.Base.extend({
     this.startPositionX = touch.position.x;
     this.startLeft = this.$graduationsUl.position().left;
 
-    this.dragging = true;
     this.onStart();
   },
 
   _handleTapMove: function (ev, touch) {
+    if (Math.abs(touch.position.x - this.startPositionX) > this.sensitivity) {
+      this.dragging = true;
+    }
+
     if (this.dragging) {
       ev.preventDefault();
 
@@ -198,6 +205,9 @@ Craft.SlideRuleInput = Garnish.Base.extend({
       ev.preventDefault();
       this.dragging = false;
       this.onEnd();
+      console.log('drag action');
+    } else {
+      console.log('click action');
     }
   },
 
