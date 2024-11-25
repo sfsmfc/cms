@@ -24,7 +24,9 @@ Craft.SlideRuleInput = Garnish.Base.extend({
     this.$graduations = $('<div class="graduations"></div>').appendTo(
       this.$container
     );
-    this.$graduationsUl = $('<ul></ul>').appendTo(this.$graduations);
+    this.$graduationsUl = $('<ul></ul>').attr({
+      'aria-hidden': 'true',
+    }).appendTo(this.$graduations);
 
     this.$container.attr({
       role: 'slider',
