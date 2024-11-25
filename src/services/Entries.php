@@ -1310,7 +1310,7 @@ SQL)->execute();
         if ($searchTerm !== null && $searchTerm !== '') {
             $searchParams = $this->_getSearchParams($searchTerm);
             if (!empty($searchParams)) {
-                $query->where(['or', ...$searchParams]);
+                $query->andWhere(['or', ...$searchParams]);
             }
         }
 
