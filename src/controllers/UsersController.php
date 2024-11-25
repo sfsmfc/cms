@@ -991,7 +991,7 @@ class UsersController extends Controller
      */
     public function actionIndex(?string $source = null): Response
     {
-        $this->requirePermission('editUsers');
+        $this->requirePermission('viewUsers');
         return $this->renderTemplate('users/_index.twig', [
             'title' => Craft::t('app', 'Users'),
             'buttonLabel' => Craft::t('app', 'New {type}', [
@@ -1087,7 +1087,7 @@ class UsersController extends Controller
         $response->contentHtml(function() use ($user) {
             $config = [
                 'showInGrid' => true,
-                'canCreate' => true,
+                'canCreate' => Craft::$app->getUser()->checkPermission('editUsers'),
             ];
 
             // Use an element index view if there's more than 50 addresses
