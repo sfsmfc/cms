@@ -6,8 +6,10 @@ Craft.SlideRuleInput = Garnish.Base.extend({
   $selectedOption: null,
   $input: null,
   value: null,
+  dragging: false,
   onStartHasRun: false,
-  sensitivity: 5,
+  sensitivity: 3,
+  rotateIntent: false,
 
   startPositionX: null,
 
@@ -132,6 +134,9 @@ Craft.SlideRuleInput = Garnish.Base.extend({
   _handleTapStart: function (ev, touch) {
     ev.preventDefault();
 
+    // Only allow rotation if the user taps on the overlay
+    this.rotateIntent = $(ev.target).is('.overlay');
+
     this.startPositionX = touch.position.x;
     this.startLeft = this.$graduationsUl.position().left;
 
@@ -139,21 +144,23 @@ Craft.SlideRuleInput = Garnish.Base.extend({
   },
 
   _handleTapMove: function (ev, touch) {
+    if (!this.startPositionX || !this.rotateIntent) return;
+
     if (Math.abs(touch.position.x - this.startPositionX) > this.sensitivity) {
       this.dragging = true;
     }
 
-    if (this.dragging) {
-      ev.preventDefault();
+    if (!this.dragging) return;
 
-      var curX = this.startPositionX - touch.position.x;
-      var left = this.startLeft - curX;
-      var value = this.positionToValue(left);
+    ev.preventDefault();
 
-      this.setValue(value);
+    var curX = this.startPositionX - touch.position.x;
+    var left = this.startLeft - curX;
+    var value = this.positionToValue(left);
 
-      this.onChange();
-    }
+    this.setValue(value);
+
+    this.onChange();
   },
 
   setValue: function (value) {
@@ -200,15 +207,27 @@ Craft.SlideRuleInput = Garnish.Base.extend({
     this.value = value;
   },
 
-  _handleTapEnd: function (ev) {
+  _handleTapEnd: function (ev, touch) {
+    if (!this.rotateIntent) return;
+
     if (this.dragging) {
       ev.preventDefault();
       this.dragging = false;
-      this.onEnd();
-      console.log('drag action');
     } else {
-      console.log('click action');
+      const cursorPosX =
+        this.$cursor.offset().left + this.$cursor.outerWidth() / 2; // Center of cursor
+      const delta = touch.position.x - cursorPosX;
+      const left = this.startLeft - delta;
+      const value = this.positionToValue(left);
+
+      this.setValue(value);
+
+      this.onChange();
     }
+
+    this.onEnd();
+    this.startPositionX = null;
+    this.rotateIntent = false;
   },
 
   positionToValue: function (position) {
