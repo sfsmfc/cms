@@ -7,7 +7,6 @@ Craft.SlideRuleInput = Garnish.Base.extend({
   $input: null,
   value: null,
   dragging: false,
-  onStartHasRun: false,
   sensitivity: 3,
   rotateIntent: false,
 
@@ -137,6 +136,8 @@ Craft.SlideRuleInput = Garnish.Base.extend({
     // Only allow rotation if the user taps on the overlay
     this.rotateIntent = $(ev.target).is('.overlay');
 
+    if (!this.rotateIntent) return;
+
     this.startPositionX = touch.position.x;
     this.startLeft = this.$graduationsUl.position().left;
 
@@ -144,23 +145,31 @@ Craft.SlideRuleInput = Garnish.Base.extend({
   },
 
   _handleTapMove: function (ev, touch) {
-    if (!this.startPositionX || !this.rotateIntent) return;
+    if (!this.rotateIntent) return;
 
     if (Math.abs(touch.position.x - this.startPositionX) > this.sensitivity) {
       this.dragging = true;
+      ev.preventDefault();
+      this._setValueFromTouch(touch);
+      this.onChange();
+    }
+  },
+
+  _setValueFromTouch: function (touch) {
+    let referencePosition = this.dragging
+      ? this.startPositionX
+      : this.$cursor.offset().left + this.$cursor.outerWidth() / 2;
+    let delta;
+
+    if (this.dragging) {
+      delta = referencePosition - touch.position.x;
+    } else {
+      delta = touch.position.x - referencePosition;
     }
 
-    if (!this.dragging) return;
-
-    ev.preventDefault();
-
-    var curX = this.startPositionX - touch.position.x;
-    var left = this.startLeft - curX;
-    var value = this.positionToValue(left);
-
+    const position = this.startLeft - delta;
+    const value = this.positionToValue(position);
     this.setValue(value);
-
-    this.onChange();
   },
 
   setValue: function (value) {
@@ -214,14 +223,7 @@ Craft.SlideRuleInput = Garnish.Base.extend({
       ev.preventDefault();
       this.dragging = false;
     } else {
-      const cursorPosX =
-        this.$cursor.offset().left + this.$cursor.outerWidth() / 2; // Center of cursor
-      const delta = touch.position.x - cursorPosX;
-      const left = this.startLeft - delta;
-      const value = this.positionToValue(left);
-
-      this.setValue(value);
-
+      this._setValueFromTouch(touch);
       this.onChange();
     }
 
