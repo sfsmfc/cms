@@ -1535,7 +1535,7 @@ return [
     'Structures' => 'Štruktúry',
     'Subject' => 'Predmet',
     'Submit' => 'Odoslať',
-    'Subpath' => 'Dielčia cesta',
+    'Subpath' => 'Subcesta',
     'Suburb' => 'Predmestie',
     'Success' => 'Úspech',
     'Successfully activated the user.' => 'Používateľ úspešne aktivovaný.',
