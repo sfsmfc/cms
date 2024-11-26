@@ -165,8 +165,8 @@ Craft.SortableCheckboxSelect.Item = Garnish.Base.extend({
     return $item.length ? $item : null;
   },
 
-  getAllCheckedSiblings: function() {
-    return $item = this.$item.siblings(
+  getAllCheckedSiblings: function () {
+    return this.$item.siblings(
       '.checkbox-select-item:not(.all):has(input[type=checkbox]:checked)'
     );
   },
