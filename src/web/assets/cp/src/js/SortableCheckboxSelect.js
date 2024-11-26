@@ -123,10 +123,26 @@ Craft.SortableCheckboxSelect.Item = Garnish.Base.extend({
       }
     });
 
+    const allCheckedSiblings = this.getAllCheckedSiblings();
+    // if there are no other checked siblings, hide current item's action menu btn
+    if (allCheckedSiblings.length == 0) {
+      this.$actionMenuBtn.hide();
+    } else if (allCheckedSiblings.length == 1) {
+      // if there's only one other checked sibling,
+      // we need to show that sibling's action menu btn as it would have been hidden so far
+      $(allCheckedSiblings[0]).find('.btn.action-btn').show();
+    }
+
     this.$item.trigger('checked');
   },
 
   onUncheck: function () {
+    const allCheckedSiblings = this.getAllCheckedSiblings();
+    // if there's only one other checked sibling, hide that sibling's action menu btn
+    if (allCheckedSiblings.length == 1) {
+      $(allCheckedSiblings[0]).find('.btn.action-btn').hide();
+    }
+
     this.$moveHandle?.addClass('disabled');
     this.$actionMenuBtn?.remove();
     this.$actionMenu?.remove();
@@ -147,6 +163,12 @@ Craft.SortableCheckboxSelect.Item = Garnish.Base.extend({
       '.checkbox-select-item:not(.all):has(input[type=checkbox]:checked):first'
     );
     return $item.length ? $item : null;
+  },
+
+  getAllCheckedSiblings: function() {
+    return $item = this.$item.siblings(
+      '.checkbox-select-item:not(.all):has(input[type=checkbox]:checked)'
+    );
   },
 
   moveUp: function () {
