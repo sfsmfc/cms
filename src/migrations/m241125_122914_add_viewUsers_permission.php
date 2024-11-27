@@ -17,8 +17,6 @@ class m241125_122914_add_viewUsers_permission extends Migration
      */
     public function safeUp(): bool
     {
-        $projectConfig = Craft::$app->getProjectConfig();
-
         $userIds = (new Query())
             ->select(['upu.userId'])
             ->from(['upu' => Table::USERPERMISSIONS_USERS])
@@ -42,22 +40,12 @@ class m241125_122914_add_viewUsers_permission extends Migration
             $this->batchInsert(Table::USERPERMISSIONS_USERS, ['permissionId', 'userId'], $insert);
         }
 
-        // Don't make the same config changes twice
-        $schemaVersion = $projectConfig->get('system.schemaVersion', true);
-
-        if (version_compare($schemaVersion, '5.6.0', '<')) {
-            foreach ($projectConfig->get('users.groups') ?? [] as $uid => $group) {
-                $groupPermissions = array_flip($group['permissions'] ?? []);
-                $save = false;
-
-                if (isset($groupPermissions[strtolower('editUsers')])) {
-                    $groupPermissions[strtolower('viewUsers')] = true;
-                    $save = true;
-                }
-
-                if ($save) {
-                    $projectConfig->set("users.groups.$uid.permissions", array_keys($groupPermissions));
-                }
+        $projectConfig = Craft::$app->getProjectConfig();
+        foreach ($projectConfig->get('users.groups') ?? [] as $uid => $group) {
+            $groupPermissions = array_flip($group['permissions'] ?? []);
+            if (isset($groupPermissions[strtolower('editUsers')])) {
+                $groupPermissions[strtolower('viewUsers')] = true;
+                $projectConfig->set("users.groups.$uid.permissions", array_keys($groupPermissions));
             }
         }
 
