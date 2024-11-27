@@ -1669,6 +1669,17 @@ class GeneralConfig extends BaseConfig
      * - `aliasOf`: The original locale ID
      * - `displayName`: The locale alias’s display name _(optional)_
      *
+     *  ::: code
+     *  ```php Static Config
+     *  ->localeAliases([
+     *     'smj' => [
+     *         'aliasOf' => 'sv',
+     *         'displayName' => 'Lule Sámi',
+     *     ],
+     * ])
+     *  ```
+     *  :::
+     *
      * @since 5.0.0
      * @group System
      */
