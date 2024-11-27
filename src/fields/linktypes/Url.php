@@ -76,8 +76,13 @@ class Url extends BaseTextLinkType
 
     public function validateValue(string $value, ?string &$error = null): bool
     {
-        // Leveraging Uri package to convert domains to punycode
-        return parent::validateValue(Uri::new($value), $error);
+        try {
+            // Leveraging Uri package to convert domains to punycode
+            $value = Uri::new($value);
+            return parent::validateValue($value, $error);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     protected function pattern(): string
