@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 5
 
+## Unreleased
+
+- Fixed a bug where element slideouts had Save buttons even if the user didn’t have permission to save the element. ([#16205](https://github.com/craftcms/cms/pull/16205))
+
 ## 5.5.3 - 2024-11-22
 
 - Element indexes now sort by ID by default, for sources that don’t define a default sort option.
