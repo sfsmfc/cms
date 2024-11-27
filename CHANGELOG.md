@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 4
 
+## Unreleased
+
+- Fixed an error that could occur when duplicating an element with an Assets field that had a dynamic subpath. ([#16214](https://github.com/craftcms/cms/issues/16214))
+
 ## 4.13.3 - 2024-11-22
 
 - Element indexes now sort by ID by default, for sources that don’t define a default sort option.
