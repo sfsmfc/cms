@@ -28,6 +28,8 @@ use craft\fields\linktypes\Email as EmailType;
 use craft\fields\linktypes\Entry;
 use craft\fields\linktypes\Phone;
 use craft\fields\linktypes\Url as UrlType;
+use craft\gql\GqlEntityRegistry;
+use craft\gql\types\generators\LinkDataType;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Component;
 use craft\helpers\Cp;
@@ -35,6 +37,8 @@ use craft\helpers\Html;
 use craft\helpers\StringHelper;
 use craft\validators\ArrayValidator;
 use craft\validators\StringValidator;
+use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
 use yii\base\InvalidArgumentException;
 use yii\db\Schema;
@@ -181,6 +185,12 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
     public int $maxLength = 255;
 
     /**
+     * @var bool Whether GraphQL values should be returned as objects with `type`,
+     * `value`, `label`, `urlSuffix`, and `url` keys.
+     */
+    public bool $fullGraphqlData = true;
+
+    /**
      * @inheritdoc
      */
     public function __construct($config = [])
@@ -196,6 +206,15 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
 
         if (array_key_exists('placeholder', $config)) {
             unset($config['placeholder']);
+        }
+
+        if (isset($config['graphqlMode'])) {
+            $config['fullGraphqlData'] = ArrayHelper::remove($config, 'graphqlMode') === 'full';
+        }
+
+        // Default fullGraphqlData to false for existing fields
+        if (isset($config['id']) && !isset($config['fullGraphqlData'])) {
+            $config['fullGraphqlData'] = false;
         }
 
         parent::__construct($config);
@@ -354,7 +373,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
             }
         }
 
-        return $html .
+        $html .=
             Html::tag('hr') .
             Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Show the “Label” field'),
@@ -374,6 +393,15 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'name' => 'showTargetField',
                 'on' => $this->showTargetField,
             ]) .
+            Html::tag('hr') .
+            Html::a(Craft::t('app', 'Advanced'), options: [
+                'class' => 'fieldtoggle',
+                'data' => ['target' => 'advanced'],
+            ]) .
+            Html::beginTag('div', [
+                'id' => 'advanced',
+                'class' => 'hidden',
+            ]) .
             Cp::textFieldHtml([
                 'label' => Craft::t('app', 'Max Length'),
                 'instructions' => Craft::t('app', 'The maximum length (in bytes) the field can hold.'),
@@ -386,6 +414,24 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'errors' => $this->getErrors('maxLength'),
                 'data' => ['error-key' => 'maxLength'],
             ]);
+
+        if (Craft::$app->getConfig()->getGeneral()->enableGql) {
+            $html .=
+                Cp::selectFieldHtml([
+                    'label' => Craft::t('app', 'GraphQL Mode'),
+                    'id' => 'graphql-mode',
+                    'name' => 'graphqlMode',
+                    'options' => [
+                        ['label' => Craft::t('app', 'Full data'), 'value' => 'full'],
+                        ['label' => Craft::t('app', 'URL only'), 'value' => 'url'],
+                    ],
+                    'value' => $this->fullGraphqlData ? 'full' : 'url',
+                ]);
+        }
+
+        $html .= Html::endTag('div');
+
+        return $html;
     }
 
     /**
@@ -705,6 +751,39 @@ JS;
         }
 
         return $this->getPreviewHtml($value, new EntryElement());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getContentGqlType(): Type|array
+    {
+        if (!$this->fullGraphqlData) {
+            return parent::getContentGqlType();
+        }
+
+        return LinkDataType::generateType($this);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getContentGqlMutationArgumentType(): Type|array
+    {
+        if (!$this->fullGraphqlData) {
+            return parent::getContentGqlMutationArgumentType();
+        }
+
+        $typeName = 'LinkDataInput';
+        return GqlEntityRegistry::getOrCreate($typeName, fn() => new InputObjectType([
+            'name' => $typeName,
+            'fields' => [
+                'type' => Type::string(),
+                'value' => Type::string(),
+                'label' => Type::string(),
+                'urlSuffix' => Type::string(),
+            ],
+        ]));
     }
 
     /**
