@@ -16,6 +16,7 @@
 - Added the “Affiliated Site” native user field. ([#16174](https://github.com/craftcms/cms/pull/16174))
 - Added support for setting site-specific email setting overrides. ([#16187](https://github.com/craftcms/cms/pull/16187))
 - Added the “View users” user permission. ([#16206](https://github.com/craftcms/cms/pull/16206))
+- Added the “GraphQL Mode” Link field setting. ([#16237](https://github.com/craftcms/cms/pull/16237))
 
 ### Development
 - Added support for fallback element partial templates, e.g. `_partials/entry.twig` as opposed to `_partials/entry/typeHandle.twig`. ([#16125](https://github.com/craftcms/cms/pull/16125))
@@ -31,6 +32,8 @@
 - Added `craft\elements\User::getAffiliatedSite()`.
 - Added `craft\fields\data\LinkData::$urlSuffix`.
 - Added `craft\fields\data\LinkData::getUrl()`.
+- Added `craft\gql\types\LinkData`.
+- Added `craft\gql\types\generators\LinkDataType`.
 - Added `craft\mail\Mailer::$siteId`.
 - Added `craft\mail\Mailer::$siteOverrides`.
 - Added `craft\models\MailSettings::$siteOverrides`.
