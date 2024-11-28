@@ -163,59 +163,6 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
     private array $_linkTypes;
 
     /**
-     * Returns the link types available to the field.
-     *
-     * @return array<string,BaseLinkType>
-     */
-    public function getLinkTypes(): array
-    {
-        if (!isset($this->_linkTypes)) {
-            $this->_linkTypes = [];
-            $types = self::types();
-
-            foreach ($this->types as $typeId) {
-                if (isset($types[$typeId])) {
-                    $this->_linkTypes[$typeId] = Component::createComponent([
-                        'type' => $types[$typeId],
-                        'settings' => $this->typeSettings[$typeId] ?? [],
-                    ], BaseLinkType::class);
-                }
-            }
-        }
-
-        return $this->_linkTypes;
-    }
-
-    private function resolveType(string $value): string
-    {
-        $linkTypes = $this->getLinkTypes();
-
-        // check URL last, if it's selected
-        $urlType = ArrayHelper::remove($linkTypes, UrlType::id());
-        if ($urlType) {
-            $linkTypes[UrlType::id()] = $urlType;
-        }
-
-        foreach ($linkTypes as $id => $linkType) {
-            if ($linkType->supports($value)) {
-                return $id;
-            }
-        }
-
-        // See if any unselected types support it
-        foreach (self::types() as $typeId => $type) {
-            if (!isset($linkTypes[$typeId]) && $type !== UrlType::class) {
-                $linkType = Component::createComponent($type, BaseLinkType::class);
-                if ($linkType->supports($value)) {
-                    return $linkType::id();
-                }
-            }
-        }
-
-        return UrlType::id();
-    }
-
-    /**
      * @var string[] Allowed link types
      */
     public array $types = [
@@ -274,6 +221,59 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
         $rules[] = [['types', 'maxLength'], 'required'];
         $rules[] = [['maxLength'], 'number', 'integerOnly' => true, 'min' => 10];
         return $rules;
+    }
+
+    /**
+     * Returns the link types available to the field.
+     *
+     * @return array<string,BaseLinkType>
+     */
+    public function getLinkTypes(): array
+    {
+        if (!isset($this->_linkTypes)) {
+            $this->_linkTypes = [];
+            $types = self::types();
+
+            foreach ($this->types as $typeId) {
+                if (isset($types[$typeId])) {
+                    $this->_linkTypes[$typeId] = Component::createComponent([
+                        'type' => $types[$typeId],
+                        'settings' => $this->typeSettings[$typeId] ?? [],
+                    ], BaseLinkType::class);
+                }
+            }
+        }
+
+        return $this->_linkTypes;
+    }
+
+    private function resolveType(string $value): string
+    {
+        $linkTypes = $this->getLinkTypes();
+
+        // check URL last, if it's selected
+        $urlType = ArrayHelper::remove($linkTypes, UrlType::id());
+        if ($urlType) {
+            $linkTypes[UrlType::id()] = $urlType;
+        }
+
+        foreach ($linkTypes as $id => $linkType) {
+            if ($linkType->supports($value)) {
+                return $id;
+            }
+        }
+
+        // See if any unselected types support it
+        foreach (self::types() as $typeId => $type) {
+            if (!isset($linkTypes[$typeId]) && $type !== UrlType::class) {
+                $linkType = Component::createComponent($type, BaseLinkType::class);
+                if ($linkType->supports($value)) {
+                    return $linkType::id();
+                }
+            }
+        }
+
+        return UrlType::id();
     }
 
     /**
