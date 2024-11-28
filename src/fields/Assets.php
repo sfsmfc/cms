@@ -945,6 +945,9 @@ class Assets extends BaseRelationField
         if ($isDynamic) {
             // Prepare the path by parsing tokens and normalizing slashes.
             try {
+                if ($element?->duplicateOf) {
+                    $element = $element->duplicateOf;
+                }
                 $renderedSubpath = Craft::$app->getView()->renderObjectTemplate($subpath, $element);
             } catch (InvalidConfigException|RuntimeError $e) {
                 throw new InvalidSubpathException($subpath, null, 0, $e);
