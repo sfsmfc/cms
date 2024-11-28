@@ -824,9 +824,7 @@ code,
     font-size: 0.8em !important;
   }
 
-  .instructions &,
-  .pane &,
-  .note & {
+  p & {
     background-color: var(--gray-100);
     padding-block: 0.0625em;
     padding-inline: 0.25em;
