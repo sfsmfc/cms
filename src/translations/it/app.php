@@ -297,6 +297,7 @@ return [
     'Choose' => 'Scegli',
     'City' => 'Città',
     'City/Town' => 'Città/Paese',
+    'Class' => 'Class',
     'Clear Caches' => 'Svuota cache',
     'Clear all' => 'Elimina tutto',
     'Clear caches' => 'Svuota cache',
