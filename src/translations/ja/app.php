@@ -297,6 +297,7 @@ return [
     'Choose' => '選択',
     'City' => '市区町村',
     'City/Town' => '市区町村',
+    'Class' => 'Class',
     'Clear Caches' => 'キャッシュをクリア',
     'Clear all' => 'すべてクリア',
     'Clear caches' => 'キャッシュをクリア',
