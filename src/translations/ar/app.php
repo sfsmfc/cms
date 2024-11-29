@@ -297,6 +297,7 @@ return [
     'Choose' => 'اختر',
     'City' => 'المدينة',
     'City/Town' => 'City/Town',
+    'Class' => 'Class',
     'Clear Caches' => 'مسح التخزين المؤقت',
     'Clear all' => 'مسح الكل',
     'Clear caches' => 'مسح ذاكرة التخزين المؤقت',
