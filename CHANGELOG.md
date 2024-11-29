@@ -4,6 +4,7 @@
 
 - Fixed an error that could occur when duplicating an element with an Assets field that had a dynamic subpath. ([#16214](https://github.com/craftcms/cms/issues/16214))
 - Reduced the likelihood of a deadlock error occurring when updating search indexes. ([#15221](https://github.com/craftcms/cms/issues/15221))
+- Fixed a bug where renaming asset folders could move them to the webroot on Windows. ([#16215](https://github.com/craftcms/cms/issues/16215))
 - Fixed a bug where element slideouts had Save buttons even if the user didn’t have permission to save the element. ([#16205](https://github.com/craftcms/cms/pull/16205))
 - Fixed a bug where pagination wasn’t working properly on the Entry Types index page when searching. ([#16204](https://github.com/craftcms/cms/issues/16204))
 - Fixed an error that could occur when saving an element with an invalid Link field value. ([#16212](https://github.com/craftcms/cms/issues/16212))
