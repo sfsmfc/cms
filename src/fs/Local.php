@@ -415,7 +415,7 @@ class Local extends Fs implements LocalFsInterface
             throw new FsException("The path `$path` is not contained.");
         }
 
-        return $this->getRootPath() . DIRECTORY_SEPARATOR . $path;
+        return $this->getRootPath() . DIRECTORY_SEPARATOR . FileHelper::normalizePath($path);
     }
 
     /**
