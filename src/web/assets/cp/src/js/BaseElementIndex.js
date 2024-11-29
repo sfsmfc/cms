@@ -4064,7 +4064,7 @@ const ViewMenu = Garnish.Base.extend({
     });
   },
 
-  updateMenuContent: function() {
+  updateMenuContent: function () {
     this.updateSortField();
     this.updateTableFieldVisibility();
     if (
@@ -4075,7 +4075,7 @@ const ViewMenu = Garnish.Base.extend({
     }
   },
 
-  menuHasContent: function() {
+  menuHasContent: function () {
     this.updateMenuContent();
     if (this.$sortField == null && this.$tableColumnsField.hasClass('hidden')) {
       return false;
