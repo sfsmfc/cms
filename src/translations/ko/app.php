@@ -297,6 +297,7 @@ return [
     'Choose' => '선택',
     'City' => '도시명',
     'City/Town' => 'City/Town',
+    'Class' => 'Class',
     'Clear Caches' => '캐시 지우기',
     'Clear all' => '모두 지우기',
     'Clear caches' => '캐시 지우기',
