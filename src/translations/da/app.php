@@ -297,6 +297,7 @@ return [
     'Choose' => 'Vælg',
     'City' => 'By',
     'City/Town' => 'City/Town',
+    'Class' => 'Class',
     'Clear Caches' => 'Ryd cache',
     'Clear all' => 'Ryd Alt',
     'Clear caches' => 'Ryd caches',
