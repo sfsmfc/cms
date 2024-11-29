@@ -373,16 +373,18 @@ class Local extends Fs implements LocalFsInterface
      */
     public function renameDirectory(string $path, string $newName): void
     {
-        if (!is_dir($this->prefixPath($path))) {
+        $fullPath = $this->prefixPath($path);
+
+        if (!is_dir($fullPath)) {
             throw new FsObjectNotFoundException('No folder exists at path: ' . $path);
         }
 
-        $components = explode(DIRECTORY_SEPARATOR, $this->prefixPath($path));
+        $components = explode(DIRECTORY_SEPARATOR, $fullPath);
         array_pop($components);
         $components[] = $newName;
         $newPath = implode(DIRECTORY_SEPARATOR, $components);
 
-        @rename($this->prefixPath($path), $newPath);
+        @rename($fullPath, $newPath);
     }
 
     /**
