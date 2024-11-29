@@ -297,6 +297,7 @@ return [
     'Choose' => 'Seçiniz',
     'City' => 'Şehir',
     'City/Town' => 'City/Town',
+    'Class' => 'Class',
     'Clear Caches' => 'Önbellekleri Temizle',
     'Clear all' => 'Hepsini Temizle',
     'Clear caches' => 'Önbellekleri temizle',
