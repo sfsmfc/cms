@@ -297,6 +297,7 @@ return [
     'Choose' => '选择',
     'City' => '城市',
     'City/Town' => 'City/Town',
+    'Class' => 'Class',
     'Clear Caches' => '清除缓存',
     'Clear all' => '全部清除',
     'Clear caches' => '清除缓存',
