@@ -297,6 +297,7 @@ return [
     'Choose' => 'Välj',
     'City' => 'Stad',
     'City/Town' => 'City/Town',
+    'Class' => 'Class',
     'Clear Caches' => 'Rensa cache',
     'Clear all' => 'Rensa alla',
     'Clear caches' => 'Rensa cache',
