@@ -1495,6 +1495,15 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         }
         this.activeViewMenu = this.viewMenus[this.sourceKey];
         this.activeViewMenu.showTrigger();
+
+        // check if we should show the View button (ViewMenu.$trigger)
+        if (this.activeViewMenu) {
+          if (!this.activeViewMenu?.menuHasContent()) {
+            this.activeViewMenu.disableTrigger();
+          } else {
+            this.activeViewMenu.enableTrigger();
+          }
+        }
       }
     },
 
@@ -2565,6 +2574,15 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         this.viewModeBtns[this._viewMode]
           .addClass('active')
           .attr('aria-pressed', 'true');
+      }
+
+      // check if we should show the View button (ViewMenu.$trigger)
+      if (this.activeViewMenu) {
+        if (!this.activeViewMenu?.menuHasContent()) {
+          this.activeViewMenu.disableTrigger();
+        } else {
+          this.activeViewMenu.enableTrigger();
+        }
       }
     },
 
@@ -4034,14 +4052,6 @@ const ViewMenu = Garnish.Base.extend({
 
     this.menu.on('show', () => {
       this.$trigger.addClass('active');
-      this.updateSortField();
-      this.updateTableFieldVisibility();
-      if (
-        this.elementIndex.getSelectedSourceState('mode') !==
-        this.elementIndex.defaultViewMode
-      ) {
-        this._createRevertBtn();
-      }
     });
 
     this.menu.on('hide', () => {
@@ -4054,6 +4064,26 @@ const ViewMenu = Garnish.Base.extend({
     });
   },
 
+  updateMenuContent: function() {
+    this.updateSortField();
+    this.updateTableFieldVisibility();
+    if (
+      this.elementIndex.getSelectedSourceState('mode') !==
+      this.elementIndex.defaultViewMode
+    ) {
+      this._createRevertBtn();
+    }
+  },
+
+  menuHasContent: function() {
+    this.updateMenuContent();
+    if (this.$sortField == null && this.$tableColumnsField.hasClass('hidden')) {
+      return false;
+    }
+
+    return true;
+  },
+
   showTrigger: function () {
     this.$trigger.removeClass('hidden');
   },
@@ -4061,6 +4091,18 @@ const ViewMenu = Garnish.Base.extend({
   hideTrigger: function () {
     this.$trigger.data('trigger').hide();
     this.$trigger.addClass('hidden');
+    this.menu.hide();
+  },
+
+  enableTrigger: function () {
+    this.$trigger.removeClass('disabled');
+    this.$trigger.attr('aria-disabled', false);
+  },
+
+  disableTrigger: function () {
+    this.$trigger.data('trigger').hide();
+    this.$trigger.addClass('disabled');
+    this.$trigger.attr('aria-disabled', true);
     this.menu.hide();
   },
 
