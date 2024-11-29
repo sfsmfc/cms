@@ -372,11 +372,11 @@ class Drafts extends Component
         $draft->setScenario(Element::SCENARIO_ESSENTIALS);
         $draft->validate();
 
-        // If there are any errors on the URI, re-validate as disabled
-        if ($draft->hasErrors('uri') && $draft->enabled) {
-            $draft->enabled = false;
-            $draft->validate();
-        }
+//        // If there are any errors on the URI, re-validate as disabled
+//        if ($draft->hasErrors('uri') && $draft->enabled) {
+//            $draft->enabled = false;
+//            $draft->validate();
+//        }
 
         try {
             if ($draft->hasErrors() || !Craft::$app->getElements()->saveElement($draft, false)) {

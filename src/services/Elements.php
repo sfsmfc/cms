@@ -1637,10 +1637,10 @@ class Elements extends Component
         $mainClone->validate();
 
         // If there are any errors on the URI, re-validate as disabled
-        if ($mainClone->hasErrors('uri') && $mainClone->enabled) {
-            $mainClone->enabled = false;
-            $mainClone->validate();
-        }
+//        if ($mainClone->hasErrors('uri') && $mainClone->enabled) {
+//            $mainClone->enabled = false;
+//            $mainClone->validate();
+//        }
 
         if ($mainClone->hasErrors()) {
             throw new InvalidElementException($mainClone, 'Element ' . $element->id . ' could not be duplicated because it doesn\'t validate.');
