@@ -17,6 +17,7 @@
 - Added support for setting site-specific email setting overrides. ([#16187](https://github.com/craftcms/cms/pull/16187))
 - Added the “View users” user permission. ([#16206](https://github.com/craftcms/cms/pull/16206))
 - Added the “GraphQL Mode” Link field setting. ([#16237](https://github.com/craftcms/cms/pull/16237))
+- The Queue Manager utility now shows jobs’ class names. ([#16228](https://github.com/craftcms/cms/pull/16228))
 
 ### Development
 - Added support for fallback element partial templates, e.g. `_partials/entry.twig` as opposed to `_partials/entry/typeHandle.twig`. ([#16125](https://github.com/craftcms/cms/pull/16125))
