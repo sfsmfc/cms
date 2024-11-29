@@ -297,6 +297,7 @@ return [
     'Choose' => 'Velg',
     'City' => 'By',
     'City/Town' => 'By/Sted',
+    'Class' => 'Class',
     'Clear Caches' => 'Tøm hurtigbufferene',
     'Clear all' => 'Tøm alt',
     'Clear caches' => 'Tøm hurtigbufferene',
