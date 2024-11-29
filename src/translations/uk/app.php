@@ -297,6 +297,7 @@ return [
     'Choose' => 'Вибрати',
     'City' => 'Місто',
     'City/Town' => 'City/Town',
+    'Class' => 'Class',
     'Clear Caches' => 'Очистити кеш',
     'Clear all' => 'Очистити все',
     'Clear caches' => 'Очистити кеші',
