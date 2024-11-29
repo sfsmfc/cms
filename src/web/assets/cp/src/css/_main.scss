@@ -3751,6 +3751,10 @@ table {
 
       .checkbox-preview-label {
         display: inline;
+
+        .chip.small {
+          padding-inline: 0;
+        }
         font-style: italic;
         margin-inline-start: 5px;
       }
