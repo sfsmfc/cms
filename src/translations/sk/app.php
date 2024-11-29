@@ -297,6 +297,7 @@ return [
     'Choose' => 'Vybrať',
     'City' => 'Mesto',
     'City/Town' => 'Mesto/Obec',
+    'Class' => 'Class',
     'Clear Caches' => 'Vymazať Cache',
     'Clear all' => 'Vymazať Všetko',
     'Clear caches' => 'Vymazať cache',
