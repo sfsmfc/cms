@@ -297,6 +297,7 @@ return [
     'Choose' => 'Kiválasztás',
     'City' => 'Város',
     'City/Town' => 'City/Town',
+    'Class' => 'Class',
     'Clear Caches' => 'Gyorsítótárak tisztítása',
     'Clear all' => 'Minden törlése',
     'Clear caches' => 'Gyorsítótárak kiürítése',
