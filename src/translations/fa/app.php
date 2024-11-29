@@ -297,6 +297,7 @@ return [
     'Choose' => 'انتخاب کردن',
     'City' => 'شهر',
     'City/Town' => 'City/Town',
+    'Class' => 'Class',
     'Clear Caches' => 'پاک کردن حافظه های نهان',
     'Clear all' => 'پاک کردن همه',
     'Clear caches' => 'پاک کردن حافظه های نهان',
