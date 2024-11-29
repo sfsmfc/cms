@@ -297,6 +297,7 @@ return [
     'Choose' => 'בחר',
     'City' => 'עיר',
     'City/Town' => 'עיר/עיירה',
+    'Class' => 'Class',
     'Clear Caches' => 'ניקוי מטמונים',
     'Clear all' => 'נקה הכל',
     'Clear caches' => 'ניקוי מטמונים',
