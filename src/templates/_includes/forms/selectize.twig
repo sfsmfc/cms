@@ -95,6 +95,18 @@
         if (status) {
             label += `<span class="status ${status}"></span>`;
         }
+        const color = hasData(data, 'color') ? getData(data, 'color') : null;
+        if (color) {
+            label += '<div class="color small">';
+            if (color[0] == '#') {
+                label += `<div class="color-preview" style="background-color: ${color}"></div>`;
+            } else if (color != '__blank__') {
+                label += `<div class="color-preview bg-${color}"></div>`;
+            } else {
+                label += `<div class="color-preview"></div>`;
+            }
+            label += '</div>';
+        }
         label += `<span>${Craft.escapeHtml(getData(data, 'text'))}</span>`;
         if (showHint && hasData(data, 'hint') && getData(data, 'hint') !== '') {
             const hintLang = getData(data, 'hintLang');
