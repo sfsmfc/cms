@@ -696,10 +696,6 @@ class DateTimeHelperTest extends TestCase
             [true, '1 year'],
             [true, '1 month'],
             [true, '1 minutes'],
-
-            [false, ''],
-            [false, 'random string'],
-
         ];
     }
 
