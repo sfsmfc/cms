@@ -1677,6 +1677,13 @@ class Fields extends Component
             $field ??= $this->getFieldById($fieldRecord->id);
             $field->id = $fieldRecord->id;
         } else {
+            // if it's not a control panel save request, get the field again
+            // so that it has the new settings
+            // https://github.com/craftcms/cms/issues/16227
+            if (!isset($this->_savingFields[$fieldUid])) {
+                $field = $this->getFieldById($fieldRecord->id);
+            }
+
             // Save the old field handle and settings on the model in case the field type needs to do something with it.
             $field->oldHandle = $fieldRecord->getOldHandle();
             $field->oldSettings = is_string($oldSettings) ? Json::decode($oldSettings) : null;
