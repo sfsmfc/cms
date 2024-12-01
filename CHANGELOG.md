@@ -9,6 +9,7 @@
 - Fixed a bug where pagination wasn’t working properly on the Entry Types index page when searching. ([#16204](https://github.com/craftcms/cms/issues/16204))
 - Fixed an error that could occur when saving an element with an invalid Link field value. ([#16212](https://github.com/craftcms/cms/issues/16212))
 - Fixed a bug where sortable checkbox selects were displaying menu buttons even when only one option was selected. ([#16213](https://github.com/craftcms/cms/issues/16213))
+- Fixed a bug where it wasn’t possible to sort embedded element indexes by custom fields.
 
 ## 5.5.3 - 2024-11-22
 
