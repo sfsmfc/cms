@@ -83,11 +83,11 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
     {
         // presets => palette
         if (array_key_exists('presets', $config) || array_key_exists('defaultColor', $config)) {
-            $default = ArrayHelper::remove($config, 'defaultColor');
+            $defaultColor = ArrayHelper::remove($config, 'defaultColor');
             $config['palette'] = array_map(fn(string $color) => [
                 'color' => $color,
                 'label' => null,
-                'default' => ($color === $default),
+                'default' => ($color === $defaultColor),
             ], ArrayHelper::remove($config, 'presets') ?? []);
         }
 
@@ -260,8 +260,11 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
         }
 
         // If this is a new entry, look for any default options
-        if ($value === null && $this->isFresh($element) && $this->defaultColor) {
-            $value = $this->defaultColor;
+        if ($value === null && $this->isFresh($element)) {
+            $defaultColor = $this->getDefaultColor();
+            if ($defaultColor) {
+                $value = $defaultColor;
+            }
         }
 
         $value = trim($value);
