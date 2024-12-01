@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Reduced the likelihood of a deadlock error occurring when updating search indexes. ([#15221](https://github.com/craftcms/cms/issues/15221))
+- The PHP Info utility is no longer shown in environments where the `phpinfo()` function is disabled. ([#16229](https://github.com/craftcms/cms/pull/16229))
 - Fixed an error that could occur when duplicating an element with an Assets field that had a dynamic subpath. ([#16214](https://github.com/craftcms/cms/issues/16214))
 - Fixed a bug where renaming asset folders could move them to the webroot on Windows. ([#16215](https://github.com/craftcms/cms/issues/16215))
 - Fixed a bug where Matrix fields’ content tables weren’t getting renamed properly when applying project config changes. ([#16227](https://github.com/craftcms/cms/issues/16227))
