@@ -107,7 +107,7 @@ class Utilities extends Component
 
         return array_values(array_filter($event->types, function(string $class) use ($disabledUtilities) {
             /** @var class-string<UtilityInterface> $class */
-            return !isset($disabledUtilities[$class::id()]);
+            return !isset($disabledUtilities[$class::id()]) && $class::isSelectable();
         }));
     }
 
