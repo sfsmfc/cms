@@ -284,6 +284,19 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
     {
         return [
             ColorValidator::class,
+            [
+                function(ElementInterface $element) {
+                    if (!$this->allowCustomColors) {
+                        /** @var ColorData $value */
+                        $value = $element->getFieldValue($this->handle);
+                        if (!ArrayHelper::contains($this->palette, fn(array $color) => $color['color'] === $value->getHex())) {
+                            $element->addError("field:$this->handle", Craft::t('yii', '{attribute} is invalid.', [
+                                'attribute' => $this->getUiLabel(),
+                            ]));
+                        }
+                    }
+                },
+            ],
         ];
     }
 
@@ -320,32 +333,16 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
         );
 
         $html =
-            Html::beginTag('div', [
-                'class' => array_filter([
-                    'flex',
-                    'flex-inline',
-                    'flex-col',
-                    'items-start',
-//                    $this->allowCustomColors ? 'pane' : null,
-//                    $this->allowCustomColors ? 'hairline' : null,
-//                    $this->allowCustomColors ? 'padding-m' : null,
-                ]),
-            ]) .
+            Html::beginTag('div', ['class' => ['flex', 'flex-inline', 'flex-col', 'items-start']]) .
             Cp::colorSelectFieldHtml([
                 'id' => $id,
                 'describedBy' => $this->describedBy,
                 'name' => "$this->handle[color]",
                 'options' => array_filter([
-                    $showBlankOption ? [
-                        'label' => Craft::t('app', 'No color'),
-                        'value' => '__blank__',
-                        'data' => ['color' => '__blank__'],
-                    ] : null,
                     ...array_map(
                         fn(array $color) => [
                             'label' => $color['label'] ?? $color['color'],
                             'value' => $color['color'],
-                            'data' => ['color' => $color['color']],
                         ],
                         $this->palette,
                     ),
@@ -354,6 +351,7 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
                         'value' => '__custom__',
                     ] : null,
                 ]),
+                'withBlankOption' => $showBlankOption,
                 'value' => $isInPalette ? $value->getHex() : ($isCustom ? '__custom__' : '__blank__'),
                 'toggle' => $this->allowCustomColors,
                 'targetPrefix' => $this->allowCustomColors ? "$id-custom-" : null,
@@ -390,6 +388,8 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
                     'presets' => $this->getPresets(),
                 ]) .
                 Html::endTag('div');
+        } elseif ($value && !$isInPalette) {
+            Craft::$app->getView()->setInitialDeltaValue($this->handle, $value->getHex());
         }
 
         $html .= Html::endTag('div');

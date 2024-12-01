@@ -95,8 +95,8 @@
         if (status) {
             label += `<span class="status ${status}"></span>`;
         }
-        const color = hasData(data, 'color') ? getData(data, 'color') : null;
-        if (color) {
+        const color = hasData(data, 'color') ? getData(data, 'color') : false;
+        if (color !== false) {
             label += '<div class="color small">';
             if (color[0] == '#') {
                 label += `<div class="color-preview" style="background-color: ${color}"></div>`;
