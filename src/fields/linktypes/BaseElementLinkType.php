@@ -198,11 +198,37 @@ JS, [
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function validateValue(string $value, ?string &$error = null): bool
     {
         return true;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function normalizeValue(string $value): string
+    {
+        if (is_numeric($value)) {
+            $value = sprintf('{%s:%s@%s:url}',
+                static::elementType()::refHandle(),
+                $value,
+                Craft::$app->getSites()->getCurrentSite()->id,
+            );
+        }
+
+        return parent::normalizeValue($value);
+    }
+
+    /**
+     * Returns an Element that the field is supposed to link to.
+     *
+     * @param string|null $value
+     * @return ElementInterface|null
+     * @throws \craft\errors\SiteNotFoundException
+     */
     public function element(?string $value): ?ElementInterface
     {
         if (

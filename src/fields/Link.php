@@ -21,6 +21,7 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\fields\conditions\TextFieldConditionRule;
 use craft\fields\data\LinkData;
 use craft\fields\linktypes\Asset;
+use craft\fields\linktypes\BaseElementLinkType;
 use craft\fields\linktypes\BaseLinkType;
 use craft\fields\linktypes\BaseTextLinkType;
 use craft\fields\linktypes\Category;
@@ -418,7 +419,11 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'label' => $this->showLabelField ? ($value['label'] ?? null) : null,
                 'target' => $this->showTargetField ? ($value['target'] ?? null) : null,
             ]);
-            $value = trim($value['value'] ?? $value[$typeId]['value'] ?? '');
+            $value = $value['value'] ?? $value[$typeId]['value'] ?? '';
+
+            if (is_string($value)) {
+                $value = trim($value);
+            }
 
             if (!$value) {
                 return null;
@@ -432,6 +437,10 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                     throw new InvalidArgumentException("Invalid link type: $typeId");
                 }
                 $linkType = Component::createComponent($type, BaseLinkType::class);
+            }
+
+            if ($linkType instanceof BaseElementLinkType && $value instanceof ElementInterface) {
+                $value = sprintf('{%s:%s@%s:url}', $value::refHandle(), $value->id, $value->siteId);
             }
 
             $value = $linkType->normalizeValue(str_replace(' ', '+', $value));
