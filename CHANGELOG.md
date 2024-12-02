@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 4
 
+## Unreleased
+
+- Fixed a bug where asset, category, and entry sources defined by the `EVENT_REGISTER_SOURCES` event didn’t have any custom fields available to them, unless the `EVENT_REGISTER_FIELD_LAYOUTS` event was also used to define the available field layouts for the event-defined source. ([#16256](https://github.com/craftcms/cms/discussions/16256))
+
 ## 4.13.4 - 2024-12-02
 
 - Reduced the likelihood of a deadlock error occurring when updating search indexes. ([#15221](https://github.com/craftcms/cms/issues/15221))

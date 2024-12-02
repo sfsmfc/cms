@@ -350,16 +350,16 @@ class Entry extends Element implements ExpirableElementInterface
     protected static function defineFieldLayouts(string $source): array
     {
         // Get all the sections covered by this source
-        $sections = [];
         if ($source === '*') {
             $sections = Craft::$app->getSections()->getAllSections();
         } elseif ($source === 'singles') {
             $sections = Craft::$app->getSections()->getSectionsByType(Section::TYPE_SINGLE);
-        } elseif (
-            preg_match('/^section:(.+)$/', $source, $matches) &&
-            $section = Craft::$app->getSections()->getSectionByUid($matches[1])
-        ) {
-            $sections = [$section];
+        } elseif (preg_match('/^section:(.+)$/', $source, $matches)) {
+            $sections = array_filter([
+                Craft::$app->getSections()->getSectionByUid($matches[1]),
+            ]);
+        } else {
+            return parent::defineFieldLayouts($source);
         }
 
         $fieldLayouts = [];
