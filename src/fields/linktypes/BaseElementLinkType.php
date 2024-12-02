@@ -209,8 +209,16 @@ JS, [
     /**
      * @inheritdoc
      */
-    public function normalizeValue(string $value): string
+    public function normalizeValue(mixed $value): string
     {
+        /** @phpstan-ignore-next-line */
+        if ($value instanceof ElementInterface) {
+            $value = sprintf('{%s:%s@%s:url}',
+                static::elementType()::refHandle(),
+                $value->id,
+                $value->siteId,
+            );
+        }
         if (is_numeric($value)) {
             $value = sprintf('{%s:%s@%s:url}',
                 static::elementType()::refHandle(),

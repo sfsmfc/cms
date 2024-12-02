@@ -21,7 +21,6 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\fields\conditions\TextFieldConditionRule;
 use craft\fields\data\LinkData;
 use craft\fields\linktypes\Asset;
-use craft\fields\linktypes\BaseElementLinkType;
 use craft\fields\linktypes\BaseLinkType;
 use craft\fields\linktypes\BaseTextLinkType;
 use craft\fields\linktypes\Category;
@@ -439,11 +438,11 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 $linkType = Component::createComponent($type, BaseLinkType::class);
             }
 
-            if ($linkType instanceof BaseElementLinkType && $value instanceof ElementInterface) {
-                $value = sprintf('{%s:%s@%s:url}', $value::refHandle(), $value->id, $value->siteId);
+            if (is_string($value)) {
+                $value = str_replace(' ', '+', $value);
             }
 
-            $value = $linkType->normalizeValue(str_replace(' ', '+', $value));
+            $value = $linkType->normalizeValue($value);
         } else {
             if (!$value) {
                 return null;
