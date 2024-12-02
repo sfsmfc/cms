@@ -32,8 +32,6 @@
     }) %}
 {% endif %}
 
-{% set canHaveDrafts = canHaveDrafts ?? elementInstance.hasDrafts() %}
-
 {% block sidebar %}
     {% if sources is not empty %}
         {{ tag('a', {

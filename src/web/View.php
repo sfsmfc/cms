@@ -2414,6 +2414,7 @@ JS;
 
         $context['elementDisplayName'] = $elementType::displayName();
         $context['elementPluralDisplayName'] = $elementType::pluralDisplayName();
+        $context['canHaveDrafts'] ??= $elementType::hasDrafts();
 
         return null;
     }
