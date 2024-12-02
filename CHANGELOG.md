@@ -2,14 +2,21 @@
 
 ## Unreleased
 
-- Fixed an error that could occur when duplicating an element with an Assets field that had a dynamic subpath. ([#16214](https://github.com/craftcms/cms/issues/16214))
 - Reduced the likelihood of a deadlock error occurring when updating search indexes. ([#15221](https://github.com/craftcms/cms/issues/15221))
+- The PHP Info utility is no longer shown in environments where the `phpinfo()` function is disabled. ([#16229](https://github.com/craftcms/cms/pull/16229))
+- “View” buttons within element indexes are now disabled when the selected view mode has no applicable settings. ([#16242](https://github.com/craftcms/cms/pull/16242))
+- Fixed an error that could occur when duplicating an element with an Assets field that had a dynamic subpath. ([#16214](https://github.com/craftcms/cms/issues/16214))
 - Fixed a bug where renaming asset folders could move them to the webroot on Windows. ([#16215](https://github.com/craftcms/cms/issues/16215))
+- Fixed a bug where utilities’ `isSelectable()` methods weren’t being respected.
 - Fixed a bug where element slideouts had Save buttons even if the user didn’t have permission to save the element. ([#16205](https://github.com/craftcms/cms/pull/16205))
 - Fixed a bug where pagination wasn’t working properly on the Entry Types index page when searching. ([#16204](https://github.com/craftcms/cms/issues/16204))
 - Fixed an error that could occur when saving an element with an invalid Link field value. ([#16212](https://github.com/craftcms/cms/issues/16212))
 - Fixed a bug where sortable checkbox selects were displaying menu buttons even when only one option was selected. ([#16213](https://github.com/craftcms/cms/issues/16213))
 - Fixed a bug where it wasn’t possible to sort embedded element indexes by custom fields.
+- Fixed a bug where changes to nested elements weren’t getting saved to a draft of the parent, if the element editor was triggered via the “Edit” action menu item. ([#16251](https://github.com/craftcms/cms/issues/16251))
+- Fixed a bug where all elements would get soft-deleted when deleting a section on PostgreSQL. ([#16230](https://github.com/craftcms/cms/issues/16230))
+- Fixed a bug where entry cards could contain two entry type icons if the “Entry Type” attribute was included in the card view designer. ([#16234](https://github.com/craftcms/cms/issues/16234))
+- Fixed a styling issue.
 
 ## 5.5.3 - 2024-11-22
 

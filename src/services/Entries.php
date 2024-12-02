@@ -1144,13 +1144,13 @@ SQL)->execute();
 UPDATE $entriesTable [[entries]]
 SET [[deletedWithSection]] = TRUE
 FROM $elementsTable [[elements]]
-WHERE $conditionSql
+WHERE [[entries.id]] = [[elements.id]] AND $conditionSql
 SQL)->execute();
                 $db->createCommand(<<<SQL
 UPDATE $elementsTable [[elements]]
 SET [[dateDeleted]] = '$now'
 FROM $entriesTable [[entries]]
-WHERE $conditionSql
+WHERE [[entries.id]] = [[elements.id]] AND $conditionSql
 SQL)->execute();
             }
 
