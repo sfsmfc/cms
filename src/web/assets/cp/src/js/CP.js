@@ -111,9 +111,9 @@ Craft.CP = Garnish.Base.extend(
       //this.updateContentHeading();
 
       // Swap any instruction text with info icons
-      let $allInstructions = this.$details.find(
-        '.meta > .field > .instructions'
-      );
+      let $allInstructions = this.$details
+        .find('.meta > .field > .instructions')
+        .add($('.field.info-icon-instructions > .instructions'));
 
       for (let i = 0; i < $allInstructions.length; i++) {
         let $instructions = $allInstructions.eq(i);
@@ -1693,7 +1693,12 @@ Craft.CP = Garnish.Base.extend(
         } else if (
           this.displayedJobInfo.status === Craft.CP.JOB_STATUS_FAILED
         ) {
-          this.jobProgressIcon.showFailMode(Craft.t('app', 'Failed'));
+          if (Craft.canAccessQueueManager) {
+            this.jobProgressIcon.showFailMode(Craft.t('app', 'Failed'));
+          } else {
+            this.jobProgressIcon.$a.remove();
+            this.jobProgressIcon.destroy();
+          }
         }
       } else {
         if (this.jobProgressIcon) {

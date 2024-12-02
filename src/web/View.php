@@ -8,6 +8,7 @@
 namespace craft\web;
 
 use Craft;
+use craft\base\ElementInterface;
 use craft\events\AssetBundleEvent;
 use craft\events\CreateTwigEvent;
 use craft\events\RegisterTemplateRootsEvent;
@@ -27,7 +28,9 @@ use craft\web\twig\GlobalsExtension;
 use craft\web\twig\SafeHtml;
 use craft\web\twig\SinglePreloaderExtension;
 use craft\web\twig\TemplateLoader;
+use Illuminate\Support\Collection;
 use LogicException;
+use Stringable;
 use Throwable;
 use Twig\Error\LoaderError as TwigLoaderError;
 use Twig\Error\RuntimeError as TwigRuntimeError;
@@ -363,6 +366,9 @@ class View extends \yii\web\View
         }
 
         // Register the control panel hooks
+        $this->hook('cp.layouts.elementindex', [$this, '_prepareElementIndexVariables']);
+        $this->hook('cp.elements.toolbar', [$this, '_prepareElementToolbarVariables']);
+        $this->hook('cp.elements.sources', [$this, '_prepareElementSourcesVariables']);
         $this->hook('cp.elements.element', [$this, '_elementChipHtml']);
     }
 
@@ -393,7 +399,9 @@ class View extends \yii\web\View
         $twig = new Environment(new TemplateLoader($this), $this->_getTwigOptions());
 
         // Mark SafeHtml as a safe interface
-        $twig->getRuntime(EscaperRuntime::class)->addSafeClass(SafeHtml::class, ['html']);
+        /** @var class-string<Stringable> $safeClass */
+        $safeClass = SafeHtml::class;
+        $twig->getRuntime(EscaperRuntime::class)->addSafeClass($safeClass, ['html']);
 
         $twig->addExtension(new StringLoaderExtension());
         $twig->addExtension(new Extension($this, $twig));
@@ -2391,6 +2399,78 @@ JS;
         }
         $js .= '}';
         $this->registerJs($js, self::POS_HEAD);
+    }
+
+    private function _prepareElementIndexVariables(array &$context): null
+    {
+        /** @var class-string<ElementInterface> $elementType */
+        $elementType = $context['elementType'];
+
+        $context['title'] ??= $elementType::pluralDisplayName();
+        $context['context'] = 'index';
+        $context['sources'] = Craft::$app->getElementSources()->getSources($elementType, withDisabled: true);
+
+        $context['showSiteMenu'] = Craft::$app->getIsMultiSite() ? ($context['showSiteMenu'] ?? 'auto') : false;
+        if ($context['showSiteMenu'] === 'auto') {
+            $context['showSiteMenu'] = $elementType::isLocalized();
+        }
+
+        $context['elementDisplayName'] = $elementType::displayName();
+        $context['elementPluralDisplayName'] = $elementType::pluralDisplayName();
+
+        return null;
+    }
+
+    private function _prepareElementToolbarVariables(array &$context): null
+    {
+        /** @var class-string<ElementInterface> $elementType */
+        $elementType = $context['elementType'];
+
+        $context['context'] ??= 'index';
+        $context['isAdministrative'] = match ($context['context']) {
+            'index', 'embedded-index' => true,
+            default => false,
+        };
+        $context['showStatusMenu'] ??= 'auto';
+        if ($context['showStatusMenu'] === 'auto') {
+            $context['showStatusMenu'] = $elementType::hasStatuses();
+        }
+        $context['showSiteMenu'] = Craft::$app->getIsMultiSite() ? ($context['showSiteMenu'] ?? 'auto') : false;
+        if ($context['showSiteMenu'] === 'auto') {
+            $context['showSiteMenu'] = $elementType::isLocalized();
+        }
+        $context['idPrefix'] = sprintf('elementtoolbar%s-', mt_rand());
+
+        if ($context['showStatusMenu']) {
+            $context['elementStatuses'] = $elementType::statuses();
+        }
+
+        return null;
+    }
+
+    private function _prepareElementSourcesVariables(array &$context): null
+    {
+        /** @var class-string<ElementInterface> $elementType */
+        $elementType = $context['elementType'];
+
+        $context['keyPrefix'] ??= '';
+        $context['isTopLevel'] = $context['keyPrefix'] === '';
+
+        if ($context['isTopLevel']) {
+            $context['baseSortOptions'] ??= Collection::make($elementType::sortOptions())
+                ->map(fn($option, $key) => [
+                    'label' => $option['label'] ?? $option,
+                    'attr' => $option['attribute'] ?? $option['orderBy'] ?? $key,
+                    'defaultDir' => $option['defaultDir'] ?? 'asc',
+                ])
+                ->values()
+                ->all();
+            $context['tableColumns'] ??= Craft::$app->getElementSources()->getAvailableTableAttributes($elementType);
+        }
+
+        $context['viewModes'] ??= $elementType::indexViewModes();
+
+        return null;
     }
 
     /**

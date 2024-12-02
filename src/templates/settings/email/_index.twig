@@ -98,6 +98,56 @@
         }) }}
     {% endif %}
 
+    {% if craft.app.isMultiSite %}
+        {{ forms.editableTableField({
+            label: 'Site Overrides'|t('app'),
+            instructions: 'Blank values will default to the settings above.'|t('app'),
+            id: 'site-overrides',
+            name: 'siteOverrides',
+            cols: {
+                heading: {
+                    type: 'heading',
+                    heading: 'Site'|t('app'),
+                    suggestEnvVars: true,
+                    thin: true,
+                },
+                fromEmail: {
+                    type: 'autosuggest',
+                    heading: 'System Email Address'|t('app'),
+                    suggestEnvVars: true,
+                },
+                replyToEmail: {
+                    type: 'autosuggest',
+                    heading: 'Reply-To Address'|t('app'),
+                    suggestEnvVars: true,
+                },
+                fromName: {
+                    type: 'autosuggest',
+                    heading: 'Sender Name'|t('app'),
+                    suggestEnvVars: true,
+                },
+                template: CraftEdition >= CraftPro ? {
+                    type: 'template',
+                    heading: 'HTML Email Template'|t('app'),
+                    suggestEnvVars: true,
+                    code: true,
+                }
+            }|filter,
+            rows: collect(craft.app.sites.getAllSites())
+                .keyBy(site => site.uid)
+                .map(site => {
+                    heading: site.getUiLabel(),
+                    ...(settings.siteOverrides[site.uid] ?? {})
+                })
+                .all(),
+            fullWidth: true,
+            allowAdd: false,
+            allowDelete: false,
+            allowReorder: false,
+            errors: (freshSettings ? null : settings.getErrors('siteOverrides')|unique),
+        }) }}
+    {% endif %}
+
     <hr>
 
     {{ forms.selectField({

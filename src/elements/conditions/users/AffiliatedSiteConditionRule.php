@@ -1,27 +1,30 @@
 <?php
 
-namespace craft\elements\conditions;
+namespace craft\elements\conditions\users;
 
 use Craft;
 use craft\base\conditions\BaseMultiSelectConditionRule;
 use craft\base\ElementInterface;
+use craft\elements\conditions\ElementConditionRuleInterface;
 use craft\elements\db\ElementQueryInterface;
+use craft\elements\db\UserQuery;
+use craft\elements\User;
 use craft\models\Site;
 
 /**
  * Site condition rule.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 4.0.0
+ * @since 5.6.0
  */
-class SiteConditionRule extends BaseMultiSelectConditionRule implements ElementConditionRuleInterface
+class AffiliatedSiteConditionRule extends BaseMultiSelectConditionRule implements ElementConditionRuleInterface
 {
     /**
      * @inheritdoc
      */
     public function getLabel(): string
     {
-        return Craft::t('app', 'Site');
+        return Craft::t('app', 'Affiliated Site');
     }
 
     /**
@@ -29,7 +32,7 @@ class SiteConditionRule extends BaseMultiSelectConditionRule implements ElementC
      */
     public function getExclusiveQueryParams(): array
     {
-        return ['site', 'siteId'];
+        return ['affiliatedSite', 'affiliatedSiteId'];
     }
 
     /**
@@ -40,7 +43,7 @@ class SiteConditionRule extends BaseMultiSelectConditionRule implements ElementC
         return array_map(fn(Site $site) => [
             'label' => $site->getUiLabel(),
             'value' => $site->uid,
-        ], Craft::$app->getSites()->getEditableSites());
+        ], Craft::$app->getSites()->getAllSites());
     }
 
     /**
@@ -49,7 +52,8 @@ class SiteConditionRule extends BaseMultiSelectConditionRule implements ElementC
     public function modifyQuery(ElementQueryInterface $query): void
     {
         $sites = Craft::$app->getSites();
-        $query->siteId($this->paramValue(fn($uid) => $sites->getSiteByUid($uid, true)->id ?? null));
+        /** @var UserQuery $query */
+        $query->affiliatedSiteId($this->paramValue(fn($uid) => $sites->getSiteByUid($uid, true)->id ?? null));
     }
 
     /**
@@ -57,6 +61,7 @@ class SiteConditionRule extends BaseMultiSelectConditionRule implements ElementC
      */
     public function matchElement(ElementInterface $element): bool
     {
-        return $this->matchValue($element->getSite()->uid);
+        /** @var User $element */
+        return $this->matchValue($element->getAffiliatedSite()?->uid);
     }
 }

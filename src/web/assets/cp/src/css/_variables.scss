@@ -47,8 +47,12 @@
   --error-color-rgb: 216 31 35;
   --error-color: rgb(var(--error-color-rgb));
   --warning-color: var(--amber-700);
+  --warning-background: var(--amber-100);
+  --warning-border-color: var(--amber-300);
   --success-color: var(--teal-700);
   --notice-color: var(--sky-700);
+  --notice-background: var(--sky-100);
+  --notice-border-color: var(--sky-300);
 
   // status colors
   --enabled-color: var(--teal-550);

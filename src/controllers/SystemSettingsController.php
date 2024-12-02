@@ -334,6 +334,10 @@ class SystemSettingsController extends Controller
         $settings->template = $this->request->getBodyParam('template');
         $settings->transportType = $this->request->getBodyParam('transportType');
         $settings->transportSettings = Component::cleanseConfig($this->request->getBodyParam(sprintf('transportTypes.%s', Html::id($settings->transportType))) ?? []);
+        $settings->siteOverrides = array_filter(array_map(
+            fn(array $overrides) => array_filter($overrides),
+            $this->request->getBodyParam('siteOverrides') ?? [],
+        ));
 
         return $settings;
     }
