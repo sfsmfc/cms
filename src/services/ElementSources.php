@@ -296,7 +296,9 @@ class ElementSources extends Component
      */
     public function getSourceSortOptions(string $elementType, string $sourceKey): array
     {
-        $fieldLayouts = $this->getFieldLayoutsForSource($elementType, $sourceKey);
+        $fieldLayouts = $sourceKey === '__IMP__'
+            ? $elementType::fieldLayouts(null)
+            : $this->getFieldLayoutsForSource($elementType, $sourceKey);
         $sortOptions = $this->getSortOptionsForFieldLayouts($fieldLayouts);
 
         // Fire a 'defineSourceSortOptions' event

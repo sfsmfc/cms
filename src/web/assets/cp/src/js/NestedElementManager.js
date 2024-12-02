@@ -412,54 +412,25 @@ Craft.NestedElementManager = Garnish.Base.extend(
 
     initElement($element) {
       if (Garnish.hasAttr($element, 'data-editable')) {
+        // Double-clicks
         this.addListener($element, 'dblclick,taphold', (ev) => {
-          if ($(ev.target).closest('a[href],button,[role=button]').length) {
-            // Let the link/button do its thing
-            return;
+          if (!$(ev.target).closest('a[href],button,[role=button]').length) {
+            this.createElementEditor($element);
           }
-
-          const slideout = Craft.createElementEditor(
-            this.elementType,
-            $element,
-            {
-              onBeforeSubmit: async () => {
-                // If the nested element is primarily owned by the same owner element it was queried for,
-                // then ensure we're working with a draft and save the nested entry changes to the draft
-                // note: this workflow doesn't apply to entries nested directly in global sets as globals don't use element editor
-                if (
-                  typeof this.elementEditor !== 'undefined' &&
-                  Garnish.hasAttr($element, 'data-owner-is-canonical') &&
-                  !this.elementEditor.settings.isUnpublishedDraft
-                ) {
-                  await slideout.elementEditor.checkForm(true, true);
-                  await this.markAsDirty();
-                  if (
-                    this.elementEditor.settings.draftId &&
-                    slideout.elementEditor.settings.draftId
-                  ) {
-                    if (!slideout.elementEditor.settings.saveParams) {
-                      slideout.elementEditor.settings.saveParams = {};
-                    }
-                    slideout.elementEditor.settings.saveParams.action =
-                      'elements/save-nested-element-for-derivative';
-                    slideout.elementEditor.settings.saveParams.newOwnerId =
-                      this.settings.ownerId;
-                  }
-                }
-              },
-              onSubmit: (ev) => {
-                if (ev.data.id != $element.data('id')) {
-                  // swap the element with the new one
-                  $element
-                    .attr('data-id', ev.data.id)
-                    .data('id', ev.data.id)
-                    .data('owner-id', ev.data.ownerId);
-                  Craft.refreshElementInstances(ev.data.id);
-                }
-              },
-            }
-          );
         });
+
+        // "Edit" action menu item
+        const $editBtn = $element
+          .find('.action-btn')
+          .data('disclosureMenu')
+          ?.$container.find('[data-edit-action]');
+        if ($editBtn.length) {
+          // Override the default event listener
+          $editBtn.off('activate');
+          this.addListener($editBtn, 'activate', () => {
+            this.createElementEditor($element);
+          });
+        }
       }
 
       if (this.settings.sortable) {
@@ -489,6 +460,46 @@ Craft.NestedElementManager = Garnish.Base.extend(
           );
         }
       }
+    },
+
+    createElementEditor($element) {
+      const slideout = Craft.createElementEditor(this.elementType, $element, {
+        onBeforeSubmit: async () => {
+          // If the nested element is primarily owned by the same owner element it was queried for,
+          // then ensure we're working with a draft and save the nested entry changes to the draft
+          // note: this workflow doesn't apply to entries nested directly in global sets as globals don't use element editor
+          if (
+            typeof this.elementEditor !== 'undefined' &&
+            Garnish.hasAttr($element, 'data-owner-is-canonical') &&
+            !this.elementEditor.settings.isUnpublishedDraft
+          ) {
+            await slideout.elementEditor.checkForm(true, true);
+            await this.markAsDirty();
+            if (
+              this.elementEditor.settings.draftId &&
+              slideout.elementEditor.settings.draftId
+            ) {
+              if (!slideout.elementEditor.settings.saveParams) {
+                slideout.elementEditor.settings.saveParams = {};
+              }
+              slideout.elementEditor.settings.saveParams.action =
+                'elements/save-nested-element-for-derivative';
+              slideout.elementEditor.settings.saveParams.newOwnerId =
+                this.settings.ownerId;
+            }
+          }
+        },
+        onSubmit: (ev) => {
+          if (ev.data.id != $element.data('id')) {
+            // swap the element with the new one
+            $element
+              .attr('data-id', ev.data.id)
+              .data('id', ev.data.id)
+              .data('owner-id', ev.data.ownerId);
+            Craft.refreshElementInstances(ev.data.id);
+          }
+        },
+      });
     },
 
     async deleteElement($element) {
