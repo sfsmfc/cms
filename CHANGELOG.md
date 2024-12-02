@@ -1,6 +1,6 @@
 # Release Notes for Craft CMS 5
 
-## Unreleased
+## 5.5.4 - 2024-12-02
 
 - Reduced the likelihood of a deadlock error occurring when updating search indexes. ([#15221](https://github.com/craftcms/cms/issues/15221))
 - The PHP Info utility is no longer shown in environments where the `phpinfo()` function is disabled. ([#16229](https://github.com/craftcms/cms/pull/16229))
