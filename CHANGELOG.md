@@ -15,6 +15,7 @@
 - Fixed a bug where changes to nested elements weren’t getting saved to a draft of the parent, if the element editor was triggered via the “Edit” action menu item. ([#16251](https://github.com/craftcms/cms/issues/16251))
 - Fixed a bug where all elements would get soft-deleted when deleting a section on PostgreSQL. ([#16230](https://github.com/craftcms/cms/issues/16230))
 - Fixed a bug where entry cards could contain two entry type icons if the “Entry Type” attribute was included in the card view designer. ([#16234](https://github.com/craftcms/cms/issues/16234))
+- Fixed a styling issue.
 
 ## 5.5.3 - 2024-11-22
 
