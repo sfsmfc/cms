@@ -1636,12 +1636,6 @@ class Elements extends Component
         $mainClone->setScenario(Element::SCENARIO_ESSENTIALS);
         $mainClone->validate();
 
-        // If there are any errors on the URI, re-validate as disabled
-        if ($mainClone->hasErrors('uri') && $mainClone->enabled) {
-            $mainClone->enabled = false;
-            $mainClone->validate();
-        }
-
         if ($mainClone->hasErrors()) {
             throw new InvalidElementException($mainClone, 'Element ' . $element->id . ' could not be duplicated because it doesn\'t validate.');
         }
