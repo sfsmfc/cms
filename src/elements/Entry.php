@@ -371,21 +371,17 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
      */
     protected static function defineFieldLayouts(?string $source): array
     {
-        if ($source !== null) {
-            if ($source === '*') {
-                $sections = Craft::$app->getEntries()->getAllSections();
-            } elseif ($source === 'singles') {
-                $sections = Craft::$app->getEntries()->getSectionsByType(Section::TYPE_SINGLE);
-            } else {
-                $sections = [];
-                if (preg_match('/^section:(.+)$/', $source, $matches)) {
-                    $section = Craft::$app->getEntries()->getSectionByUid($matches[1]);
-                    if ($section) {
-                        $sections[] = $section;
-                    }
-                }
-            }
+        if ($source === '*') {
+            $sections = Craft::$app->getEntries()->getAllSections();
+        } elseif ($source === 'singles') {
+            $sections = Craft::$app->getEntries()->getSectionsByType(Section::TYPE_SINGLE);
+        } elseif ($source !== null && preg_match('/^section:(.+)$/', $source, $matches)) {
+            $sections = array_filter([
+                Craft::$app->getEntries()->getSectionByUid($matches[1]),
+            ]);
+        }
 
+        if (isset($sections)) {
             $entryTypes = array_values(array_unique(array_merge(
                 ...array_map(fn(Section $section) => $section->getEntryTypes(), $sections),
             )));
