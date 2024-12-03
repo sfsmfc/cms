@@ -160,6 +160,7 @@
             allowDelete: false,
             allowReorder: false,
             errors: (freshSettings ? null : settings.getErrors('siteOverrides')|unique),
+            static: readOnly,
         }) }}
     {% endif %}
 
