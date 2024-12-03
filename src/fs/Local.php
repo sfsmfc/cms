@@ -143,6 +143,7 @@ class Local extends Fs implements LocalFsInterface
         return Craft::$app->getView()->renderTemplate('_components/fs/Local/settings.twig',
             [
                 'volume' => $this,
+                'disabled' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
             ]);
     }
 
