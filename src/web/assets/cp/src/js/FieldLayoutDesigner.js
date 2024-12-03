@@ -180,7 +180,7 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
 
       cvd.$libraryContainer
         .data('sortableCheckboxSelect')
-        .dragSort.on('dragStop', function () {
+        ?.dragSort.on('dragStop', function () {
           cvd.updatePreview();
         });
     },
@@ -1883,12 +1883,12 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
     let cvd = this.$container.data('cvd');
 
     // when item is moved up or down via disclosure menu - update preview
-    this.sortableCheckboxSelect.$container.on('movedUp movedDown', function () {
+    this.sortableCheckboxSelect?.$container.on('movedUp movedDown', function () {
       cvd.updatePreview();
     });
 
     // when checkbox is checked or unchecked - apply config & update preview
-    this.sortableCheckboxSelect.$container.on(
+    this.sortableCheckboxSelect?.$container.on(
       'checked unchecked',
       function (ev) {
         let val = $(ev.target).find('input.checkbox').val();

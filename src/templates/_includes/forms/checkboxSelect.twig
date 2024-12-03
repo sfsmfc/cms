@@ -1,6 +1,7 @@
 {%- set id = id ?? "checkbox-select-#{random()}" %}
 {%- set options = options ?? [] %}
 {%- set values = values ?? [] %}
+{%- set disabled = disabled ?? false %}
 {%- set sortable = sortable ?? false %}
 
 {%- set showAllOption = showAllOption ?? false %}
@@ -44,7 +45,7 @@
         {% if not showAllOption or option.value is not defined or option.value != allValue %}
             <div class="checkbox-select-item">
                 {% set selected = (showAllOption and allChecked) or (option.value is defined and option.value in values) %}
-                {% if sortable %}
+                {% if sortable and not disabled %}
                     {{ tag('a', {
                         class: {
                             move: true,
@@ -65,7 +66,7 @@
     {% endfor %}
 {% endtag %}
 
-{% if sortable %}
+{% if sortable and not disabled %}
     {% js %}
         new Craft.SortableCheckboxSelect($('#{{ id|namespaceInputId }}'));
     {% endjs %}

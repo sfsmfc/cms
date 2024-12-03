@@ -25,6 +25,7 @@ use craft\web\assets\admintable\AdminTableAsset;
 use craft\web\assets\generalsettings\GeneralSettingsAsset;
 use craft\web\Controller;
 use yii\base\Exception;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -289,6 +290,10 @@ class SystemSettingsController extends Controller
      */
     public function actionEditGlobalSet(?int $globalSetId = null, ?GlobalSet $globalSet = null): Response
     {
+        if ($globalSetId === null && $this->readOnly) {
+            throw new ForbiddenHttpException('Administrative changes are disallowed in this environment.');
+        }
+
         if ($globalSet === null) {
             if ($globalSetId !== null) {
                 $globalSet = Craft::$app->getGlobals()->getSetById($globalSetId);

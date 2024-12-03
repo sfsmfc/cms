@@ -2476,6 +2476,8 @@ JS, [
             'id' => 'cvd' . mt_rand(),
         ];
 
+        $disabled = isset($config['config']['disabled']) && $config['config']['disabled'];
+
         // get the attributes that are set to be visible in the card body
         $selectedCardAttributes = $fieldLayout->getCardBodyAttributes();
 
@@ -2543,6 +2545,7 @@ JS, [
             'required' => true,
             //'targetPrefix' => 'cardView-',
             'sortable' => true,
+            'disabled' => $disabled,
         ]);
 
 
@@ -2671,6 +2674,7 @@ JS, [
             'customizableUi' => true,
         ];
 
+        $disabled = isset($config['disabled']) && $config['disabled'];
         $tabs = array_values($fieldLayout->getTabs());
 
         if (!$config['customizableTabs']) {
@@ -2749,7 +2753,7 @@ JS;
         return
             Html::beginTag('div', [
                 'id' => $config['id'],
-                'class' => 'layoutdesigner',
+                'class' => 'layoutdesigner' . ($disabled ? ' disabled' : ''),
             ]) .
             Html::hiddenInput('fieldLayout', Json::encode($fieldLayoutConfig), [
                 'data' => ['config-input' => true],
@@ -3404,5 +3408,30 @@ JS;
         }
 
         return self::$_requestedSite ?: null;
+    }
+
+    /**
+     * Returns the notice that should show when admin is viewing the available settings pages
+     * while `allowAdminChanges` is set to false.
+     *
+     * @return string
+     * @since 5.6.0
+     */
+    public static function allowAdminChangesReadOnlyNotice(): string
+    {
+        return
+            Html::beginTag('div', [
+                'class' => 'content-notice',
+            ]) .
+            Html::tag('div', '', [
+                'class' => ['content-notice-icon'],
+                'aria' => ['hidden' => 'true'],
+                'data' => ['icon' => 'lightbulb'],
+            ]) .
+            Html::tag('p', Craft::t(
+                'app',
+                '`allowAdminChanges` is off. You can view the settings, but not change them.',
+            )) .
+            Html::endTag('div');
     }
 }

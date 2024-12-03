@@ -1107,19 +1107,6 @@ class Cp extends Component
      */
     public function allowAdminChangesReadOnlyNotice(): string
     {
-        return
-            Html::beginTag('div', [
-                'class' => 'content-notice',
-            ]) .
-            Html::tag('div', '', [
-                'class' => ['content-notice-icon'],
-                'aria' => ['hidden' => 'true'],
-                'data' => ['icon' => 'lightbulb'],
-            ]) .
-            Html::tag('p', Craft::t(
-                'app',
-                '`allowAdminChanges` is off. You can view the settings, but not change them.',
-            )) .
-            Html::endTag('div');
+        return CpHelper::allowAdminChangesReadOnlyNotice();
     }
 }

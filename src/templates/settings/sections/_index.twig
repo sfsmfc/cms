@@ -1,6 +1,10 @@
 {% extends "_layouts/cp" %}
 {% set title = "Sections"|t('app') %}
 
+{% if readOnly is not defined %}
+    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
+
 {% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
 
 {% do view.registerTranslations('app', [
@@ -20,9 +24,14 @@
 ] %}
 
 {% block actionButton %}
-    <a href="{{ url('settings/sections/new') }}" class="btn submit add icon">{{ "New section"|t('app') }}</a>
+    {% if not readOnly %}
+        <a href="{{ url('settings/sections/new') }}" class="btn submit add icon">{{ "New section"|t('app') }}</a>
+    {% endif %}
 {% endblock %}
 
+{% if readOnly %}
+    {% set contentNotice = craft.cp.allowAdminChangesReadOnlyNotice() %}
+{% endif %}
 
 {% block content %}
     <div id="sections-vue-admin-table"></div>
@@ -36,13 +45,18 @@
             { name: 'type', title: Craft.t('app', 'Type'), sortField: true },
         ];
 
-        new Craft.VueAdminTable({
+        let config = {
             columns,
             container: '#sections-vue-admin-table',
-            deleteAction: 'sections/delete-section',
-            deleteConfirmationMessage: Craft.t('app', "Are you sure you want to delete “{name}” and all its entries?"),
             emptyMessage: Craft.t('app', 'No sections exist yet.'),
             tableDataEndpoint: 'sections/table-data',
-        });
+        };
+
+        if (!{{ readOnly }}) {
+            config['deleteAction'] = 'sections/delete-section';
+            config['deleteConfirmationMessage'] = Craft.t('app', "Are you sure you want to delete “{name}” and all its entries?");
+        }
+
+        new Craft.VueAdminTable(config);
     })();
 {% endjs %}
