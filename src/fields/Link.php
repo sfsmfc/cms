@@ -302,17 +302,16 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
     {
         // Sort types by the order from the config and if anything remains by the label, with URL at the top
         // get only the selected types
-        $selectedTypes = [];
+        /** @var Collection<string,class-string<BaseLinkType>> $selectedTypes */
+        $selectedTypes = Collection::make();
         foreach (self::types() as $typeId => $type) {
             if (in_array($typeId, $this->types)) {
                 $selectedTypes[$typeId] = $type;
             }
         }
-        // and ensure they're sorted by $this->types order
-        $selectedTypes = Collection::make(array_replace(array_flip($this->types), $selectedTypes));
 
         // now get the remaining types (if there are any)
-        $remainingTypes = Collection::make([]);
+        $remainingTypes = Collection::make();
         if ($selectedTypes->count() < count(self::types())) {
             $remainingTypes = Collection::make(self::types())
                 ->filter(function($value, $key) use ($selectedTypes) {
