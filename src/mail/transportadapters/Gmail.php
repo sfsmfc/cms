@@ -83,6 +83,7 @@ class Gmail extends BaseTransportAdapter
     {
         return Craft::$app->getView()->renderTemplate('_components/mailertransportadapters/Gmail/settings.twig', [
             'adapter' => $this,
+            'disabled' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 

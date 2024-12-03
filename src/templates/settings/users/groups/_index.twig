@@ -1,8 +1,11 @@
 {% requireEdition CraftPro %}
-{% requireAdmin %}
+{% requireAdmin '0' %}
 
 {% extends "settings/users/_layout" %}
 {% set selectedNavItem = 'groups' %}
+{% if readOnly is not defined %}
+    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
 
 {% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
 
@@ -14,12 +17,18 @@
 
 {% set groups = craft.app.userGroups.getAllGroups() %}
 
+{% if readOnly %}
+    {% set contentNotice = craft.cp.allowAdminChangesReadOnlyNotice() %}
+{% endif %}
+
 {% block content %}
     <div id="groups-vue-admin-table"></div>
 
-    <div class="buttons">
-        <a href="{{ url('settings/users/groups/new') }}" class="btn submit add icon">{{ "New user group"|t('app') }}</a>
-    </div>
+    {% if not readOnly %}
+        <div class="buttons">
+            <a href="{{ url('settings/users/groups/new') }}" class="btn submit add icon">{{ "New user group"|t('app') }}</a>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% set tableData = [] %}
@@ -39,11 +48,14 @@
         { name: '__slot:handle', title: Craft.t('app', 'Handle') }
     ];
 
-    new Craft.VueAdminTable({
+    var config = {
         columns: columns,
         container: '#groups-vue-admin-table',
-        deleteAction: 'user-settings/delete-group',
         emptyMessage: Craft.t('app', 'No groups exist yet.'),
         tableData: {{ tableData|json_encode|raw }}
-    });
+    };
+    if (!{{ readOnly }}) {
+        config['deleteAction'] = 'user-settings/delete-group';
+    }
+    new Craft.VueAdminTable(config);
 {% endjs %}

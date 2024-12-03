@@ -18,6 +18,7 @@ use craft\helpers\App;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Assets;
 use craft\helpers\Cp as CpHelper;
+use craft\helpers\Html;
 use craft\helpers\Inflector;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
@@ -325,13 +326,11 @@ class Cp extends Component
         }
 
         if ($isAdmin) {
-            if ($generalConfig->allowAdminChanges) {
-                $navItems[] = [
-                    'url' => 'settings',
-                    'label' => Craft::t('app', 'Settings'),
-                    'icon' => 'gear',
-                ];
-            }
+            $navItems[] = [
+                'url' => 'settings',
+                'label' => Craft::t('app', 'Settings'),
+                'icon' => 'gear',
+            ];
 
             $navItems[] = [
                 'url' => 'plugin-store',
@@ -422,10 +421,12 @@ class Cp extends Component
             'iconMask' => '@app/icons/light/user-group.svg',
             'label' => Craft::t('app', 'Users'),
         ];
-        $settings[$label]['addresses'] = [
-            'iconMask' => '@app/icons/light/map-location.svg',
-            'label' => Craft::t('app', 'Addresses'),
-        ];
+        if (Craft::$app->getConfig()->getGeneral()->allowAdminChanges) {
+            $settings[$label]['addresses'] = [
+                'iconMask' => '@app/icons/light/map-location.svg',
+                'label' => Craft::t('app', 'Addresses'),
+            ];
+        }
         $settings[$label]['email'] = [
             'iconMask' => '@app/icons/light/envelope.svg',
             'label' => Craft::t('app', 'Email'),
@@ -1095,5 +1096,30 @@ class Cp extends Component
     public function fieldLayoutDesigner(FieldLayout $fieldLayout, array $config = []): string
     {
         return CpHelper::fieldLayoutDesignerHtml($fieldLayout, $config);
+    }
+
+    /**
+     * Returns the notice that should show when admin is viewing the available settings pages
+     * while `allowAdminChanges` is set to false.
+     *
+     * @return string
+     * @since 5.6.0
+     */
+    public function allowAdminChangesReadOnlyNotice(): string
+    {
+        return
+            Html::beginTag('div', [
+                'class' => 'content-notice',
+            ]) .
+            Html::tag('div', '', [
+                'class' => ['content-notice-icon'],
+                'aria' => ['hidden' => 'true'],
+                'data' => ['icon' => 'lightbulb'],
+            ]) .
+            Html::tag('p', Craft::t(
+                'app',
+                '`allowAdminChanges` is off. You can view the settings, but not change them.',
+            )) .
+            Html::endTag('div');
     }
 }

@@ -108,6 +108,7 @@ class Sendmail extends BaseTransportAdapter
         return Craft::$app->getView()->renderTemplate('_components/mailertransportadapters/Sendmail/settings.twig', [
             'adapter' => $this,
             'commandOptions' => $commandOptions,
+            'disabled' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 

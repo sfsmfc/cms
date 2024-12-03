@@ -1,9 +1,14 @@
-{% requireAdmin %}
+{% requireAdmin '0' %}
 
 {% extends '_layouts/cp.twig' %}
 
 {% set title = 'Email Settings'|t('app') %}
-{% set fullPageForm = true %}
+
+{% if readOnly is not defined %}
+    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
+
+{% set fullPageForm = not readOnly %}
 
 {% set crumbs = [
     { label: "Settings"|t('app'), url: url('settings') }
@@ -33,6 +38,10 @@
 {% endif %}
 
 
+{% if readOnly %}
+    {% set contentNotice = craft.cp.allowAdminChangesReadOnlyNotice() %}
+{% endif %}
+
 {% block content %}
     {% if customMailerFiles|length %}
         <div class="readable">
@@ -47,8 +56,10 @@
         <hr>
     {% endif %}
 
-    {{ actionInput('system-settings/save-email-settings') }}
-    {{ redirectInput('settings') }}
+    {% if not readOnly %}
+        {{ actionInput('system-settings/save-email-settings') }}
+        {{ redirectInput('settings') }}
+    {% endif %}
 
     {{ forms.autosuggestField({
         first: true,
@@ -60,7 +71,8 @@
         value: settings.fromEmail,
         autofocus: true,
         required: true,
-        errors: (freshSettings ? null : settings.getErrors('fromEmail'))
+        errors: (freshSettings ? null : settings.getErrors('fromEmail')),
+        disabled: readOnly,
     }) }}
 
     {{ forms.autosuggestField({
@@ -71,7 +83,8 @@
         name: 'replyToEmail',
         suggestEnvVars: true,
         value: settings.replyToEmail,
-        errors: (freshSettings ? null : settings.getErrors('replyToEmail'))
+        errors: (freshSettings ? null : settings.getErrors('replyToEmail')),
+        disabled: readOnly,
     }) }}
 
     {{ forms.autosuggestField({
@@ -82,7 +95,8 @@
         suggestEnvVars: true,
         value: settings.fromName,
         required: true,
-        errors: (freshSettings ? null : settings.getErrors('fromName'))
+        errors: (freshSettings ? null : settings.getErrors('fromName')),
+        disabled: readOnly,
     }) }}
 
     {% if CraftEdition >= CraftPro %}
@@ -94,7 +108,8 @@
             suggestions: craft.cp.getTemplateSuggestions(),
             suggestEnvVars: true,
             value: settings.template,
-            errors: (freshSettings ? null : settings.getErrors('template'))
+            errors: (freshSettings ? null : settings.getErrors('template')),
+            disabled: readOnly,
         }) }}
     {% endif %}
 
@@ -108,22 +123,35 @@
         options: transportTypeOptions,
         value: className(adapter),
         errors: adapter.getErrors('type') ?? null,
-        toggle: true
+        toggle: true,
+        disabled: readOnly,
     }) }}
 
 
     {% for _adapter in allTransportAdapters %}
         {% set isCurrent = (className(_adapter) == className(adapter)) %}
-        <div id="{{ className(_adapter)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+        {% set classes = [] %}
+        {% if not isCurrent %}
+            {% set classes = classes|merge(['hidden']) %}
+        {% endif %}
+        {% if readOnly %}
+            {% set classes = classes|merge(['disabled']) %}
+        {% endif %}
+
+        {# Craft's transport adapters are set to show disabled fields when admin changes are not allowed,
+           but we need to add a 'disabled' class here for external adapters, so that their fields are not accidentally editable #}
+        <div id="{{ className(_adapter)|id }}" {% if classes|length %}class="{{ classes|join(' ') }}"{% endif %}>
             {% namespace 'transportTypes['~className(_adapter)|id~']' %}
                 {{ (isCurrent ? adapter : _adapter).getSettingsHtml()|raw }}
             {% endnamespace %}
         </div>
     {% endfor %}
 
-    <hr>
+    {% if not readOnly %}
+        <hr>
 
-    <div class="buttons">
-        <button type="button" id="test" class="btn formsubmit" data-action="system-settings/test-email-settings">{{ "Test"|t('app') }}</button>
-    </div>
+        <div class="buttons">
+            <button type="button" id="test" class="btn formsubmit" data-action="system-settings/test-email-settings">{{ "Test"|t('app') }}</button>
+        </div>
+    {% endif %}
 {% endblock %}

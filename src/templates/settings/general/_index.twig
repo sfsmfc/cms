@@ -1,7 +1,10 @@
 {% extends "_layouts/cp" %}
 {% import "_includes/forms" as forms %}
 {% set title = "General Settings"|t('app') %}
-{% set fullPageForm = true %}
+{% if readOnly is not defined %}
+    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
+{% set fullPageForm = not readOnly %}
 
 {% set crumbs = [
     { label: "Settings"|t('app'), url: url('settings') }
@@ -33,10 +36,15 @@
 
 {% from _self import configWarning %}
 
+{% if readOnly %}
+    {% set contentNotice = craft.cp.allowAdminChangesReadOnlyNotice() %}
+{% endif %}
 
 {% block content %}
-    {{ actionInput('system-settings/save-general-settings') }}
-    {{ redirectInput('settings') }}
+    {% if not readOnly %}
+        {{ actionInput('system-settings/save-general-settings') }}
+        {{ redirectInput('settings') }}
+    {% endif %}
 
     {{ forms.autosuggestField({
         first: true,
@@ -44,7 +52,8 @@
         id: 'name',
         suggestEnvVars: true,
         name: 'name',
-        value: system.name
+        value: system.name,
+        disabled: readOnly,
     }) }}
 
     {{ forms.booleanMenuField({
@@ -55,7 +64,8 @@
         yesLabel: 'Online'|t('app'),
         noLabel: 'Offline'|t('app'),
         includeEnvVars: true,
-        value: system.live
+        value: system.live,
+        disabled: readOnly,
     }) }}
 
     {{ forms.textField({
@@ -66,6 +76,7 @@
         value: system.retryDuration,
         inputmode: 'numeric',
         size: 4,
+        disabled: readOnly,
     }) }}
 
     {{ forms.timeZoneField({
@@ -75,6 +86,7 @@
         name: 'timeZone',
         value: system.timeZone,
         includeEnvVars: true,
+        disabled: readOnly,
     }) }}
 
     {% if CraftEdition >= CraftPro %}
@@ -88,13 +100,14 @@
 
         {{ forms.field({
             label: "Login Page Logo"|t('app'),
-            instructions: "SVG file recommended. The logo will be displayed at {size} wide."|t('app', { size: '300px' })
-        }, include('settings/general/_images/logo.twig')) }}
+            instructions: "SVG file recommended. The logo will be displayed at {size} wide."|t('app', { size: '300px' }),
+        }, include('settings/general/_images/logo.twig', {'disabled': readOnly})) }}
 
         {{ forms.field({
             label: "Site Icon"|t('app'),
-            instructions: "Square SVG file recommended. The logo will be displayed at {size} by {size}."|t('app', { size: '32px' })
-        }, include('settings/general/_images/icon.twig')) }}
+            instructions: "Square SVG file recommended. The logo will be displayed at {size} by {size}."|t('app', { size: '32px' }),
+            disabled: readOnly,
+        }, include('settings/general/_images/icon.twig', {'disabled': readOnly})) }}
 
         <div class="clear"></div>
     {% endif %}

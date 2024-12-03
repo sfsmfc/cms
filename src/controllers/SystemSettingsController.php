@@ -38,6 +38,8 @@ use yii\web\Response;
  */
 class SystemSettingsController extends Controller
 {
+    private bool $readOnly;
+
     /**
      * @inheritdoc
      */
@@ -47,8 +49,16 @@ class SystemSettingsController extends Controller
             return false;
         }
 
-        // All system setting actions require an admin
-        $this->requireAdmin();
+        // All actions require an admin account (but not allowAdminChanges)
+        $this->requireAdmin(false);
+
+        $viewActions = ['general-settings', 'edit-email-settings', 'global-set-index', 'edit-global-set'];
+        // Most actions then require allowAdminChanges
+        if (!in_array($action->id, $viewActions)) {
+            $this->requireAdminChanges();
+        }
+
+        $this->readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
 
         return true;
     }
@@ -64,6 +74,7 @@ class SystemSettingsController extends Controller
 
         return $this->renderTemplate('settings/general/_index.twig', [
             'system' => Craft::$app->getProjectConfig()->get('system') ?? [],
+            'readOnly' => $this->readOnly,
         ]);
     }
 
@@ -159,6 +170,7 @@ class SystemSettingsController extends Controller
             'transportTypeOptions' => $transportTypeOptions,
             'allTransportAdapters' => $allTransportAdapters,
             'customMailerFiles' => $customMailerFiles,
+            'readOnly' => $this->readOnly,
         ]);
     }
 
@@ -263,6 +275,7 @@ class SystemSettingsController extends Controller
             'buttonLabel' => Craft::t('app', 'New {type}', [
                 'type' => GlobalSet::lowerDisplayName(),
             ]),
+            'readOnly' => $this->readOnly,
         ]);
     }
 
@@ -316,6 +329,7 @@ class SystemSettingsController extends Controller
             'globalSet' => $globalSet,
             'title' => $title,
             'crumbs' => $crumbs,
+            'readOnly' => $this->readOnly,
         ]);
     }
 

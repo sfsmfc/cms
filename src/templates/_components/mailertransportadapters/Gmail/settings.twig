@@ -6,7 +6,8 @@
     name: 'username',
     suggestEnvVars: true,
     value: adapter.username,
-    errors: adapter.getErrors('username')
+    errors: adapter.getErrors('username'),
+    disabled: disabled,
 }) }}
 
 {{ forms.autosuggestField({
@@ -15,5 +16,6 @@
     name: 'password',
     suggestEnvVars: true,
     value: adapter.password,
-    errors: adapter.getErrors('password')
+    errors: adapter.getErrors('password'),
+    disabled: disabled,
 }) }}

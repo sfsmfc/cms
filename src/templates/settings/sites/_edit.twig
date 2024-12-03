@@ -1,6 +1,9 @@
 {% extends '_layouts/cp.twig' %}
 
-{% set fullPageForm = true %}
+{% if readOnly is not defined %}
+    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
+{% set fullPageForm = not readOnly %}
 
 {% set formActions = [
     {
@@ -13,11 +16,16 @@
 
 {% import '_includes/forms.twig' as forms %}
 
+{% if readOnly %}
+    {% set contentNotice = craft.cp.allowAdminChangesReadOnlyNotice() %}
+{% endif %}
 
 {% block content %}
-    {{ actionInput('sites/save-site') }}
-    {{ redirectInput('settings/sites') }}
-    {% if site.id %}{{ hiddenInput('siteId', site.id) }}{% endif %}
+    {% if not readOnly %}
+        {{ actionInput('sites/save-site') }}
+        {{ redirectInput('settings/sites') }}
+        {% if site.id %}{{ hiddenInput('siteId', site.id) }}{% endif %}
+    {% endif %}
 
     {{ forms.selectField({
         first: true,
@@ -27,7 +35,8 @@
         id: 'group',
         name: 'group',
         options: groupOptions,
-        value: groupId
+        value: groupId,
+        disabled: readOnly,
     }) }}
 
     <div id="site-settings">
@@ -42,6 +51,7 @@
             errors: site.getErrors('name'),
             autofocus: true,
             required: true,
+            disabled: readOnly,
         }) }}
 
         {{ forms.textField({
@@ -54,7 +64,8 @@
             autocapitalize: false,
             value: site.handle,
             errors: site.getErrors('handle'),
-            required: true
+            required: true,
+            disabled: readOnly,
         }) }}
 
         {{ forms.languageMenuField({
@@ -66,6 +77,7 @@
             options: craft.cp.getLanguageOptions(true),
             errors: site.getErrors('language'),
             includeEnvVars: true,
+            disabled: readOnly,
         }) }}
 
         {% if (craft.app.isMultiSite or not site.id) %}
@@ -79,6 +91,7 @@
                 value: site.getEnabled(false),
                 disabled: site.primary,
                 tip: site.primary ? 'The primary site cannot be disabled.'|t('app') : null,
+                disabled: readOnly,
             }) }}
         {% endif %}
 
@@ -88,7 +101,8 @@
                 instructions: "The primary site will be loaded by default on the front end."|t('app'),
                 id: 'primary',
                 name: 'primary',
-                on: site.primary
+                on: site.primary,
+                disabled: readOnly,
             }) }}
         {% else %}
             {{ hiddenInput('primary', '1') }}
@@ -101,7 +115,8 @@
             id: 'has-urls',
             name: 'hasUrls',
             on: site.hasUrls,
-            toggle: 'url-settings'
+            toggle: 'url-settings',
+            disabled: readOnly,
         }) }}
 
         <div id="url-settings" class="nested-fields{% if not site.hasUrls %} hidden{% endif %}">
@@ -114,7 +129,8 @@
                 suggestAliases: true,
                 name: 'baseUrl',
                 value: site.getBaseUrl(false),
-                errors: site.getErrors('baseUrl')
+                errors: site.getErrors('baseUrl'),
+                disabled: readOnly,
             }) }}
         </div>
     </div>

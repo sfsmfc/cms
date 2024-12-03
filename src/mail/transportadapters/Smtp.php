@@ -125,6 +125,7 @@ class Smtp extends BaseTransportAdapter
     {
         return Craft::$app->getView()->renderTemplate('_components/mailertransportadapters/Smtp/settings.twig', [
             'adapter' => $this,
+            'disabled' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 

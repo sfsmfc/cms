@@ -25,6 +25,8 @@ use yii\web\Response;
  */
 class UserSettingsController extends Controller
 {
+    private bool $readOnly;
+
     /**
      * @inheritdoc
      */
@@ -34,8 +36,16 @@ class UserSettingsController extends Controller
             return false;
         }
 
-        // All user settings actions require an admin
-        $this->requireAdmin();
+        // All actions require an admin account (but not allowAdminChanges)
+        $this->requireAdmin(false);
+
+        $viewActions = ['edit-group'];
+        // Most actions then require allowAdminChanges
+        if (!in_array($action->id, $viewActions)) {
+            $this->requireAdminChanges();
+        }
+
+        $this->readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
 
         if ($action->id !== 'save-user-settings') {
             Craft::$app->requireEdition(CmsEdition::Team);
@@ -61,9 +71,10 @@ class UserSettingsController extends Controller
                 $group = Craft::$app->getUserGroups()->getTeamGroup();
             }
 
-            return $this->renderTemplate('settings/users/groups/_team.twig', compact(
-                'group',
-            ));
+            return $this->renderTemplate('settings/users/groups/_team.twig', [
+                'group' => $group,
+                'readOnly' => $this->readOnly,
+            ]);
         }
 
         if (!$group) {
@@ -98,12 +109,13 @@ class UserSettingsController extends Controller
             $title = Craft::t('app', 'Create a new user group');
         }
 
-        return $this->renderTemplate('settings/users/groups/_edit.twig', compact(
-            'group',
-            'crumbs',
-            'formActions',
-            'title',
-        ));
+        return $this->renderTemplate('settings/users/groups/_edit.twig', [
+            'group' => $group,
+            'crumbs' => $crumbs,
+            'formActions' => $formActions,
+            'title' => $title,
+            'readOnly' => $this->readOnly,
+        ]);
     }
 
     /**

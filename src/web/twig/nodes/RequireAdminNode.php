@@ -26,6 +26,8 @@ class RequireAdminNode extends Node
     {
         $compiler
             ->addDebugInfo($this)
-            ->write(Craft::class . "::\$app->controller->requireAdmin();\n");
+            ->write(Craft::class . "::\$app->controller->requireAdmin(")
+            ->subcompile($this->getNode('requireAdminChanges'))
+            ->raw(");\n");
     }
 }

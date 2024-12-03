@@ -7,7 +7,8 @@
     suggestEnvVars: true,
     value: adapter.host,
     required: true,
-    errors: adapter.getErrors('host')
+    errors: adapter.getErrors('host'),
+    disabled: disabled,
 }) }}
 
 {{ forms.autosuggestField({
@@ -17,7 +18,8 @@
     suggestEnvVars: true,
     value: adapter.port,
     size: 20,
-    errors: adapter.getErrors('port')
+    errors: adapter.getErrors('port'),
+    disabled: disabled,
 }) }}
 
 {{ forms.booleanMenuField({
@@ -26,7 +28,8 @@
     name: 'useAuthentication',
     includeEnvVars: true,
     value: adapter.useAuthentication,
-    toggle: 'auth-credentials'
+    toggle: 'auth-credentials',
+    disabled: disabled,
 }) }}
 
 <div id="auth-credentials" class="nested-fields{% if not adapter.useAuthentication %} hidden{% endif %}">
@@ -36,7 +39,8 @@
         name: 'username',
         suggestEnvVars: true,
         value: adapter.username,
-        errors: adapter.getErrors('username')
+        errors: adapter.getErrors('username'),
+        disabled: disabled,
     }) }}
 
     {{ forms.autosuggestField({
@@ -45,6 +49,7 @@
         name: 'password',
         suggestEnvVars: true,
         value: adapter.password,
-        errors: adapter.getErrors('password')
+        errors: adapter.getErrors('password'),
+        disabled: disabled,
     }) }}
 </div>
