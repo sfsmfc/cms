@@ -1072,6 +1072,7 @@ class GeneralConfig extends BaseConfig
      *
      * @group Security
      * @since 3.5.0
+     * @deprecated in 4.13.0. [[\craft\filters\BasicHttpAuthLogin]] should be used instead.
      */
     public bool $enableBasicHttpAuth = false;
 
@@ -1667,6 +1668,17 @@ class GeneralConfig extends BaseConfig
      * - `id`: The alias locale ID
      * - `aliasOf`: The original locale ID
      * - `displayName`: The locale alias’s display name _(optional)_
+     *
+     *  ::: code
+     *  ```php Static Config
+     *  ->localeAliases([
+     *     'smj' => [
+     *         'aliasOf' => 'sv',
+     *         'displayName' => 'Lule Sámi',
+     *     ],
+     * ])
+     *  ```
+     *  :::
      *
      * @since 5.0.0
      * @group System

@@ -131,6 +131,12 @@ class Gc extends Component
         $this->deletePartialElements(Tag::class, Table::TAGS, 'id');
         $this->deletePartialElements(User::class, Table::USERS, 'id');
 
+        $this->deleteOrphanedFieldLayouts(Asset::class, Table::VOLUMES);
+        $this->deleteOrphanedFieldLayouts(Category::class, Table::CATEGORYGROUPS);
+        $this->deleteOrphanedFieldLayouts(Entry::class, Table::ENTRYTYPES);
+        $this->deleteOrphanedFieldLayouts(GlobalSet::class, Table::GLOBALSETS);
+        $this->deleteOrphanedFieldLayouts(Tag::class, Table::TAGGROUPS);
+
         $this->_deleteUnsupportedSiteEntries();
         $this->deleteOrphanedNestedElements(Address::class, Table::ADDRESSES);
         $this->deleteOrphanedNestedElements(Entry::class, Table::ENTRIES);
@@ -298,15 +304,13 @@ class Gc extends Component
     /**
      * Deletes elements that are missing data in the given element extension table.
      *
-     * @param string $elementType The element type
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The element type
      * @param string $table The extension table name
      * @param string $fk The column name that contains the foreign key to `elements.id`
      * @since 3.6.6
      */
     public function deletePartialElements(string $elementType, string $table, string $fk): void
     {
-        /** @var string|ElementInterface $elementType */
         $this->_stdout(sprintf('    > deleting partial %s data ... ', $elementType::lowerDisplayName()));
 
         $ids = (new Query())
@@ -486,15 +490,13 @@ class Gc extends Component
      * Deletes elements which have a `fieldId` value, but it’s set to an invalid field ID,
      * or they're missing a row in the `elements_owners` table.
      *
-     * @param string $elementType The element type
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The element type
      * @param string $table The extension table name
      * @param string $fieldFk The column name that contains the foreign key to `fields.id`
      * @since 5.4.2
      */
     public function deleteOrphanedNestedElements(string $elementType, string $table, string $fieldFk = 'fieldId'): void
     {
-        /** @var string|ElementInterface $elementType */
         $this->_stdout(sprintf('    > deleting orphaned nested %s ... ', $elementType::pluralLowerDisplayName()));
 
         $ids1 = (new Query())
@@ -595,6 +597,32 @@ class Gc extends Component
 
         if (!empty($ids)) {
             Db::delete(Table::STRUCTUREELEMENTS, ['id' => $ids]);
+        }
+
+        $this->_stdout("done\n", Console::FG_GREEN);
+    }
+
+    /**
+     * Deletes field layouts that are no longer used.
+     *
+     * @param class-string<ElementInterface> $elementType The element type
+     * @param string $table The  table name that contains a foreign key to `fieldlayouts.id`
+     * @param string $fk The column name that contains the foreign key to `fieldlayouts.id`
+     * @since 5.5.0
+     */
+    public function deleteOrphanedFieldLayouts(string $elementType, string $table, string $fk = 'fieldLayoutId'): void
+    {
+        $this->_stdout(sprintf('    > deleting orphaned %s field layouts ... ', $elementType::lowerDisplayName()));
+
+        $ids = (new Query())
+            ->select('fl.id')
+            ->from(['fl' => Table::FIELDLAYOUTS])
+            ->leftJoin(['t' => $table], "[[t.$fk]] = [[fl.id]]")
+            ->where(['fl.type' => $elementType, "t.$fk" => null])
+            ->column();
+
+        if (!empty($ids)) {
+            Db::delete(Table::FIELDLAYOUTS, ['id' => $ids]);
         }
 
         $this->_stdout("done\n", Console::FG_GREEN);

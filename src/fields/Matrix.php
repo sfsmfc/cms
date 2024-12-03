@@ -234,6 +234,13 @@ class Matrix extends Field implements
     public array $defaultTableColumns = [];
 
     /**
+     * @var string The default view mode that should be used
+     * if the field's view mode is set to element index and has "Include Table View" turned on.
+     * @since 5.5.0
+     */
+    public string $defaultIndexViewMode = 'cards';
+
+    /**
      * @var int|null The total entries to display per page within element indexes
      * @since 5.0.0
      */
@@ -634,6 +641,7 @@ class Matrix extends Field implements
             'field' => $this,
             'defaultTableColumnOptions' => static::defaultTableColumnOptions($this->getEntryTypes()),
             'defaultCreateButtonLabel' => $this->defaultCreateButtonLabel(),
+            'indexViewModes' => Entry::indexViewModes(),
         ]);
     }
 
@@ -665,6 +673,10 @@ class Matrix extends Field implements
         // error or we're loading an entry revision.
         if ($value === '') {
             $query->setCachedResult([]);
+        } elseif ($value === '*') {
+            // preload the nested entries so NestedElementManager::saveNestedElements() doesn't resave them all
+            $query->drafts(null)->status(null)->limit(null);
+            $query->setCachedResult($query->all());
         } elseif ($element && is_array($value)) {
             $query->setCachedResult($this->_createEntriesFromSerializedData($value, $element, $fromRequest));
         }
@@ -929,6 +941,7 @@ JS;
             )),
             'pageSize' => $this->pageSize ?? 50,
             'storageKey' => sprintf('field:%s', $this->uid),
+            'defaultViewMode' => $this->defaultIndexViewMode,
         ];
 
         if (!$static) {

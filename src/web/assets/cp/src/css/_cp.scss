@@ -922,7 +922,7 @@ li.breadcrumb-toggle-wrapper {
   }
 
   h1 {
-    line-height: 34px;
+    line-height: 1.3;
     margin-block: 0;
     min-width: 0;
   }
@@ -934,6 +934,13 @@ li.breadcrumb-toggle-wrapper {
 }
 
 #page-title {
+  --page-title-columns: 1fr 34px;
+  min-height: 34px;
+  display: grid;
+  grid-template-columns: var(--page-title-columns);
+  align-items: center;
+  gap: var(--s);
+
   &.has-toolbar {
     @media only screen and (min-width: $minHorizontalUiWidth) {
       min-width: calc(#{$sidebarWidth} - var(--xl) - var(--s)) !important;
@@ -983,7 +990,17 @@ li.breadcrumb-toggle-wrapper {
   }
 }
 
+#revision-indicators {
+  min-width: 34px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  align-self: start;
+}
+
 #action-buttons {
+  flex-shrink: 0;
+
   .action-btn {
     width: var(--ui-control-height);
     height: var(--ui-control-height);
@@ -1109,6 +1126,7 @@ li.breadcrumb-toggle-wrapper {
   padding-block: var(--xl);
   padding-inline: var(--padding);
   word-wrap: break-word;
+  container-type: inline-size;
 
   & > hr {
     margin-inline: calc(var(--xl) * -1);
@@ -1692,7 +1710,7 @@ li.breadcrumb-toggle-wrapper {
 
         .badge {
           margin-inline: 10px -4px;
-          margin-block: 0 0;
+          margin-block: 0;
           flex-shrink: 1;
           padding-block: 0;
           padding-inline: 6px;
@@ -1861,8 +1879,8 @@ li.breadcrumb-toggle-wrapper {
   & > :not(h2, hr, .line-break) {
     &,
     &:last-child {
-      // 4 cols for >= 1536px
-      @media only screen and (min-width: $minXlUiWidth) {
+      // 4 cols for container width >= 888px
+      @container (min-width: 55.5em) {
         &.width-25 {
           width: 25%;
         }
@@ -1876,8 +1894,8 @@ li.breadcrumb-toggle-wrapper {
         }
       }
 
-      // 2 cols for 600 - 1535px
-      @media only screen and (min-width: $minDesktopWidth) and (max-width: $minXlUiWidth - calc(1rem/16)) {
+      // 2 cols when container width > 584px and < 887px
+      @container (min-width: 36.5em) and (max-width: 55.4375em) {
         &.width-25,
         &.width-50 {
           width: 50%;

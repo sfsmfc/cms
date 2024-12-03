@@ -664,8 +664,7 @@ class ElementHelper
     /**
      * Returns an element type's source definition based on a given source key/path and context.
      *
-     * @param string $elementType The element type class
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The element type class
      * @param string $sourceKey The source key/path
      * @param string $context The context
      * @return array|null The source definition, or null if it cannot be found
@@ -711,7 +710,6 @@ class ElementHelper
 
         if (!str_starts_with($sourceKey, 'custom:')) {
             // Let the element get involved
-            /** @var string|ElementInterface $elementType */
             $source = $elementType::findSource($sourceKey, $context);
             if ($source) {
                 $source['type'] = ElementSources::TYPE_NATIVE;
@@ -832,6 +830,47 @@ class ElementHelper
         }
 
         return Html::encode(StringHelper::stripHtml($value));
+    }
+
+    /**
+     * Returns the HTML for a link attribute based on provided URL.
+     *
+     * @param string|null $url
+     * @return string
+     * @since 5.5.0
+     */
+    public static function linkAttributeHtml(?string $url): string
+    {
+        return Html::beginTag('a',  [
+            'href' => $url,
+            'rel' => 'noopener',
+            'target' => '_blank',
+            'title' => Craft::t('app', 'Visit webpage'),
+            'aria-label' => Craft::t('app', 'View'),
+        ]) .
+        Html::tag('span', Cp::iconSvg('world'), [
+            'class' => ['cp-icon', 'small', 'inline-flex'],
+        ]) .
+        Html::endTag('a');
+    }
+
+    /**
+     * Returns the HTML for URI attribute based on a value (text) and a URL it's supposed to link to.
+     *
+     * @param string|null $value
+     * @param string|null $url
+     * @return string
+     * @since 5.5.0
+     */
+    public static function uriAttributeHtml(?string $value, ?string $url): string
+    {
+        return Html::a(Html::tag('span', $value, ['dir' => 'ltr']), $url, [
+            'href' => $url,
+            'rel' => 'noopener',
+            'target' => '_blank',
+            'class' => 'go',
+            'title' => Craft::t('app', 'Visit webpage'),
+        ]);
     }
 
     /**
@@ -1002,10 +1041,6 @@ class ElementHelper
         }
 
         $first = reset($canonicalElements);
-
-        if (!$first::hasDrafts()) {
-            return;
-        }
 
         $drafts = $first::find()
             ->draftOf($canonicalElements)
