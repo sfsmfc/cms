@@ -1883,9 +1883,12 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
     let cvd = this.$container.data('cvd');
 
     // when item is moved up or down via disclosure menu - update preview
-    this.sortableCheckboxSelect?.$container.on('movedUp movedDown', function () {
-      cvd.updatePreview();
-    });
+    this.sortableCheckboxSelect?.$container.on(
+      'movedUp movedDown',
+      function () {
+        cvd.updatePreview();
+      }
+    );
 
     // when checkbox is checked or unchecked - apply config & update preview
     this.sortableCheckboxSelect?.$container.on(
