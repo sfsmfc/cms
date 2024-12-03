@@ -420,17 +420,19 @@ Craft.NestedElementManager = Garnish.Base.extend(
         });
 
         // "Edit" action menu item
-        const $editBtn = $element
-          .find('.action-btn')
-          .data('disclosureMenu')
-          ?.$container.find('[data-edit-action]');
-        if ($editBtn.length) {
-          // Override the default event listener
-          $editBtn.off('activate');
-          this.addListener($editBtn, 'activate', () => {
-            this.createElementEditor($element);
-          });
-        }
+        setTimeout(() => {
+          const $editBtn = $element
+            .find('.action-btn')
+            .data('disclosureMenu')
+            ?.$container.find('[data-edit-action]');
+          if ($editBtn?.length) {
+            // Override the default event listener
+            $editBtn.off('activate');
+            this.addListener($editBtn, 'activate', () => {
+              this.createElementEditor($element);
+            });
+          }
+        }, 1);
       }
 
       if (this.settings.sortable) {
