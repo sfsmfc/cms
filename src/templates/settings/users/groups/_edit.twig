@@ -5,6 +5,10 @@
 {% endif %}
 {% set fullPageForm = not readOnly %}
 
+{% if readOnly %}
+    {% set contentNotice = craft.cp.allowAdminChangesReadOnlyNotice() %}
+{% endif %}
+
 {% block content %}
     {% if not readOnly %}
         {{ actionInput('user-settings/save-group') }}
