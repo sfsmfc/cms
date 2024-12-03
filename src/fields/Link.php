@@ -89,7 +89,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
      */
     public static function phpType(): string
     {
-        return 'string|null';
+        return sprintf('\\%s|null', LinkData::class);
     }
 
     /**
