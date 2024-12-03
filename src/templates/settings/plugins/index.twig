@@ -21,6 +21,9 @@
 
 {% set disabledPlugins = craft.app.config.general.disabledPlugins %}
 
+{% if readOnly %}
+    {% set contentNotice = craft.cp.allowAdminChangesReadOnlyNotice() %}
+{% endif %}
 
 {% block content %}
     {% if info|length %}
@@ -83,7 +86,7 @@
                                                             }) }}
                                                         </li>
                                                     {% endif %}
-                                                    {% if config.hasCpSettings %}
+                                                    {% if config.hasCpSettings and not readOnly %}
                                                         <li class="link-settings">
                                                             {{ tag('a', {
                                                                 href: url('settings/plugins/'~config.moduleId),

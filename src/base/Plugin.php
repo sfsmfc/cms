@@ -303,6 +303,14 @@ class Plugin extends Module implements PluginInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function canViewReadOnlySettings(): bool
+    {
+        return false;
+    }
+
+    /**
      * Instantiates and returns the plugin’s installation migration, if it has one.
      *
      * @return Migration|null The plugin’s installation migration

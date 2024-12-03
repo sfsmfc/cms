@@ -185,4 +185,12 @@ interface PluginInterface
      * @since 3.0.16
      */
     public function afterSaveSettings(): void;
+
+    /**
+     * Returns whether plugin is prepared to view its settings when `allowAdminChanges` is disabled.
+     *
+     * @return bool
+     * @since 5.6.0
+     */
+    public function canViewReadOnlySettings(): bool;
 }

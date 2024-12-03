@@ -397,6 +397,7 @@ class Cp extends Component
      */
     public function settings(): array
     {
+        $allowAdminChanges = Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
         $settings = [];
 
         $label = Craft::t('app', 'System');
@@ -479,7 +480,7 @@ class Cp extends Component
         $pluginsService = Craft::$app->getPlugins();
 
         foreach ($pluginsService->getAllPlugins() as $plugin) {
-            if ($plugin->hasCpSettings) {
+            if ($plugin->hasCpSettings && ($allowAdminChanges || $plugin->canViewReadOnlySettings())) {
                 $settings[$label][$plugin->id] = [
                     'url' => 'settings/plugins/' . $plugin->id,
                     'icon' => $pluginsService->getPluginIconSvg($plugin->id),
@@ -492,7 +493,9 @@ class Cp extends Component
         if ($this->hasEventHandlers(self::EVENT_REGISTER_CP_SETTINGS)) {
             $event = new RegisterCpSettingsEvent(['settings' => $settings]);
             $this->trigger(self::EVENT_REGISTER_CP_SETTINGS, $event);
-            return $event->settings;
+            if ($allowAdminChanges || $event->readOnlyModeReady) {
+                return $event->settings;
+            }
         }
 
         return $settings;
