@@ -200,14 +200,10 @@ class Category extends Element
      */
     protected static function defineFieldLayouts(?string $source): array
     {
-        if ($source !== null) {
-            $groups = [];
-            if (preg_match('/^group:(.+)$/', $source, $matches)) {
-                $group = Craft::$app->getCategories()->getGroupByUid($matches[1]);
-                if ($group) {
-                    $groups[] = $group;
-                }
-            }
+        if ($source !== null && preg_match('/^group:(.+)$/', $source, $matches)) {
+            $groups = array_filter([
+                Craft::$app->getCategories()->getGroupByUid($matches[1]),
+            ]);
         } else {
             $groups = Craft::$app->getCategories()->getAllGroups();
         }
