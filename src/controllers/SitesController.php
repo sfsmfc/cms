@@ -43,13 +43,13 @@ class SitesController extends Controller
             return false;
         }
 
-        // All actions require an admin account (but not allowAdminChanges)
-        $this->requireAdmin(false);
-
         $viewActions = ['settings-index', 'edit-site'];
-        // Most actions then require allowAdminChanges
-        if (!in_array($action->id, $viewActions)) {
-            $this->requireAdminChanges();
+        if (in_array($action->id, $viewActions)) {
+            // Some actions require admin but not allowAdminChanges
+            $this->requireAdmin(false);
+        } else {
+            // All other actions require an admin & allowAdminChanges
+            $this->requireAdmin();
         }
 
         $this->readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
