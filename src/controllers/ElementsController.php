@@ -1184,10 +1184,10 @@ JS, [
     {
         return
             Html::beginTag('div', [
-                'class' => 'revision-notice',
+                'class' => 'content-notice',
             ]) .
             Html::tag('div', '', [
-                'class' => ['revision-icon'],
+                'class' => ['content-notice-icon'],
                 'aria' => ['hidden' => 'true'],
                 'data' => ['icon' => 'lightbulb'],
             ]) .

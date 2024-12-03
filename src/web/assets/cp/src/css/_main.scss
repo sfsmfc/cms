@@ -1030,7 +1030,7 @@ button {
   }
 }
 
-.revision-notice {
+.content-notice {
   display: flex;
   align-items: center;
   place-content: stretch center;
@@ -1047,7 +1047,7 @@ button {
     margin: 0;
   }
 
-  .revision-icon {
+  .content-notice-icon {
     position: relative;
     flex-shrink: 0;
     width: 34px;
@@ -7808,7 +7808,8 @@ fieldset {
     }
 
     input:disabled,
-    textarea:disabled {
+    textarea:disabled,
+    select:disabled {
       cursor: not-allowed;
     }
   }
