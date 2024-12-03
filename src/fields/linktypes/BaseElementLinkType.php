@@ -14,6 +14,7 @@ use craft\helpers\Cp;
 use craft\helpers\Html;
 use craft\services\ElementSources;
 use Illuminate\Support\Collection;
+use yii\base\InvalidArgumentException;
 
 /**
  * Base element link type.
@@ -209,10 +210,12 @@ JS, [
     /**
      * @inheritdoc
      */
-    public function normalizeValue(mixed $value): string
+    public function normalizeValue(ElementInterface|int|string $value): string
     {
-        /** @phpstan-ignore-next-line */
         if ($value instanceof ElementInterface) {
+            if (!is_a($value, static::elementType())) {
+                throw new InvalidArgumentException(sprintf('$value must be an %s instance, ID, or reference tag.', static::elementType()::lowerDisplayName()));
+            }
             $value = sprintf('{%s:%s@%s:url}',
                 static::elementType()::refHandle(),
                 $value->id,
