@@ -34,6 +34,9 @@ class PhpInfo extends Utility
         return 'php-info';
     }
 
+    /**
+     * @inheritdoc
+     */
     public static function isSelectable(): bool
     {
         return function_exists('phpinfo');

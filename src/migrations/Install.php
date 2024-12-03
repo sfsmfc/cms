@@ -746,6 +746,7 @@ class Install extends Migration
         $this->createTable(Table::USERS, [
             'id' => $this->integer()->notNull(),
             'photoId' => $this->integer(),
+            'affiliatedSiteId' => $this->integer(),
             'active' => $this->boolean()->defaultValue(false)->notNull(),
             'pending' => $this->boolean()->defaultValue(false)->notNull(),
             'locked' => $this->boolean()->defaultValue(false)->notNull(),
@@ -1084,6 +1085,7 @@ class Install extends Migration
         $this->addForeignKey(null, Table::USERPREFERENCES, ['userId'], Table::USERS, ['id'], 'CASCADE', null);
         $this->addForeignKey(null, Table::USERS, ['id'], Table::ELEMENTS, ['id'], 'CASCADE', null);
         $this->addForeignKey(null, Table::USERS, ['photoId'], Table::ASSETS, ['id'], 'SET NULL', null);
+        $this->addForeignKey(null, Table::USERS, ['affiliatedSiteId'], Table::SITES, ['id'], 'SET NULL', null);
         $this->addForeignKey(null, Table::VOLUMEFOLDERS, ['parentId'], Table::VOLUMEFOLDERS, ['id'], 'CASCADE', null);
         $this->addForeignKey(null, Table::VOLUMEFOLDERS, ['volumeId'], Table::VOLUMES, ['id'], 'CASCADE', null);
         $this->addForeignKey(null, Table::VOLUMES, ['fieldLayoutId'], Table::FIELDLAYOUTS, ['id'], 'SET NULL', null);

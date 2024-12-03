@@ -254,7 +254,7 @@ class Cp extends Component
 
         if (
             Craft::$app->edition !== CmsEdition::Solo &&
-            Craft::$app->getUser()->checkPermission('editUsers')
+            Craft::$app->getUser()->checkPermission('viewUsers')
         ) {
             $navItems[] = [
                 'label' => Craft::t('app', 'Users'),

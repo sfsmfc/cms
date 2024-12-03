@@ -823,6 +823,24 @@ code,
   &.smalltext {
     font-size: 0.8em !important;
   }
+
+  p & {
+    background-color: var(--gray-100);
+    padding-block: 0.0625em;
+    padding-inline: 0.25em;
+    border-radius: var(--small-border-radius);
+    border: 1px solid var(--hairline-color);
+  }
+
+  .warning & {
+    background-color: var(--warning-background);
+    border-color: var(--warning-border-color);
+  }
+
+  .tip & {
+    background-color: var(--notice-background);
+    border-color: var(--notice-border-color);
+  }
 }
 
 .code {
@@ -1463,6 +1481,8 @@ td.right {
 }
 
 .info-hud {
+  max-width: 550px;
+
   table {
     max-width: 280px;
     table-layout: auto;
@@ -3699,6 +3719,14 @@ table {
   & > .cp-icon {
     margin-inline: -2px -4px;
     margin-block: 3px 0;
+
+    // hide the entry type icon if we're alreayd showing one for the card
+    + .card-content
+      .card-body
+      .chip[data-type='craft\\\\models\\\\EntryType']
+      .cp-icon {
+      display: none;
+    }
   }
 
   .card-content,
@@ -3743,8 +3771,13 @@ table {
 
       .checkbox-preview-label {
         display: inline;
+
         font-style: italic;
         margin-inline-start: 5px;
+      }
+
+      .chip.small {
+        padding-inline: 0;
       }
     }
   }
@@ -7819,6 +7852,15 @@ fieldset {
     margin-block: 5px 0;
     margin-inline: 0;
   }
+
+  /* radio and checkbox */
+  .custom-option-wrapper {
+    display: inline-block;
+  }
+
+  .custom-option-input {
+    margin-inline-start: var(--xs);
+  }
 }
 
 .field > .instructions,
@@ -8037,6 +8079,10 @@ fieldset {
     margin-block-start: 2px;
     padding-inline-start: calc(1rem + 5px);
   }
+}
+
+.checkboxfield__custom-wrapper {
+  display: inline-block;
 }
 
 /* radio */
