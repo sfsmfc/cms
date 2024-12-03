@@ -3430,7 +3430,7 @@ JS;
             ]) .
             Html::tag('p', Craft::t(
                 'app',
-                '`allowAdminChanges` is off. You can view the settings, but not change them.',
+                '<code>allowAdminChanges</code> is off. You can view the settings, but not change them.',
             )) .
             Html::endTag('div');
     }
