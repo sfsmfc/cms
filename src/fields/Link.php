@@ -479,7 +479,11 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'urlSuffix' => $this->showUrlSuffixField ? ($value['urlSuffix'] ?? null) : null,
                 'target' => $this->showTargetField ? ($value['target'] ?? null) : null,
             ]);
-            $value = trim($value['value'] ?? $value[$typeId]['value'] ?? '');
+            $value = $value['value'] ?? $value[$typeId]['value'] ?? '';
+
+            if (is_string($value)) {
+                $value = trim($value);
+            }
 
             if (!$value) {
                 return null;
@@ -499,7 +503,11 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 $linkType = Component::createComponent($type, BaseLinkType::class);
             }
 
-            $value = $linkType->normalizeValue(str_replace(' ', '+', $value));
+            if (is_string($value)) {
+                $value = str_replace(' ', '+', $value);
+            }
+
+            $value = $linkType->normalizeValue($value);
         } else {
             if (!$value) {
                 return null;
