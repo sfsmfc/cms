@@ -28,9 +28,11 @@ class RequireAdminTokenParser extends AbstractTokenParser
         $parser = $this->parser;
         $stream = $parser->getStream();
 
-        $nodes = [
-            'requireAdminChanges' => $parser->getExpressionParser()->parseExpression(),
-        ];
+        $nodes = [];
+
+        if ($stream->test(Token::NAME_TYPE) || $stream->test(Token::NUMBER_TYPE)) {
+            $nodes['requireAdminChanges'] = $parser->getExpressionParser()->parseExpression();
+        }
 
         $stream->expect(Token::BLOCK_END_TYPE);
 
