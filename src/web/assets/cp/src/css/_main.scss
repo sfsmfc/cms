@@ -1116,11 +1116,12 @@ a.fieldtoggle.expanded::before,
 a.fieldtoggle {
   display: block;
   position: relative;
-  margin-block: 14px;
+  margin-block: var(--m);
   margin-inline: 0;
-  padding-inline-start: 12px;
+  padding-inline-start: var(--m);
   color: var(--text-color);
   text-decoration: none;
+  cursor: default;
 }
 
 a.fieldtoggle::before {
@@ -5657,7 +5658,6 @@ table.data tbody tr:not(.disabled).active-drop-target {
         & > .heading,
         & > .value {
           padding-block: 6px;
-          padding-inline: 0;
         }
 
         &:first-child {
@@ -5770,7 +5770,7 @@ table.data tbody tr:not(.disabled).active-drop-target {
     & > .input > .text.fullwidth {
       margin-block: 0;
       margin-inline: var(--neg-padding);
-      padding-inline: var(--padding);
+      padding-inline: var(--m);
       border: none;
       background-color: var(--gray-050) !important;
       width: calc(100% + var(--padding) + var(--padding));
@@ -5804,6 +5804,12 @@ $min2ColWidth: 400px;
   padding-inline: var(--padding);
   overflow: visible;
 
+  --heading-width: 150px;
+
+  #details & {
+    --heading-width: 126px;
+  }
+
   &,
   & > .flex-fields {
     & > .field,
@@ -5813,17 +5819,16 @@ $min2ColWidth: 400px;
       box-sizing: border-box;
       flex-wrap: wrap; // for error lists
       justify-content: space-between;
-      align-items: center;
+      align-items: stretch;
       margin-block: 0 !important;
       margin-inline: var(--neg-padding) !important;
       padding-block: 0;
-      padding-inline: var(--padding);
       transition:
         padding-inline-start linear 100ms,
         padding-inline-end linear 100ms;
 
-      &.nested {
-        padding-inline-start: 38px;
+      &.nested > .heading {
+        padding-inline-start: calc(var(--m) * 2);
       }
 
       &.add {
@@ -5848,17 +5853,20 @@ $min2ColWidth: 400px;
         margin: 0;
 
         @media screen and (min-width: $min2ColWidth) {
-          flex: 0 0 104px;
-          margin-inline-end: var(--s);
+          flex: 0 0 var(--heading-width);
           line-height: 18px;
         }
       }
 
-      &.lightswitch-field > .heading {
+      #details &.lightswitch-field > .heading {
         flex: 1;
+        border-inline-end: none;
       }
 
       & > .input {
+        display: flex;
+        align-items: center;
+
         .flex {
           flex-wrap: nowrap;
 
@@ -5874,7 +5882,8 @@ $min2ColWidth: 400px;
 
       @media screen and (min-width: $min2ColWidth) {
         padding-block: 12px;
-        padding-inline: 0;
+        padding-inline: var(--m) 10px;
+        border-inline-end: 1px solid var(--hairline-color);
       }
 
       & > .copytextbtn {
@@ -5884,7 +5893,7 @@ $min2ColWidth: 400px;
 
     & > .data > .heading {
       padding-block: var(--s);
-      padding-inline: 0;
+      padding-inline: var(--m) 0;
     }
 
     & > .field > .heading > label,
@@ -5899,13 +5908,14 @@ $min2ColWidth: 400px;
       width: 100%;
 
       @media screen and (min-width: $min2ColWidth) {
-        width: calc(100% - 112px);
+        width: calc(100% - var(--heading-width));
       }
     }
 
     & > .data > .value {
       display: flex;
       align-items: center;
+      width: calc(100% - (var(--heading-width) + 10px));
 
       & > [data-icon='draft'] {
         margin-block-start: -2px;
@@ -5914,8 +5924,12 @@ $min2ColWidth: 400px;
     }
 
     & > .field.lightswitch-field > .input {
-      flex: 0;
-      width: auto;
+      padding-inline: 10px;
+
+      #details & {
+        flex: 0;
+        width: auto;
+      }
     }
 
     & > .field {
@@ -5957,11 +5971,19 @@ $min2ColWidth: 400px;
             margin-block: -5px;
             margin-inline: 0;
             padding-block: 12px;
-            padding-inline: 0;
             border-radius: 0;
             background-color: transparent;
             border: none !important;
+            padding-inline: 10px;
+
+            &:placeholder-shown + div[data-icon] {
+              inset-inline-start: 10px;
+            }
           }
+        }
+
+        & > .datetimewrapper {
+          width: calc(100% - 3px);
         }
 
         & > .datewrapper,
@@ -5969,10 +5991,6 @@ $min2ColWidth: 400px;
         & > .datetimewrapper > .datewrapper,
         & > .datetimewrapper > .timewrapper {
           background-color: transparent;
-
-          .text + div[data-icon] {
-            inset-inline-start: 0;
-          }
         }
 
         & > .datetimewrapper {
@@ -6072,7 +6090,6 @@ $min2ColWidth: 400px;
   background-color: transparent;
 
   .menubtn:not(.action-btn) {
-    padding-inline-start: 0;
     justify-content: flex-start;
     width: 100%;
     background-color: transparent;
@@ -6080,7 +6097,7 @@ $min2ColWidth: 400px;
     &::after {
       position: absolute;
       inset-block-start: calc(50% - 5px);
-      inset-inline-end: 0;
+      inset-inline-end: 11px;
     }
   }
 

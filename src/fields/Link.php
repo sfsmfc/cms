@@ -35,6 +35,7 @@ use craft\helpers\Component;
 use craft\helpers\Cp;
 use craft\helpers\Html;
 use craft\helpers\StringHelper;
+use craft\helpers\Template;
 use craft\validators\ArrayValidator;
 use craft\validators\StringValidator;
 use GraphQL\Type\Definition\InputObjectType;
@@ -103,6 +104,11 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
             'label' => Schema::TYPE_STRING,
             'urlSuffix' => Schema::TYPE_STRING,
             'target' => Schema::TYPE_STRING,
+            'title' => Schema::TYPE_STRING,
+            'class' => Schema::TYPE_STRING,
+            'id' => Schema::TYPE_STRING,
+            'rel' => Schema::TYPE_STRING,
+            'ariaLabel' => Schema::TYPE_STRING,
         ];
     }
 
@@ -149,16 +155,11 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
     public bool $showLabelField = false;
 
     /**
-     * @var bool Whether the “URL Suffix” field should be shown.
+     * @var string[] Attribute fields to show.
+     * @phpstan-var array<'urlSuffix'|'target'|'title'|'class'|'id'|'rel'|'ariaLabel'>
      * @since 5.6.0
      */
-    public bool $showUrlSuffixField = false;
-
-    /**
-     * @var bool Whether the “Open in a new tab” field should be shown.
-     * @since 5.5.0
-     */
-    public bool $showTargetField = false;
+    public array $advancedFields = [];
 
     /**
      * @var array<string,BaseLinkType>
@@ -208,6 +209,18 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
             unset($config['placeholder']);
         }
 
+        $config['advancedFields'] ??= [];
+
+        if (isset($config['showTargetField'])) {
+            unset($config['showTargetField']);
+            $config['advancedFields'][] = 'target';
+        }
+
+        if (isset($config['showUrlSuffixField'])) {
+            unset($config['showUrlSuffixField']);
+            $config['advancedFields'][] = 'urlSuffix';
+        }
+
         if (isset($config['graphqlMode'])) {
             $config['fullGraphqlData'] = ArrayHelper::remove($config, 'graphqlMode') === 'full';
         }
@@ -240,6 +253,25 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
         $rules[] = [['types', 'maxLength'], 'required'];
         $rules[] = [['maxLength'], 'number', 'integerOnly' => true, 'min' => 10];
         return $rules;
+    }
+
+    /**
+     * @deprecated in 5.6.0
+     * @return bool
+     */
+    public function getShowTargetField(): bool
+    {
+        return in_array('target', $this->advancedFields);
+    }
+
+    /**
+     * @deprecated in 5.6.0
+     */
+    public function setShowTargetField(bool $showTargetField): void
+    {
+        if (!$this->getShowTargetField()) {
+            $this->advancedFields[] = 'target';
+        }
     }
 
     /**
@@ -380,17 +412,21 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'name' => 'showLabelField',
                 'on' => $this->showLabelField,
             ]) .
-            Cp::lightswitchFieldHtml([
-                'label' => Craft::t('app', 'Show the “URL Suffix” field'),
-                'id' => 'show-url-suffix-field',
-                'name' => 'showUrlSuffixField',
-                'on' => $this->showUrlSuffixField,
-            ]) .
-            Cp::lightswitchFieldHtml([
-                'label' => Craft::t('app', 'Show the “Open in a new tab” field'),
-                'id' => 'show-target-field',
-                'name' => 'showTargetField',
-                'on' => $this->showTargetField,
+            Cp::checkboxSelectFieldHtml([
+                'label' => Craft::t('app', 'Advanced Fields'),
+                'id' => 'attribute-fields',
+                'name' => 'advancedFields',
+                'options' => [
+                    ['label' => Craft::t('app', 'URL Suffix'), 'value' => 'urlSuffix'],
+                    ['label' => Craft::t('app', 'Target'), 'value' => 'target'],
+                    ['label' => Craft::t('app', 'Title Text'), 'value' => 'title'],
+                    ['label' => Craft::t('app', 'Class Name'), 'value' => 'class'],
+                    ['label' => Craft::t('app', 'ID'), 'value' => 'id'],
+                    ['label' => Template::raw(Craft::t('app', 'Relation ({ex})', ['ex' => '<code>rel</code>'])), 'value' => 'rel'],
+                    ['label' => Craft::t('app', 'ARIA Label'), 'value' => 'ariaLabel'],
+                ],
+                'values' => $this->advancedFields,
+                'sortable' => true,
             ]) .
             Html::tag('hr') .
             Html::a(Craft::t('app', 'Advanced'), options: [
@@ -457,9 +493,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                     $type = $value->getType();
                     $value = [
                         'type' => $type,
-                        $type => [
-                            'value' => sprintf('{%s:%s@%s:url}', $linkedElement::refHandle(), $linkedElement->id, $element->siteId),
-                        ],
+                        'value' => sprintf('{%s:%s@%s:url}', $linkedElement::refHandle(), $linkedElement->id, $element->siteId),
                     ];
                 }
             }
@@ -474,9 +508,18 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
         if (is_array($value)) {
             $typeId = $value['type'] ?? UrlType::id();
             $config = array_filter([
-                'label' => $this->showLabelField ? ($value['label'] ?? null) : null,
-                'urlSuffix' => $this->showUrlSuffixField ? ($value['urlSuffix'] ?? null) : null,
-                'target' => $this->showTargetField ? ($value['target'] ?? null) : null,
+                'label' => (isset($value['label']) && $this->showLabelField) ? $value['label'] : null,
+                'urlSuffix' => (isset($value['urlSuffix']) && in_array('urlSuffix', $this->advancedFields)) ? $value['urlSuffix'] : null,
+                'target' => (isset($value['target']) && in_array('target', $this->advancedFields)) ? $value['target'] : null,
+                'title' => (isset($value['title']) && in_array('title', $this->advancedFields)) ? $value['title'] : null,
+                'class' => (isset($value['class']) && in_array('class', $this->advancedFields))
+                    ? (implode(' ', array_map(fn(string $class) => Html::id($class), explode(' ', $value['class']))))
+                    : null,
+                'id' => (isset($value['id']) && in_array('id', $this->advancedFields)) ? Html::id($value['id']) : null,
+                'rel' => (isset($value['rel']) && in_array('rel', $this->advancedFields))
+                    ? (implode(' ', array_map(fn(string $class) => Html::id($class), explode(' ', $value['rel']))))
+                    : null,
+                'ariaLabel' => (isset($value['ariaLabel']) && in_array('ariaLabel', $this->advancedFields)) ? $value['ariaLabel'] : null,
             ]);
             $value = $value['value'] ?? $value[$typeId]['value'] ?? '';
 
@@ -629,7 +672,7 @@ JS;
                 Html::endTag('div');
         }
 
-        $pane = $this->showLabelField || $this->showUrlSuffixField || $this->showTargetField;
+        $pane = $this->showLabelField || !empty($this->advancedFields);
         $html =
             Html::beginTag('div', [
                 'id' => $id,
@@ -658,29 +701,78 @@ JS;
             ]);
         }
 
-        if ($this->showUrlSuffixField) {
-            $html .= Cp::textFieldHtml([
-                'fieldClass' => ['my-m', 'info-icon-instructions'],
-                'label' => Craft::t('app', 'URL Suffix'),
-                'instructions' => Craft::t('app', 'Query params (e.g. {ex1}) or a URI fragment (e.g. {ex2}) that should be appended to the URL.', [
-                    'ex1' => '`?p1=foo&p2=bar`',
-                    'ex2' => '`#anchor`',
-                ]),
-                'id' => "$id-url-suffix",
-                'name' => "$this->handle[urlSuffix]",
-                'value' => $value?->urlSuffix,
-            ]);
-        }
+        if (!empty($this->advancedFields)) {
+            $html .=
+                Html::a(Craft::t('app', 'Advanced'), options: [
+                    'class' => ['fieldtoggle', 'mb-0'],
+                    'data' => ['target' => "$id-advanced"],
+                ]) .
+                Html::beginTag('div', [
+                    'id' => "$id-advanced",
+                    'class' => ['hidden', 'meta', 'pane', 'hairline'],
+                ]);
 
-        if ($this->showTargetField) {
-            $html .= Cp::lightswitchFieldHtml([
-                'fieldClass' => 'my-m',
-                'label' => Craft::t('app', 'Open in a new tab'),
-                'id' => "$id-target",
-                'name' => "$this->handle[target]",
-                'on' => $value?->target,
-                'value' => '_blank',
-            ]);
+            foreach ($this->advancedFields as $field) {
+                $html .= match ($field) {
+                    'urlSuffix' => Cp::textFieldHtml([
+                        'fieldClass' => 'info-icon-instructions',
+                        'label' => Craft::t('app', 'URL Suffix'),
+                        'instructions' => Craft::t('app', 'Query params (e.g. {ex1}) or a URI fragment (e.g. {ex2}) that should be appended to the URL.', [
+                            'ex1' => '`?p1=foo&p2=bar`',
+                            'ex2' => '`#anchor`',
+                        ]),
+                        'id' => "$id-url-suffix",
+                        'name' => "$this->handle[urlSuffix]",
+                        'value' => $value?->urlSuffix,
+                    ]),
+                    'target' => Cp::lightswitchFieldHtml([
+                        'label' => Craft::t('app', 'Open in a new tab'),
+                        'id' => "$id-target",
+                        'name' => "$this->handle[target]",
+                        'on' => $value?->target,
+                        'value' => '_blank',
+                    ]),
+                    'title' => Cp::textFieldHtml([
+                        'label' => Craft::t('app', 'Title Text'),
+                        'id' => "$id-title",
+                        'name' => "$this->handle[title]",
+                        'value' => $value?->title,
+                    ]),
+                    'class' => Cp::textFieldHtml([
+                        'fieldClass' => 'info-icon-instructions',
+                        'class' => 'code',
+                        'label' => Craft::t('app', 'Class Name'),
+                        'instructions' => Craft::t('app', 'Separate multiple values with spaces.'),
+                        'id' => "$id-class",
+                        'name' => "$this->handle[class]",
+                        'value' => $value?->class,
+                    ]),
+                    'id' => Cp::textFieldHtml([
+                        'class' => 'code',
+                        'label' => Craft::t('app', 'ID'),
+                        'id' => "$id-id",
+                        'name' => "$this->handle[id]",
+                        'value' => $value?->id,
+                    ]),
+                    'rel' => Cp::textfieldHtml([
+                        'fieldClass' => 'info-icon-instructions',
+                        'class' => 'code',
+                        'label' => Craft::t('app', 'Relation ({ex})', ['ex' => '<code>rel</code>']),
+                        'instructions' => Craft::t('app', 'Separate multiple values with spaces.'),
+                        'id' => "$id-rel",
+                        'name' => "$this->handle[rel]",
+                        'value' => $value?->rel,
+                    ]),
+                    'ariaLabel' => Cp::textFieldHtml([
+                        'label' => Craft::t('app', 'ARIA Label'),
+                        'id' => "$id-aria-label",
+                        'name' => "$this->handle[ariaLabel]",
+                        'value' => $value?->ariaLabel,
+                    ]),
+                };
+            }
+
+            $html .= Html::endTag('div');
         }
 
         $html .= Html::endTag('div');
