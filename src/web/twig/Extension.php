@@ -1256,9 +1256,10 @@ class Extension extends AbstractExtension implements GlobalsInterface
      *
      * @param mixed $haystack
      * @param mixed $needle
-     * @return int
+     * @param int|null $default
+     * @return int|null
      */
-    public function indexOfFilter(mixed $haystack, mixed $needle): int
+    public function indexOfFilter(mixed $haystack, mixed $needle, ?int $default = -1): ?int
     {
         if (is_string($haystack)) {
             $index = strpos($haystack, $needle);
@@ -1280,7 +1281,7 @@ class Extension extends AbstractExtension implements GlobalsInterface
             return $index;
         }
 
-        return -1;
+        return $default;
     }
 
     /**
@@ -1771,6 +1772,7 @@ class Extension extends AbstractExtension implements GlobalsInterface
             'SORT_LOCALE_STRING' => SORT_LOCALE_STRING,
             'SORT_NATURAL' => SORT_NATURAL,
             'SORT_FLAG_CASE' => SORT_FLAG_CASE,
+            'PHP_INT_MAX' => PHP_INT_MAX,
             'POS_HEAD' => View::POS_HEAD,
             'POS_BEGIN' => View::POS_BEGIN,
             'POS_END' => View::POS_END,
