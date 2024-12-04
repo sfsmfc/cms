@@ -133,8 +133,8 @@ Craft.SlideRuleInput = Garnish.Base.extend({
   _handleTapStart: function (ev, touch) {
     ev.preventDefault();
 
-    // Only allow rotation if the user taps on the overlay
-    this.rotateIntent = $(ev.target).is('.overlay');
+    // Only allow rotation if the user taps on anything within the graduations container
+    this.rotateIntent = $(ev.target).is('.graduations *');
 
     if (!this.rotateIntent) return;
 
@@ -149,6 +149,7 @@ Craft.SlideRuleInput = Garnish.Base.extend({
 
     if (Math.abs(touch.position.x - this.startPositionX) > this.sensitivity) {
       this.dragging = true;
+      this.$container.addClass('dragging');
       ev.preventDefault();
       this._setValueFromTouch(touch);
       this.onChange();
@@ -222,6 +223,7 @@ Craft.SlideRuleInput = Garnish.Base.extend({
     if (this.dragging) {
       ev.preventDefault();
       this.dragging = false;
+      this.$container.removeClass('dragging');
     } else {
       this._setValueFromTouch(touch);
       this.onChange();
