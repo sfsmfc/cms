@@ -358,6 +358,7 @@ class Extension extends AbstractExtension implements GlobalsInterface
     /**
      * @inheritdoc
      */
+    /** @phpstan-ignore-next-line */
     public function getOperators(): array
     {
         return [
