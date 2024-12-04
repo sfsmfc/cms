@@ -8,4 +8,5 @@
 - The Queue Manager utility now shows jobs’ class names. ([#16228](https://github.com/craftcms/cms/pull/16228)) 
 
 ## System
+- Database rows with foreign keys referencing nonexistent rows are now deleted via garbage collection.
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
