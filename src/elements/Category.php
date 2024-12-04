@@ -212,14 +212,14 @@ class Category extends Element
      */
     protected static function defineFieldLayouts(string $source): array
     {
-        $fieldLayouts = [];
-        if (
-            preg_match('/^group:(.+)$/', $source, $matches) &&
-            ($group = Craft::$app->getCategories()->getGroupByUid($matches[1]))
-        ) {
-            $fieldLayouts[] = $group->getFieldLayout();
+        if (preg_match('/^group:(.+)$/', $source, $matches)) {
+            $group = Craft::$app->getCategories()->getGroupByUid($matches[1]);
+            return array_filter([
+                $group?->getFieldLayout(),
+            ]);
         }
-        return $fieldLayouts;
+
+        return parent::defineFieldLayouts($source);
     }
 
     /**

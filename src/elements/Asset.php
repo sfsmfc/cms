@@ -442,14 +442,14 @@ class Asset extends Element
      */
     protected static function defineFieldLayouts(string $source): array
     {
-        $fieldLayouts = [];
-        if (
-            preg_match('/^volume:(.+)$/', $source, $matches) &&
-            ($volume = Craft::$app->getVolumes()->getVolumeByUid($matches[1]))
-        ) {
-            $fieldLayouts[] = $volume->getFieldLayout();
+        if (preg_match('/^volume:(.+)$/', $source, $matches)) {
+            $volume = Craft::$app->getVolumes()->getVolumeByUid($matches[1]);
+            return array_filter([
+                $volume?->getFieldLayout(),
+            ]);
         }
-        return $fieldLayouts;
+
+        return parent::defineFieldLayouts($source);
     }
 
     /**

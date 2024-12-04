@@ -196,7 +196,7 @@ trait ElementTrait
     public bool $resaving = false;
 
     /**
-     * @var ElementInterface|null The element that this element is being duplicated by.
+     * @var ElementInterface|null The element that this element is duplicating.
      */
     public ?ElementInterface $duplicateOf = null;
 

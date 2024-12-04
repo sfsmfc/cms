@@ -1,6 +1,10 @@
 # Release Notes for Craft CMS 4
 
-## Unreleased
+## 4.13.5 - 2024-12-03
+
+- Fixed a bug where asset, category, and entry sources defined by the `EVENT_REGISTER_SOURCES` event didn’t have any custom fields available to them, unless the `EVENT_REGISTER_FIELD_LAYOUTS` event was also used to define the available field layouts for the event-defined source. ([#16256](https://github.com/craftcms/cms/discussions/16256))
+
+## 4.13.4 - 2024-12-02
 
 - Reduced the likelihood of a deadlock error occurring when updating search indexes. ([#15221](https://github.com/craftcms/cms/issues/15221))
 - The PHP Info utility is no longer shown in environments where the `phpinfo()` function is disabled. ([#16229](https://github.com/craftcms/cms/pull/16229))
@@ -8,6 +12,7 @@
 - Fixed a bug where renaming asset folders could move them to the webroot on Windows. ([#16215](https://github.com/craftcms/cms/issues/16215))
 - Fixed a bug where Matrix fields’ content tables weren’t getting renamed properly when applying project config changes. ([#16227](https://github.com/craftcms/cms/issues/16227))
 - Fixed a bug where utilities’ `isSelectable()` methods weren’t being respected.
+- Fixed an exception that could be thrown when displaying entry indexes, if any `EVENT_INIT` or `EVENT_DEFINE_BEHAVIORS` entry event handlers were calling `getSection()` or `getType()` on the entry. ([#16254](https://github.com/craftcms/cms/issues/16254))
 
 ## 4.13.3 - 2024-11-22
 
