@@ -1144,13 +1144,13 @@ SQL)->execute();
 UPDATE $entriesTable [[entries]]
 SET [[deletedWithSection]] = TRUE
 FROM $elementsTable [[elements]]
-WHERE $conditionSql
+WHERE [[entries.id]] = [[elements.id]] AND $conditionSql
 SQL)->execute();
                 $db->createCommand(<<<SQL
 UPDATE $elementsTable [[elements]]
 SET [[dateDeleted]] = '$now'
 FROM $entriesTable [[entries]]
-WHERE $conditionSql
+WHERE [[entries.id]] = [[elements.id]] AND $conditionSql
 SQL)->execute();
             }
 
@@ -1310,7 +1310,7 @@ SQL)->execute();
         if ($searchTerm !== null && $searchTerm !== '') {
             $searchParams = $this->_getSearchParams($searchTerm);
             if (!empty($searchParams)) {
-                $query->where(['or', ...$searchParams]);
+                $query->andWhere(['or', ...$searchParams]);
             }
         }
 

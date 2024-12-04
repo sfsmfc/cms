@@ -445,7 +445,7 @@ class ElementsController extends Controller
                         'visibleLayoutElements' => $form ? $form->getVisibleElements() : [],
                         'updatedTimestamp' => $element->dateUpdated?->getTimestamp(),
                         'canonicalUpdatedTimestamp' => $canonical->dateUpdated?->getTimestamp(),
-                        'isStatic' => $isRevision,
+                        'isStatic' => $isRevision || !$canSave,
                     ]
                 )
             );
@@ -1480,7 +1480,7 @@ JS, [
                 asUnpublishedDraft: $element::hasDrafts(),
             );
         } catch (InvalidElementException $e) {
-            return $this->_asFailure($e->element, Craft::t('app', 'Couldn’t duplicate {type}.', [
+            return $this->_asFailure($element, Craft::t('app', 'Couldn’t duplicate {type}.', [
                 'type' => $element::lowerDisplayName(),
             ]));
         } catch (Throwable $e) {

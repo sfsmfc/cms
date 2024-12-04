@@ -28,6 +28,8 @@ use craft\fields\linktypes\Email as EmailType;
 use craft\fields\linktypes\Entry;
 use craft\fields\linktypes\Phone;
 use craft\fields\linktypes\Url as UrlType;
+use craft\gql\GqlEntityRegistry;
+use craft\gql\types\generators\LinkDataType;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Component;
 use craft\helpers\Cp;
@@ -35,6 +37,8 @@ use craft\helpers\Html;
 use craft\helpers\StringHelper;
 use craft\validators\ArrayValidator;
 use craft\validators\StringValidator;
+use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
 use yii\base\InvalidArgumentException;
 use yii\db\Schema;
@@ -85,7 +89,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
      */
     public static function phpType(): string
     {
-        return 'string|null';
+        return sprintf('\\%s|null', LinkData::class);
     }
 
     /**
@@ -163,6 +167,82 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
     private array $_linkTypes;
 
     /**
+     * @var string[] Allowed link types
+     */
+    public array $types = [
+        'entry',
+        'url',
+    ];
+
+    /**
+     * @var array<string,array> Settings for the allowed types
+     */
+    public array $typeSettings = [];
+
+    /**
+     * @var int The maximum length (in bytes) the field can hold
+     */
+    public int $maxLength = 255;
+
+    /**
+     * @var bool Whether GraphQL values should be returned as objects with `type`,
+     * `value`, `label`, `urlSuffix`, and `url` keys.
+     */
+    public bool $fullGraphqlData = true;
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct($config = [])
+    {
+        if (isset($config['types'], $config['typeSettings'])) {
+            // Filter out any unneeded type settings
+            foreach (array_keys($config['typeSettings']) as $typeId) {
+                if (!in_array($typeId, $config['types'])) {
+                    unset($config['typeSettings'][$typeId]);
+                }
+            }
+        }
+
+        if (array_key_exists('placeholder', $config)) {
+            unset($config['placeholder']);
+        }
+
+        if (isset($config['graphqlMode'])) {
+            $config['fullGraphqlData'] = ArrayHelper::remove($config, 'graphqlMode') === 'full';
+        }
+
+        // Default fullGraphqlData to false for existing fields
+        if (isset($config['id']) && !isset($config['fullGraphqlData'])) {
+            $config['fullGraphqlData'] = false;
+        }
+
+        parent::__construct($config);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function fields(): array
+    {
+        $fields = parent::fields();
+        unset($fields['placeholder']);
+        return $fields;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineRules(): array
+    {
+        $rules = parent::defineRules();
+        $rules[] = [['types'], ArrayValidator::class];
+        $rules[] = [['types', 'maxLength'], 'required'];
+        $rules[] = [['maxLength'], 'number', 'integerOnly' => true, 'min' => 10];
+        return $rules;
+    }
+
+    /**
      * Returns the link types available to the field.
      *
      * @return array<string,BaseLinkType>
@@ -216,84 +296,22 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
     }
 
     /**
-     * @var string[] Allowed link types
-     */
-    public array $types = [
-        'entry',
-        'url',
-    ];
-
-    /**
-     * @var array<string,array> Settings for the allowed types
-     */
-    public array $typeSettings = [];
-
-    /**
-     * @var int The maximum length (in bytes) the field can hold
-     */
-    public int $maxLength = 255;
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($config = [])
-    {
-        if (isset($config['types'], $config['typeSettings'])) {
-            // Filter out any unneeded type settings
-            foreach (array_keys($config['typeSettings']) as $typeId) {
-                if (!in_array($typeId, $config['types'])) {
-                    unset($config['typeSettings'][$typeId]);
-                }
-            }
-        }
-
-        if (array_key_exists('placeholder', $config)) {
-            unset($config['placeholder']);
-        }
-
-        parent::__construct($config);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function fields(): array
-    {
-        $fields = parent::fields();
-        unset($fields['placeholder']);
-        return $fields;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function defineRules(): array
-    {
-        $rules = parent::defineRules();
-        $rules[] = [['types'], ArrayValidator::class];
-        $rules[] = [['types', 'maxLength'], 'required'];
-        $rules[] = [['maxLength'], 'number', 'integerOnly' => true, 'min' => 10];
-        return $rules;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getSettingsHtml(): ?string
     {
         // Sort types by the order from the config and if anything remains by the label, with URL at the top
         // get only the selected types
-        $selectedTypes = [];
+        /** @var Collection<string,class-string<BaseLinkType>> $selectedTypes */
+        $selectedTypes = Collection::make();
         foreach (self::types() as $typeId => $type) {
             if (in_array($typeId, $this->types)) {
                 $selectedTypes[$typeId] = $type;
             }
         }
-        // and ensure they're sorted by $this->types order
-        $selectedTypes = Collection::make(array_replace(array_flip($this->types), $selectedTypes));
 
         // now get the remaining types (if there are any)
-        $remainingTypes = Collection::make([]);
+        $remainingTypes = Collection::make();
         if ($selectedTypes->count() < count(self::types())) {
             $remainingTypes = Collection::make(self::types())
                 ->filter(function($value, $key) use ($selectedTypes) {
@@ -354,7 +372,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
             }
         }
 
-        return $html .
+        $html .=
             Html::tag('hr') .
             Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Show the “Label” field'),
@@ -374,6 +392,15 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'name' => 'showTargetField',
                 'on' => $this->showTargetField,
             ]) .
+            Html::tag('hr') .
+            Html::a(Craft::t('app', 'Advanced'), options: [
+                'class' => 'fieldtoggle',
+                'data' => ['target' => 'advanced'],
+            ]) .
+            Html::beginTag('div', [
+                'id' => 'advanced',
+                'class' => 'hidden',
+            ]) .
             Cp::textFieldHtml([
                 'label' => Craft::t('app', 'Max Length'),
                 'instructions' => Craft::t('app', 'The maximum length (in bytes) the field can hold.'),
@@ -386,6 +413,24 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'errors' => $this->getErrors('maxLength'),
                 'data' => ['error-key' => 'maxLength'],
             ]);
+
+        if (Craft::$app->getConfig()->getGeneral()->enableGql) {
+            $html .=
+                Cp::selectFieldHtml([
+                    'label' => Craft::t('app', 'GraphQL Mode'),
+                    'id' => 'graphql-mode',
+                    'name' => 'graphqlMode',
+                    'options' => [
+                        ['label' => Craft::t('app', 'Full data'), 'value' => 'full'],
+                        ['label' => Craft::t('app', 'URL only'), 'value' => 'url'],
+                    ],
+                    'value' => $this->fullGraphqlData ? 'full' : 'url',
+                ]);
+        }
+
+        $html .= Html::endTag('div');
+
+        return $html;
     }
 
     /**
@@ -433,7 +478,11 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'urlSuffix' => $this->showUrlSuffixField ? ($value['urlSuffix'] ?? null) : null,
                 'target' => $this->showTargetField ? ($value['target'] ?? null) : null,
             ]);
-            $value = trim($value['value'] ?? $value[$typeId]['value'] ?? '');
+            $value = $value['value'] ?? $value[$typeId]['value'] ?? '';
+
+            if (is_string($value)) {
+                $value = trim($value);
+            }
 
             if (!$value) {
                 return null;
@@ -453,7 +502,11 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 $linkType = Component::createComponent($type, BaseLinkType::class);
             }
 
-            $value = $linkType->normalizeValue(str_replace(' ', '+', $value));
+            if (is_string($value)) {
+                $value = str_replace(' ', '+', $value);
+            }
+
+            $value = $linkType->normalizeValue($value);
         } else {
             if (!$value) {
                 return null;
@@ -705,6 +758,39 @@ JS;
         }
 
         return $this->getPreviewHtml($value, new EntryElement());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getContentGqlType(): Type|array
+    {
+        if (!$this->fullGraphqlData) {
+            return parent::getContentGqlType();
+        }
+
+        return LinkDataType::generateType($this);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getContentGqlMutationArgumentType(): Type|array
+    {
+        if (!$this->fullGraphqlData) {
+            return parent::getContentGqlMutationArgumentType();
+        }
+
+        $typeName = 'LinkDataInput';
+        return GqlEntityRegistry::getOrCreate($typeName, fn() => new InputObjectType([
+            'name' => $typeName,
+            'fields' => [
+                'type' => Type::string(),
+                'value' => Type::string(),
+                'label' => Type::string(),
+                'urlSuffix' => Type::string(),
+            ],
+        ]));
     }
 
     /**

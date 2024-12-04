@@ -66,6 +66,7 @@ use yii\validators\RequiredValidator;
 use yii\validators\Validator;
 use yii\web\BadRequestHttpException;
 use yii\web\IdentityInterface;
+use yii\web\Response;
 
 /**
  * User represents a user element.
@@ -1659,7 +1660,7 @@ XML;
 
         return (
             $user->id === $this->id ||
-            $user->can('editUsers')
+            $user->can('viewUsers')
         );
     }
 
@@ -1945,7 +1946,7 @@ XML;
                         }
                     }
 
-                    if (!$isCurrentUser) {
+                    if (!$isCurrentUser && Craft::$app->getUser()->checkPermission('editUsers')) {
                         $statusItems[] = [
                             'icon' => 'paperplane',
                             'label' => Craft::t('app', 'Send password reset email'),
@@ -2126,6 +2127,12 @@ JS,
 
         return $items;
     }
+
+//    public function prepareEditScreen(Response $response, string $containerId): void
+//    {
+//        $cpScreen = $response->getBehavior('cp-screen');
+//        $t = 1;
+//    }
 
     private function _copyPasswordResetUrlActionItem(string $label, View $view): array
     {

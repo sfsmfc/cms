@@ -3,6 +3,17 @@
 {%- set values = values ?? [] %}
 {%- set sortable = sortable ?? false %}
 
+{% set options = options|map((value, key) => value is iterable ? value : {
+    label: value,
+    value: key,
+}) %}
+
+{% if sortable and values|length %}
+    {% set options = collect(options)
+        .sortBy(o => values|indexOf(o.value, PHP_INT_MAX))
+        .all() %}
+{% endif %}
+
 {%- set showAllOption = showAllOption ?? false %}
 {%- if showAllOption %}
     {%- set allLabel = allLabel ?? "All"|t('app') %}
@@ -37,9 +48,6 @@
         {{- hiddenInput(name, '') }}
     {%- endif %}
     {%- for key, option in options %}
-        {%- if option is not iterable %}
-            {%- set option = {label: option, value: key} %}
-        {%- endif %}
         {% if not showAllOption or option.value is not defined or option.value != allValue %}
             <div class="checkbox-select-item">
                 {% set selected = (showAllOption and allChecked) or (option.value is defined and option.value in values) %}

@@ -390,12 +390,6 @@ SQL,
         $draft->setScenario(Element::SCENARIO_ESSENTIALS);
         $draft->validate();
 
-        // If there are any errors on the URI, re-validate as disabled
-        if ($draft->hasErrors('uri') && $draft->enabled) {
-            $draft->enabled = false;
-            $draft->validate();
-        }
-
         try {
             // no need to propagate or save content here – and it could end up overriding any
             // content changes made to other sites from a previous onAfterPropagate(), etc.

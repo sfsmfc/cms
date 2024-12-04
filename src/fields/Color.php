@@ -52,6 +52,19 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
     }
 
     /**
+     * @inheritdoc
+     */
+    public static function dbType(): string
+    {
+        return sprintf('%s(7)', Schema::TYPE_CHAR);
+    }
+
+    /**
+     * @var string|null The default color hex
+     */
+    public ?string $defaultColor = null;
+
+    /**
      * @var string[] Preset colors
      * @since 4.8.0
      */
@@ -76,19 +89,6 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
 
         parent::__construct($config);
     }
-
-    /**
-     * @inheritdoc
-     */
-    public static function dbType(): string
-    {
-        return sprintf('%s(7)', Schema::TYPE_CHAR);
-    }
-
-    /**
-     * @var string|null The default color hex
-     */
-    public ?string $defaultColor = null;
 
     /** @inheritdoc */
     public function getSettingsHtml(): ?string
