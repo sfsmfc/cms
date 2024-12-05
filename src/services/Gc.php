@@ -15,6 +15,7 @@ use craft\console\Application as ConsoleApplication;
 use craft\db\Connection;
 use craft\db\Query;
 use craft\db\Table;
+use craft\db\TableSchema;
 use craft\elements\Address;
 use craft\elements\Asset;
 use craft\elements\Category;
@@ -152,6 +153,7 @@ class Gc extends Component
         $this->_deleteOrphanedSearchIndexes();
         $this->_deleteOrphanedRelations();
         $this->_deleteOrphanedStructureElements();
+        $this->_deleteOrphanedFkRows();
 
         $this->_hardDeleteStructures();
 
@@ -598,6 +600,57 @@ class Gc extends Component
         if (!empty($ids)) {
             Db::delete(Table::STRUCTUREELEMENTS, ['id' => $ids]);
         }
+
+        $this->_stdout("done\n", Console::FG_GREEN);
+    }
+
+    private function _deleteOrphanedFkRows(): void
+    {
+        $this->_stdout('    > deleting orphaned foreign key rows ... ');
+
+        // Disable FK checks
+        $qb = $this->db->getSchema()->getQueryBuilder();
+        $this->db->createCommand($qb->checkIntegrity(false))->execute();
+
+        $isMysql = $this->db->getIsMysql();
+        foreach ($this->db->getSchema()->getTableSchemas() as $table) {
+            /** @var TableSchema $table */
+            $extendedFkInfo = $table->getExtendedForeignKeys();
+            $counter = 0;
+            foreach ($table->foreignKeys as $fk) {
+                if ($extendedFkInfo[$counter]['deleteType'] === 'CASCADE') {
+                    $fk = array_merge($fk);
+                    $refTable = array_shift($fk);
+
+                    foreach ($fk as $fkColumn => $pkColumn) {
+                        if ($isMysql) {
+                            $sql = <<<SQL
+DELETE t.* FROM $table->name t
+LEFT JOIN $refTable t2 ON t2.$pkColumn = t.$fkColumn
+WHERE t.$fkColumn IS NOT NULL
+AND t2.$pkColumn IS NULL
+SQL;
+                        } else {
+                            $sql = <<<SQL
+DELETE FROM $table->name t
+WHERE t2.$pkColumn IS NULL
+AND NOT EXISTS (
+    SELECT * FROM $refTable
+    WHERE "$pkColumn" = t."$fkColumn"
+)
+SQL;
+                        }
+
+                        $this->db->createCommand($sql)->execute();
+                    }
+                }
+
+                $counter++;
+            }
+        }
+
+        // Re-enable FK checks
+        $this->db->createCommand($qb->checkIntegrity())->execute();
 
         $this->_stdout("done\n", Console::FG_GREEN);
     }
