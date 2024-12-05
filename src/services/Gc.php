@@ -556,7 +556,7 @@ SQL;
                         } else {
                             $sql = <<<SQL
 DELETE FROM $table->name t
-WHERE t2.$pkColumn IS NULL
+WHERE t.$fkColumn IS NOT NULL
 AND NOT EXISTS (
     SELECT * FROM $refTable
     WHERE "$pkColumn" = t."$fkColumn"
