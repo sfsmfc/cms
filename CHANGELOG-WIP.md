@@ -37,6 +37,7 @@
 - Added `craft\base\conditions\BaseElementSelectConditionRule::setElementIds()`.
 - Added `craft\elements\User::$affiliatedSiteId`.
 - Added `craft\elements\User::getAffiliatedSite()`.
+- Added `craft\elements\conditions\entries\FieldConditionRule`.
 - Added `craft\fields\data\LinkData::$urlSuffix`.
 - Added `craft\fields\data\LinkData::getUrl()`.
 - Added `craft\gql\types\LinkData`.
@@ -44,11 +45,10 @@
 - Added `craft\mail\Mailer::$siteId`.
 - Added `craft\mail\Mailer::$siteOverrides`.
 - Added `craft\models\MailSettings::$siteOverrides`.
-- Added `craft\elements\conditions\entries\FieldConditionRule`.
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
+- `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
 - `craft\helpers\Cp::elementIndexHtml()` now supports passing `defaultSort` in the `$config` array, when `sources` is `null`. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\models\Site` now implements `craft\base\Chippable`.
-- `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
 - Sortable checkbox selects now always display the selected options first on initial render. 
 
 ### System
