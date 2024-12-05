@@ -36,6 +36,9 @@ class Revisions extends Component
 {
     /**
      * @event RevisionEvent The event that is triggered before a revision is created.
+     *
+     * You may set [[\yii\base\ModelEvent::$handled]] to `true` to prevent the revision from getting created, but
+     * only if at least one revision for the element already exists.
      */
     public const EVENT_BEFORE_CREATE_REVISION = 'beforeCreateRevision';
 
@@ -88,6 +91,7 @@ class Revisions extends Component
         $db = Craft::$app->getDb();
 
         $num = ArrayHelper::remove($newAttributes, 'revisionNum');
+        $lastRevisionInfo = null;
 
         try {
             if (!$force || !$num) {
@@ -135,6 +139,11 @@ class Revisions extends Component
                     'revisionNotes' => $notes,
                 ]);
                 $this->trigger(self::EVENT_BEFORE_CREATE_REVISION, $event);
+
+                // only bail early if we have at least one revision
+                if ($event->handled && $lastRevisionInfo) {
+                    return $lastRevisionInfo['id'];
+                }
 
                 $notes = $event->revisionNotes;
                 $creatorId = $event->creatorId;
