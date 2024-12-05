@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 5
 
+## Unreleased
+
+- Fixed a bug where blank user group descriptions weren’t getting omitted from project config data. ([#16272](https://github.com/craftcms/cms/pull/16272))
+
 ## 5.5.5 - 2024-12-03
 
 - Fixed a bug where asset, category, and entry sources defined by the `EVENT_REGISTER_SOURCES` event didn’t have any custom fields available to them, unless the `EVENT_REGISTER_FIELD_LAYOUTS` event was also used to define the available field layouts for the event-defined source. ([#16256](https://github.com/craftcms/cms/discussions/16256))
