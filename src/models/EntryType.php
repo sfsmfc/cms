@@ -364,15 +364,15 @@ JS, [
         $config = [
             'name' => $this->name,
             'handle' => $this->handle,
-            'icon' => $this->icon,
+            'icon' => $this->icon ?: null,
             'color' => $this->color?->value,
             'hasTitleField' => $this->hasTitleField,
             'titleTranslationMethod' => $this->titleTranslationMethod,
-            'titleTranslationKeyFormat' => $this->titleTranslationKeyFormat,
-            'titleFormat' => $this->titleFormat,
+            'titleTranslationKeyFormat' => $this->titleTranslationKeyFormat ?: null,
+            'titleFormat' => $this->titleFormat ?: null,
             'showSlugField' => $this->showSlugField,
             'slugTranslationMethod' => $this->slugTranslationMethod,
-            'slugTranslationKeyFormat' => $this->slugTranslationKeyFormat,
+            'slugTranslationKeyFormat' => $this->slugTranslationKeyFormat ?: null,
             'showStatusField' => $this->showStatusField,
         ];
 
