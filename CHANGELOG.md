@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Fixed a bug where blank user group descriptions weren’t getting omitted from project config data. ([#16272](https://github.com/craftcms/cms/pull/16272))
+- Fixed a bug where some blank user group and entry type values weren’t getting omitted from project config data. ([#16272](https://github.com/craftcms/cms/pull/16272), [#16273](https://github.com/craftcms/cms/pull/16273))
 
 ## 5.5.5 - 2024-12-03
 
