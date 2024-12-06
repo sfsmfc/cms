@@ -3729,6 +3729,14 @@ abstract class Element extends Component implements ElementInterface
     /**
      * @inheritdoc
      */
+    public function getAdditionalAltActions(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getActionMenuItems(): array
     {
         $items = [
@@ -6008,7 +6016,7 @@ JS,
             $this->trigger(self::EVENT_BEFORE_SAVE, $event);
             return $event->isValid;
         }
-        
+
         return true;
     }
 

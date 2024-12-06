@@ -36,6 +36,8 @@
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
 
 ### Extensibility
+- Added `craft\base\Element::getAdditionalAltActions()`.
+- Added `craft\base\ElementInterface::getAdditionalAltActions()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::allowMultiple()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::getElementIds()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::setElementIds()`.

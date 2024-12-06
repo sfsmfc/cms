@@ -482,51 +482,19 @@ class ElementsController extends Controller
             }
 
             $response
-                ->saveShortcutRedirectUrl('{cpEditUrl}')
-                ->addAltAction(
-                    $isUnpublishedDraft && $canSaveCanonical
-                        ? Craft::t('app', 'Create and continue editing')
-                        : Craft::t('app', 'Save and continue editing'),
-                    [
-                        'redirect' => '{cpEditUrl}',
-                        'shortcut' => true,
-                        'retainScroll' => true,
-                        'eventData' => ['autosave' => false],
-                    ]
-                );
+                ->saveShortcutRedirectUrl('{cpEditUrl}');
 
-            if ($isCurrent) {
-                $newElement = $element->createAnother();
-                if ($newElement && $elementsService->canSave($newElement, $user)) {
-                    $response->addAltAction(
-                        $isUnpublishedDraft && $canSaveCanonical
-                            ? Craft::t('app', 'Create and add another')
-                            : Craft::t('app', 'Save and add another'),
-                        [
-                            'shortcut' => true,
-                            'shift' => true,
-                            'eventData' => ['autosave' => false],
-                            'params' => ['addAnother' => 1],
-                        ]
-                    );
-                }
-
-                if ($canSaveCanonical && $isUnpublishedDraft) {
-                    $response->addAltAction(Craft::t('app', 'Save {type}', [
-                        'type' => Craft::t('app', 'draft'),
-                    ]), [
-                        'action' => 'elements/save-draft',
-                        'redirect' => "$redirectUrl#",
-                        'eventData' => ['autosave' => false],
-                    ]);
-                }
-
-                if ($canDuplicate) {
-                    $response->addAltAction(Craft::t('app', 'Save as a new {type}', compact('type')), [
-                        'action' => 'elements/duplicate',
-                        'redirect' => '{cpEditUrl}',
-                    ]);
-                }
+            foreach ($this->_additionalAltActions(
+                $element,
+                $type,
+                $user,
+                $redirectUrl,
+                $canSaveCanonical,
+                $canDuplicate,
+                $isCurrent,
+                $isUnpublishedDraft,
+            ) as $additionalAltAction) {
+                $response->addAltAction($additionalAltAction[0], $additionalAltAction[1]);
             }
         }
 
@@ -817,6 +785,82 @@ class ElementsController extends Controller
         }
 
         return $items;
+    }
+
+    /**
+     * @param ElementInterface $element
+     * @param string $type
+     * @param User|null $user
+     * @param string $redirectUrl
+     * @param bool $canSaveCanonical
+     * @param bool $canDuplicate
+     * @param bool $isCurrent
+     * @param bool $isUnpublishedDraft
+     * @return array[]
+     */
+    private function _additionalAltActions(
+        ElementInterface $element,
+        string $type,
+        ?User $user,
+        string $redirectUrl,
+        bool $canSaveCanonical,
+        bool $canDuplicate,
+        bool $isCurrent,
+        bool $isUnpublishedDraft,
+    ): array
+    {
+        $elementsService = Craft::$app->getElements();
+
+        $altActions = [
+            [
+                $isUnpublishedDraft && $canSaveCanonical
+                    ? Craft::t('app', 'Create and continue editing')
+                    : Craft::t('app', 'Save and continue editing'),
+                [
+                    'redirect' => '{cpEditUrl}',
+                    'shortcut' => true,
+                    'retainScroll' => true,
+                    'eventData' => ['autosave' => false],
+                ],
+            ],
+        ];
+
+        if ($isCurrent) {
+            $newElement = $element->createAnother();
+            if ($newElement && $elementsService->canSave($newElement, $user)) {
+                $altActions[] = [
+                    $isUnpublishedDraft && $canSaveCanonical
+                        ? Craft::t('app', 'Create and add another')
+                        : Craft::t('app', 'Save and add another'),
+                    [
+                        'shortcut' => true,
+                        'shift' => true,
+                        'eventData' => ['autosave' => false],
+                        'params' => ['addAnother' => 1],
+                    ]
+                ];
+
+            }
+
+            if ($canSaveCanonical && $isUnpublishedDraft) {
+                $altActions[] = [Craft::t('app', 'Save {type}', [
+                    'type' => Craft::t('app', 'draft'),
+                ]), [
+                    'action' => 'elements/save-draft',
+                    'redirect' => "$redirectUrl#",
+                    'eventData' => ['autosave' => false],
+                ]];
+            }
+
+            if ($canDuplicate) {
+                $altActions[] = [Craft::t('app', 'Save as a new {type}', compact('type')), [
+                    'action' => 'elements/duplicate',
+                    'redirect' => '{cpEditUrl}',
+                ]];
+            }
+        }
+
+        return $altActions;
     }
 
     private function _additionalButtons(
