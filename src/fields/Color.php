@@ -222,7 +222,8 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
                 foreach ($this->palette as $color) {
                     if (!$validator->validate($color['color'], $error)) {
                         $this->addError('palette', Craft::t('yii', '{attribute} is invalid.', [
-                            'attribute' => StringHelper::ensureLeft($color['color'], '#'),
+                            /** @phpstan-ignore-next-line */
+                            'attribute' => StringHelper::ensureLeft($color['color'] ?? '', '#'),
                         ]));
                     }
                 }
