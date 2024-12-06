@@ -447,14 +447,10 @@ class Asset extends Element
      */
     protected static function defineFieldLayouts(?string $source): array
     {
-        if ($source !== null) {
-            $volumes = [];
-            if (preg_match('/^volume:(.+)$/', $source, $matches)) {
-                $volume = Craft::$app->getVolumes()->getVolumeByUid($matches[1]);
-                if ($volume) {
-                    $volumes[] = $volume;
-                }
-            }
+        if ($source !== null && preg_match('/^volume:(.+)$/', $source, $matches)) {
+            $volumes = array_filter([
+                Craft::$app->getVolumes()->getVolumeByUid($matches[1]),
+            ]);
         } else {
             $volumes = Craft::$app->getVolumes()->getAllVolumes();
         }

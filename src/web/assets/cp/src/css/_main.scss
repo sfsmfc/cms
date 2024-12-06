@@ -775,11 +775,6 @@ hr {
   color: transparent;
 }
 
-.pane hr {
-  margin-block: 24px;
-  margin-inline: -24px;
-}
-
 /* paragraphs */
 p {
   margin-block: 1em;
@@ -3719,6 +3714,14 @@ table {
   & > .cp-icon {
     margin-inline: -2px -4px;
     margin-block: 3px 0;
+
+    // hide the entry type icon if we're alreayd showing one for the card
+    + .card-content
+      .card-body
+      .chip[data-type='craft\\\\models\\\\EntryType']
+      .cp-icon {
+      display: none;
+    }
   }
 
   .card-content,
@@ -3763,8 +3766,13 @@ table {
 
       .checkbox-preview-label {
         display: inline;
+
         font-style: italic;
         margin-inline-start: 5px;
+      }
+
+      .chip.small {
+        padding-inline: 0;
       }
     }
   }
@@ -5461,6 +5469,11 @@ table.data tbody tr:not(.disabled).active-drop-target {
       width: calc(100% + #{24 + 24}px);
       height: 100%;
     }
+  }
+
+  hr {
+    margin-block: var(--pane-padding);
+    margin-inline: calc(var(--pane-padding) * -1);
   }
 }
 

@@ -1197,6 +1197,7 @@ class Cp
             'showStatusMenu' => 'auto',
             'showSiteMenu' => 'auto',
             'fieldLayouts' => [],
+            'defaultSort' => null,
             'defaultTableColumns' => null,
             'registerJs' => true,
             'jsSettings' => [],
@@ -1291,6 +1292,7 @@ class Cp
                     'key' => '__IMP__',
                     'label' => Craft::t('app', 'All elements'),
                     'hasThumbs' => $elementType::hasThumbs(),
+                    'defaultSort' => $config['defaultSort'],
                     'defaultViewMode' => $config['defaultViewMode'],
                 ],
             ];

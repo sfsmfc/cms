@@ -1583,12 +1583,14 @@ class Elements extends Component
 
                         // Make sure this isn't a revision
                         if ($skipRevisions) {
+                            $label = $element->getUiLabel();
+                            $label = $label !== '' ? "$label ($element->id)" : sprintf('%s %s', $element::lowerDisplayName(), $element->id);
                             try {
                                 if (ElementHelper::isRevision($element)) {
-                                    throw new InvalidElementException($element, "Skipped resaving {$element->getUiLabel()} ($element->id) because it's a revision.");
+                                    throw new InvalidElementException($element, "Skipped resaving $label because it's a revision.");
                                 }
                             } catch (Throwable $rootException) {
-                                throw new InvalidElementException($element, "Skipped resaving {$element->getUiLabel()} ($element->id) due to an error obtaining its root element: " . $rootException->getMessage());
+                                throw new InvalidElementException($element, "Skipped resaving $label due to an error obtaining its root element: " . $rootException->getMessage());
                             }
                         }
                     } catch (InvalidElementException $e) {
@@ -1858,12 +1860,6 @@ class Elements extends Component
         // Validate
         $mainClone->setScenario(Element::SCENARIO_ESSENTIALS);
         $mainClone->validate();
-
-        // If there are any errors on the URI, re-validate as disabled
-        if ($mainClone->hasErrors('uri') && $mainClone->enabled) {
-            $mainClone->enabled = false;
-            $mainClone->validate();
-        }
 
         if ($mainClone->hasErrors()) {
             throw new InvalidElementException($mainClone, 'Element ' . $element->id . ' could not be duplicated because it doesn\'t validate.');
