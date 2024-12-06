@@ -474,7 +474,7 @@ return [
     'Current' => 'Current',
     'Currently SVG images do not support focal point.' => 'Currently SVG images do not support focal point.',
     'Custom Fields' => 'Custom Fields',
-    'Custom color…' => 'Custom color…',
+    'Custom color:' => 'Custom color:',
     'Custom' => 'Custom',
     'Custom:' => 'Custom:',
     'Customize sources' => 'Customize sources',

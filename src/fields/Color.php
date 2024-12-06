@@ -334,10 +334,18 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
         );
 
         $html =
-            Html::beginTag('div', ['class' => ['flex', 'flex-inline', 'flex-col', 'items-start']]) .
+            Html::beginTag('div', [
+                'class' => ['flex', 'flex-col', 'items-stretch'],
+                'style' => [
+                    'width' => '25em',
+                    'max-width' => '100%',
+                ],
+            ]) .
             Cp::colorSelectFieldHtml([
                 'id' => $id,
+                'labelledBy' => $this->getLabelId(),
                 'describedBy' => $this->describedBy,
+                'class' => 'fullwidth',
                 'name' => "$this->handle[color]",
                 'options' => array_filter([
                     ...array_map(
@@ -348,7 +356,7 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
                         $this->palette,
                     ),
                     $this->allowCustomColors ? [
-                        'label' => Craft::t('app', 'Custom color…'),
+                        'label' => Craft::t('app', 'Custom…'),
                         'value' => '__custom__',
                     ] : null,
                 ]),
@@ -359,6 +367,7 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
             ]);
 
         if ($this->allowCustomColors) {
+            $customLabelId = "$id-custom-label";
             $html .=
                 Html::beginTag('div', [
                     'id' => "$id-custom-__custom__",
@@ -377,12 +386,12 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
                         'padding-inline' => '9px',
                     ],
                 ]) .
-                Html::label(Craft::t('app', 'Custom:'), "$id-custom-input", [
-                    'id' => "$id-custom-label",
+                Html::label(Craft::t('app', 'Custom color:'), "$id-custom-input", [
+                    'id' => $customLabelId,
                 ]) .
                 Cp::colorHtml([
                     'id' => "$id-custom-input",
-                    'labelledBy' => "$id-custom-label",
+                    'labelledBy' => $customLabelId,
                     'describedBy' => $this->describedBy,
                     'name' => "$this->handle[custom]",
                     'value' => $isCustom ? $value->getHex() : null,
