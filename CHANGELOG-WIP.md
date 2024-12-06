@@ -23,6 +23,7 @@
 - Section condition rules now have a “has a value” operator. ([#16270](https://github.com/craftcms/cms/discussions/16270))
 - The Queue Manager utility now shows jobs’ class names. ([#16228](https://github.com/craftcms/cms/pull/16228))
 - Improved the wording of field instance action labels. ([#16261](https://github.com/craftcms/cms/discussions/16261))
+- Improved the error output for nested elements when they can’t be resaved via `resave` commands.
 
 ### Development
 - Added support for fallback element partial templates, e.g. `_partials/entry.twig` as opposed to `_partials/entry/typeHandle.twig`. ([#16125](https://github.com/craftcms/cms/pull/16125))
