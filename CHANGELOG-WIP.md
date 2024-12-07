@@ -12,6 +12,7 @@
 - Improved the accessibility of control panel icons. ([#16128](https://github.com/craftcms/cms/pull/16128))
 - Improved the accessibility of Selectize inputs. ([#16110](https://github.com/craftcms/cms/pull/16110))
 - Improved the accessibility of the image rotation control within the Image Editor. ([#16218](https://github.com/craftcms/cms/pull/16218))
+- Improved the accessibility of action menus on the Plugins index page.
 
 ### Administration
 - Added the “Show the ‘URL Suffix’ field” setting to Link fields. ([#15813](https://github.com/craftcms/cms/discussions/15813))
@@ -21,6 +22,8 @@
 - Added the “GraphQL Mode” Link field setting. ([#16237](https://github.com/craftcms/cms/pull/16237))
 - Added the “Field” entry condition rule, which replaces “Matrix field”, includes a “has a value” operator. ([#16270](https://github.com/craftcms/cms/discussions/16270))
 - Section condition rules now have a “has a value” operator. ([#16270](https://github.com/craftcms/cms/discussions/16270))
+- Added “Copy plugin handle” and “Copy package name” options to plugins’ action menus on the Plugins index page. ([#16281](https://github.com/craftcms/cms/discussions/16281))
+- The Updates utility now shows an action menu for each plugin, with “Copy plugin handle” and “Copy package name” options. ([#16281](https://github.com/craftcms/cms/discussions/16281))
 - The Queue Manager utility now shows jobs’ class names. ([#16228](https://github.com/craftcms/cms/pull/16228))
 - Improved the wording of field instance action labels. ([#16261](https://github.com/craftcms/cms/discussions/16261))
 - Improved the error output for nested elements when they can’t be resaved via `resave` commands.
