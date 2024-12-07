@@ -47,7 +47,7 @@ import './plugins.scss';
       },
 
       addUninstalledPluginRow: function (handle, info) {
-        const $table = $('#plugins');
+        let $table = $('#plugins');
         if (!$table.length) {
           $table = $('<table/>', {
             id: 'plugins',
