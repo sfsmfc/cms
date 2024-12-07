@@ -51,7 +51,7 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
         this.$libraryContainer.children('.fld-field-library');
       let $fieldSearchContainer = this.$fieldLibrary.children('.search');
       this.$fieldSearch = $fieldSearchContainer.children('input');
-      this.$clearFieldSearchBtn = $fieldSearchContainer.children('.clear');
+      this.$clearFieldSearchBtn = $fieldSearchContainer.children('.clear-btn');
       this.$fieldGroups = this.$libraryContainer.find('.fld-field-group');
       this.$fields = this.$fieldGroups.children('.fld-element');
       this.$uiLibrary = this.$libraryContainer.children('.fld-ui-library');
