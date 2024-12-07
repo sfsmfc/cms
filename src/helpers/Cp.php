@@ -2794,7 +2794,7 @@ JS;
                 'placeholder' => Craft::t('app', 'Search'),
             ]) .
             Html::tag('div', '', [
-                'class' => ['clear', 'hidden'],
+                'class' => ['clear-btn', 'hidden'],
                 'title' => Craft::t('app', 'Clear'),
                 'aria' => ['label' => Craft::t('app', 'Clear')],
             ]) .

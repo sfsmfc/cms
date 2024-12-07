@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed a bug where some blank user group and entry type values weren’t getting omitted from project config data. ([#16272](https://github.com/craftcms/cms/pull/16272), [#16273](https://github.com/craftcms/cms/pull/16273))
+- Fixed a bug where custom fields would stay visible within Field Layout Designer field libraries when they didn’t match the search criteria, if they had previously been dragged. ([#16277](https://github.com/craftcms/cms/issues/16277))
 
 ## 5.5.5 - 2024-12-03
 
