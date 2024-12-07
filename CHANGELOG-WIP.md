@@ -44,14 +44,11 @@
 - Added `craft\base\conditions\BaseElementSelectConditionRule::setElementIds()`.
 - Added `craft\elements\User::$affiliatedSiteId`.
 - Added `craft\elements\User::getAffiliatedSite()`.
-<<<<<<< HEAD
+- Added `craft\elements\conditions\entries\FieldConditionRule`.
 - Added `craft\fields\Color::$allowCustomColors`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added `craft\fields\Color::$palette`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added `craft\fields\Color::getDefaultColor()`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added `craft\fields\Color::setDefaultValue()`. ([#16249](https://github.com/craftcms/cms/pull/16249))
-=======
-- Added `craft\elements\conditions\entries\FieldConditionRule`.
->>>>>>> 5.6
 - Added `craft\fields\data\LinkData::$urlSuffix`.
 - Added `craft\fields\data\LinkData::getUrl()`.
 - Added `craft\gql\types\LinkData`.
@@ -64,14 +61,11 @@
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
 - `craft\helpers\Cp::elementIndexHtml()` now supports passing `defaultSort` in the `$config` array, when `sources` is `null`. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\models\Site` now implements `craft\base\Chippable`.
-<<<<<<< HEAD
+- `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260))
 - Deprecated `craft\fields\Color::$presets`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - `_includes/forms/colorSelect.twig` now supports `options` and `withBlankOption` variables.
-- `_includes/forms/selectize.twig` now supports a `color` property in option data, which can be set to a hex value or a color name.
-=======
-- `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260)) 
-- Sortable checkbox selects now always display the selected options first on initial render. 
->>>>>>> 5.6
+- `_includes/forms/selectize.twig` now supports a `color` property in option data, which can be set to a hex value or a color name. 
+- Sortable checkbox selects now always display the selected options first on initial render.
 
 ### System
 - Craft now keeps track of which site users registered from. When sending an email from the control panel, the current site is now set to the user’s affiliated site, if known. ([#16174](https://github.com/craftcms/cms/pull/16174))
