@@ -5886,7 +5886,10 @@ $min2ColWidth: 400px;
     }
 
     & > .field > .heading {
-      padding-block-start: var(--s);
+      @media screen and (width <= calc(#{$min2ColWidth} - 1px)) {
+        padding-block-start: var(--xs);
+        padding-inline: 10px;
+      }
 
       @media screen and (min-width: $min2ColWidth) {
         padding-block: 12px;

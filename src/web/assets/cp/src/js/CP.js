@@ -118,11 +118,12 @@ Craft.CP = Garnish.Base.extend(
       for (let i = 0; i < $allInstructions.length; i++) {
         let $instructions = $allInstructions.eq(i);
         let $label = $instructions.siblings('.heading').children('label');
-        $('<span/>', {
+        $('<div/>', {
           class: 'info',
           html: $instructions.children().html(),
         }).appendTo($label);
-        $instructions.remove();
+        // Keep the original element around in case an aria-describedby attribute is referencing it
+        $instructions.addClass('visually-hidden');
       }
 
       if (!this.isMobile && this.$header.length) {
