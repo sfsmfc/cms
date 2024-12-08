@@ -17,10 +17,10 @@
 - Improved the accessibility of the Craft Support widget. ([#16293]](https://github.com/craftcms/cms/pull/16293))
 
 ### Administration
-- Added the “Show the ‘URL Suffix’ field” setting to Link fields. ([#15813](https://github.com/craftcms/cms/discussions/15813))
 - Added the “Affiliated Site” native user field. ([#16174](https://github.com/craftcms/cms/pull/16174))
 - Added support for setting site-specific email setting overrides. ([#16187](https://github.com/craftcms/cms/pull/16187))
 - Added the “View users” user permission. ([#16206](https://github.com/craftcms/cms/pull/16206))
+- Added the “Advanced Fields” setting to Link fields, with “Target”, “URL Suffix”, “Title Text”, “ARIA Label”, “Class Name”, “ID”, and “Relation (rel)” options. ([#15813](https://github.com/craftcms/cms/discussions/15813))
 - Added the “GraphQL Mode” Link field setting. ([#16237](https://github.com/craftcms/cms/pull/16237))
 - Added the “Field” entry condition rule, which replaces “Matrix field”, includes a “has a value” operator. ([#16270](https://github.com/craftcms/cms/discussions/16270))
 - Section condition rules now have a “has a value” operator. ([#16270](https://github.com/craftcms/cms/discussions/16270))
@@ -47,6 +47,11 @@
 - Added `craft\elements\User::$affiliatedSiteId`.
 - Added `craft\elements\User::getAffiliatedSite()`.
 - Added `craft\elements\conditions\entries\FieldConditionRule`.
+- Added `craft\fields\data\LinkData::$ariaLabel`.
+- Added `craft\fields\data\LinkData::$class`.
+- Added `craft\fields\data\LinkData::$id`.
+- Added `craft\fields\data\LinkData::$rel`.
+- Added `craft\fields\data\LinkData::$title`.
 - Added `craft\fields\data\LinkData::$urlSuffix`.
 - Added `craft\fields\data\LinkData::getUrl()`.
 - Added `craft\gql\types\LinkData`.
@@ -58,7 +63,8 @@
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
 - `craft\helpers\Cp::elementIndexHtml()` now supports passing `defaultSort` in the `$config` array, when `sources` is `null`. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\models\Site` now implements `craft\base\Chippable`.
-- `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260)) 
+- `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260))
+- Deprecated `craft\fields\Link::$showTargetField`.
 - Sortable checkbox selects now always display the selected options first on initial render. 
 
 ### System
