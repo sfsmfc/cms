@@ -508,19 +508,20 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
         if (is_array($value)) {
             $typeId = $value['type'] ?? UrlType::id();
             $config = array_filter([
-                'label' => (isset($value['label']) && $this->showLabelField) ? $value['label'] : null,
-                'urlSuffix' => (isset($value['urlSuffix']) && in_array('urlSuffix', $this->advancedFields)) ? $value['urlSuffix'] : null,
-                'target' => (isset($value['target']) && in_array('target', $this->advancedFields)) ? $value['target'] : null,
-                'title' => (isset($value['title']) && in_array('title', $this->advancedFields)) ? $value['title'] : null,
-                'class' => (isset($value['class']) && in_array('class', $this->advancedFields))
+                'label' => (!empty($value['label']) && $this->showLabelField) ? $value['label'] : null,
+                'urlSuffix' => (!empty($value['urlSuffix']) && in_array('urlSuffix', $this->advancedFields)) ? $value['urlSuffix'] : null,
+                'target' => (!empty($value['target']) && in_array('target', $this->advancedFields)) ? $value['target'] : null,
+                'title' => (!empty($value['title']) && in_array('title', $this->advancedFields)) ? $value['title'] : null,
+                'class' => (!empty($value['class']) && in_array('class', $this->advancedFields))
                     ? (implode(' ', array_map(fn(string $class) => Html::id($class), explode(' ', $value['class']))))
                     : null,
-                'id' => (isset($value['id']) && in_array('id', $this->advancedFields)) ? Html::id($value['id']) : null,
-                'rel' => (isset($value['rel']) && in_array('rel', $this->advancedFields))
-                    ? (implode(' ', array_map(fn(string $class) => Html::id($class), explode(' ', $value['rel']))))
+                'id' => (!empty($value['id']) && in_array('id', $this->advancedFields)) ? Html::id($value['id']) : null,
+                'rel' => (!empty($value['rel']) && in_array('rel', $this->advancedFields))
+                    ? (implode(' ', array_map(fn(string $rel) => Html::id($rel), explode(' ', $value['rel']))))
                     : null,
-                'ariaLabel' => (isset($value['ariaLabel']) && in_array('ariaLabel', $this->advancedFields)) ? $value['ariaLabel'] : null,
+                'ariaLabel' => (!empty($value['ariaLabel']) && in_array('ariaLabel', $this->advancedFields)) ? $value['ariaLabel'] : null,
             ]);
+
             $value = $value['value'] ?? $value[$typeId]['value'] ?? '';
 
             if (is_string($value)) {
