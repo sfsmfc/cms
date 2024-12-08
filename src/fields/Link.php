@@ -703,7 +703,7 @@ JS;
 
         if (!empty($this->advancedFields)) {
             $html .=
-                Html::a(Craft::t('app', 'Advanced'), options: [
+                Html::button(Craft::t('app', 'Advanced'), options: [
                     'class' => ['fieldtoggle', 'mb-0'],
                     'data' => ['target' => "$id-advanced"],
                 ]) .
