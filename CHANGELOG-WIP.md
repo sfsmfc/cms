@@ -13,6 +13,8 @@
 - Improved the accessibility of Selectize inputs. ([#16110](https://github.com/craftcms/cms/pull/16110))
 - Improved the accessibility of the image rotation control within the Image Editor. ([#16218](https://github.com/craftcms/cms/pull/16218))
 - Improved the accessibility of action menus on the Plugins index page.
+- Improved the accessibility of “More” and “Advanced” toggle triggers. ([#16293]](https://github.com/craftcms/cms/pull/16293))
+- Improved the accessibility of the Craft Support widget. ([#16293]](https://github.com/craftcms/cms/pull/16293))
 
 ### Administration
 - Added the “Show the ‘URL Suffix’ field” setting to Link fields. ([#15813](https://github.com/craftcms/cms/discussions/15813))

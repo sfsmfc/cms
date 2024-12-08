@@ -393,7 +393,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'on' => $this->showTargetField,
             ]) .
             Html::tag('hr') .
-            Html::a(Craft::t('app', 'Advanced'), options: [
+            Html::button(Craft::t('app', 'Advanced'), options: [
                 'class' => 'fieldtoggle',
                 'data' => ['target' => 'advanced'],
             ]) .
