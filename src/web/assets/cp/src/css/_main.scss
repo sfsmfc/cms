@@ -1101,18 +1101,21 @@ button.toggle {
 }
 
 .toggle::before,
+button.fieldtoggle::before,
 a.fieldtoggle::before {
   @include mixins.angle(right);
   transition: transform linear 100ms;
 }
 
 .toggle.expanded::before,
+button.fieldtoggle.expanded::before,
 a.fieldtoggle.expanded::before,
 .sidebar nav li.expanded > .toggle::before,
 .structure li:not(.collapsed) > .row > .toggle::before {
   transform: rotate(45deg) !important;
 }
 
+button.fieldtoggle,
 a.fieldtoggle {
   display: block;
   position: relative;
@@ -1123,6 +1126,11 @@ a.fieldtoggle {
   text-decoration: none;
 }
 
+button.fieldtoggle {
+  cursor: pointer;
+}
+
+button.fieldtoggle::before,
 a.fieldtoggle::before {
   display: block;
   position: absolute;
