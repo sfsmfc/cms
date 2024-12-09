@@ -372,11 +372,19 @@ a#system-info {
 li.crumb .btn.menubtn,
 .btn.action-btn {
   padding: 0;
-  width: var(--touch-target-size);
-  min-height: var(--touch-target-size);
 
   &:not(:hover, :active, [aria-expanded='true']) {
     background-color: transparent;
+  }
+
+  &:not(.m) {
+    width: var(--touch-target-size);
+    min-height: var(--touch-target-size);
+  }
+
+  &.m {
+    width: var(--ui-control-height);
+    height: var(--ui-control-height);
   }
 }
 
@@ -1000,11 +1008,6 @@ li.breadcrumb-toggle-wrapper {
 
 #action-buttons {
   flex-shrink: 0;
-
-  .action-btn {
-    width: var(--ui-control-height);
-    height: var(--ui-control-height);
-  }
 
   @media only screen and (width <= 400px) {
     .btngroup .btn:first-child {
