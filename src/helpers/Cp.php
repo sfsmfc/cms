@@ -2672,13 +2672,13 @@ JS, [
      */
     public static function fieldLayoutDesignerHtml(FieldLayout $fieldLayout, array $config = []): string
     {
+        $readOnly = isset($config['disabled']) && $config['disabled'];
         $config += [
             'id' => 'fld' . mt_rand(),
             'customizableTabs' => true,
             'customizableUi' => true,
         ];
 
-        $disabled = isset($config['disabled']) && $config['disabled'];
         $tabs = array_values($fieldLayout->getTabs());
 
         if (!$config['customizableTabs']) {
@@ -2721,6 +2721,7 @@ JS, [
             'customizableTabs' => $config['customizableTabs'],
             'customizableUi' => $config['customizableUi'],
             'withCardViewDesigner' => $config['withCardViewDesigner'] ?? false,
+            'readOnly' => $readOnly,
         ]);
         $namespacedId = $view->namespaceInputId($config['id']);
 
@@ -2765,12 +2766,13 @@ JS;
             Html::beginTag('div', ['class' => 'fld-container']) .
             Html::beginTag('div', ['class' => 'fld-workspace']) .
             Html::beginTag('div', ['class' => 'fld-tabs']) .
-            implode('', array_map(fn(FieldLayoutTab $tab) => self::_fldTabHtml($tab, $config['customizableTabs']), $tabs)) .
+            implode('', array_map(fn(FieldLayoutTab $tab) => self::_fldTabHtml($tab, $config['customizableTabs'], $readOnly), $tabs)) .
             Html::endTag('div') . // .fld-tabs
             ($config['customizableTabs']
                 ? Html::button(Craft::t('app', 'New Tab'), [
                     'type' => 'button',
                     'class' => ['fld-new-tab-btn', 'btn', 'add', 'icon'],
+                    'disabled' => $readOnly,
                 ])
                 : '') .
             Html::endTag('div') . // .fld-workspace
@@ -2785,12 +2787,14 @@ JS;
                     'class' => ['btn', 'small', 'active'],
                     'aria' => ['pressed' => 'true'],
                     'data' => ['library' => 'field'],
+                    'disabled' => $readOnly,
                 ]) .
                 Html::button(Craft::t('app', 'UI Elements'), [
                     'type' => 'button',
                     'class' => ['btn', 'small'],
                     'aria' => ['pressed' => 'false'],
                     'data' => ['library' => 'ui'],
+                    'disabled' => $readOnly,
                 ]) .
                 Html::endTag('section') // .btngroup
                 : '') .
@@ -2800,6 +2804,7 @@ JS;
                 'class' => 'fullwidth',
                 'inputmode' => 'search',
                 'placeholder' => Craft::t('app', 'Search'),
+                'disabled' => $readOnly,
             ]) .
             Html::tag('div', '', [
                 'class' => ['clear', 'hidden'],
@@ -2834,9 +2839,10 @@ JS;
     /**
      * @param FieldLayoutTab $tab
      * @param bool $customizable
+     * @param bool $disabled
      * @return string
      */
-    private static function _fldTabHtml(FieldLayoutTab $tab, bool $customizable): string
+    private static function _fldTabHtml(FieldLayoutTab $tab, bool $customizable, $disabled): string
     {
         $menuId = sprintf('menu-%s', mt_rand());
         return
@@ -2860,6 +2866,7 @@ JS;
             Html::button(Craft::t('app', 'Add'), [
                 'class' => ['btn', 'add', 'icon', 'dashed', 'fullwidth', 'fld-add-btn'],
                 'aria' => ['controls' => $menuId],
+                'disabled' => $disabled,
             ]) .
             Html::tag('div', options: [
                 'id' => $menuId,
@@ -2911,6 +2918,7 @@ JS;
                 'has-custom-width' => $element->hasCustomWidth(),
                 'has-settings' => $element->hasSettings(),
             ],
+            'disabled' => true,
         ]);
 
         return Html::modifyTagAttributes($element->selectorHtml(), $attributes);

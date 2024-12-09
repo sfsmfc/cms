@@ -39,6 +39,11 @@ Craft.ui = {
     if (config.spinner) {
       $btn.append($('<div class="spinner spinner-absolute"/>'));
     }
+
+    if (config.disabled) {
+      $btn.attr('disabled', 'disabled');
+    }
+
     return $btn;
   },
 
