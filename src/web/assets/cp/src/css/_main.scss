@@ -7842,7 +7842,8 @@ fieldset {
 
     input:disabled,
     textarea:disabled,
-    select:disabled {
+    select:disabled,
+    button:disabled {
       cursor: not-allowed;
     }
   }
