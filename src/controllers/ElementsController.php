@@ -860,6 +860,8 @@ class ElementsController extends Controller
             }
         }
 
+        $altActions = array_merge($altActions, $element->getAdditionalAltActions());
+
         return $altActions;
     }
 

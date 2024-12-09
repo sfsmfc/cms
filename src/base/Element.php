@@ -37,6 +37,7 @@ use craft\enums\AttributeStatus;
 use craft\enums\Color;
 use craft\errors\InvalidFieldException;
 use craft\events\AuthorizationCheckEvent;
+use craft\events\DefineAltActionsEvent;
 use craft\events\DefineAttributeHtmlEvent;
 use craft\events\DefineAttributeKeywordsEvent;
 use craft\events\DefineEagerLoadingMapEvent;
@@ -367,6 +368,13 @@ abstract class Element extends Component implements ElementInterface
      * @since 4.0.0
      */
     public const EVENT_DEFINE_ADDITIONAL_BUTTONS = 'defineAdditionalButtons';
+
+    /**
+     * @event DefineAltActionsEvent The event that is triggered when defining additional alt actions that should be shown at the top of the element’s edit page.
+     * @see getAddtionalAltActions()
+     * @since 5.6.0
+     */
+    public const EVENT_DEFINE_ADDITIONAL_ALT_ACTIONS = 'defineAdditionalAltActions';
 
     /**
      * @event DefineMenuItemsEvent The event that is triggered when defining action menu items..
@@ -3731,6 +3739,13 @@ abstract class Element extends Component implements ElementInterface
      */
     public function getAdditionalAltActions(): array
     {
+        // Fire a 'defineAdditionalAltActions' event
+        if ($this->hasEventHandlers(self::EVENT_DEFINE_ADDITIONAL_ALT_ACTIONS)) {
+            $event = new DefineAltActionsEvent();
+            $this->trigger(self::EVENT_DEFINE_ADDITIONAL_ALT_ACTIONS, $event);
+            return $event->altActions;
+        }
+
         return [];
     }
 

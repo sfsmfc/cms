@@ -41,6 +41,7 @@
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
 
 ### Extensibility
+- Added `craft\base\Element::EVENT_DEFINE_ADDITIONAL_ALT_ACTIONS`.
 - Added `craft\base\Element::getAdditionalAltActions()`.
 - Added `craft\base\ElementInterface::getAdditionalAltActions()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::allowMultiple()`.
@@ -49,6 +50,7 @@
 - Added `craft\elements\User::$affiliatedSiteId`.
 - Added `craft\elements\User::getAffiliatedSite()`.
 - Added `craft\elements\conditions\entries\FieldConditionRule`.
+- Added `craft\events\DefineAltActionsEvent`.
 - Added `craft\fields\data\LinkData::$ariaLabel`.
 - Added `craft\fields\data\LinkData::$class`.
 - Added `craft\fields\data\LinkData::$id`.
