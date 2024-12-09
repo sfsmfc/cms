@@ -1128,4 +1128,20 @@ class Assets extends BaseRelationField
 
         return $folders;
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function settingsTemplateVariables(): array
+    {
+        return parent::settingsTemplateVariables() + ['readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
+    }
 }

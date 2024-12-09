@@ -158,6 +158,7 @@ class Money extends Field implements InlineEditableFieldInterface, SortableField
             'field' => $this,
             'currencies' => $this->_isoCurrencies,
             'subUnits' => $this->subunits(),
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 
@@ -399,5 +400,13 @@ class Money extends Field implements InlineEditableFieldInterface, SortableField
             'type' => MoneyType::getType(),
             'description' => $this->instructions,
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

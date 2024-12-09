@@ -88,6 +88,7 @@ class Email extends Field implements InlineEditableFieldInterface, MergeableFiel
             'name' => 'placeholder',
             'value' => $this->placeholder,
             'errors' => $this->getErrors('placeholder'),
+            'disabled' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 
@@ -164,5 +165,13 @@ class Email extends Field implements InlineEditableFieldInterface, MergeableFiel
         }
 
         return $this->getPreviewHtml($value, $element ?? new Entry());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

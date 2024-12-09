@@ -1,6 +1,9 @@
 {% import "_includes/forms" as forms %}
 
 {% set targetPrefix = "datetime#{random()}-" %}
+{% if readOnly is not defined %}
+    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
 
 {{ forms.radioGroupField({
     id: 'dateTime',
@@ -10,6 +13,7 @@
     toggle: true,
     targetPrefix: ".#{targetPrefix}",
     tip: value == 'showTime' ? 'Time fields are better suited for managing Time-only values.'|t('app'),
+    disabled: readOnly,
 }) }}
 
 {{ forms.selectField({
@@ -24,6 +28,7 @@
     name: 'minuteIncrement',
     options: incrementOptions,
     value: field.minuteIncrement ? field.minuteIncrement : 30,
+    disabled: readOnly,
 }) }}
 
 {{ forms.lightswitchField({
@@ -37,6 +42,7 @@
     id: 'show-time-zone',
     name: 'showTimeZone',
     on: field.showTimeZone,
+    disabled: readOnly,
 }) }}
 
 {{ forms.dateField({
@@ -51,6 +57,7 @@
     value: field.min,
     errors: field.getErrors('min'),
     data: {'error-key': 'min'},
+    disabled: readOnly,
 }) }}
 
 {{ forms.dateField({
@@ -65,4 +72,5 @@
     value: field.max,
     errors: field.getErrors('max'),
     data: {'error-key': 'max'},
+    disabled: readOnly,
 }) }}

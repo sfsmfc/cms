@@ -1430,6 +1430,7 @@ JS, [
         $warning = $config['warning'] ?? null;
         $errors = $config['errors'] ?? null;
         $status = $config['status'] ?? null;
+        $disabled = $config['disabled'] ?? $config['static'] ?? false;
 
         $fieldset = $config['fieldset'] ?? false;
         $fieldId = $config['fieldId'] ?? "$id-field";
@@ -1601,6 +1602,7 @@ JS, [
                         'input',
                         $orientation,
                         $errors ? 'errors' : null,
+                        $disabled ? 'disabled' : null,
                     ]),
                 ],
                 $config['inputContainerAttributes'] ?? []
@@ -2755,7 +2757,7 @@ JS;
         return
             Html::beginTag('div', [
                 'id' => $config['id'],
-                'class' => 'layoutdesigner' . ($disabled ? ' disabled' : ''),
+                'class' => 'layoutdesigner',
             ]) .
             Html::hiddenInput('fieldLayout', Json::encode($fieldLayoutConfig), [
                 'data' => ['config-input' => true],

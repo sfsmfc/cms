@@ -1,5 +1,9 @@
 {% import "_includes/forms" as forms %}
 
+{% if readOnly is not defined %}
+    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
+
 {% macro numberField(config, decimals) %}
     {% from '_includes/forms' import textField %}
     {{ hiddenInput("#{config.name}[locale]", craft.app.formattingLocale.id) }}
@@ -17,6 +21,7 @@
         options: currencies|map(currency => {label: currency.getCode(), value: currency.getCode()}),
         value: field.currency,
         class: 'selectize',
+        disabled: readOnly,
     }) }}
 {% endset %}
 
@@ -25,6 +30,7 @@
     required: true,
     errors: field.getErrors('currency'),
     data: {'error-key': 'currency'},
+    disabled: readOnly,
 }, currencyInput) }}
 
 {{ _self.numberField({
@@ -35,6 +41,7 @@
     size: 10,
     errors: field.getErrors('defaultValue'),
     data: {'error-key': 'defaultValue'},
+    disabled: readOnly,
 }, subUnits) }}
 
 {{ _self.numberField({
@@ -45,6 +52,7 @@
     size: 10,
     errors: field.getErrors('min'),
     data: {'error-key': 'min'},
+    disabled: readOnly,
 }, subUnits) }}
 
 {{ _self.numberField({
@@ -55,12 +63,14 @@
     size: 10,
     errors: field.getErrors('max'),
     data: {'error-key': 'max'},
+    disabled: readOnly,
 }, subUnits) }}
 
 {{ forms.lightswitchField({
     label: 'Show Currency'|t('app'),
     name: 'showCurrency',
     on: field.showCurrency,
+    disabled: readOnly,
 }) }}
 
 {{ forms.textField({
@@ -71,6 +81,7 @@
     size: 2,
     errors: field.getErrors('size'),
     data: {'error-key': 'size'},
+    disabled: readOnly,
 }) }}
 
 {% js %}

@@ -1,5 +1,9 @@
 {% import '_includes/forms' as forms %}
 
+{% if readOnly is not defined %}
+    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
+
 {{ forms.selectField({
     label: 'Minute Increment'|t('app'),
     instructions: 'The number of minutes that timepicker options should be incremented by. (Authors can enter a specific time manually.)'|t('app'),
@@ -7,6 +11,7 @@
     name: 'minuteIncrement',
     options: incrementOptions,
     value: field.minuteIncrement ? field.minuteIncrement : 30,
+    disabled: readOnly,
 }) }}
 
 {{ forms.timeField({
@@ -16,6 +21,7 @@
     value: min,
     errors: field.getErrors('min'),
     data: {'error-key': 'min'},
+    disabled: readOnly,
 }) }}
 
 {{ forms.timeField({
@@ -25,4 +31,5 @@
     value: max,
     errors: field.getErrors('max'),
     data: {'error-key': 'max'},
+    disabled: readOnly,
 }) }}

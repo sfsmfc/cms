@@ -642,6 +642,7 @@ class Matrix extends Field implements
             'defaultTableColumnOptions' => static::defaultTableColumnOptions($this->getEntryTypes()),
             'defaultCreateButtonLabel' => $this->defaultCreateButtonLabel(),
             'indexViewModes' => Entry::indexViewModes(),
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 
@@ -1609,5 +1610,13 @@ JS;
 
         /** @var Entry[] $entries */
         return $entries;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

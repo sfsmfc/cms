@@ -2,6 +2,9 @@
 
 {% set sourceOptions = field.getSourceOptions() %}
 {% set elementType = elementType ?? pluralElementType %}
+{% if readOnly is not defined %}
+    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
 
 {% block fieldSettings %}
     {% block sourcesField %}
@@ -17,6 +20,7 @@
                     showAllOption: true,
                     errors: field.getErrors('sources'),
                     data: {'error-key': 'sources'},
+                    disabled: readOnly,
                 }) }}
             {% else %}
                 {{ forms.selectField({
@@ -28,11 +32,13 @@
                     value: field.source,
                     errors: field.getErrors('source'),
                     data: {'error-key': 'source'},
+                    disabled: readOnly,
                 }) }}
             {% endif %}
         {% else %}
             {{ forms.field({
-                label: (field.allowMultipleSources ? "Sources"|t('app') : "Source"|t('app'))
+                label: (field.allowMultipleSources ? "Sources"|t('app') : "Source"|t('app')),
+                disabled: readOnly,
             }, '<p class="error">' ~ "No sources exist yet."|t('app') ~ '</p>') }}
         {% endif %}
     {% endblock %}
@@ -47,7 +53,8 @@
             instructions: 'Whether the structure of the related {type} should be maintained.'|t('app', { type: pluralElementType }),
             id: 'maintain-hierarchy',
             name: 'maintainHierarchy',
-            on: field.maintainHierarchy
+            on: field.maintainHierarchy,
+            disabled: readOnly,
         }) }}
     {% endblock %}
 
@@ -64,6 +71,7 @@
                 size: 2,
                 errors: field.getErrors('minRelations'),
                 data: {'error-key': 'minRelations'},
+                disabled: readOnly,
             }) }}
 
             {{ forms.textField({
@@ -77,6 +85,7 @@
                 size: 2,
                 errors: field.getErrors('maxRelations'),
                 data: {'error-key': 'maxRelations'},
+                disabled: readOnly,
             }) }}
         {% endif %}
 
@@ -89,6 +98,7 @@
             size: 2,
             errors: field.getErrors('branchLimit'),
             data: {'error-key': 'branchLimit'},
+            disabled: readOnly,
         }) }}
     {% endblock %}
 
@@ -105,6 +115,7 @@
                 id: 'show-cards-in-grid',
                 name: 'showCardsInGrid',
                 on: field.showCardsInGrid,
+                disabled: readOnly,
             }) }}
         {% endtag %}
     {% endblock %}
@@ -117,7 +128,8 @@
             name: 'selectionLabel',
             value: field.selectionLabel,
             placeholder: field.defaultSelectionLabel(),
-            errors: field.getErrors('selectionLabel')
+            errors: field.getErrors('selectionLabel'),
+            disabled: readOnly,
         }) }}
     {% endblock %}
 
@@ -127,7 +139,8 @@
             instructions: 'Whether validation errors on the related {type} should prevent the source element from being saved.'|t('app', { type: pluralElementType }),
             id: 'validate-related-elements',
             name: 'validateRelatedElements',
-            on: field.validateRelatedElements
+            on: field.validateRelatedElements,
+            disabled: readOnly,
         }) }}
     {% endblock %}
 
@@ -143,6 +156,7 @@
                 id: 'allow-self-relations',
                 name: 'allowSelfRelations',
                 on: field.allowSelfRelations,
+                disabled: readOnly,
             }) }}
 
             {% if craft.app.getIsMultiSite() %}

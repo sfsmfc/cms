@@ -137,6 +137,7 @@ class Range extends Field implements InlineEditableFieldInterface, SortableField
     {
         return Craft::$app->getView()->renderTemplate('_components/fieldtypes/Range/settings.twig', [
             'field' => $this,
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 
@@ -255,5 +256,13 @@ class Range extends Field implements InlineEditableFieldInterface, SortableField
             'type' => NumberType::getType(),
             'description' => $this->instructions,
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

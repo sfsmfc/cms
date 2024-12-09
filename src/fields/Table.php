@@ -246,6 +246,8 @@ class Table extends Field
      */
     public function getSettingsHtml(): ?string
     {
+        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
+
         $typeOptions = [
             'checkbox' => Craft::t('app', 'Checkbox'),
             'color' => Craft::t('app', 'Color'),
@@ -349,6 +351,7 @@ class Table extends Field
             'cols' => $columnSettings,
             'rows' => $this->columns,
             'errors' => $this->getErrors('columns'),
+            'readOnly' => $readOnly,
         ]);
 
         $defaultsField = Cp::editableTableFieldHtml([
@@ -362,6 +365,7 @@ class Table extends Field
             'cols' => $columns,
             'rows' => $this->defaults,
             'initJs' => false,
+            'static' => $readOnly,
         ]);
 
         return $view->renderTemplate('_components/fieldtypes/Table/settings.twig', [
@@ -744,5 +748,13 @@ class Table extends Field
             'addRowLabel' => Craft::t('site', $this->addRowLabel),
             'describedBy' => $this->describedBy,
         ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

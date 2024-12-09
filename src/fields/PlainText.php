@@ -142,6 +142,7 @@ class PlainText extends Field implements InlineEditableFieldInterface, SortableF
         return Craft::$app->getView()->renderTemplate('_components/fieldtypes/PlainText/settings.twig',
             [
                 'field' => $this,
+                'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
             ]);
     }
 
@@ -231,5 +232,13 @@ class PlainText extends Field implements InlineEditableFieldInterface, SortableF
         }
 
         return $this->getPreviewHtml($value, $element ?? new Entry());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

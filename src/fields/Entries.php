@@ -159,4 +159,20 @@ class Entries extends BaseRelationField
 
         return Cp::chipHtml($mockup);
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function settingsTemplateVariables(): array
+    {
+        return parent::settingsTemplateVariables() + ['readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
+    }
 }

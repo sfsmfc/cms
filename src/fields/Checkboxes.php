@@ -79,4 +79,12 @@ class Checkboxes extends BaseOptionsField
     {
         return Craft::t('app', 'Checkbox Options');
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
+    }
 }

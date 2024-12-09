@@ -92,4 +92,12 @@ class MultiSelect extends BaseOptionsField
     {
         return Craft::t('app', 'Multi-select Options');
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
+    }
 }

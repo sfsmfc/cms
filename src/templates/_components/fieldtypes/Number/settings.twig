@@ -1,6 +1,9 @@
 {% import "_includes/forms" as forms %}
 
 {% set decimals = not field.getErrors('decimals') ? field.decimals : null %}
+{% if readOnly is not defined %}
+    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
 
 {% macro numberField(config, decimals) %}
     {% from '_includes/forms' import textField %}
@@ -23,6 +26,7 @@
     size: 5,
     errors: field.getErrors('min'),
     data: {'error-key': 'min'},
+    disabled: readOnly,
 }, decimals) }}
 
 {{ _self.numberField({
@@ -33,6 +37,7 @@
     size: 5,
     errors: field.getErrors('max'),
     data: {'error-key': 'max'},
+    disabled: readOnly,
 }, decimals) }}
 
 {{ _self.numberField({
@@ -43,6 +48,7 @@
     size: 5,
     errors: field.getErrors('step'),
     data: {'error-key': 'step'},
+    disabled: readOnly,
 }, null) }}
 
 {{ forms.textField({
@@ -53,6 +59,7 @@
     size: 5,
     errors: field.getErrors('decimals'),
     data: {'error-key': 'decimals'},
+    disabled: readOnly,
 }) }}
 
 {{ forms.textField({
@@ -61,7 +68,8 @@
     name: 'size',
     value: field.size,
     size: 5,
-    errors: field.getErrors('size')
+    errors: field.getErrors('size'),
+    disabled: readOnly,
 }) }}
 
 {{ _self.numberField({
@@ -72,6 +80,7 @@
     size: 5,
     errors: field.getErrors('defaultValue'),
     data: {'error-key': 'defaultValue'},
+    disabled: readOnly,
 }, decimals) }}
 
 {{ forms.textField({
@@ -80,7 +89,8 @@
     id: 'prefix',
     name: 'prefix',
     value: field.prefix,
-    errors: field.getErrors('prefix')
+    errors: field.getErrors('prefix'),
+    disabled: readOnly,
 }) }}
 
 {{ forms.textField({
@@ -89,7 +99,8 @@
     id: 'suffix',
     name: 'suffix',
     value: field.suffix,
-    errors: field.getErrors('suffix')
+    errors: field.getErrors('suffix'),
+    disabled: readOnly,
 }) }}
 
 {% set previewFormatInput %}
@@ -105,6 +116,7 @@
             value: field.previewFormat,
             toggle: true,
             targetPrefix: 'preview-format-',
+            disabled: readOnly,
         }) }}
         <div id="preview-format-currency"{% if field.previewFormat != 'currency' %} class="hidden"{% endif %}>
             {{ forms.select({
@@ -293,6 +305,7 @@
                     {label: 'ZWL', value: 'ZWL'},
                 ],
                 value: field.previewCurrency,
+                disabled: readOnly,
             }) }}
         </div>
     </div>
@@ -306,4 +319,5 @@
     instructions: 'How field values will be formatted within element indexes.'|t('app'),
     errors: field.getErrors('previewFormat')|merge(field.getErrors('previewCurrency')),
     data: {'error-key': 'previewFormat'},
+    disabled: readOnly,
 }, previewFormatInput) }}

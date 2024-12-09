@@ -86,6 +86,7 @@ class Icon extends Field implements InlineEditableFieldInterface, ThumbableField
             ]),
             'name' => 'includeProIcons',
             'on' => $this->includeProIcons,
+            'disabled' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 
@@ -148,5 +149,13 @@ class Icon extends Field implements InlineEditableFieldInterface, ThumbableField
     public function getThumbHtml(mixed $value, ElementInterface $element, int $size): ?string
     {
         return $value ? Html::tag('div', Cp::iconSvg($value), ['class' => 'cp-icon']) : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

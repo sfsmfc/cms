@@ -2086,8 +2086,12 @@ ul.icons {
 
 .disabled:not(.status, .status-label) {
   opacity: 0.5;
-  pointer-events: none;
   user-select: none;
+  cursor: not-allowed !important;
+
+  .layoutdesigner {
+    pointer-events: none;
+  }
 }
 
 .noteditable {
@@ -8531,7 +8535,7 @@ tr.indexingSession td.progress div.progressContainer div.progressInfo {
 }
 
 .select:not(.selectize) select {
-  &:hover {
+  &:hover:not(:disabled) {
     @include mixins.select-input-focused-styles;
   }
 

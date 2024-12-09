@@ -1,5 +1,9 @@
 {% import "_includes/forms" as forms %}
 
+{% if readOnly is not defined %}
+  {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
+
 {{ forms.textField({
   label: 'Min {type}'|t('app', {
     type: 'Addresses'|t('app'),
@@ -13,6 +17,7 @@
   size: 3,
   errors: field.getErrors('minAddresses'),
   data: {'error-key': 'minAddresses'},
+  disabled: readOnly,
 }) }}
 
 {{ forms.textField({
@@ -28,6 +33,7 @@
   size: 3,
   errors: field.getErrors('maxAddresses'),
   data: {'error-key': 'maxAddresses'},
+  disabled: readOnly,
 }) }}
 
 {{ forms.selectField({
@@ -42,4 +48,5 @@
     {label: 'As an element index'|t('app'), value: constant('VIEW_MODE_INDEX', field)},
   ],
   value: field.viewMode,
+  disabled: readOnly,
 }) }}

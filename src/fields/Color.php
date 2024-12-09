@@ -93,6 +93,8 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
     /** @inheritdoc */
     public function getSettingsHtml(): ?string
     {
+        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
+
         return Cp::colorFieldHtml([
             'label' => Craft::t('app', 'Default Color'),
             'id' => 'default-color',
@@ -100,6 +102,7 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
             'value' => $this->defaultColor,
             'errors' => $this->getErrors('defaultColor'),
             'data' => ['error-key' => 'defaultColor'],
+            'disabled' => $readOnly,
         ]) .
             Cp::editableTableFieldHtml([
                 'label' => Craft::t('app', 'Presets'),
@@ -123,6 +126,7 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
                 ],
                 'errors' => $this->getErrors('presets'),
                 'data' => ['error-key' => 'presets'],
+                'static' => $readOnly,
             ]);
     }
 
@@ -246,5 +250,13 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
         }
 
         return $this->getPreviewHtml($value, $element ?? new Entry());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

@@ -232,6 +232,7 @@ class Date extends Field implements InlineEditableFieldInterface, SortableFieldI
             'value' => $dateTimeValue,
             'incrementOptions' => $incrementOptions,
             'field' => $this,
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 
@@ -480,5 +481,13 @@ class Date extends Field implements InlineEditableFieldInterface, SortableFieldI
             'type' => $type,
             'description' => $this->instructions,
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

@@ -129,4 +129,20 @@ class Users extends BaseRelationField
         $condition->queryParams = ['group', 'groupId'];
         return $condition;
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function settingsTemplateVariables(): array
+    {
+        return parent::settingsTemplateVariables() + ['readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
+    }
 }

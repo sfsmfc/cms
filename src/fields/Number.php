@@ -195,6 +195,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
     {
         return Craft::$app->getView()->renderTemplate('_components/fieldtypes/Number/settings.twig', [
             'field' => $this,
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 
@@ -372,5 +373,13 @@ JS;
             'type' => NumberType::getType(),
             'description' => $this->instructions,
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

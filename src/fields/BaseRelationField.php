@@ -1220,6 +1220,7 @@ JS, [
      */
     public function getTargetSiteFieldHtml(): ?string
     {
+        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
         $class = static::elementType();
 
         if (!Craft::$app->getIsMultiSite() || !$class::isLocalized()) {
@@ -1245,6 +1246,7 @@ JS, [
                 'checked' => $showTargetSite,
                 'toggle' => 'target-site-field',
                 'reverseToggle' => 'show-site-menu-field',
+                'disabled' => $readOnly,
             ]) .
             Cp::selectFieldHtml([
                 'fieldClass' => !$showTargetSite ? ['hidden'] : null,
@@ -1253,6 +1255,7 @@ JS, [
                 'name' => 'targetSiteId',
                 'options' => $siteOptions,
                 'value' => $this->targetSiteId,
+                'disabled' => $readOnly,
             ]) .
             Cp::checkboxFieldHtml([
                 'fieldset' => true,
@@ -1267,6 +1270,7 @@ JS, [
                 'id' => 'show-site-menu',
                 'name' => 'showSiteMenu',
                 'checked' => $this->showSiteMenu,
+                'disabled' => $readOnly,
             ]);
     }
 
@@ -1298,6 +1302,7 @@ JS, [
             'value' => $this->viewMode,
             'toggle' => true,
             'targetPrefix' => 'view-mode--',
+            'disabled' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 
@@ -1335,6 +1340,7 @@ JS, [
                 'instructions' => Craft::t('app', 'Only allow {type} to be selected if they match the following rules:', [
                     'type' => $elementType::pluralLowerDisplayName(),
                 ]),
+                'static' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
             ]);
         }
 

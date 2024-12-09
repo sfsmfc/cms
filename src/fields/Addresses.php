@@ -355,6 +355,7 @@ class Addresses extends Field implements
     {
         return Craft::$app->getView()->renderTemplate('_components/fieldtypes/Addresses/settings.twig', [
             'field' => $this,
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 
@@ -874,5 +875,13 @@ class Addresses extends Field implements
         $this->addressManager()->restoreNestedElements($element);
 
         parent::afterElementRestore($element);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

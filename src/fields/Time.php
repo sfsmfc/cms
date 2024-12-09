@@ -132,6 +132,7 @@ class Time extends Field implements InlineEditableFieldInterface, SortableFieldI
             'field' => $this,
             'min' => $this->min ? DateTimeHelper::toDateTime(['time' => $this->min], true) : null,
             'max' => $this->max ? DateTimeHelper::toDateTime(['time' => $this->max], true) : null,
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 
@@ -260,5 +261,13 @@ class Time extends Field implements InlineEditableFieldInterface, SortableFieldI
             'type' => DateTimeType::getType(),
             'description' => $this->instructions,
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }

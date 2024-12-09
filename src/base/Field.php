@@ -1275,4 +1275,15 @@ JS, [
 
         return true;
     }
+
+    /**
+     * Returns whether the field's settings are ready to show its fields in a disabled mode.
+     *
+     * @return bool
+     * @since 5.6.0
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return false;
+    }
 }

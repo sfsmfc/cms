@@ -300,6 +300,8 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
      */
     public function getSettingsHtml(): ?string
     {
+        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
+
         // Sort types by the order from the config and if anything remains by the label, with URL at the top
         // get only the selected types
         /** @var Collection<string,class-string<BaseLinkType>> $selectedTypes */
@@ -349,6 +351,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
             'required' => true,
             'targetPrefix' => 'types-',
             'sortable' => true,
+            'disabled' => $readOnly,
         ]);
 
         $linkTypes = $this->getLinkTypes();
@@ -379,18 +382,21 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'id' => 'show-label-field',
                 'name' => 'showLabelField',
                 'on' => $this->showLabelField,
+                'disabled' => $readOnly,
             ]) .
             Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Show the “URL Suffix” field'),
                 'id' => 'show-url-suffix-field',
                 'name' => 'showUrlSuffixField',
                 'on' => $this->showUrlSuffixField,
+                'disabled' => $readOnly,
             ]) .
             Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Show the “Open in a new tab” field'),
                 'id' => 'show-target-field',
                 'name' => 'showTargetField',
                 'on' => $this->showTargetField,
+                'disabled' => $readOnly,
             ]) .
             Html::tag('hr') .
             Html::a(Craft::t('app', 'Advanced'), options: [
@@ -412,6 +418,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'value' => $this->maxLength,
                 'errors' => $this->getErrors('maxLength'),
                 'data' => ['error-key' => 'maxLength'],
+                'disabled' => $readOnly,
             ]);
 
         if (Craft::$app->getConfig()->getGeneral()->enableGql) {
@@ -425,6 +432,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                         ['label' => Craft::t('app', 'URL only'), 'value' => 'url'],
                     ],
                     'value' => $this->fullGraphqlData ? 'full' : 'url',
+                    'disabled' => $readOnly,
                 ]);
         }
 
@@ -806,5 +814,13 @@ JS;
             $targetIds[] = $element->id;
         }
         return $targetIds;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
     }
 }
