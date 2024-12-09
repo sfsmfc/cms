@@ -52,10 +52,10 @@
             tableDataEndpoint: 'sections/table-data',
         };
 
-        if (!{{ readOnly }}) {
+        {% if not readOnly %}
             config['deleteAction'] = 'sections/delete-section';
             config['deleteConfirmationMessage'] = Craft.t('app', "Are you sure you want to delete “{name}” and all its entries?");
-        }
+        {% endif %}
 
         new Craft.VueAdminTable(config);
     })();

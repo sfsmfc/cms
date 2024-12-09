@@ -72,9 +72,9 @@ let config = {
     tableData: {{ tableData|json_encode|raw }}
 };
 
-if (!{{ readOnly }}) {
+{% if not readOnly %}
     config['deleteAction'] = 'fs/remove';
-}
+{% endif %}
 
 new Craft.VueAdminTable(config);
 {% endjs %}

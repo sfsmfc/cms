@@ -54,8 +54,8 @@
         emptyMessage: Craft.t('app', 'No groups exist yet.'),
         tableData: {{ tableData|json_encode|raw }}
     };
-    if (!{{ readOnly }}) {
+    {% if not readOnly %}
         config['deleteAction'] = 'user-settings/delete-group';
-    }
+    {% endif %}
     new Craft.VueAdminTable(config);
 {% endjs %}

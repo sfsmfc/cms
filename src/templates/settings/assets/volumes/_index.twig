@@ -57,10 +57,10 @@ let config = {
     tableData: {{ tableData|json_encode|raw }}
 }
 
-if (!{{ readOnly }}) {
+{% if not readOnly %}
     config['deleteAction'] = 'volumes/delete-volume';
     config['reorderAction'] = '{{ volumes|length > 1 ? 'volumes/reorder-volumes' : ''}}';
-}
+{% endif %}
 
 new Craft.VueAdminTable(config);
 {% endjs %}

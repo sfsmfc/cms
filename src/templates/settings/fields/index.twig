@@ -106,11 +106,11 @@
       emptyMessage: info.emptyMessage,
       tableDataEndpoint: 'fields/table-data',
       search: true,
-    }
+    };
 
-    if (!{{ readOnly }}) {
-      config['deleteAction'] = 'fields/delete-field';
-    }
+  {% if not readOnly %}
+    config['deleteAction'] = 'fields/delete-field';
+  {% endif %}
 
     new Craft.VueAdminTable(config);
   })({{

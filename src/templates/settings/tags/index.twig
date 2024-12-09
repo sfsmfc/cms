@@ -54,9 +54,9 @@
         tableData: {{ tableData|json_encode|raw }}
     };
 
-    if (!{{ readOnly }}) {
+    {% if not readOnly %}
         config['deleteAction'] = 'tags/delete-tag-group';
-    }
+    {% endif %}
 
     new Craft.VueAdminTable(config);
 {% endjs %}

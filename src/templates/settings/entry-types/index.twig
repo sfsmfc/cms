@@ -60,10 +60,10 @@
         search: true,
     }
 
-    if (!{{ readOnly }}) {
+    {% if not readOnly %}
         config['deleteAction'] = 'entry-types/delete';
         config['deleteConfirmationMessage'] = Craft.t('app', 'Are you sure you want to delete “{name}” and all entries of that type?');
-    }
+    {% endif %}
 
     new Craft.VueAdminTable(config);
   })();

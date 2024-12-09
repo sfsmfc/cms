@@ -51,10 +51,10 @@ let config = {
     tableData: {{ tableData|json_encode|raw }}
 }
 
-if (!{{ readOnly }}) {
+{% if not readOnly %}
     config['deleteAction'] = 'globals/delete-set';
     config['reorderAction'] = '{{ globalSets|length > 1 ? 'globals/reorder-sets' : ''}}';
-}
+{% endif %}
 
 new Craft.VueAdminTable(config);
 {% endjs %}

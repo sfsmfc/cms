@@ -70,9 +70,9 @@
         tableData: {{ tableData|json_encode|raw }}
     };
 
-    if (!{{ readOnly }}) {
+    {% if not readOnly %}
         config['deleteAction'] = 'categories/delete-category-group';
-    }
+    {% endif %}
 
     new Craft.VueAdminTable(config);
 {% endjs %}
