@@ -434,4 +434,12 @@ class Local extends Fs implements LocalFsInterface
 
         return $this->visibilityMap[$type][$config[self::CONFIG_VISIBILITY]];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
+    }
 }

@@ -54,11 +54,11 @@
     {% if not isCurrent %}
         {% set classes = classes|merge(['hidden']) %}
     {% endif %}
-    {% if readOnly %}
+    {# we need to add a 'disabled' class here, so that Fs-specific fields are not accidentally editable #}
+    {% if readOnly and not filesystem.readOnlySettingsReady() %}
         {% set classes = classes|merge(['disabled']) %}
     {% endif %}
 
-    {# we need to add a 'disabled' class here, so that Fs-specific fields are not accidentally editable #}
     <div id="{{ fsType|id }}"{% if classes|length %} class="{{ classes|join(' ') }}"{% endif %}>
         {% namespace 'types['~fsType|id~']' %}
             {% if isCurrent %}
