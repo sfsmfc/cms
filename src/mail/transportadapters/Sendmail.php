@@ -142,4 +142,12 @@ class Sendmail extends BaseTransportAdapter
             self::DEFAULT_COMMAND,
         ]));
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
+    }
 }

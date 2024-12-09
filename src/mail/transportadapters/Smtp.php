@@ -147,4 +147,12 @@ class Smtp extends BaseTransportAdapter
 
         return $config;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
+    }
 }

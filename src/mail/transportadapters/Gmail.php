@@ -100,4 +100,12 @@ class Gmail extends BaseTransportAdapter
             'password' => App::parseEnv($this->password),
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function readOnlySettingsReady(): bool
+    {
+        return true;
+    }
 }
