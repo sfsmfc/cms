@@ -5,6 +5,7 @@
 - Improved the styling of inline code fragments. ([#16141](https://github.com/craftcms/cms/pull/16141))
 - Added the “Affiliated Site” user condition rule. ([#16174](https://github.com/craftcms/cms/pull/16174))
 - The global sidebar no longer shows “Failed” for queue jobs, for users that don’t have access to the Queue Manager. ([#16184](https://github.com/craftcms/cms/issues/16184))
+- Addresses and Matrix fields now show provisional drafts when previewing an owner element. ([#16295](https://github.com/craftcms/cms/issues/16295))
 
 ### Accessibility
 - Improved the accessibility of Checkboxes and Radio Buttons fields that allow custom options. ([#16080](https://github.com/craftcms/cms/pull/16080))
@@ -36,6 +37,7 @@
 - Added the `affiliatedSite` and `affiliatedSiteId` user query and GraphQL params. ([#16174](https://github.com/craftcms/cms/pull/16174))
 - Added the `affiliatedSiteHandle` and `affiliatedSiteId` user GraphQL field. ([#16174](https://github.com/craftcms/cms/pull/16174))
 - Added the `PHP_INT_MAX` global Twig variable.
+- Added the `withProvisionalDrafts` element query param, which causes the resulting elements to be replaced with any provisional drafts for the current user.
 - It’s now possible to pass nested custom field value keys into element queries’ `orderBy` and `select` params (e.g. `myDateField.tz`). ([#16157](https://github.com/craftcms/cms/discussions/16157))
 - It’s now possible to set Link field values to arrays with `value` keys set to element instances or IDs. ([#16255](https://github.com/craftcms/cms/pull/16255))
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
