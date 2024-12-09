@@ -1315,8 +1315,8 @@ class User extends Element implements IdentityInterface
         // Choose a color based on the UUID
         $uid = strtolower($this->uid ?? '00ff');
         $totalColors = count(self::$photoColors);
-        $color1Index = base_convert(substr($uid, 0, 2), 16, 10) % $totalColors;
-        $color2Index = base_convert(substr($uid, 2, 2), 16, 10) % $totalColors;
+        $color1Index = (int)base_convert(substr($uid, 0, 2), 16, 10) % $totalColors;
+        $color2Index = (int)base_convert(substr($uid, 2, 2), 16, 10) % $totalColors;
         if ($color2Index === $color1Index) {
             $color2Index = ($color1Index + 1) % $totalColors;
         }

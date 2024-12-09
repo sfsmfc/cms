@@ -4,6 +4,7 @@
 
 - Fixed a bug where blank user group descriptions weren’t getting omitted from project config data. ([#16272](https://github.com/craftcms/cms/pull/16272))
 - Fixed a bug where pressing <kbd>Return</kbd> when a color text input within an editable table was focused was submitting the form rather than moving focus to the next row.
+- Fixed a JavaScript error that occurred on the Plugins index page, if there were any missing plugins associated with the Craft CMS license and no plugins were Composer-installed yet.
 
 ## 4.13.5 - 2024-12-03
 
