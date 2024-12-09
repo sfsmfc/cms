@@ -807,8 +807,7 @@ class ElementsController extends Controller
         bool $canDuplicate,
         bool $isCurrent,
         bool $isUnpublishedDraft,
-    ): array
-    {
+    ): array {
         $elementsService = Craft::$app->getElements();
 
         $altActions = [
@@ -837,9 +836,8 @@ class ElementsController extends Controller
                         'shift' => true,
                         'eventData' => ['autosave' => false],
                         'params' => ['addAnother' => 1],
-                    ]
+                    ],
                 ];
-
             }
 
             if ($canSaveCanonical && $isUnpublishedDraft) {
