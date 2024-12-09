@@ -817,7 +817,6 @@ class EntryQuery extends ElementQuery
      */
     public function status(array|string|null $value): self
     {
-        /** @var self */
         return parent::status($value);
     }
 

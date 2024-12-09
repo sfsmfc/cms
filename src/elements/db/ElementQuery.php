@@ -1359,6 +1359,7 @@ class ElementQuery extends Query implements ElementQueryInterface
 
     /**
      * @inheritdoc
+     * @return Query
      * @throws QueryAbortedException if it can be determined that there won’t be any results
      */
     public function prepare($builder): Query

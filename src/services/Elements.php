@@ -3399,7 +3399,7 @@ class Elements extends Component
             }
 
             // Save the element’s site settings record
-            if ($element->isNewForSite) {
+            if ($element->isNewForSite || !isset($siteSettingsRecord)) {
                 // First time we've saved the element for this site
                 $siteSettingsRecord = new Element_SiteSettingsRecord();
                 $siteSettingsRecord->elementId = $element->id;
