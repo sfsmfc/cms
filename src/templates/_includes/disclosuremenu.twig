@@ -39,6 +39,7 @@
         sel: selected,
         error: item.destructive ?? false,
         formsubmit: item.action ?? false,
+        disabled: item.disabled ?? false,
       }|filter|keys,
       href: type == 'button' ? null : url(item.url),
       data: {
