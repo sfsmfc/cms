@@ -74,3 +74,4 @@
 - Craft now keeps track of which site users registered from. When sending an email from the control panel, the current site is now set to the user’s affiliated site, if known. ([#16174](https://github.com/craftcms/cms/pull/16174))
 - Database rows with foreign keys referencing nonexistent rows are now deleted via garbage collection.
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
+- Fixed a bug where embedded element index filter HUDs were including condition rules for fields that weren’t applicable to the nested elements. ([#16289](https://github.com/craftcms/cms/discussions/16289))

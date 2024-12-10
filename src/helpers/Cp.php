@@ -1294,6 +1294,7 @@ class Cp
                     'hasThumbs' => $elementType::hasThumbs(),
                     'defaultSort' => $config['defaultSort'],
                     'defaultViewMode' => $config['defaultViewMode'],
+                    'fieldLayouts' => $config['fieldLayouts'],
                 ],
             ];
 
