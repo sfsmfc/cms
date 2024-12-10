@@ -1717,6 +1717,19 @@ JS, [
     }
 
     /**
+     * Renders a color input’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.6.0
+     */
+    public static function colorHtml(array $config): string
+    {
+        return static::renderTemplate('_includes/forms/color.twig', $config);
+    }
+
+    /**
      * Renders a color field’s HTML.
      *
      * @param array $config

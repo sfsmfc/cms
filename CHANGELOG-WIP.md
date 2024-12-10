@@ -6,6 +6,7 @@
 - Added the “Affiliated Site” user condition rule. ([#16174](https://github.com/craftcms/cms/pull/16174))
 - The global sidebar no longer shows “Failed” for queue jobs, for users that don’t have access to the Queue Manager. ([#16184](https://github.com/craftcms/cms/issues/16184))
 - Addresses and Matrix fields now show provisional drafts when previewing an owner element. ([#16295](https://github.com/craftcms/cms/issues/16295))
+- Color fields with a predefined color palette now primarily show a color select dropdown, rather than a manual color input. ([#16249](https://github.com/craftcms/cms/pull/16249))
 
 ### Accessibility
 - Improved the accessibility of Checkboxes and Radio Buttons fields that allow custom options. ([#16080](https://github.com/craftcms/cms/pull/16080))
@@ -22,6 +23,8 @@
 - Added the “View users” user permission. ([#16206](https://github.com/craftcms/cms/pull/16206))
 - Added the “Advanced Fields” setting to Link fields, with “Target”, “URL Suffix”, “Title Text”, “ARIA Label”, “Class Name”, “ID”, and “Relation (rel)” options. ([#15813](https://github.com/craftcms/cms/discussions/15813))
 - Added the “GraphQL Mode” Link field setting. ([#16237](https://github.com/craftcms/cms/pull/16237))
+- Added the “Palette” setting to Color fields, which replaces “Presets”. ([#16249](https://github.com/craftcms/cms/pull/16249))
+- Added the “Allow custom colors” setting to Color fields. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added the “Field” entry condition rule, which replaces “Matrix field”, includes a “has a value” operator. ([#16270](https://github.com/craftcms/cms/discussions/16270))
 - Section condition rules now have a “has a value” operator. ([#16270](https://github.com/craftcms/cms/discussions/16270))
 - Added “Copy plugin handle” and “Copy package name” options to plugins’ action menus on the Plugins index page. ([#16281](https://github.com/craftcms/cms/discussions/16281))
@@ -49,6 +52,10 @@
 - Added `craft\elements\User::$affiliatedSiteId`.
 - Added `craft\elements\User::getAffiliatedSite()`.
 - Added `craft\elements\conditions\entries\FieldConditionRule`.
+- Added `craft\fields\Color::$allowCustomColors`. ([#16249](https://github.com/craftcms/cms/pull/16249))
+- Added `craft\fields\Color::$palette`. ([#16249](https://github.com/craftcms/cms/pull/16249))
+- Added `craft\fields\Color::getDefaultColor()`. ([#16249](https://github.com/craftcms/cms/pull/16249))
+- Added `craft\fields\Color::setDefaultValue()`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added `craft\fields\data\LinkData::$ariaLabel`.
 - Added `craft\fields\data\LinkData::$class`.
 - Added `craft\fields\data\LinkData::$id`.
@@ -58,6 +65,7 @@
 - Added `craft\fields\data\LinkData::getUrl()`.
 - Added `craft\gql\types\LinkData`.
 - Added `craft\gql\types\generators\LinkDataType`.
+- Added `craft\helpers\Cp::colorHtml()`.
 - Added `craft\mail\Mailer::$siteId`.
 - Added `craft\mail\Mailer::$siteOverrides`.
 - Added `craft\models\MailSettings::$siteOverrides`.
@@ -67,8 +75,11 @@
 - `craft\helpers\Cp::elementIndexHtml()` now supports passing `defaultSort` in the `$config` array, when `sources` is `null`. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\models\Site` now implements `craft\base\Chippable`.
 - `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260))
+- Deprecated `craft\fields\Color::$presets`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Deprecated `craft\fields\Link::$showTargetField`.
-- Sortable checkbox selects now always display the selected options first on initial render. 
+- `_includes/forms/colorSelect.twig` now supports `options` and `withBlankOption` variables.
+- `_includes/forms/selectize.twig` now supports a `color` property in option data, which can be set to a hex value or a color name. 
+- Sortable checkbox selects now always display the selected options first on initial render.
 
 ### System
 - Craft now keeps track of which site users registered from. When sending an email from the control panel, the current site is now set to the user’s affiliated site, if known. ([#16174](https://github.com/craftcms/cms/pull/16174))
