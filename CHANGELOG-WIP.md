@@ -8,4 +8,5 @@
 
 ## System
 - Database rows with foreign keys referencing nonexistent rows are now deleted via garbage collection.
+- Pages which contain image transform generation URLs now set no-cache headers. ([#16195](https://github.com/craftcms/cms/discussions/16195))
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
