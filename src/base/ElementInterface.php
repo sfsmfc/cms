@@ -1005,12 +1005,14 @@ interface ElementInterface extends
     public function getAdditionalButtons(): string;
 
     /**
-     * Returns additional alt actions that should be shown in the save button dropdown on the element’s edit page.
+     * Returns alternative form actions for the element.
+     *
+     * See [[\craft\web\CpScreenResponseBehavior::altActions()]] for documentation on supported action properties.
      *
      * @return array
      * @since 5.6.0
      */
-    public function getAdditionalAltActions(): array;
+    public function getAltActions(): array;
 
     /**
      * Returns the additional locations that should be available for previewing the element, besides its primary [[getUrl()|URL]].

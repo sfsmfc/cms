@@ -10,7 +10,7 @@ namespace craft\events;
 use craft\base\Event;
 
 /**
- * DefineAltActionsEvent is used to define menu items.
+ * DefineAltActionsEvent is used to define form actions.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 5.6.0
@@ -18,7 +18,9 @@ use craft\base\Event;
 class DefineAltActionsEvent extends Event
 {
     /**
-     * @var array The menu items.
+     * @var array The form actions.
+     *
+     * See [[\craft\web\CpScreenResponseBehavior::altActions()]] for documentation on supported action properties.
      */
     public array $altActions = [];
 }

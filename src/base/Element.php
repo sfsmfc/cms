@@ -370,11 +370,11 @@ abstract class Element extends Component implements ElementInterface
     public const EVENT_DEFINE_ADDITIONAL_BUTTONS = 'defineAdditionalButtons';
 
     /**
-     * @event DefineAltActionsEvent The event that is triggered when defining additional alt actions that should be shown at the top of the element’s edit page.
-     * @see getAddtionalAltActions()
+     * @event DefineAltActionsEvent The event that is triggered when defining alternative form actions for the element.
+     * @see getAltActions()
      * @since 5.6.0
      */
-    public const EVENT_DEFINE_ADDITIONAL_ALT_ACTIONS = 'defineAdditionalAltActions';
+    public const EVENT_DEFINE_ALT_ACTIONS = 'defineAltActions';
 
     /**
      * @event DefineMenuItemsEvent The event that is triggered when defining action menu items..
@@ -3737,16 +3737,70 @@ abstract class Element extends Component implements ElementInterface
     /**
      * @inheritdoc
      */
-    public function getAdditionalAltActions(): array
+    public function getAltActions(): array
     {
-        // Fire a 'defineAdditionalAltActions' event
-        if ($this->hasEventHandlers(self::EVENT_DEFINE_ADDITIONAL_ALT_ACTIONS)) {
-            $event = new DefineAltActionsEvent();
-            $this->trigger(self::EVENT_DEFINE_ADDITIONAL_ALT_ACTIONS, $event);
+        $isUnpublishedDraft = $this->getIsUnpublishedDraft();
+        $elementsService = Craft::$app->getElements();
+        $canSaveCanonical = $elementsService->canSaveCanonical($this);
+
+        $altActions = [
+            [
+                'label' => $isUnpublishedDraft && $canSaveCanonical
+                    ? Craft::t('app', 'Create and continue editing')
+                    : Craft::t('app', 'Save and continue editing'),
+                'redirect' => '{cpEditUrl}',
+                'shortcut' => true,
+                'retainScroll' => true,
+                'eventData' => ['autosave' => false],
+            ],
+        ];
+
+        if ($this->getIsCanonical() || $this->isProvisionalDraft) {
+            $newElement = $this->createAnother();
+            if ($newElement && $elementsService->canSave($newElement)) {
+                $altActions[] = [
+                    'label' => $isUnpublishedDraft && $canSaveCanonical
+                        ? Craft::t('app', 'Create and add another')
+                        : Craft::t('app', 'Save and add another'),
+                    'shortcut' => true,
+                    'shift' => true,
+                    'eventData' => ['autosave' => false],
+                    'params' => ['addAnother' => 1],
+                ];
+            }
+
+            if ($canSaveCanonical && $isUnpublishedDraft) {
+                $altActions[] = [
+                    'label' => Craft::t('app', 'Save {type}', [
+                        'type' => Craft::t('app', 'draft'),
+                    ]),
+                    'action' => 'elements/save-draft',
+                    'redirect' => sprintf('%s#', ElementHelper::postEditUrl($this)),
+                    'eventData' => ['autosave' => false],
+                ];
+            }
+
+            if (!$this->getIsRevision() && $elementsService->canDuplicateAsDraft($this)) {
+                $altActions[] = [
+                    'label' => Craft::t('app', 'Save as a new {type}', [
+                        'type' => static::lowerDisplayName(),
+                    ]),
+                    'action' => 'elements/duplicate',
+                    'redirect' => '{cpEditUrl}',
+                ];
+            }
+        }
+
+        // Fire a 'defineAltActions' event
+        if ($this->hasEventHandlers(self::EVENT_DEFINE_ALT_ACTIONS)) {
+            $event = new DefineAltActionsEvent([
+                'altActions' => $altActions,
+            ]);
+            $this->trigger(self::EVENT_DEFINE_ALT_ACTIONS, $event);
             return $event->altActions;
         }
 
-        return [];
+        return $altActions;
     }
 
     /**

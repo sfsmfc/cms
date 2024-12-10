@@ -311,13 +311,7 @@ class ElementsController extends Controller
 
         // Permissions
         $canSave = $this->_canSave($element, $user);
-
-        if ($isUnpublishedDraft) {
-            $canSaveCanonical = $this->_canApplyUnpublishedDraft($element, $user);
-        } else {
-            $canSaveCanonical = ($isCanonical || $element->isProvisionalDraft) ? $canSave : $elementsService->canSave($canonical, $user);
-        }
-
+        $canSaveCanonical = $elementsService->canSaveCanonical($element, $user);
         $canCreateDrafts = $elementsService->canCreateDrafts($canonical, $user);
         $canDuplicate = !$isRevision && $elementsService->canDuplicateAsDraft($element, $user);
 
@@ -482,20 +476,8 @@ class ElementsController extends Controller
             }
 
             $response
-                ->saveShortcutRedirectUrl('{cpEditUrl}');
-
-            foreach ($this->_additionalAltActions(
-                $element,
-                $type,
-                $user,
-                $redirectUrl,
-                $canSaveCanonical,
-                $canDuplicate,
-                $isCurrent,
-                $isUnpublishedDraft,
-            ) as $additionalAltAction) {
-                $response->addAltAction($additionalAltAction[0], $additionalAltAction[1]);
-            }
+                ->saveShortcutRedirectUrl('{cpEditUrl}')
+                ->altActions($element->getAltActions());
         }
 
         return $response;
@@ -785,82 +767,6 @@ class ElementsController extends Controller
         }
 
         return $items;
-    }
-
-    /**
-     * @param ElementInterface $element
-     * @param string $type
-     * @param User|null $user
-     * @param string $redirectUrl
-     * @param bool $canSaveCanonical
-     * @param bool $canDuplicate
-     * @param bool $isCurrent
-     * @param bool $isUnpublishedDraft
-     * @return array[]
-     */
-    private function _additionalAltActions(
-        ElementInterface $element,
-        string $type,
-        ?User $user,
-        string $redirectUrl,
-        bool $canSaveCanonical,
-        bool $canDuplicate,
-        bool $isCurrent,
-        bool $isUnpublishedDraft,
-    ): array {
-        $elementsService = Craft::$app->getElements();
-
-        $altActions = [
-            [
-                $isUnpublishedDraft && $canSaveCanonical
-                    ? Craft::t('app', 'Create and continue editing')
-                    : Craft::t('app', 'Save and continue editing'),
-                [
-                    'redirect' => '{cpEditUrl}',
-                    'shortcut' => true,
-                    'retainScroll' => true,
-                    'eventData' => ['autosave' => false],
-                ],
-            ],
-        ];
-
-        if ($isCurrent) {
-            $newElement = $element->createAnother();
-            if ($newElement && $elementsService->canSave($newElement, $user)) {
-                $altActions[] = [
-                    $isUnpublishedDraft && $canSaveCanonical
-                        ? Craft::t('app', 'Create and add another')
-                        : Craft::t('app', 'Save and add another'),
-                    [
-                        'shortcut' => true,
-                        'shift' => true,
-                        'eventData' => ['autosave' => false],
-                        'params' => ['addAnother' => 1],
-                    ],
-                ];
-            }
-
-            if ($canSaveCanonical && $isUnpublishedDraft) {
-                $altActions[] = [Craft::t('app', 'Save {type}', [
-                    'type' => Craft::t('app', 'draft'),
-                ]), [
-                    'action' => 'elements/save-draft',
-                    'redirect' => "$redirectUrl#",
-                    'eventData' => ['autosave' => false],
-                ]];
-            }
-
-            if ($canDuplicate) {
-                $altActions[] = [Craft::t('app', 'Save as a new {type}', compact('type')), [
-                    'action' => 'elements/duplicate',
-                    'redirect' => '{cpEditUrl}',
-                ]];
-            }
-        }
-
-        $altActions = array_merge($altActions, $element->getAdditionalAltActions());
-
-        return $altActions;
     }
 
     private function _additionalButtons(
@@ -1862,12 +1768,10 @@ JS, [
 
         $isUnpublishedDraft = $element->getIsUnpublishedDraft();
 
-        if ($isUnpublishedDraft) {
-            if (!$this->_canApplyUnpublishedDraft($element, $user)) {
-                throw new ForbiddenHttpException('User not authorized to create this element.');
-            }
-        } elseif (!$elementsService->canSave($element->getCanonical(true), $user)) {
-            throw new ForbiddenHttpException('User not authorized to save this element.');
+        if (!$elementsService->canSaveCanonical($element, $user)) {
+            throw new ForbiddenHttpException($isUnpublishedDraft
+                ? 'User not authorized to create this element.'
+                : 'User not authorized to save this element.');
         }
 
         // Validate and save the draft
@@ -2566,20 +2470,6 @@ JS, [
         }
 
         return Craft::$app->getElements()->canSave($element, $user);
-    }
-
-    /**
-     * Returns whether an unpublished draft can shed its draft status by the given user.
-     *
-     * @param ElementInterface $element
-     * @param User $user
-     * @return bool
-     */
-    private function _canApplyUnpublishedDraft(ElementInterface $element, User $user): bool
-    {
-        $fakeCanonical = clone $element;
-        $fakeCanonical->draftId = null;
-        return Craft::$app->getElements()->canSave($fakeCanonical, $user);
     }
 
     /**
