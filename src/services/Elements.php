@@ -4307,6 +4307,25 @@ SQL;
     }
 
     /**
+     * Returns whether a user is authorized to save the canonical version of the given element.
+     *
+     * @param ElementInterface $element
+     * @param User|null $user
+     * @return bool
+     * @since 5.6.0
+     */
+    public function canSaveCanonical(ElementInterface $element, ?User $user = null): bool
+    {
+        if ($element->getIsUnpublishedDraft()) {
+            $fakeCanonical = clone $element;
+            $fakeCanonical->draftId = null;
+            return $this->canSave($fakeCanonical, $user);
+        }
+
+        return $this->canSave($element->getCanonical(true), $user);
+    }
+
+    /**
      * Returns whether a user is authorized to duplicate the given element.
      *
      * This should always be called in conjunction with [[canView()]] or [[canSave()]].

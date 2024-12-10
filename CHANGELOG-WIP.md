@@ -46,12 +46,15 @@
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
 
 ### Extensibility
+- Added `craft\base\Element::EVENT_DEFINE_ALT_ACTIONS`. ([#16294](https://github.com/craftcms/cms/pull/16294))
+- Added `craft\base\ElementInterface::getAltActions()`. ([#16294](https://github.com/craftcms/cms/pull/16294))
 - Added `craft\base\conditions\BaseElementSelectConditionRule::allowMultiple()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::getElementIds()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::setElementIds()`.
 - Added `craft\elements\User::$affiliatedSiteId`.
 - Added `craft\elements\User::getAffiliatedSite()`.
 - Added `craft\elements\conditions\entries\FieldConditionRule`.
+- Added `craft\events\DefineAltActionsEvent`.
 - Added `craft\fields\Color::$allowCustomColors`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added `craft\fields\Color::$palette`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added `craft\fields\Color::getDefaultColor()`. ([#16249](https://github.com/craftcms/cms/pull/16249))
@@ -69,6 +72,7 @@
 - Added `craft\mail\Mailer::$siteId`.
 - Added `craft\mail\Mailer::$siteOverrides`.
 - Added `craft\models\MailSettings::$siteOverrides`.
+- Added `craft\services\Elements::canSaveCanonical()`.
 - Added `craft\web\View::setTwig()`.
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
