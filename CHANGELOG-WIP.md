@@ -7,6 +7,7 @@
 - The global sidebar no longer shows “Failed” for queue jobs, for users that don’t have access to the Queue Manager. ([#16184](https://github.com/craftcms/cms/issues/16184))
 - Addresses and Matrix fields now show provisional drafts when previewing an owner element. ([#16295](https://github.com/craftcms/cms/issues/16295))
 - Color fields with a predefined color palette now primarily show a color select dropdown, rather than a manual color input. ([#16249](https://github.com/craftcms/cms/pull/16249))
+- Improved how fields are sized in responsive field layouts. ([#16303](https://github.com/craftcms/cms/pull/16303)) 
 
 ### Accessibility
 - Improved the accessibility of Checkboxes and Radio Buttons fields that allow custom options. ([#16080](https://github.com/craftcms/cms/pull/16080))
