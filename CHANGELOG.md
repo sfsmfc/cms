@@ -1,6 +1,6 @@
 # Release Notes for Craft CMS 5
 
-## Unreleased
+## 5.5.6 - 2024-12-10
 
 - Fixed a bug where some blank user group and entry type values weren’t getting omitted from project config data. ([#16272](https://github.com/craftcms/cms/pull/16272), [#16273](https://github.com/craftcms/cms/pull/16273))
 - Fixed a bug where pressing <kbd>Return</kbd> when a color text input within an editable table was focused was submitting the form rather than moving focus to the next row.
