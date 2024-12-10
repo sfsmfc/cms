@@ -103,13 +103,14 @@ class Template extends BaseUiElement
      */
     protected function settingsHtml(): ?string
     {
-        return Cp::textFieldHtml([
+        return Cp::autosuggestFieldHtml([
             'label' => Craft::t('app', 'Template'),
             'instructions' => Craft::t('app', 'The path to a template file within your `templates/` folder.'),
             'tip' => Craft::t('app', 'The template will be rendered with an `element` variable.'),
             'class' => 'code',
             'id' => 'template',
             'name' => 'template',
+            'suggestTemplates' => true,
             'value' => $this->template,
         ]);
     }

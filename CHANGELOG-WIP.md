@@ -33,6 +33,7 @@
 - The Queue Manager utility now shows jobs’ class names. ([#16228](https://github.com/craftcms/cms/pull/16228))
 - Improved the wording of field instance action labels. ([#16261](https://github.com/craftcms/cms/discussions/16261))
 - Templates rendered for “Template” field layout UI elements can now call control panel template functions like `elementChip()` and `elementCard()`. ([#16267](https://github.com/craftcms/cms/issues/16267))
+- “Template” field layout UI elements now show suggestions for the Template input.
 - Improved the error output for nested elements when they can’t be resaved via `resave` commands.
 - `resave` commands’ `--drafts`, `--provisional-drafts`, and `--revisions` options can now be set to `null`, causing elements to be resaved regardless of whether they’re drafts/provisional drafts/revisions.
 
@@ -82,8 +83,9 @@
 - `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260))
 - Deprecated `craft\fields\Color::$presets`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Deprecated `craft\fields\Link::$showTargetField`.
+- `_includes/forms/autosuggest.twig` now supports a `suggestTemplates` variable. 
 - `_includes/forms/colorSelect.twig` now supports `options` and `withBlankOption` variables.
-- `_includes/forms/selectize.twig` now supports a `color` property in option data, which can be set to a hex value or a color name. 
+- `_includes/forms/selectize.twig` now supports a `color` property in option data, which can be set to a hex value or a color name.
 - Sortable checkbox selects now always display the selected options first on initial render.
 
 ### System
