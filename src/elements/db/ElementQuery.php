@@ -152,6 +152,14 @@ class ElementQuery extends Query implements ElementQueryInterface
     public bool $asArray = false;
 
     /**
+     * @var bool Whether to replace canonical elements with provisional drafts,
+     * when they exist for the current user.
+     * @used-by withProvisionalDrafts()
+     * @since 5.6.0
+     */
+    public bool $withProvisionalDrafts = false;
+
+    /**
      * @var bool Whether to ignore placeholder elements when populating the results.
      * @used-by ignorePlaceholders()
      * @since 3.2.9
@@ -675,6 +683,16 @@ class ElementQuery extends Query implements ElementQueryInterface
     public function asArray(bool $value = true): static
     {
         $this->asArray = $value;
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     * @uses $withProvisionalDrafts
+     */
+    public function withProvisionalDrafts(bool $value = true): static
+    {
+        $this->withProvisionalDrafts = $value;
         return $this;
     }
 
@@ -3545,7 +3563,6 @@ class ElementQuery extends Query implements ElementQueryInterface
      */
     private function _createElements(array $rows): array
     {
-        $elementsService = Craft::$app->getElements();
         $elements = [];
 
         if ($this->asArray === true) {
@@ -3578,6 +3595,10 @@ class ElementQuery extends Query implements ElementQueryInterface
 
                     $elements[$key] = $element;
                 }
+            }
+
+            if ($this->withProvisionalDrafts) {
+                ElementHelper::swapInProvisionalDrafts($elements);
             }
 
             // Fire an 'afterPopulateElements' event

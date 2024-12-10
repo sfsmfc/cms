@@ -11,6 +11,8 @@ use Craft;
 use craft\base\ElementInterface;
 use craft\helpers\Cp;
 use craft\helpers\Html;
+use craft\web\twig\CpExtension;
+use craft\web\twig\Environment;
 use craft\web\View;
 use Throwable;
 
@@ -22,6 +24,25 @@ use Throwable;
  */
 class Template extends BaseUiElement
 {
+    private static Environment $twig;
+
+    /**
+     * @return Environment
+     */
+    private static function twig(): Environment
+    {
+        if (!isset(self::$twig)) {
+            $view = Craft::$app->getView();
+            $templateMode = $view->getTemplateMode();
+            $view->setTemplateMode(View::TEMPLATE_MODE_SITE);
+            self::$twig = Craft::$app->getView()->createTwig();
+            self::$twig->addExtension(new CpExtension());
+            $view->setTemplateMode($templateMode);
+        }
+
+        return self::$twig;
+    }
+
     /**
      * @var string The template path
      */
@@ -102,13 +123,22 @@ class Template extends BaseUiElement
             return $this->_error(Craft::t('app', 'No template path has been chosen yet.'), 'warning');
         }
 
+        $view = Craft::$app->getView();
+        $templateMode = $view->getTemplateMode();
+        $view->setTemplateMode(View::TEMPLATE_MODE_SITE);
+        $twig = $view->getTwig();
+        $view->setTwig(self::twig());
+
         try {
-            $content = trim(Craft::$app->getView()->renderTemplate($this->template, [
+            $content = trim($view->renderTemplate($this->template, [
                 'element' => $element,
                 'static' => $static,
             ], $this->templateMode));
         } catch (Throwable $e) {
             return $this->_error($e->getMessage(), 'error');
+        } finally {
+            $view->setTwig($twig);
+            $view->setTemplateMode($templateMode);
         }
 
         if ($content === '') {

@@ -6,6 +6,7 @@
 - Fixed a bug where pressing <kbd>Return</kbd> when a color text input within an editable table was focused was submitting the form rather than moving focus to the next row.
 - Fixed a JavaScript error that occurred on the Plugins index page, if there were any missing plugins associated with the Craft CMS license and no plugins were Composer-installed yet.
 - Fixed a bug where custom fields would stay visible within Field Layout Designer field libraries when they didn’t match the search criteria, if they had previously been dragged. ([#16277](https://github.com/craftcms/cms/issues/16277))
+- Fixed a bug where new, unsaved nested addresses and entries could cause validation errors when saving the owner element. ([#16282](https://github.com/craftcms/cms/issues/16282))
 
 ## 5.5.5 - 2024-12-03
 

@@ -385,6 +385,21 @@ class View extends \yii\web\View
     }
 
     /**
+     * Sets the Twig environment for the current template mode.
+     *
+     * @param Environment $twig
+     * @since 5.6.0
+     */
+    public function setTwig(Environment $twig): void
+    {
+        if ($this->_templateMode === self::TEMPLATE_MODE_CP) {
+            $this->_cpTwig = $twig;
+        } else {
+            $this->_siteTwig = $twig;
+        }
+    }
+
+    /**
      * Creates a new Twig environment.
      *
      * @return Environment

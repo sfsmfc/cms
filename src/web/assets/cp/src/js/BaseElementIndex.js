@@ -4612,6 +4612,7 @@ const FilterHud = Garnish.HUD.extend({
         condition: this.elementIndex.settings.condition,
         conditionConfig: this.conditionConfig,
         serialized: this.serialized,
+        fieldLayouts: this.elementIndex.$source.data('field-layouts'),
         id: `${this.id}-filters`,
       },
     })

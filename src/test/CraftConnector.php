@@ -132,7 +132,7 @@ class CraftConnector extends Yii2
      *
      * @inheritDoc
      */
-    public function startApp(\yii\log\Logger $logger = null)
+    public function startApp(\yii\log\Logger $logger = null): void
     {
         parent::startApp($logger);
 
