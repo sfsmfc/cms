@@ -991,7 +991,7 @@ return [
     'Move to' => 'Verplaatsen naar',
     'Move to…' => 'Verplaatsen naar...',
     'Move up' => 'Omhoog',
-    'Move' => 'Bewegen',
+    'Move' => 'Verplaatsen',
     'Move…' => 'Verplaatsen…',
     'Multi-line text' => 'Multi-lijn tekst',
     'Multi-select Options' => 'Multi-selectie-opties',
