@@ -3458,7 +3458,7 @@ table {
     flex-direction: row;
     align-items: center;
     gap: var(--s);
-    max-width: 100%;
+    width: 100%;
 
     .status,
     .icon {
@@ -3468,6 +3468,10 @@ table {
     .icon {
       margin-block: -4px 0;
       margin-inline: -1px;
+    }
+
+    .label {
+      flex: 1;
     }
 
     .chip-label {
@@ -7706,8 +7710,6 @@ textarea.text.fullwidth {
 }
 
 .link-input {
-  container-type: inline-size;
-
   & > .flex {
     & > div {
       &.text-link {
@@ -7745,17 +7747,23 @@ textarea.text.fullwidth {
         }
       }
     }
-  }
 
-  @container (max-width: 399px) {
-    & {
-      flex-direction: column;
-      align-items: start;
+    @container (max-width: calc(399rem/16)) {
+      & {
+        flex-direction: column;
+        align-items: stretch;
 
-      & > .select,
-      & > .select select,
-      & > div > .text {
-        width: 100%;
+        & > .select,
+        & > .select select,
+        & > div[data-link-type] .text,
+        & > div[data-link-type] .chip {
+          display: flex;
+          width: 100%;
+        }
+
+        & > div[data-link-type] ul.elements {
+          align-items: stretch;
+        }
       }
     }
   }
@@ -7862,6 +7870,7 @@ fieldset {
 
   & > .input {
     position: relative;
+    container-type: inline-size;
 
     & + .instructions {
       margin-block: 5px 0;
