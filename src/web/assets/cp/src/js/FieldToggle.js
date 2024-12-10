@@ -155,7 +155,16 @@ Craft.FieldToggle = Garnish.Base.extend({
     return val.replace(/[^\w]+/g, '-');
   },
 
-  onToggleChange: function () {
+  onToggleChange: async function (force = false) {
+    // is this a selectize input and does it look like it was just opened?
+    const selectize = this.$toggle.data('selectize');
+    if (selectize && this.$toggle.val() === '') {
+      await Craft.sleep(1);
+      if (selectize.isOpen) {
+        return;
+      }
+    }
+
     if (this.type === 'select' || this.type === 'fieldset') {
       this.hideTarget(this._$target);
       this.findTargets();

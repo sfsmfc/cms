@@ -1294,6 +1294,7 @@ class Cp
                     'hasThumbs' => $elementType::hasThumbs(),
                     'defaultSort' => $config['defaultSort'],
                     'defaultViewMode' => $config['defaultViewMode'],
+                    'fieldLayouts' => $config['fieldLayouts'],
                 ],
             ];
 
@@ -1713,6 +1714,19 @@ JS, [
     {
         $config['id'] = $config['id'] ?? 'checkboxgroup' . mt_rand();
         return static::fieldHtml('template:_includes/forms/checkboxGroup.twig', $config);
+    }
+
+    /**
+     * Renders a color input’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.6.0
+     */
+    public static function colorHtml(array $config): string
+    {
+        return static::renderTemplate('_includes/forms/color.twig', $config);
     }
 
     /**

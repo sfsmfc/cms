@@ -1816,11 +1816,7 @@ li.breadcrumb-toggle-wrapper {
 }
 
 /* flexbox field layouts */
-#content :not(.meta) > .flex-fields,
-#content > .flex-fields,
-.so-content .flex-fields,
-.lp-content .flex-fields,
-.draghelper .flex-fields {
+.flex-fields {
   --row-gap: var(--xl);
   display: flex;
   flex-wrap: wrap;
@@ -1828,6 +1824,7 @@ li.breadcrumb-toggle-wrapper {
   margin-block: 0 calc(var(--padding) * -1);
   margin-inline: calc(var(--padding) * -1);
   width: calc(100% + var(--padding) * 2);
+  container-type: inline-size;
 
   & > :not(.error-summary) {
     margin-block: 0 var(--row-gap) !important;
@@ -1874,16 +1871,12 @@ li.breadcrumb-toggle-wrapper {
       }
     }
   }
-}
 
-#content :not(.meta) > .flex-fields,
-#content > .flex-fields,
-.draghelper.drag-in-content .flex-fields {
   & > :not(h2, hr, .line-break) {
     &,
     &:last-child {
-      // 4 cols for container width >= 888px
-      @container (min-width: 55.5em) {
+      // 4 cols for container width >= 800px
+      @container (min-width: calc(800rem/16)) {
         &.width-25 {
           width: 25%;
         }
@@ -1897,27 +1890,9 @@ li.breadcrumb-toggle-wrapper {
         }
       }
 
-      // 2 cols when container width > 584px and < 887px
-      @container (min-width: 36.5em) and (max-width: 55.4375em) {
-        &.width-25,
-        &.width-50 {
-          width: 50%;
-        }
-      }
-    }
-  }
-}
-
-.so-content .flex-fields,
-.lp-content .flex-fields,
-.draghelper.drag-in-slideout .flex-fields {
-  & > :not(h2, hr, .line-break) {
-    &,
-    &:last-child {
-      // 2 cols for >= 1200
-      @media only screen and (min-width: $minDesktopWidth * 2) {
-        &.width-25,
-        &.width-50 {
+      // 2 cols when container width >= 400px and < 800px
+      @container (min-width: calc(400rem/16)) and (max-width: calc(800rem/16 - 1px)) {
+        &.width-25 {
           width: 50%;
         }
       }
