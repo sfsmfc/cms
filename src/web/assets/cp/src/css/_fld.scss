@@ -113,7 +113,7 @@ $gridColor: var(--gray-100);
   }
 
   .filtered {
-    display: none;
+    display: none !important;
   }
 }
 
