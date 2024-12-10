@@ -434,7 +434,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 $linkType = Component::createComponent($type, BaseLinkType::class);
             }
 
-            $value = $linkType->normalizeValue(str_replace(' ', '+', $value));
+            $value = $linkType->normalizeValue($value);
         } else {
             if (!$value) {
                 return null;
