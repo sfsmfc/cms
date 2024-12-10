@@ -220,6 +220,7 @@ a#system-info {
 
 #global-footer {
   --link-color: #1453db;
+  --link-icon-color: #2c61de;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -275,8 +276,6 @@ a#system-info {
 }
 
 #edition-logo {
-  position: relative;
-  inset-block-start: -1px;
   user-select: none;
   border: 1px solid var(--gray-600);
   border-radius: 3px;
@@ -284,11 +283,10 @@ a#system-info {
   box-sizing: content-box;
   font-size: 11px;
   padding-block: 6px;
-  padding-inline: 7px;
+  padding-inline: 7px 5px;
   line-height: 8px;
   font-weight: 600;
   letter-spacing: 1.7px;
-  padding-inline-end: 5px;
   text-transform: uppercase;
 }
 
