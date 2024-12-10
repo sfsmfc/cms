@@ -163,7 +163,7 @@ class LinkData extends BaseObject implements Serializable
                 'class' => $this->class,
                 'id' => $this->id,
                 'rel' => $this->rel,
-                'ariaLabel' => $this->ariaLabel,
+                'aria-label' => $this->ariaLabel,
             ]);
         }
 
