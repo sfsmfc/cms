@@ -1,6 +1,6 @@
 # Release Notes for Craft CMS 5
 
-## Unreleased
+## 5.5.6.1 - 2024-12-11
 
 - Fixed a bug where Tags fields had “Replace” actions. ([#16310](https://github.com/craftcms/cms/issues/16310))
 - Fixed styling issues. ([#16298](https://github.com/craftcms/cms/issues/16298), [#16312](https://github.com/craftcms/cms/issues/16312))
