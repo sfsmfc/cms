@@ -1861,6 +1861,12 @@ class Elements extends Component
         $mainClone->setScenario(Element::SCENARIO_ESSENTIALS);
         $mainClone->validate();
 
+        // If there are any errors on the URI, re-validate as disabled
+        if ($mainClone->hasErrors('uri') && $mainClone->enabled) {
+            $mainClone->enabled = false;
+            $mainClone->validate();
+        }
+
         if ($mainClone->hasErrors()) {
             throw new InvalidElementException($mainClone, 'Element ' . $element->id . ' could not be duplicated because it doesn\'t validate.');
         }
@@ -4298,6 +4304,25 @@ SQL;
         }
 
         return $this->_authCheck($element, $user, self::EVENT_AUTHORIZE_SAVE) ?? $element->canSave($user);
+    }
+
+    /**
+     * Returns whether a user is authorized to save the canonical version of the given element.
+     *
+     * @param ElementInterface $element
+     * @param User|null $user
+     * @return bool
+     * @since 5.6.0
+     */
+    public function canSaveCanonical(ElementInterface $element, ?User $user = null): bool
+    {
+        if ($element->getIsUnpublishedDraft()) {
+            $fakeCanonical = clone $element;
+            $fakeCanonical->draftId = null;
+            return $this->canSave($fakeCanonical, $user);
+        }
+
+        return $this->canSave($element->getCanonical(true), $user);
     }
 
     /**

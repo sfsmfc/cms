@@ -105,7 +105,7 @@
             instructions: "The template Craft CMS will use for HTML emails"|t('app'),
             id: 'template',
             name: 'template',
-            suggestions: craft.cp.getTemplateSuggestions(),
+            suggestTemplates: true,
             suggestEnvVars: true,
             value: settings.template,
             errors: (freshSettings ? null : settings.getErrors('template')),

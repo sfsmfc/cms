@@ -389,10 +389,12 @@ class Addresses extends Field implements
             $query->setCachedResult([]);
         } elseif ($value === '*') {
             // preload the nested entries so NestedElementManager::saveNestedElements() doesn't resave them all
-            $query->drafts(null)->status(null)->limit(null);
+            $query->drafts(null)->savedDraftsOnly()->status(null)->limit(null);
             $query->setCachedResult($query->all());
         } elseif ($element && is_array($value)) {
             $query->setCachedResult($this->createAddressesFromSerializedData($value, $element, $fromRequest));
+        } elseif (Craft::$app->getRequest()->getIsPreview()) {
+            $query->withProvisionalDrafts();
         }
 
         return $query;

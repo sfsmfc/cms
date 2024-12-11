@@ -413,6 +413,19 @@ $.extend(Craft, {
   },
 
   /**
+   * Sleeps for the given duration in milliseconds.
+   *
+   * @param {number} delay
+   * @return {Promise}
+   * @since 5.6.0
+   */
+  sleep: function (delay) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, delay);
+    });
+  },
+
+  /**
    * @param {string} [path]
    * @param {(Object|string)} [params]
    * @param {string} [baseUrl]
