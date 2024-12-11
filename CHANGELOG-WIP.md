@@ -46,6 +46,7 @@
 - It’s now possible to pass nested custom field value keys into element queries’ `orderBy` and `select` params (e.g. `myDateField.tz`). ([#16157](https://github.com/craftcms/cms/discussions/16157))
 - It’s now possible to set Link field values to arrays with `value` keys set to element instances or IDs. ([#16255](https://github.com/craftcms/cms/pull/16255))
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
+- It’s now possible to reference custom field handles in element queries’ `where` params. ([#16318](https://github.com/craftcms/cms/pull/16318))
 
 ### Extensibility
 - Added `craft\base\Element::EVENT_DEFINE_ALT_ACTIONS`. ([#16294](https://github.com/craftcms/cms/pull/16294))
