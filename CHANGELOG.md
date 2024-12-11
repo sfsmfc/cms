@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed a bug where Tags fields had “Replace” actions. ([#16310](https://github.com/craftcms/cms/issues/16310))
 - Fixed a styling issue in Safari. ([#16298](https://github.com/craftcms/cms/issues/16298))
 
 ## 5.5.6 - 2024-12-10
