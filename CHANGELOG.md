@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 5
 
+## Unreleased
+
+- Fixed a bug where field conditions weren’t taking effect within Matrix fields set to inline-editable blocks mode, if the owner element didn’t support drafts. ([#16315](https://github.com/craftcms/cms/pull/16315))
+
 ## 5.5.6.1 - 2024-12-11
 
 - Fixed a bug where Tags fields had “Replace” actions. ([#16310](https://github.com/craftcms/cms/issues/16310))
