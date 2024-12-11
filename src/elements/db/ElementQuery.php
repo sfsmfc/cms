@@ -1543,14 +1543,12 @@ class ElementQuery extends Query implements ElementQueryInterface
             );
         }
 
-        $db = $builder->db;
-        if (!$db instanceof Connection) {
+        if (!$builder->db instanceof Connection) {
             throw new QueryAbortedException(sprintf('Element queries must be executed for %s connections.', Connection::class));
         }
 
         // todo: remove after the next breakpoint
-        /** @var  */
-        if (!$db->columnExists(Table::ELEMENTS_SITES, 'content')) {
+        if (!$builder->db->columnExists(Table::ELEMENTS_SITES, 'content')) {
             throw new QueryAbortedException("The elements_sites.content column doesn't exist yet.");
         }
 
@@ -1710,7 +1708,7 @@ class ElementQuery extends Query implements ElementQueryInterface
         }
 
         // Map custom field handles to their content values
-        $isMysql = $db->getIsMysql();
+        $isMysql = $builder->db->getIsMysql();
         foreach ($this->customFields as $field) {
             $dbTypes = $field::dbType();
 
@@ -1752,7 +1750,7 @@ class ElementQuery extends Query implements ElementQueryInterface
         $this->_applyRevisionParams();
         $this->_applySearchParam();
         $this->_applyInBulkOpParam();
-        $this->_applyOrderByParams($db);
+        $this->_applyOrderByParams($builder->db);
         $this->_applySelectParam();
         $this->_applyJoinParams();
 
@@ -1774,7 +1772,7 @@ class ElementQuery extends Query implements ElementQueryInterface
             }
         }
 
-        $this->_applyUniqueParam($db);
+        $this->_applyUniqueParam($builder->db);
 
         // Pass along the cache info
         if ($this->queryCacheDuration !== null) {
