@@ -7660,6 +7660,8 @@ textarea.text.fullwidth {
 }
 
 .link-input {
+  container-type: inline-size;
+
   & > .flex {
     & > div {
       &.text-link {
@@ -7820,7 +7822,6 @@ fieldset {
 
   & > .input {
     position: relative;
-    container-type: inline-size;
 
     & + .instructions {
       margin-block: 5px 0;
