@@ -26,4 +26,10 @@ class DefineAttributeHtmlEvent extends Event
      * @var string|null The attribute’s HTML.
      */
     public ?string $html = null;
+
+    /**
+     * @var string The display mode the element is being shown in.
+     * @since 5.6.0
+     */
+    public string $displayMode;
 }
