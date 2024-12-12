@@ -679,6 +679,8 @@ class Matrix extends Field implements
             $query->setCachedResult($query->all());
         } elseif ($element && is_array($value)) {
             $query->setCachedResult($this->_createEntriesFromSerializedData($value, $element, $fromRequest));
+        } elseif (Craft::$app->getRequest()->getIsPreview()) {
+            $query->withProvisionalDrafts();
         }
 
         return $query;

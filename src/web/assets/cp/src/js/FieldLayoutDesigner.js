@@ -866,18 +866,13 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
     }).appendTo(this.$container);
     const disclosureMenu = $actionBtn.disclosureMenu().data('disclosureMenu');
 
-    let makeRequiredBtn,
-      dropRequiredBtn,
-      makeThumbnailBtn,
-      dropThumbnailBtn,
-      showInCardsBtn,
-      omitFromCardsBtn;
+    let makeRequiredBtn, dropRequiredBtn, makeThumbnailBtn, dropThumbnailBtn;
 
     this.hasSettings = Garnish.hasAttr(this.$container, 'data-has-settings');
 
     if (this.hasSettings) {
       disclosureMenu.addItem({
-        label: Craft.t('app', 'Settings'),
+        label: Craft.t('app', 'Instance settings'),
         icon: 'gear',
         onActivate: () => {
           this.createSettings();
@@ -891,7 +886,7 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
 
     if (this.fieldId) {
       disclosureMenu.addItem({
-        label: Craft.t('app', 'Edit field'),
+        label: Craft.t('app', 'Edit global field settings'),
         icon: 'pencil',
         onActivate: () => {
           this.showFieldEditor();

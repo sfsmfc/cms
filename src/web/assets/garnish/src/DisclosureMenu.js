@@ -524,8 +524,12 @@ export default Base.extend(
         el.classList.add('error');
         el.setAttribute('data-destructive', 'true');
       }
+      if (item.disabled) {
+        el.classList.add('disabled');
+      }
       if (item.action) {
         el.classList.add('formsubmit');
+        $(el).formsubmit();
       }
       if (type === 'link') {
         el.href = Craft.getUrl(item.url);

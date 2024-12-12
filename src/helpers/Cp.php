@@ -1197,6 +1197,7 @@ class Cp
             'showStatusMenu' => 'auto',
             'showSiteMenu' => 'auto',
             'fieldLayouts' => [],
+            'defaultSort' => null,
             'defaultTableColumns' => null,
             'registerJs' => true,
             'jsSettings' => [],
@@ -1291,7 +1292,9 @@ class Cp
                     'key' => '__IMP__',
                     'label' => Craft::t('app', 'All elements'),
                     'hasThumbs' => $elementType::hasThumbs(),
+                    'defaultSort' => $config['defaultSort'],
                     'defaultViewMode' => $config['defaultViewMode'],
+                    'fieldLayouts' => $config['fieldLayouts'],
                 ],
             ];
 
@@ -1711,6 +1714,19 @@ JS, [
     {
         $config['id'] = $config['id'] ?? 'checkboxgroup' . mt_rand();
         return static::fieldHtml('template:_includes/forms/checkboxGroup.twig', $config);
+    }
+
+    /**
+     * Renders a color input’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.6.0
+     */
+    public static function colorHtml(array $config): string
+    {
+        return static::renderTemplate('_includes/forms/color.twig', $config);
     }
 
     /**
@@ -3231,13 +3247,17 @@ JS;
      *
      * @param string $icon
      * @param string|null $fallbackLabel
+     * @param string|null $altText
      * @return string
      * @since 5.0.0
      */
-    public static function iconSvg(string $icon, ?string $fallbackLabel = null): string
+    public static function iconSvg(string $icon, ?string $fallbackLabel = null, ?string $altText = null): string
     {
         $locale = Craft::$app->getLocale();
         $orientation = $locale->getOrientation();
+        $attributes = [
+            'focusable' => 'false',
+        ];
 
         // BC support for some legacy icon names
         $icon = match ($icon) {
@@ -3326,11 +3346,22 @@ JS;
             return self::fallbackIconSvg($fallbackLabel);
         }
 
-        // Add aria-hidden="true"
+        if ($altText !== null) {
+            $attributes['aria'] = ['label' => $altText];
+            $attributes['role'] = 'img';
+        } else {
+            $attributes['aria'] = [
+                'hidden' => 'true',
+                'labelledby' => false,
+            ];
+        }
+
+        // Remove title tag
+        $svg = preg_replace(Html::TITLE_TAG_RE, '', $svg);
+
+        // Add attributes for accessibility
         try {
-            $svg = Html::modifyTagAttributes($svg, [
-                'aria' => ['hidden' => 'true'],
-            ]);
+            $svg = Html::modifyTagAttributes($svg, $attributes);
         } catch (InvalidArgumentException) {
         }
 
