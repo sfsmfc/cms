@@ -235,6 +235,23 @@ class Lightswitch extends Field implements InlineEditableFieldInterface, Sortabl
      */
     public function getPreviewHtml(mixed $value, ElementInterface $element): string
     {
+        if ($element->getDisplayMode() == 'cards' && !$value) {
+            $label = $this->offLabel ?: Craft::t('app', 'Disabled');
+
+            return
+                Html::tag('span', '', [
+                    'class' => 'cross-icon',
+                    'role' => 'img',
+                    'title' => $label,
+                    'aria' => [
+                        'label' => $label,
+                    ],
+                ]) .
+                Html::tag('span', $this->getUiLabel(), [
+                    'class' => 'checkbox-preview-label',
+                ]);
+        }
+
         if (!$value) {
             return '';
         }

@@ -8025,6 +8025,24 @@ body.reduce-focus-visibility {
   }
 }
 
+.cross-icon {
+  display: inline-flex;
+  padding-block: 0 4px;
+  padding-inline: 5px;
+  background-color: var(--gray-600);
+  color: var(--white);
+  border-radius: var(--small-border-radius);
+
+  &::before {
+    --checkbox-size: 14px;
+    @include mixins.icon;
+    content: '\d7';
+    font-weight: bold;
+    line-height: var(--checkbox-size);
+    font-size: var(--checkbox-size);
+  }
+}
+
 .checkbox-preview-label {
   display: none;
 }
