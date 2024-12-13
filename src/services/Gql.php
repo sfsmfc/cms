@@ -1154,8 +1154,7 @@ class Gql extends Component
     /**
      * Returns the content arguments
      *
-     * @param string $elementType
-     * @phpstorm-param class-string<BaseElementInterface> $elementType
+     * @param class-string<BaseElementInterface> $elementType
      * @param callable $setter
      * @phpstan-param callable():array $setter
      * @return array
@@ -1172,8 +1171,7 @@ class Gql extends Component
     /**
      * Returns the content arguments for a given element type and field layouts.
      *
-     * @param string $elementType
-     * @phpstorm-param class-string<BaseElementInterface> $elementType
+     * @param class-string<BaseElementInterface> $elementType
      * @param FieldLayout[] $fieldLayouts
      * @return array
      * @since 5.0.0
@@ -1201,8 +1199,7 @@ class Gql extends Component
     /**
      * Returns the content arguments for a given element type and custom fields.
      *
-     * @param string $elementType
-     * @phpstorm-param class-string<BaseElementInterface> $elementType
+     * @param class-string<BaseElementInterface> $elementType
      * @param FieldInterface[] $fields
      * @return array
      * @since 5.0.0
