@@ -1456,7 +1456,7 @@ return [
     'Set up your site' => 'Konfigurer nettstedet ditt',
     'Set up' => 'Konfigurer',
     'Settings' => 'Innstillinger',
-    'Setup Key' => 'Konfigurasjonsnøkkel',
+    'Setup Key' => 'Oppsettnøkkelen',
     'Share query' => 'Del forespørsel',
     'Share' => 'Del',
     'Should icons that are exclusive to Font Awesome Pro be selectable? (<a href="{url}">View pricing</a>)' => 'Skal ikoner som er eksklusive for Font Awesome Pro være mulig å velge? /<a href="{url}">Vis priser</a>)',

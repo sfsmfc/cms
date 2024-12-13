@@ -2299,19 +2299,28 @@ JS, [
         }
 
         if ($elementUid) {
-            $withDrafts = false;
-            if (!Craft::$app->getConfig()->getGeneral()->autosaveDrafts) {
-                $withDrafts = null;
+            $element = $this->_elementQuery($elementType)
+                ->uid($elementUid)
+                ->siteId($siteId)
+                ->preferSites($preferSites)
+                ->unique()
+                ->status(null)
+                ->one();
+
+            if ($element) {
+                return $element;
             }
+
+            // check for an unpublished draft if we got this far
+            // (e.g. newly added matrix "block" or where autosaveDrafts is off)
+            // https://github.com/craftcms/cms/issues/15985
             return $this->_elementQuery($elementType)
                 ->uid($elementUid)
                 ->siteId($siteId)
                 ->preferSites($preferSites)
-                // when autosaveDrafts is off, we need search among drafts too
-                // https://github.com/craftcms/cms/issues/15985
-                ->drafts($withDrafts)
                 ->unique()
                 ->status(null)
+                ->draftOf(false)
                 ->one();
         }
 

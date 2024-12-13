@@ -890,8 +890,6 @@ li.sel > a {
   font-size: 11px;
   margin-block-start: -1px;
   padding-inline-start: 4px;
-  color: var(--link-color);
-  opacity: 0.9;
 
   body.ltr & {
     content: 'circlerarr';
@@ -7710,6 +7708,8 @@ textarea.text.fullwidth {
 }
 
 .link-input {
+  container-type: inline-size;
+
   & > .flex {
     & > div {
       &.text-link {
@@ -7870,7 +7870,6 @@ fieldset {
 
   & > .input {
     position: relative;
-    container-type: inline-size;
 
     & + .instructions {
       margin-block: 5px 0;

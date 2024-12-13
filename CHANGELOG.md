@@ -1,5 +1,15 @@
 # Release Notes for Craft CMS 5
 
+## Unreleased
+
+- Fixed a bug where field conditions weren’t taking effect within Matrix fields set to inline-editable blocks mode, if the owner element didn’t support drafts. ([#16315](https://github.com/craftcms/cms/pull/16315))
+- Fixed a bug where Matrix fields’ entry types weren’t maintaining their original block type order when upgrading to Craft 5. ([#16314](https://github.com/craftcms/cms/issues/16314))
+
+## 5.5.6.1 - 2024-12-11
+
+- Fixed a bug where Tags fields had “Replace” actions. ([#16310](https://github.com/craftcms/cms/issues/16310))
+- Fixed styling issues. ([#16298](https://github.com/craftcms/cms/issues/16298), [#16312](https://github.com/craftcms/cms/issues/16312))
+
 ## 5.5.6 - 2024-12-10
 
 - Fixed a bug where some blank user group and entry type values weren’t getting omitted from project config data. ([#16272](https://github.com/craftcms/cms/pull/16272), [#16273](https://github.com/craftcms/cms/pull/16273))
