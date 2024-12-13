@@ -21,6 +21,7 @@ use craft\helpers\ArrayHelper;
 use craft\helpers\Cp;
 use craft\helpers\StringHelper;
 use craft\models\FieldLayout;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use yii\base\Component;
 
@@ -277,6 +278,11 @@ class ElementSources extends Component
     {
         // Don't bother the element type for custom sources
         if (str_starts_with($sourceKey, 'custom:')) {
+            $sourceConfigs = $this->_sourceConfigs($elementType);
+            $sourceConfig = Arr::first($sourceConfigs, fn(array $config) => ($config['key'] ?? null) === $sourceKey);
+            if ($sourceConfig) {
+                return $elementType::fieldLayoutsForCustomSource($sourceConfig);
+            }
             return Craft::$app->getFields()->getLayoutsByType($elementType);
         }
 
