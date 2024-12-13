@@ -10,6 +10,7 @@ namespace craft\elements\db;
 use craft\base\ElementInterface;
 use craft\db\Query;
 use craft\elements\ElementCollection;
+use craft\models\FieldLayout;
 use yii\base\Arrayable;
 use yii\db\Connection;
 use yii\db\QueryInterface;
@@ -1658,4 +1659,12 @@ interface ElementQueryInterface extends QueryInterface, Arrayable
      * @since 3.6.0
      */
     public function afterPopulate(array $elements): array;
+
+    /**
+     * Returns the field layouts that could be associated with the resulting elements.
+     *
+     * @return FieldLayout[]
+     * @since 5.6.0
+     */
+    public function getFieldLayouts(): array;
 }
