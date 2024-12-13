@@ -51,7 +51,6 @@
 
 ### Extensibility
 - Added `craft\base\Element::EVENT_DEFINE_ALT_ACTIONS`. ([#16294](https://github.com/craftcms/cms/pull/16294))
-- Added `craft\base\ElementInterface::fieldLayoutsForCustomSource()`.
 - Added `craft\base\ElementInterface::getAltActions()`. ([#16294](https://github.com/craftcms/cms/pull/16294))
 - Added `craft\base\conditions\BaseElementSelectConditionRule::allowMultiple()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::getElementIds()`.
@@ -59,6 +58,8 @@
 - Added `craft\elements\User::$affiliatedSiteId`.
 - Added `craft\elements\User::getAffiliatedSite()`.
 - Added `craft\elements\conditions\entries\FieldConditionRule`.
+- Added `craft\elements\db\ElementQueryInterface::getFieldLayouts()`.
+- Added `craft\elements\db\NestedElementQueryTrait::fieldLayouts()`.
 - Added `craft\events\DefineAltActionsEvent`.
 - Added `craft\fields\BaseRelationField::gqlFieldArguments()`.
 - Added `craft\fields\Color::$allowCustomColors`. ([#16249](https://github.com/craftcms/cms/pull/16249))

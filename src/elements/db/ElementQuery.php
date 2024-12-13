@@ -2522,6 +2522,14 @@ class ElementQuery extends Query implements ElementQueryInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getFieldLayouts(): array
+    {
+        return $this->fieldLayouts();
+    }
+
+    /**
      * Returns the field layouts whose custom fields should be returned by [[customFields()]].
      *
      * @return FieldLayout[]

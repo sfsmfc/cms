@@ -394,64 +394,6 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
     }
 
     /**
-     * @interitdoc
-     */
-    public static function fieldLayoutsForCustomSource(array $config): array
-    {
-        if (empty($config['condition']['conditionRules'])) {
-            return parent::fieldLayoutsForCustomSource($config);
-        }
-
-        // see if it specifies any entry types
-        /** @var TypeConditionRule|null $entryTypeRule */
-        $entryTypeRule = ArrayHelper::firstWhere(
-            $config['condition']['conditionRules'],
-            fn(array $rule) => $rule['class'] === TypeConditionRule::class,
-        );
-        $entryTypeOptions = $entryTypeRule['operator'] === 'in' && !empty($entryTypeRule['values'])
-            ? $entryTypeRule['values']
-            : null;
-
-        if ($entryTypeOptions) {
-            $fieldLayouts = [];
-            $entriesService = Craft::$app->getEntries();
-            foreach ($entryTypeOptions as $entryTypeUid) {
-                $entryType = $entriesService->getEntryTypeByUid($entryTypeUid);
-                if ($entryType) {
-                    $fieldLayout = $entryType->getFieldLayout();
-                    $fieldLayouts[$fieldLayout->uid] = $fieldLayout;
-                }
-            }
-            return array_values($fieldLayouts);
-        }
-
-        /** @var SectionConditionRule|null $sectionRule */
-        $sectionRule = ArrayHelper::firstWhere(
-            $config['condition']['conditionRules'],
-            fn(array $rule) => $rule['class'] === SectionConditionRule::class,
-        );
-        $sectionOptions = $sectionRule['operator'] === 'in' && !empty($sectionRule['values'])
-            ? $sectionRule['values']
-            : null;
-
-        if ($sectionOptions) {
-            $fieldLayouts = [];
-            foreach ($sectionOptions as $sectionUid) {
-                $section = Craft::$app->getEntries()->getSectionByUid($sectionUid);
-                if ($section) {
-                    foreach ($section->getEntryTypes() as $entryType) {
-                        $fieldLayout = $entryType->getFieldLayout();
-                        $fieldLayouts[$fieldLayout->uid] = $fieldLayout;
-                    }
-                }
-            }
-            return array_values($fieldLayouts);
-        }
-
-        return parent::fieldLayoutsForCustomSource($config);
-    }
-
-    /**
      * @inheritdoc
      */
     protected static function defineActions(string $source): array

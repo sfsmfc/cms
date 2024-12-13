@@ -334,15 +334,6 @@ interface ElementInterface extends
     public static function fieldLayouts(?string $source): array;
 
     /**
-     * Returns all the field layouts associated with elements from the given custom source.
-     *
-     * @param array $config The custom source config
-     * @return FieldLayout[]
-     * @since 5.6.0
-     */
-    public static function fieldLayoutsForCustomSource(array $config): array;
-
-    /**
      * Modifies a custom source’s config, before it’s returned by [[craft\services\ElementSources::getSources()]]
      *
      * @param array $config

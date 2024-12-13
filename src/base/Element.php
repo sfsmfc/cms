@@ -1036,14 +1036,6 @@ abstract class Element extends Component implements ElementInterface
     /**
      * @inheritdoc
      */
-    public static function fieldLayoutsForCustomSource(array $config): array
-    {
-        return Craft::$app->getFields()->getLayoutsByType(static::class);
-    }
-
-    /**
-     * @inheritdoc
-     */
     public static function actions(string $source): array
     {
         $actions = Collection::make(static::defineActions($source));
