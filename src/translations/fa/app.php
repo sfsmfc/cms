@@ -469,7 +469,6 @@ return [
     'Current Password' => 'رمز عبور فعلی',
     'Current User Condition' => 'شرط کاربر فعلی',
     'Current' => 'فعلی',
-    'Currently SVG images do not support focal point.' => 'در حال حاضر تصاویر SVG از نقطه کانونی پشتیبانی نمی کند.',
     'Custom Fields' => 'فیلدهای سفارشی',
     'Custom' => 'شخصی‌سازی',
     'Customize sources' => 'شخصی‌سازی منابع',
