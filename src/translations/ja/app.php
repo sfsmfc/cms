@@ -442,7 +442,6 @@ return [
     'Current Password' => '現在のパスワード',
     'Current User Condition' => '現在のユーザーの条件',
     'Current' => '現在',
-    'Currently SVG images do not support focal point.' => '現在、SVG 画像では焦点をサポートしていません。',
     'Custom' => 'カスタム',
     'Customize sources' => 'ソースのカスタマイズ',
     'Custom…' => 'カスタム…',
