@@ -66,9 +66,7 @@ class AddressField extends BaseField
     public function previewHtml(ElementInterface $element): string
     {
         /** @var Address $element */
-        return Html::tag('div', Craft::$app->getAddresses()->formatAddress($element), [
-            'class' => 'no-truncate',
-        ]);
+        return Html::tag('div', Craft::$app->getAddresses()->formatAddress($element));
     }
 
     /**

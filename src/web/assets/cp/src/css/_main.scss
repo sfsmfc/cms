@@ -3738,7 +3738,7 @@ table {
         display: none;
       }
 
-      & > *:not(:has(> .no-truncate)) {
+      & > .card-attribute-preview {
         --max-lines: 2;
         margin: 0;
         max-height: calc(var(--lh) * var(--max-lines));

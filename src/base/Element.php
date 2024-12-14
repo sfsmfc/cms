@@ -3471,7 +3471,9 @@ abstract class Element extends Component implements ElementInterface
                 ? $item->previewHtml($this)
                 : $this->getAttributeHtml($item['value']);
             if ($itemHtml !== '') {
-                $html .= Html::tag('div', $itemHtml);
+                $html .= Html::tag('div', $itemHtml, [
+                    'class' => 'card-attribute-preview',
+                ]);
             }
         }
 
