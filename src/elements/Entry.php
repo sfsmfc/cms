@@ -2039,7 +2039,11 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
                 return $section ? Html::encode(Craft::t('site', $section->name)) : '';
             case 'type':
                 try {
-                    return Cp::chipHtml($this->getType());
+                    $config = [];
+                    if ($this->viewMode === 'cards') {
+                        $config['showThumb'] = false;
+                    }
+                    return Cp::chipHtml($this->getType(), $config);
                 } catch (InvalidConfigException) {
                     return Craft::t('app', 'Unknown');
                 }

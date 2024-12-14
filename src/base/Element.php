@@ -1312,6 +1312,10 @@ abstract class Element extends Component implements ElementInterface
             }
         }
 
+        foreach ($elements as $element) {
+            $element->viewMode = $viewState['mode'];
+        }
+
         $variables['elements'] = $elements;
         $template = '_elements/' . $viewState['mode'] . 'view/' . ($includeContainer ? 'container' : 'elements');
 
@@ -2617,6 +2621,7 @@ abstract class Element extends Component implements ElementInterface
             $names['searchScore'],
             $names['updateSearchIndexForOwner'],
             $names['updatingFromDerivative'],
+            $names['viewMode'],
         );
 
         $names['canonicalId'] = true;
@@ -3472,6 +3477,8 @@ abstract class Element extends Component implements ElementInterface
      */
     public function getCardBodyHtml(): ?string
     {
+        $this->viewMode = 'cards';
+
         $previews = array_filter(array_map(
             function(BaseField|array $item) {
                 if ($item instanceof BaseField) {
@@ -5506,7 +5513,9 @@ JS, [
     {
         // Fire a 'defineAttributeHtml' event
         if ($this->hasEventHandlers(self::EVENT_DEFINE_ATTRIBUTE_HTML)) {
-            $event = new DefineAttributeHtmlEvent(['attribute' => $attribute]);
+            $event = new DefineAttributeHtmlEvent([
+                'attribute' => $attribute,
+            ]);
             $this->trigger(self::EVENT_DEFINE_ATTRIBUTE_HTML, $event);
             if (isset($event->html)) {
                 return $event->html;
