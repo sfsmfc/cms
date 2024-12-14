@@ -48,6 +48,7 @@
 - Added the `withProvisionalDrafts` element query param, which causes the resulting elements to be replaced with any provisional drafts for the current user.
 - It’s now possible to pass nested custom field value keys into element queries’ `orderBy` and `select` params (e.g. `myDateField.tz`). ([#16157](https://github.com/craftcms/cms/discussions/16157))
 - It’s now possible to set Link field values to arrays with `value` keys set to element instances or IDs. ([#16255](https://github.com/craftcms/cms/pull/16255))
+- The `duration` Twig filter now has a `language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
 - It’s now possible to reference custom field handles in element queries’ `where` params. ([#16318](https://github.com/craftcms/cms/pull/16318))
 
@@ -88,6 +89,7 @@
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
 - `craft\helpers\Cp::elementIndexHtml()` now supports passing `defaultSort` in the `$config` array, when `sources` is `null`. ([#16236](https://github.com/craftcms/cms/discussions/16236))
+- `craft\helpers\DateTimeHelper::humanDuration()` now has a `$language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 - `craft\models\Site` now implements `craft\base\Chippable`.
 - `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260))
 - Elements’ `defineCardAttributes()` methods can now return a `placeholder` value set to a callable.
