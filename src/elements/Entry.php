@@ -2040,7 +2040,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
             case 'type':
                 try {
                     $config = [];
-                    if ($this->getDisplayMode() == 'cards') {
+                    if ($this->viewMode === 'cards') {
                         $config['showThumb'] = false;
                     }
                     return Cp::chipHtml($this->getType(), $config);

@@ -1312,7 +1312,10 @@ abstract class Element extends Component implements ElementInterface
             }
         }
 
-        array_map(fn($element) => $element->displayMode = $viewState['mode'], $elements);
+        foreach ($elements as $element) {
+            $element->viewMode = $viewState['mode'];
+        }
+
         $variables['elements'] = $elements;
         $template = '_elements/' . $viewState['mode'] . 'view/' . ($includeContainer ? 'container' : 'elements');
 
@@ -2420,12 +2423,6 @@ abstract class Element extends Component implements ElementInterface
     private $_serializeFields = false;
 
     /**
-     * @var string|null The display mode used to show this element (e.g. structure, table, thumbs, cards))
-     * @since 5.6.0
-     */
-    protected ?string $displayMode = null;
-
-    /**
      * @inheritdoc
      */
     public function __construct($config = [])
@@ -2624,6 +2621,7 @@ abstract class Element extends Component implements ElementInterface
             $names['searchScore'],
             $names['updateSearchIndexForOwner'],
             $names['updatingFromDerivative'],
+            $names['viewMode'],
         );
 
         $names['canonicalId'] = true;
@@ -3479,7 +3477,7 @@ abstract class Element extends Component implements ElementInterface
      */
     public function getCardBodyHtml(): ?string
     {
-        $this->displayMode = 'cards';
+        $this->viewMode = 'cards';
 
         $previews = array_filter(array_map(
             function(BaseField|array $item) {
@@ -5517,7 +5515,6 @@ JS, [
         if ($this->hasEventHandlers(self::EVENT_DEFINE_ATTRIBUTE_HTML)) {
             $event = new DefineAttributeHtmlEvent([
                 'attribute' => $attribute,
-                'displayMode' => $this->getDisplayMode(),
             ]);
             $this->trigger(self::EVENT_DEFINE_ATTRIBUTE_HTML, $event);
             if (isset($event->html)) {
@@ -6609,16 +6606,5 @@ JS,
     public function render(array $variables = []): Markup
     {
         return ElementHelper::renderElements([$this], $variables);
-    }
-
-    /**
-     * Return the display mode the element is viewed in.
-     *
-     * @return string|null
-     * @since 5.6.0
-     */
-    public function getDisplayMode(): ?string
-    {
-        return $this->displayMode;
     }
 }
