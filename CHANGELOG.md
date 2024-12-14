@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed a bug where elements’ `getPrev()` and `getNext()` methods could cause duplicate queries. ([#16329](https://github.com/craftcms/cms/discussions/16329))
 - Fixed a bug where field conditions weren’t taking effect within Matrix fields set to inline-editable blocks mode, if the owner element didn’t support drafts. ([#16315](https://github.com/craftcms/cms/pull/16315))
 - Fixed a bug where Matrix fields’ entry types weren’t maintaining their original block type order when upgrading to Craft 5. ([#16314](https://github.com/craftcms/cms/issues/16314))
 - Fixed a bug where element card labels were getting cut off when wrapped. ([#16325](https://github.com/craftcms/cms/issues/16325))
