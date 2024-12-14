@@ -469,7 +469,6 @@ return [
     'Current Password' => 'Contraseña vigente',
     'Current User Condition' => 'Condición de usuario actual',
     'Current' => 'Actual',
-    'Currently SVG images do not support focal point.' => 'Actualmente, las imágenes SVG no son compatibles con el punto focal.',
     'Custom Fields' => 'Campos personalizados',
     'Custom' => 'Personalizado',
     'Customize sources' => 'Fuentes personalizadas',
