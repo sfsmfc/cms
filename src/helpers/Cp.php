@@ -2651,7 +2651,11 @@ JS, [
             } elseif ($cardElement instanceof BaseField) {
                 $previewHtml .= Html::tag('div', $cardElement->previewPlaceholderHtml(null, null));
             } else {
-                $previewHtml .= Html::tag('div', $elementType::attributePreviewHtml($cardElement));
+                $html = $elementType::attributePreviewHtml($cardElement);
+                if (is_callable($html)) {
+                    $html = $html();
+                }
+                $previewHtml .= Html::tag('div', $html);
             }
         }
 

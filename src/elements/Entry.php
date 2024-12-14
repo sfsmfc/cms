@@ -637,19 +637,19 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
         $attributes = array_merge(parent::defineCardAttributes(), [
             'section' => [
                 'label' => Craft::t('app', 'Section'),
-                'placeholder' => Craft::t('app', 'Section'),
+                'placeholder' => fn() => Craft::t('app', 'Section'),
             ],
             'type' => [
                 'label' => Craft::t('app', 'Entry Type'),
-                'placeholder' => Craft::t('app', 'Entry Type'),
+                'placeholder' => fn() => Craft::t('app', 'Entry Type'),
             ],
             'authors' => [
                 'label' => Craft::t('app', 'Authors'),
-                'placeholder' => $currentUser ? Cp::elementChipHtml($currentUser) : '',
+                'placeholder' => fn() => $currentUser ? Cp::elementChipHtml($currentUser) : '',
             ],
             'parent' => [
                 'label' => Craft::t('app', 'Parent'),
-                'placeholder' => Html::tag(
+                'placeholder' => fn() => Html::tag(
                     'span',
                     Craft::t('app', 'Parent {type} Title', ['type' => self::displayName()]),
                     ['class' => 'card-placeholder'],
@@ -657,23 +657,23 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
             ],
             'postDate' => [
                 'label' => Craft::t('app', 'Post Date'),
-                'placeholder' => (new \DateTime())->sub(new \DateInterval('P15D')),
+                'placeholder' => fn() => (new \DateTime())->sub(new \DateInterval('P15D')),
             ],
             'expiryDate' => [
                 'label' => Craft::t('app', 'Expiry Date'),
-                'placeholder' => (new \DateTime())->add(new \DateInterval('P15D')),
+                'placeholder' => fn() => (new \DateTime())->add(new \DateInterval('P15D')),
             ],
             'revisionNotes' => [
                 'label' => Craft::t('app', 'Revision Notes'),
-                'placeholder' => Craft::t('app', 'Revision Notes'),
+                'placeholder' => fn() => Craft::t('app', 'Revision Notes'),
             ],
             'revisionCreator' => [
                 'label' => Craft::t('app', 'Last Edited By'),
-                'placeholder' => $currentUser ? Cp::elementChipHtml($currentUser) : '',
+                'placeholder' => fn() => $currentUser ? Cp::elementChipHtml($currentUser) : '',
             ],
             'drafts' => [
                 'label' => Craft::t('app', 'Drafts'),
-                'placeholder' => Html::tag(
+                'placeholder' => fn() => Html::tag(
                     'span',
                     Craft::t('app', 'Draft {num}', ['num' => 1]),
                     ['class' => 'card-placeholder'],

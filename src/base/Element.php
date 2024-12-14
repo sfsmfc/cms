@@ -1571,19 +1571,19 @@ abstract class Element extends Component implements ElementInterface
         $attributes = [
             'dateCreated' => [
                 'label' => Craft::t('app', 'Date Created'),
-                'placeholder' => (new \DateTime())->sub(new \DateInterval('P16D')),
+                'placeholder' => fn() => (new \DateTime())->sub(new \DateInterval('P16D')),
             ],
             'dateUpdated' => [
                 'label' => Craft::t('app', 'Date Updated'),
-                'placeholder' => (new \DateTime())->sub(new \DateInterval('P15D')),
+                'placeholder' => fn() => (new \DateTime())->sub(new \DateInterval('P15D')),
             ],
             'id' => [
                 'label' => Craft::t('app', 'ID'),
-                'placeholder' => 4321,
+                'placeholder' => fn() => 4321,
             ],
             'uid' => [
                 'label' => Craft::t('app', 'UID'),
-                'placeholder' => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+                'placeholder' => fn() => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
             ],
         ];
 
@@ -1592,15 +1592,15 @@ abstract class Element extends Component implements ElementInterface
                 'link' => [
                     'label' => Craft::t('app', 'Link'),
                     'icon' => 'world',
-                    'placeholder' => ElementHelper::linkAttributeHtml('#'),
+                    'placeholder' => fn() => ElementHelper::linkAttributeHtml('#'),
                 ],
                 'slug' => [
                     'label' => Craft::t('app', 'Slug'),
-                    'placeholder' => Craft::t('app', 'Slug'),
+                    'placeholder' => fn() => Craft::t('app', 'Slug'),
                 ],
                 'uri' => [
                     'label' => Craft::t('app', 'URI'),
-                    'placeholder' => ElementHelper::uriAttributeHtml(Craft::t('app', 'link/to/something'), '#'),
+                    'placeholder' => fn() => ElementHelper::uriAttributeHtml(Craft::t('app', 'link/to/something'), '#'),
                 ],
             ]);
         }
@@ -1615,7 +1615,10 @@ abstract class Element extends Component implements ElementInterface
     {
         return match ($attribute['value']) {
             'link', 'uri' => $attribute['placeholder'],
-            default => ElementHelper::attributeHtml($attribute['placeholder'] ?? $attribute['label']),
+            default => ElementHelper::attributeHtml(is_callable($attribute['placeholder'] ?? null)
+                ? $attribute['placeholder']()
+                : $attribute['placeholder'] ?? $attribute['label']
+            ),
         };
     }
 
