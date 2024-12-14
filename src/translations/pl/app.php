@@ -476,7 +476,6 @@ return [
     'Current Password' => 'Obecne hasło',
     'Current User Condition' => 'Bieżący stan użytkownika',
     'Current' => 'Obecna',
-    'Currently SVG images do not support focal point.' => 'Obrazy SVG nie obsługują aktualnie punktu ogniskowania.',
     'Custom Fields' => 'Pola niestandardowe',
     'Custom color:' => 'Custom color:',
     'Custom' => 'Niestandardowe',
