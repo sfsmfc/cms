@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 4
 
+## Unreleased
+
+- Fixed a bug where elements’ `getPrev()` and `getNext()` methods could cause duplicate queries. ([#16329](https://github.com/craftcms/cms/discussions/16329))
+
 ## 4.13.6 - 2024-12-10
 
 - Fixed a bug where blank user group descriptions weren’t getting omitted from project config data. ([#16272](https://github.com/craftcms/cms/pull/16272))
