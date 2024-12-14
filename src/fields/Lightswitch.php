@@ -273,6 +273,6 @@ class Lightswitch extends Field implements InlineEditableFieldInterface, Sortabl
             $value = 1;
         }
 
-        return $this->getPreviewHtml($value, $element ?? new Entry());
+        return $this->getPreviewHtml($value, $element ?? new Entry(['viewMode' => 'cards']));
     }
 }
