@@ -476,7 +476,6 @@ return [
     'Current Password' => 'Текущий пароль',
     'Current User Condition' => 'Текущее условие для пользователей',
     'Current' => 'Текущий',
-    'Currently SVG images do not support focal point.' => 'В данный момент изображения SVG не поддерживают точку фокуса.',
     'Custom Fields' => 'Пользовательские поля',
     'Custom color:' => 'Custom color:',
     'Custom' => 'Пользовательский',
