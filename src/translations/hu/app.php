@@ -476,7 +476,6 @@ return [
     'Current Password' => 'Aktuális jelszó',
     'Current User Condition' => 'Aktuális felhasználó állapota',
     'Current' => 'Jelenlegi',
-    'Currently SVG images do not support focal point.' => 'Jelenleg az SVG-képek nem támogatják a fókuszpontot.',
     'Custom Fields' => 'Egyéni mezők',
     'Custom color:' => 'Custom color:',
     'Custom' => 'Egyéni',
