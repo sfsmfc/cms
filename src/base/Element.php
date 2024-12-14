@@ -3481,19 +3481,20 @@ abstract class Element extends Component implements ElementInterface
     public function getCardBodyHtml(): ?string
     {
         $this->viewMode = 'cards';
+        $html = '';
 
-        $previews = array_filter(array_map(
-            function(BaseField|array $item) {
-                if ($item instanceof BaseField) {
-                    return $item->previewHtml($this);
-                }
+        foreach ($this->getFieldLayout()?->getCardBodyElements($this) ?? [] as $item) {
+            $itemHtml = $item instanceof BaseField
+                ? $item->previewHtml($this)
+                : $this->getAttributeHtml($item['value']);
+            if ($itemHtml !== '') {
+                $html .= Html::tag('div', $itemHtml, [
+                    'class' => 'card-attribute-preview',
+                ]);
+            }
+        }
 
-                return $this->getAttributeHtml($item['value']);
-            },
-            $this->getFieldLayout()?->getCardBodyElements($this) ?? [],
-        ));
-
-        return implode("\n", array_map(fn(string $preview) => Html::tag('div', $preview), $previews));
+        return $html;
     }
 
     /**
@@ -6582,7 +6583,7 @@ JS,
         }
 
         /** @var ElementQuery $query */
-        $elementIds = $query->ids();
+        $elementIds = $query->cache()->ids();
         $key = array_search($this->getCanonicalId(), $elementIds, false);
 
         if ($key === false || !isset($elementIds[$key + $dir])) {
