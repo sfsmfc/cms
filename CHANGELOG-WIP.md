@@ -7,7 +7,7 @@
 - The Queue Manager utility now shows jobs’ class names. ([#16228](https://github.com/craftcms/cms/pull/16228)) 
 
 ## Development
-- The `|duration` Twig filter now has a `language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
+- The `duration` Twig filter now has a `language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 
 ## Extensibility
 - `craft\helpers\DateTimeHelper::humanDuration()` now has a `$language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
