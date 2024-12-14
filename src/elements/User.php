@@ -32,12 +32,14 @@ use craft\events\DefineValueEvent;
 use craft\fieldlayoutelements\users\FullNameField;
 use craft\helpers\App;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Cp;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\Html;
 use craft\helpers\Json;
 use craft\helpers\Session;
 use craft\helpers\StringHelper;
+use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use craft\helpers\User as UserHelper;
 use craft\i18n\Formatter;
@@ -468,6 +470,7 @@ class User extends Element implements IdentityInterface
             'preferredLanguage' => ['label' => Craft::t('app', 'Preferred Language')],
             'preferredLocale' => ['label' => Craft::t('app', 'Preferred Locale')],
             'lastLoginDate' => ['label' => Craft::t('app', 'Last Login')],
+            'isCredentialed' => ['label' => Craft::t('app', 'Credentialed')],
         ]));
     }
 
@@ -537,6 +540,14 @@ class User extends Element implements IdentityInterface
             'preferredLocale' => [
                 'label' => Craft::t('app', 'Preferred Locale'),
                 'placeholder' => $i18n->getLocaleById('en-US')->getDisplayName(Craft::$app->language),
+            ],
+            'isCredentialed' => [
+                'label' => Craft::t('app', 'Credentialed'),
+                'placeholder' => Template::raw(Cp::statusLabelHtml([
+                    'color' => Color::Teal,
+                    'label' => Craft::t('app', 'Credentialed'),
+                    'icon' => 'check',
+                ])),
             ],
             'lastLoginDate' => [
                 'label' => Craft::t('app', 'Last Login'),
@@ -2308,6 +2319,16 @@ JS, [
             case 'preferredLocale':
                 $locale = $this->getPreferredLocale();
                 return $locale ? Craft::$app->getI18n()->getLocaleById($locale)->getDisplayName(Craft::$app->language) : '';
+
+            case 'isCredentialed':
+                $value = $this->getIsCredentialed();
+                if ($this->viewMode === 'cards') {
+                    return Cp::statusLabelHtml([
+                        'color' => $value ? Color::Teal : Color::Gray,
+                        'label' => Craft::t('app', 'Credentialed'),
+                        'icon' => $value ? 'check' : 'xmark',
+                    ]);
+                }
         }
 
         return parent::attributeHtml($attribute);

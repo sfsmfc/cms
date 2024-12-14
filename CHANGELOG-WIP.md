@@ -5,6 +5,7 @@
 - Improved the styling of inline code fragments. ([#16141](https://github.com/craftcms/cms/pull/16141))
 - Improved the styling of attribute previews in card view. ([#16324](https://github.com/craftcms/cms/pull/16324))
 - Added the “Affiliated Site” user condition rule. ([#16174](https://github.com/craftcms/cms/pull/16174))
+- Added the “Credentialed” user card/table attribute.
 - The global sidebar no longer shows “Failed” for queue jobs, for users that don’t have access to the Queue Manager. ([#16184](https://github.com/craftcms/cms/issues/16184))
 - Addresses and Matrix fields now show provisional drafts when previewing an owner element. ([#16295](https://github.com/craftcms/cms/issues/16295))
 - Color fields with a predefined color palette now primarily show a color select dropdown, rather than a manual color input. ([#16249](https://github.com/craftcms/cms/pull/16249))
