@@ -3767,13 +3767,6 @@ table {
         text-wrap: pretty;
       }
 
-      .checkbox-preview-label {
-        display: inline;
-
-        font-style: italic;
-        margin-inline-start: 5px;
-      }
-
       .chip.small {
         padding-inline: 0;
       }
@@ -8077,24 +8070,6 @@ body.reduce-focus-visibility {
     --checkbox-size: 14px;
     @include mixins.icon;
     content: 'check';
-    line-height: var(--checkbox-size);
-    font-size: var(--checkbox-size);
-  }
-}
-
-.cross-icon {
-  display: inline-flex;
-  padding-block: 0 4px;
-  padding-inline: 5px;
-  background-color: var(--gray-600);
-  color: var(--white);
-  border-radius: var(--small-border-radius);
-
-  &::before {
-    --checkbox-size: 14px;
-    @include mixins.icon;
-    content: '\d7';
-    font-weight: bold;
     line-height: var(--checkbox-size);
     font-size: var(--checkbox-size);
   }
