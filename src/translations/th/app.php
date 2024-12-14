@@ -442,7 +442,6 @@ return [
     'Current Password' => 'Current Password',
     'Current User Condition' => 'เงื่อนไขผู้ใช้ปัจจุบัน',
     'Current' => 'Current',
-    'Currently SVG images do not support focal point.' => 'Currently SVG images do not support focal point.',
     'Custom' => 'กำหนดเอง',
     'Customize sources' => 'ปรับแต่งแหล่งที่มา',
     'Custom…' => 'Custom…',
