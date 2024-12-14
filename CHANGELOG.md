@@ -4,6 +4,7 @@
 
 - Fixed a bug where elements’ `getPrev()` and `getNext()` methods could cause duplicate queries. ([#16329](https://github.com/craftcms/cms/discussions/16329))
 - Fixed a bug where assets that were shorter than the preview thumb container weren’t getting vertically centered within it.
+- Fixed a bug where it was possible to set a focal point on SVGs, even though focal points on SVGs aren’t supported. ([#16258](https://github.com/craftcms/cms/issues/16258))
 
 ## 4.13.6 - 2024-12-10
 
