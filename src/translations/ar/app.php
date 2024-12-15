@@ -476,7 +476,6 @@ return [
     'Current Password' => 'كلمة المرور الحالية',
     'Current User Condition' => 'حالة المستخدم الحالية',
     'Current' => 'الإصدار الحالي',
-    'Currently SVG images do not support focal point.' => 'لا تدعم صور SVG النقطة البؤرية في الوقت الحالي.',
     'Custom Fields' => 'الحقول المخصَّصة',
     'Custom color:' => 'Custom color:',
     'Custom' => 'مخصص',
