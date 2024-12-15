@@ -442,7 +442,6 @@ return [
     'Current Password' => 'Aktuellt lösenord',
     'Current User Condition' => 'Aktuellt användartillstånd',
     'Current' => 'Aktuellt',
-    'Currently SVG images do not support focal point.' => 'Aktuella SVG-bilder stöder inte fokuspunkt.',
     'Custom' => 'Anpassad',
     'Customize sources' => 'Anpassa källor',
     'Custom…' => 'Anpassad…',
