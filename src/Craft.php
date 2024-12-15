@@ -9,6 +9,7 @@ use craft\base\FieldInterface;
 use craft\behaviors\CustomFieldBehavior;
 use craft\helpers\App;
 use craft\helpers\ArrayHelper;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use craft\models\FieldLayout;
@@ -339,7 +340,7 @@ EOD;
 
             // Delete any CustomFieldBehavior files that are over 10 seconds old
             $basename = basename($filePath);
-            $time = time() - 10;
+            $time = DateTimeHelper::currentTimeStamp() - 10;
             FileHelper::clearDirectory($dir, [
                 'filter' => function(string $path) use ($basename, $time): bool {
                     $b = basename($path);
