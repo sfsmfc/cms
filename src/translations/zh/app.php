@@ -469,7 +469,6 @@ return [
     'Current Password' => '当前密码',
     'Current User Condition' => '当前用户条件',
     'Current' => '当前',
-    'Currently SVG images do not support focal point.' => '当前的 SVG 图像不支持根据方位来聚焦对准。',
     'Custom Fields' => '自定义字段',
     'Custom' => '自定义',
     'Customize sources' => '自定义源',

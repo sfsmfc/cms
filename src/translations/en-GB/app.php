@@ -469,7 +469,6 @@ return [
     'Current Password' => 'Current Password',
     'Current User Condition' => 'Current User Condition',
     'Current' => 'Current',
-    'Currently SVG images do not support focal point.' => 'Currently SVG images do not support focal point.',
     'Custom Fields' => 'Custom Fields',
     'Custom' => 'Custom',
     'Customize sources' => 'Customise sources',

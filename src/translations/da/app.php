@@ -469,7 +469,6 @@ return [
     'Current Password' => 'Nuværende adgangskode',
     'Current User Condition' => 'Aktuel brugerbetingelse',
     'Current' => 'Nuværende',
-    'Currently SVG images do not support focal point.' => 'SVG-billeder understøtter i øjeblikket ikke fokuspunkt.',
     'Custom Fields' => 'Brugerdefinerede felter',
     'Custom' => 'Tilpasset',
     'Customize sources' => 'Tilpas kilder',

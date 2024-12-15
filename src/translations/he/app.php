@@ -469,7 +469,6 @@ return [
     'Current Password' => 'סיסמה נוכחית',
     'Current User Condition' => 'תנאי משתמש נוכחי',
     'Current' => 'נוכחית',
-    'Currently SVG images do not support focal point.' => 'תמונות SVG אינן תומכות כעת בנקודת מוקד.',
     'Custom Fields' => 'שדות מותאמים אישית',
     'Custom' => 'מותאם אישית',
     'Customize sources' => 'התאם אישית את המקורות',

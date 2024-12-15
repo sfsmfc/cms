@@ -469,7 +469,6 @@ return [
     'Current Password' => 'Huidige wachtwoord',
     'Current User Condition' => 'Huidige gebruikersvoorwaarde',
     'Current' => 'Huidige',
-    'Currently SVG images do not support focal point.' => 'Op dit moment ondersteunen SVG-afbeeldingen geen focuspunten.',
     'Custom Fields' => 'Aangepaste velden',
     'Custom' => 'Aangepast',
     'Customize sources' => 'Bronnen aanpassen',
