@@ -225,7 +225,7 @@ abstract class Api
                     ) {
                         $timestamp = $oldLicenseInfo[$handle]['timestamp'];
                     } else {
-                        $timestamp = time();
+                        $timestamp = DateTimeHelper::currentTimeStamp();
                     }
                 }
                 $licenseInfo[$handle] = [
