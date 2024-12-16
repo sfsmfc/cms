@@ -122,6 +122,7 @@ class User extends Element implements IdentityInterface
 
     /**
      * @event RegisterUserActionsEvent The event that is triggered when a user’s available actions are being registered
+     * @deprecated in 5.6.0
      */
     public const EVENT_REGISTER_USER_ACTIONS = 'registerUserActions';
 
