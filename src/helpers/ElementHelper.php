@@ -823,6 +823,10 @@ class ElementHelper
             ]);
         }
 
+        if ($value instanceof Markup) {
+            return (string)$value;
+        }
+
         try {
             $value = (string)$value;
         } catch (Throwable) {

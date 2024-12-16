@@ -1203,10 +1203,17 @@ JS;
         $typeArray = EntryTypeGenerator::generateTypes($this);
         $typeName = $this->handle . '_MatrixField';
 
+        $arguments = EntryArguments::getArguments();
+        $gqlService = Craft::$app->getGql();
+
+        foreach ($this->getEntryTypes() as $entryType) {
+            $arguments += $gqlService->getFieldLayoutArguments($entryType->getFieldLayout());
+        }
+
         return [
             'name' => $this->handle,
             'type' => Type::nonNull(Type::listOf(Gql::getUnionType($typeName, $typeArray))),
-            'args' => EntryArguments::getArguments(),
+            'args' => $arguments,
             'resolve' => EntryResolver::class . '::resolve',
             'complexity' => Gql::eagerLoadComplexity(),
         ];

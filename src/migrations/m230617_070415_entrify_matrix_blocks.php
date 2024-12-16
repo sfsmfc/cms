@@ -15,6 +15,7 @@ use craft\helpers\Json;
 use craft\models\EntryType;
 use craft\models\FieldLayout;
 use craft\services\ProjectConfig;
+use Illuminate\Support\Arr;
 use yii\db\Exception as DbException;
 use yii\helpers\Inflector;
 
@@ -90,8 +91,13 @@ class m230617_070415_entrify_matrix_blocks extends Migration
         foreach ($fieldConfigs as $fieldPath => $fieldConfig) {
             $fieldUid = ArrayHelper::lastValue(explode('.', $fieldPath));
             $fieldEntryTypes = [];
+            $blockTypeConfigsByField[$fieldUid] ??= [];
+            $blockTypeConfigsByField[$fieldUid] = Arr::sort(
+                $blockTypeConfigsByField[$fieldUid],
+                fn(array $config) => $config['sortOrder'] ?? 0,
+            );
 
-            foreach ($blockTypeConfigsByField[$fieldUid] ?? [] as $blockTypeUid => $blockTypeConfig) {
+            foreach ($blockTypeConfigsByField[$fieldUid] as $blockTypeUid => $blockTypeConfig) {
                 $entryType = $newEntryTypes[] = $fieldEntryTypes[] = new EntryType([
                     'uid' => $blockTypeUid,
                     'name' => $this->uniqueName($blockTypeConfig['name'], $entryTypeNames),

@@ -1312,6 +1312,10 @@ abstract class Element extends Component implements ElementInterface
             }
         }
 
+        foreach ($elements as $element) {
+            $element->viewMode = $viewState['mode'];
+        }
+
         $variables['elements'] = $elements;
         $template = '_elements/' . $viewState['mode'] . 'view/' . ($includeContainer ? 'container' : 'elements');
 
@@ -1567,19 +1571,19 @@ abstract class Element extends Component implements ElementInterface
         $attributes = [
             'dateCreated' => [
                 'label' => Craft::t('app', 'Date Created'),
-                'placeholder' => (new \DateTime())->sub(new \DateInterval('P16D')),
+                'placeholder' => fn() => (new \DateTime())->sub(new \DateInterval('P16D')),
             ],
             'dateUpdated' => [
                 'label' => Craft::t('app', 'Date Updated'),
-                'placeholder' => (new \DateTime())->sub(new \DateInterval('P15D')),
+                'placeholder' => fn() => (new \DateTime())->sub(new \DateInterval('P15D')),
             ],
             'id' => [
                 'label' => Craft::t('app', 'ID'),
-                'placeholder' => 4321,
+                'placeholder' => fn() => 4321,
             ],
             'uid' => [
                 'label' => Craft::t('app', 'UID'),
-                'placeholder' => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+                'placeholder' => fn() => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
             ],
         ];
 
@@ -1588,15 +1592,15 @@ abstract class Element extends Component implements ElementInterface
                 'link' => [
                     'label' => Craft::t('app', 'Link'),
                     'icon' => 'world',
-                    'placeholder' => ElementHelper::linkAttributeHtml('#'),
+                    'placeholder' => fn() => ElementHelper::linkAttributeHtml('#'),
                 ],
                 'slug' => [
                     'label' => Craft::t('app', 'Slug'),
-                    'placeholder' => Craft::t('app', 'Slug'),
+                    'placeholder' => fn() => Craft::t('app', 'Slug'),
                 ],
                 'uri' => [
                     'label' => Craft::t('app', 'URI'),
-                    'placeholder' => ElementHelper::uriAttributeHtml(Craft::t('app', 'link/to/something'), '#'),
+                    'placeholder' => fn() => ElementHelper::uriAttributeHtml(Craft::t('app', 'link/to/something'), '#'),
                 ],
             ]);
         }
@@ -1611,7 +1615,10 @@ abstract class Element extends Component implements ElementInterface
     {
         return match ($attribute['value']) {
             'link', 'uri' => $attribute['placeholder'],
-            default => ElementHelper::attributeHtml($attribute['placeholder'] ?? $attribute['label']),
+            default => ElementHelper::attributeHtml(is_callable($attribute['placeholder'] ?? null)
+                ? $attribute['placeholder']()
+                : $attribute['placeholder'] ?? $attribute['label']
+            ),
         };
     }
 
@@ -2617,6 +2624,7 @@ abstract class Element extends Component implements ElementInterface
             $names['searchScore'],
             $names['updateSearchIndexForOwner'],
             $names['updatingFromDerivative'],
+            $names['viewMode'],
         );
 
         $names['canonicalId'] = true;
@@ -3472,18 +3480,21 @@ abstract class Element extends Component implements ElementInterface
      */
     public function getCardBodyHtml(): ?string
     {
-        $previews = array_filter(array_map(
-            function(BaseField|array $item) {
-                if ($item instanceof BaseField) {
-                    return $item->previewHtml($this);
-                }
+        $this->viewMode = 'cards';
+        $html = '';
 
-                return $this->getAttributeHtml($item['value']);
-            },
-            $this->getFieldLayout()?->getCardBodyElements($this) ?? [],
-        ));
+        foreach ($this->getFieldLayout()?->getCardBodyElements($this) ?? [] as $item) {
+            $itemHtml = $item instanceof BaseField
+                ? $item->previewHtml($this)
+                : $this->getAttributeHtml($item['value']);
+            if ($itemHtml !== '') {
+                $html .= Html::tag('div', $itemHtml, [
+                    'class' => 'card-attribute-preview',
+                ]);
+            }
+        }
 
-        return implode("\n", array_map(fn(string $preview) => Html::tag('div', $preview), $previews));
+        return $html;
     }
 
     /**
@@ -5506,7 +5517,9 @@ JS, [
     {
         // Fire a 'defineAttributeHtml' event
         if ($this->hasEventHandlers(self::EVENT_DEFINE_ATTRIBUTE_HTML)) {
-            $event = new DefineAttributeHtmlEvent(['attribute' => $attribute]);
+            $event = new DefineAttributeHtmlEvent([
+                'attribute' => $attribute,
+            ]);
             $this->trigger(self::EVENT_DEFINE_ATTRIBUTE_HTML, $event);
             if (isset($event->html)) {
                 return $event->html;
@@ -6570,7 +6583,7 @@ JS,
         }
 
         /** @var ElementQuery $query */
-        $elementIds = $query->ids();
+        $elementIds = $query->cache()->ids();
         $key = array_search($this->getCanonicalId(), $elementIds, false);
 
         if ($key === false || !isset($elementIds[$key + $dir])) {
