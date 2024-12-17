@@ -38,8 +38,13 @@ trait NestedElementTrait
             case 'owner':
             case 'primaryOwner':
                 /** @var NestedElementInterface[] $sourceElements */
+                $ownerId = $sourceElements[0]->getOwnerId();
+                if (!$ownerId) {
+                    return false;
+                }
+
                 return [
-                    'elementType' => get_class(reset($sourceElements)),
+                    'elementType' => Craft::$app->getElements()->getElementTypeById($ownerId),
                     'map' => array_map(fn(NestedElementInterface $element) => [
                         'source' => $element->id,
                         'target' => match ($handle) {
