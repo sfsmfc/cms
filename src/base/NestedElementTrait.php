@@ -37,7 +37,7 @@ trait NestedElementTrait
         switch ($handle) {
             case 'owner':
             case 'primaryOwner':
-                /** @var NestedElementInterface[] $sourceElements */
+                /** @var array<NestedElementInterface&self> $sourceElements */
                 $ownerType = $sourceElements[0]->ownerType();
                 if (!$ownerType) {
                     return false;
