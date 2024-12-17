@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed a bug where asset edit page URLs contained spaces if the asset filename contained spaces. ([#15236](https://github.com/craftcms/cms/issues/15236))
+- Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
 
 ## 4.13.7 - 2024-12-17
 
