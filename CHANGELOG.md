@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 4
 
+## Unreleased
+
+- Fixed a bug where asset edit page URLs contained spaces if the asset filename contained spaces. ([#15236](https://github.com/craftcms/cms/issues/15236))
+
 ## 4.13.7 - 2024-12-17
 
 - Fixed a bug where elements’ `getPrev()` and `getNext()` methods could cause duplicate queries. ([#16329](https://github.com/craftcms/cms/discussions/16329))
