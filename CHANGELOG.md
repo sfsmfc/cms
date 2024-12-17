@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 5
 
+## Unreleased
+
+- Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
+
 ## 5.5.7 - 2024-12-17
 
 - Fixed a bug where elements’ `getPrev()` and `getNext()` methods could cause duplicate queries. ([#16329](https://github.com/craftcms/cms/discussions/16329))
