@@ -1,6 +1,6 @@
 # Release Notes for Craft CMS 4
 
-## Unreleased
+## 4.13.7 - 2024-12-17
 
 - Fixed a bug where elements’ `getPrev()` and `getNext()` methods could cause duplicate queries. ([#16329](https://github.com/craftcms/cms/discussions/16329))
 - Fixed a bug where assets that were shorter than the preview thumb container weren’t getting vertically centered within it.
