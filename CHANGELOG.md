@@ -9,6 +9,7 @@
 - Fixed a bug where field conditions weren’t taking effect within Matrix fields set to inline-editable blocks mode, if the owner element didn’t support drafts. ([#16315](https://github.com/craftcms/cms/pull/16315))
 - Fixed a bug where Matrix fields’ entry types weren’t maintaining their original block type order when upgrading to Craft 5. ([#16314](https://github.com/craftcms/cms/issues/16314))
 - Fixed a bug where element card labels were getting cut off when wrapped. ([#16325](https://github.com/craftcms/cms/issues/16325))
+- Fixed a PHP error that could occur when eager-loading `owner` or `primaryOwner` on nested elements. ([#16339](https://github.com/craftcms/cms/issues/16339))
 
 ## 5.5.6.1 - 2024-12-11
 
