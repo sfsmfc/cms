@@ -56,6 +56,7 @@
 - Added `craft\base\Element::EVENT_DEFINE_ALT_ACTIONS`. ([#16294](https://github.com/craftcms/cms/pull/16294))
 - Added `craft\base\ElementInterface::getAltActions()`. ([#16294](https://github.com/craftcms/cms/pull/16294))
 - Added `craft\base\ElementTrait::$viewMode`. ([#16324](https://github.com/craftcms/cms/pull/16324))
+- Added `craft\base\NestedElementTrait::ownerType()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::allowMultiple()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::getElementIds()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::setElementIds()`.
