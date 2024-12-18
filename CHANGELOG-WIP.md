@@ -98,9 +98,9 @@
 - `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260))
 - Elements’ `defineCardAttributes()` methods can now return a `placeholder` value set to a callable.
 - Deprecated `craft\elements\User::EVENT_REGISTER_USER_ACTIONS`.
+- Deprecated `craft\elements\User::IMPERSONATE_KEY`. `craft\web\User::getImpersonatorId()` should be used instead.
 - Deprecated `craft\fields\Color::$presets`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Deprecated `craft\fields\Link::$showTargetField`.
-- Deprecatod `craft\elements\User::IMPERSONATE_KEY`. `craft\web\User::getImpersonatorId()` should be used instead.
 - `_includes/forms/autosuggest.twig` now supports a `suggestTemplates` variable. 
 - `_includes/forms/colorSelect.twig` now supports `options` and `withBlankOption` variables.
 - `_includes/forms/selectize.twig` now supports a `color` property in option data, which can be set to a hex value or a color name.
