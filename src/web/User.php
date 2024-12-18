@@ -593,8 +593,7 @@ class User extends \yii\web\User
 
         // Make sure 2FA data doesn't bleed over
         $authService = Craft::$app->getAuth();
-        SessionHelper::remove($authService->userIdParam);
-        SessionHelper::remove($authService->sessionDurationParam);
+        $authService->setUser(null);
         SessionHelper::remove($authService->passkeyCreationOptionsParam);
     }
 }
