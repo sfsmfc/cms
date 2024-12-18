@@ -1160,6 +1160,7 @@ class App
             'absoluteAuthTimeoutParam' => $stateKeyPrefix . '__absoluteExpire',
             'authTimeoutParam' => $stateKeyPrefix . '__expire',
             'idParam' => $stateKeyPrefix . '__id',
+            'impersonatorIdParam' => $stateKeyPrefix . '__impersonator_id',
             'returnUrlParam' => $stateKeyPrefix . '__returnUrl',
             'tokenParam' => $stateKeyPrefix . '__token',
         ];
