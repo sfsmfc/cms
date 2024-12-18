@@ -41,7 +41,6 @@ use craft\helpers\Session;
 use craft\helpers\StringHelper;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
-use craft\helpers\User as UserHelper;
 use craft\i18n\Formatter;
 use craft\models\FieldLayout;
 use craft\models\Site;
@@ -68,7 +67,6 @@ use yii\validators\RequiredValidator;
 use yii\validators\Validator;
 use yii\web\BadRequestHttpException;
 use yii\web\IdentityInterface;
-use yii\web\Response;
 
 /**
  * User represents a user element.
@@ -118,7 +116,10 @@ class User extends Element implements IdentityInterface
      */
     public const EVENT_DEFINE_FRIENDLY_NAME = 'defineFriendlyName';
 
-    public const IMPERSONATE_KEY = 'Craft.UserSessionService.prevImpersonateUserId';
+    /**
+     * @deprecated in 5.6.0. [[\craft\web\User:getImpersonatorId()]] should be used instead.
+     */
+    public const IMPERSONATE_KEY = '__impersonator_id';
 
     /**
      * @event RegisterUserActionsEvent The event that is triggered when a user’s available actions are being registered
@@ -622,25 +623,15 @@ class User extends Element implements IdentityInterface
             return null;
         }
 
-        /** @var static $user */
-        if ($user->getStatus() === self::STATUS_ACTIVE) {
-            return $user;
+        // Only accept active users, unless they're being impersonated
+        if (
+            $user->getStatus() !== self::STATUS_ACTIVE &&
+            !Craft::$app->getUser()->getImpersonator()
+        ) {
+            return null;
         }
 
-        // If the current user is being impersonated, ignore their status
-        if ($previousUserId = Session::get(self::IMPERSONATE_KEY)) {
-            /** @var self|null $previousUser */
-            $previousUser = self::find()
-                ->id($previousUserId)
-                ->status(null)
-                ->one();
-
-            if ($previousUser && $previousUser->can('impersonateUsers')) {
-                return $user;
-            }
-        }
-
-        return null;
+        return $user;
     }
 
     /**
@@ -1869,6 +1860,7 @@ XML;
         $currentUser = Craft::$app->getUser()->getIdentity();
         $view = Craft::$app->getView();
         $usersService = Craft::$app->getUsers();
+        $userSession = Craft::$app->getUser();
 
         $canAdministrateUsers = $currentUser->can('administrateUsers');
         $canModerateUsers = $currentUser->can('moderateUsers');
@@ -1944,8 +1936,8 @@ XML;
                             ($currentUser->admin || !$this->admin) &&
                             $canModerateUsers &&
                             (
-                                ($previousUserId = Session::get(self::IMPERSONATE_KEY)) === null ||
-                                $this->id != $previousUserId
+                                ($impersonatorId = $userSession->getImpersonatorId()) === null ||
+                                $this->id !== $impersonatorId
                             )
                         ) {
                             $statusItems[] = [
@@ -1958,7 +1950,7 @@ XML;
                         }
                     }
 
-                    if (!$isCurrentUser && Craft::$app->getUser()->checkPermission('editUsers')) {
+                    if (!$isCurrentUser && $userSession->checkPermission('editUsers')) {
                         $statusItems[] = [
                             'icon' => 'paperplane',
                             'label' => Craft::t('app', 'Send password reset email'),

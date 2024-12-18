@@ -244,8 +244,9 @@ class UsersController extends Controller
         }
 
         // if we're impersonating, pass the user we're impersonating to the complete method
-        if (Session::get(User::IMPERSONATE_KEY) !== null) {
-            $user = Craft::$app->getUser()->getIdentity() ?? $user;
+        $impersonator = Craft::$app->getUser()->getImpersonator();
+        if ($impersonator !== null) {
+            $user = $impersonator;
         }
 
         return $this->_completeLogin($user, $duration);
@@ -283,8 +284,9 @@ class UsersController extends Controller
         }
 
         // if we're impersonating, pass the user we're impersonating to the complete method
-        if (Session::get(User::IMPERSONATE_KEY) !== null) {
-            $user = Craft::$app->getUser()->getIdentity();
+        $userSession = Craft::$app->getUser();
+        if ($userSession->getImpersonator() !== null) {
+            $user = $userSession->getIdentity();
         }
 
         return $this->_completeLogin($user, $duration);
@@ -365,10 +367,10 @@ class UsersController extends Controller
 
         // Save the original user ID to the session now so User::findIdentity()
         // knows not to worry if the user isn't active yet
-        Session::set(User::IMPERSONATE_KEY, $userSession->getId());
+        $userSession->setImpersonatorId($userSession->getId());
 
         if (!$userSession->loginByUserId($userId)) {
-            Session::remove(User::IMPERSONATE_KEY);
+            $userSession->setImpersonatorId(null);
             $this->setFailFlash(Craft::t('app', 'There was a problem impersonating this user.'));
             Craft::error($userSession->getIdentity()->username . ' tried to impersonate userId: ' . $userId . ' but something went wrong.', __METHOD__);
             return null;
@@ -440,10 +442,10 @@ class UsersController extends Controller
         if ($user) {
             // Save the original user ID to the session now so User::findIdentity()
             // knows not to worry if the user isn't active yet
-            Session::set(User::IMPERSONATE_KEY, $prevUserId);
+            $userSession->setImpersonatorId($prevUserId);
             $success = $userSession->login($user);
             if (!$success) {
-                Session::remove(User::IMPERSONATE_KEY);
+                $userSession->setImpersonatorId(null);
             }
         }
 
@@ -518,13 +520,9 @@ class UsersController extends Controller
 
         $forElevatedSession = (bool)$this->request->getBodyParam('forElevatedSession');
 
-        // If the current user is being impersonated get the "original" user instead
-        if ($forElevatedSession && $previousUserId = Session::get(User::IMPERSONATE_KEY)) {
-            /** @var User $user */
-            $user = User::find()
-                ->id($previousUserId)
-                ->one();
-            $staticEmail = $user->email;
+        // If the current user is being impersonated, get the impersonator instead
+        if ($forElevatedSession && ($impersonator = Craft::$app->getUser()->getImpersonator())) {
+            $staticEmail = $impersonator->email;
         } else {
             $staticEmail = $this->request->getRequiredBodyParam('email');
         }
@@ -1910,8 +1908,7 @@ JS);
             }
 
             // And admins can't unlock themselves by impersonating another admin
-            $previousUserId = Session::get(User::IMPERSONATE_KEY);
-            if ($previousUserId && $user->id == $previousUserId) {
+            if ($user->id === Craft::$app->getUser()->getImpersonatorId()) {
                 throw new ForbiddenHttpException('You can’t unlock yourself via impersonation.');
             }
         }
@@ -2347,14 +2344,9 @@ JS);
 
     public function actionAuthForm(): Response
     {
-        $user = null;
-        // If the current user is being impersonated get the "original" user instead
-        if ($previousUserId = Session::get(User::IMPERSONATE_KEY)) {
-            /** @var User $user */
-            $user = User::find()
-                ->id($previousUserId)
-                ->one();
-        }
+        // If the current user is being impersonated, use the impersonator
+        $userSession = Craft::$app->getUser();
+        $user = $userSession->getImpersonator() ?? $userSession->getIdentity();
 
         $activeMethods = Craft::$app->getAuth()->getActiveMethods($user);
         $methodClass = $this->request->getParam('method');
@@ -2391,7 +2383,7 @@ JS);
             'authForm' => $html,
             'headHtml' => $view->getHeadHtml(),
             'bodyHtml' => $view->getBodyHtml(),
-            'returnUrl' => Craft::$app->getUser()->getReturnUrl($defaultReturnUrl),
+            'returnUrl' => $userSession->getReturnUrl($defaultReturnUrl),
         ]);
     }
 
