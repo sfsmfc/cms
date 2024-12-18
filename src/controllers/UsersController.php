@@ -2346,9 +2346,7 @@ JS);
     {
         // If the current user is being impersonated, use the impersonator
         $userSession = Craft::$app->getUser();
-        $user = $userSession->getImpersonator() ?? $userSession->getIdentity();
-
-        $activeMethods = Craft::$app->getAuth()->getActiveMethods($user);
+        $activeMethods = Craft::$app->getAuth()->getActiveMethods($userSession->getImpersonator());
         $methodClass = $this->request->getParam('method');
 
         if ($methodClass) {
