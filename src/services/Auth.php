@@ -20,6 +20,7 @@ use craft\helpers\ArrayHelper;
 use craft\helpers\Component as ComponentHelper;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Json;
+use craft\helpers\Session as SessionHelper;
 use craft\models\UserGroup;
 use craft\records\WebAuthn as WebAuthnRecord;
 use craft\web\Session;
@@ -149,14 +150,13 @@ class Auth extends Component
     {
         $this->_user = $user ?? false;
         $this->_sessionDuration = $user ? ($sessionDuration ?? Craft::$app->getConfig()->getGeneral()->userSessionDuration) : false;
-        $session = Craft::$app->getSession();
 
         if ($user) {
-            $session->set($this->userIdParam, $user->id);
-            $session->set($this->sessionDurationParam, $this->_sessionDuration);
+            SessionHelper::set($this->userIdParam, $user->id);
+            SessionHelper::set($this->sessionDurationParam, $this->_sessionDuration);
         } else {
-            $session->remove($this->userIdParam);
-            $session->remove($this->sessionDurationParam);
+            SessionHelper::remove($this->userIdParam);
+            SessionHelper::remove($this->sessionDurationParam);
         }
     }
 
@@ -436,7 +436,7 @@ class Auth extends Component
             excludeCredentials: $excludeCredentials
         );
 
-        Craft::$app->getSession()->set($this->passkeyCreationOptionsParam, Json::encode($publicKeyCredentialCreationOptions));
+        SessionHelper::set($this->passkeyCreationOptionsParam, Json::encode($publicKeyCredentialCreationOptions));
 
         return $publicKeyCredentialCreationOptions;
     }
