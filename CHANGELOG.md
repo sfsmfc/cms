@@ -1,5 +1,10 @@
 # Release Notes for Craft CMS 5
 
+## Unreleased
+
+- Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
+- Fixed an error that could occur when creating nested entries within Matrix fields. ([#16331](https://github.com/craftcms/cms/issues/16331))
+
 ## 5.5.7 - 2024-12-17
 
 - Fixed a bug where elements’ `getPrev()` and `getNext()` methods could cause duplicate queries. ([#16329](https://github.com/craftcms/cms/discussions/16329))
@@ -64,7 +69,7 @@
 - Fixed a JavaScript error that broke nested element creation in global sets. ([#16182](https://github.com/craftcms/cms/issues/16182))
 - Fixed a bug where Number fields weren’t rounding existing values based on the precision specified by the Decimals setting. ([#16181](https://github.com/craftcms/cms/issues/16181))
 
-## 5.5.2 - 2024-11-19
+## 5.5.2 - 2024-11-19 [CRITICAL]
 
 - Fixed an error that could occur if an invalid folder ID was passed to `craft\services\Assets::deleteFoldersByIds()`. ([#16147](https://github.com/craftcms/cms/pull/16147))
 - Fixed a SQL error that occurred when creating a new Single section. ([#16145](https://github.com/craftcms/cms/issues/16145))

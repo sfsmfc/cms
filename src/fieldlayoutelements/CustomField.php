@@ -405,7 +405,7 @@ class CustomField extends BaseField
 
         $this->_field->describedBy = $describedBy;
 
-        return $html;
+        return $html !== '' ? $html : null;
     }
 
     /**
