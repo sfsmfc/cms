@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
+- Fixed an error that could occur when creating nested entries within Matrix fields. ([#16331](https://github.com/craftcms/cms/issues/16331))
 
 ## 5.5.7 - 2024-12-17
 

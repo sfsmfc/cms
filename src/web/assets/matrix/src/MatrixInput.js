@@ -232,7 +232,7 @@
           );
         }
 
-        Craft.queue.push(async () => {
+        await Craft.queue.push(async () => {
           if (this.addingEntry) {
             // only one new entry at a time
             return;
@@ -259,7 +259,7 @@
           const $entry = $(data.blockHtml);
 
           // Pause the element editor
-          this.elementEditor?.pause();
+          await this.elementEditor?.pause();
 
           if ($insertBefore) {
             $entry.insertBefore($insertBefore);
