@@ -1174,14 +1174,19 @@ class App
      */
     public static function viewConfig(): array
     {
-        $headers = Craft::$app->getRequest()->getHeaders();
-
-        return [
+        $config = [
             'class' => View::class,
-            // Check these headers for site requests too, in case we're rendering a system fallback template
-            'registeredAssetBundles' => array_filter(explode(',', $headers->get('X-Registered-Asset-Bundles', ''))),
-            'registeredJsFiles' => array_filter(explode(',', $headers->get('X-Registered-Js-Files', ''))),
         ];
+
+        $request = Craft::$app->getRequest();
+        if (!$request->getIsConsoleRequest()) {
+            // Check these headers for site requests too, in case we're rendering a system fallback template
+            $headers = $request->getHeaders();
+            $config['registeredAssetBundles'] = array_filter(explode(',', $headers->get('X-Registered-Asset-Bundles', '')));
+            $config['registeredJsFiles'] = array_filter(explode(',', $headers->get('X-Registered-Js-Files', '')));
+        }
+
+        return $config;
     }
 
     /**
