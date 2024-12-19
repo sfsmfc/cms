@@ -40,7 +40,7 @@
 - Fixed a bug where `craft\events\ApplyFieldSaveEvent::$field` wasn’t being set consistently by `craft\services\Fields::EVENT_BEFORE_APPLY_FIELD_SAVE`. ([#16156](https://github.com/craftcms/cms/issues/16156))
 - Fixed a bug where the address field layout’s project config data wasn’t getting recreated when running `project-config/rebuild`. ([#16189](https://github.com/craftcms/cms/issues/16189))
 
-## 4.13.2 - 2024-11-19
+## 4.13.2 - 2024-11-19 [CRITICAL]
 
 - Fixed an error that could occur if an invalid folder ID was passed to `craft\services\Assets::deleteFoldersByIds()`. ([#16147](https://github.com/craftcms/cms/pull/16147))
 - Fixed an RCE vulnerability.
