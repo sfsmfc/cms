@@ -17,7 +17,14 @@
 
 <div class="login-container">
   <div class="pane login-form-container">
-    <form class="login-form" method="post" accept-charset="UTF-8">
+    {% tag 'form' with {
+      class: {
+        'login-form': true,
+        'hidden': authFormData is defined,
+      }|filter|keys,
+      method: 'post',
+      'accept-charset': 'UTF-8',
+    } %}
       {% if staticEmail %}
         {{ hiddenInput('username', staticEmail, {
           class: 'login-username',
@@ -73,7 +80,7 @@
         failureMessage: 'Sign in unsuccessful'|t('app'),
         retryMessage: 'Try again'|t('app'),
       }) }}
-    </form>
+    {% endtag %}
 
     {% if showResetPassword %}
       <form class="login-reset-password hidden">

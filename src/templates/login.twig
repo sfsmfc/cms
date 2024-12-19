@@ -65,5 +65,11 @@
 {% endcss %}
 
 {% js %}
-  new Craft.LoginForm($('.login-container'));
+  (() => {
+    const loginForm = new Craft.LoginForm($('.login-container'));
+
+    {% if authFormData is defined %}
+      loginForm.show2faForm({{ authFormData|json_encode|raw }});
+    {% endif %}
+  })();
 {% endjs %}

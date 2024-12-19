@@ -24,6 +24,7 @@ use craft\helpers\Session as SessionHelper;
 use craft\models\UserGroup;
 use craft\records\WebAuthn as WebAuthnRecord;
 use craft\web\Session;
+use craft\web\View;
 use DateTime;
 use GuzzleHttp\Psr7\ServerRequest;
 use ParagonIE\ConstantTime\Base64UrlSafe;
@@ -174,7 +175,19 @@ class Auth extends Component
         }
 
         $method = $this->getAvailableMethods()[0] ?? null;
-        return $method?->getAuthFormHtml();
+        if (!$method) {
+            return '';
+        }
+
+        $view = Craft::$app->getView();
+        $templateMode = $view->getTemplateMode();
+        $view->setTemplateMode(View::TEMPLATE_MODE_CP);
+
+        try {
+            return $method->getAuthFormHtml();
+        } finally {
+            $view->setTemplateMode($templateMode);
+        }
     }
 
     /**

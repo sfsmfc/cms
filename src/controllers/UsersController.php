@@ -52,6 +52,7 @@ use DateTime;
 use Throwable;
 use yii\base\Exception;
 use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
@@ -208,7 +209,12 @@ class UsersController extends Controller
                 return $this->_handleSuccessfulLogin($user);
             }
 
-            return null;
+            // should we be showing the 2FA form?
+            if ($this->request->getQueryParam('verify')) {
+                return $this->runAction('auth-form');
+            }
+
+            return $this->_rerouteWithFallbackTemplate('login.twig');
         }
 
         $loginName = $this->request->getRequiredBodyParam('loginName');
@@ -238,13 +244,26 @@ class UsersController extends Controller
 
         // if user has an active 2SV method, move on to that
         $authService = Craft::$app->getAuth();
+        $userSession = Craft::$app->getUser();
         if (!empty($authService->getActiveMethods($user))) {
             $authService->setUser($user, $duration);
+
+            if ($this->request->getIsSiteRequest() && !$this->request->getAcceptsJson()) {
+                $loginPath = $generalConfig->getLoginPath();
+                if (!$loginPath) {
+                    $authService->setUser(null);
+                    throw new InvalidConfigException('User requires two-step verification, but the loginPath config setting is disabled.');
+                }
+                return $this->redirect(UrlHelper::siteUrl($loginPath, [
+                    'verify' => 1,
+                ]));
+            }
+
             return $this->runAction('auth-form');
         }
 
         // if we're impersonating, pass the user we're impersonating to the complete method
-        $impersonator = Craft::$app->getUser()->getImpersonator();
+        $impersonator = $userSession->getImpersonator();
         if ($impersonator !== null) {
             $user = $impersonator;
         }
@@ -2346,7 +2365,21 @@ JS);
     {
         // If the current user is being impersonated, use the impersonator
         $userSession = Craft::$app->getUser();
-        $activeMethods = Craft::$app->getAuth()->getActiveMethods($userSession->getImpersonator());
+        $authService = Craft::$app->getAuth();
+        $user = $userSession->getImpersonator() ?? $authService->getUser();
+
+        if (!$user) {
+            if ($this->request->getIsSiteRequest()) {
+                $loginPath = Craft::$app->getConfig()->getGeneral()->getLoginPath();
+                if (!$loginPath) {
+                    throw new InvalidConfigException('The loginPath config setting is disabled.');
+                }
+                return $this->redirect($loginPath);
+            }
+            return $this->redirect('login');
+        }
+
+        $activeMethods = $authService->getActiveMethods($user);
         $methodClass = $this->request->getParam('method');
 
         if ($methodClass) {
@@ -2366,23 +2399,45 @@ JS);
             $method = array_shift($activeMethods);
         }
 
-        $html = $method->getAuthFormHtml();
         $view = $this->getView();
+        $templateMode = $view->getTemplateMode();
+        $view->setTemplateMode(View::TEMPLATE_MODE_CP);
+//        $view->startCssBuffer();
+//        $view->startJsBuffer();
+        try {
+            $html = $method->getAuthFormHtml();
+        } finally {
+            $view->setTemplateMode($templateMode);
+        }
+//        $headHtml = $view->clearCssBuffer() ?: '';
+//        $bodyHtml = $view->clearJsBuffer() ?: '';
 
-        // explicitly set the default return URL here, since checkPermission('accessCp') will be false
-        $defaultReturnUrl = UrlHelper::cpUrl(Craft::$app->getConfig()->getGeneral()->getPostCpLoginRedirect());
+        if ($this->request->getIsCpRequest()) {
+            // explicitly set the default return URL here, since checkPermission('accessCp') will be false
+            $defaultReturnUrl = UrlHelper::cpUrl(Craft::$app->getConfig()->getGeneral()->getPostCpLoginRedirect());
+        } else {
+            $defaultReturnUrl = UrlHelper::siteUrl(Craft::$app->getConfig()->getGeneral()->getPostLoginRedirect());
+        }
 
-        return $this->asJson([
+        $authFormData = [
             'authMethod' => $method::class,
             'otherMethods' => array_map(fn(AuthMethodInterface $method) => [
                 'name' => $method::displayName(),
                 'class' => $method::class,
             ], $activeMethods),
             'authForm' => $html,
-            'headHtml' => $view->getHeadHtml(),
-            'bodyHtml' => $view->getBodyHtml(),
             'returnUrl' => $userSession->getReturnUrl($defaultReturnUrl),
-        ]);
+        ];
+
+        if ($this->request->getAcceptsJson()) {
+            return $this->asJson([
+                ...$authFormData,
+                'headHtml' => $view->getHeadHtml(),
+                'bodyHtml' => $view->getBodyHtml(),
+            ]);
+        }
+
+        return $this->renderTemplate('login.twig', compact('authFormData'), View::TEMPLATE_MODE_CP);
     }
 
     /**
@@ -2425,6 +2480,11 @@ JS);
      */
     private function _renderSetPasswordTemplate(array $variables): Response
     {
+        return $this->_rerouteWithFallbackTemplate('setpassword.twig', $variables);
+    }
+
+    private function _rerouteWithFallbackTemplate(string $cpTemplate, array $variables = []): Response
+    {
         // If this is a site request, try handling the request like normal
         if ($this->request->getIsSiteRequest()) {
             try {
@@ -2434,7 +2494,7 @@ JS);
 
                 // Avoid re-routing to the same action again
                 $this->request->checkIfActionRequest(true, true, false);
-                if ($this->request->getActionSegments() === ['users', 'set-password']) {
+                if (($this->request->getActionSegments()[0] ?? null) === $this->id) {
                     $this->request->setIsActionRequest(false);
                 }
 
@@ -2447,7 +2507,7 @@ JS);
         }
 
         // Otherwise go with the control panel’s template
-        return $this->renderTemplate('setpassword.twig', $variables, View::TEMPLATE_MODE_CP);
+        return $this->renderTemplate($cpTemplate, $variables, View::TEMPLATE_MODE_CP);
     }
 
     /**

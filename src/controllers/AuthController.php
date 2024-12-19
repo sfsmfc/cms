@@ -36,26 +36,13 @@ class AuthController extends Controller
     ];
 
     /**
-     * @inheritdoc
-     */
-    public function beforeAction($action): bool
-    {
-        if (!parent::beforeAction($action)) {
-            return false;
-        }
-
-        $this->requireCpRequest();
-        ;
-        return true;
-    }
-
-    /**
      * Returns the HTML for an authentication method’s setup slideout.
      *
      * @return Response
      */
     public function actionMethodSetupHtml(): ?Response
     {
+        $this->requireCpRequest();
         $this->requirePostRequest();
         $this->requireAcceptsJson();
 
@@ -89,6 +76,7 @@ class AuthController extends Controller
      */
     public function actionMethodListingHtml(): ?Response
     {
+        $this->requireCpRequest();
         $this->requirePostRequest();
         $this->requireAcceptsJson();
 
@@ -111,6 +99,7 @@ class AuthController extends Controller
      */
     public function actionRemoveMethod(): ?Response
     {
+        $this->requireCpRequest();
         $this->requirePostRequest();
         $this->requireElevatedSession();
 
@@ -176,6 +165,7 @@ class AuthController extends Controller
      */
     public function actionPasskeyCreationOptions(): Response
     {
+        $this->requireCpRequest();
         $this->requireAcceptsJson();
         $this->requirePostRequest();
         $this->requireElevatedSession();
@@ -194,6 +184,7 @@ class AuthController extends Controller
      */
     public function actionPasskeyRequestOptions(): Response
     {
+        $this->requireCpRequest();
         $this->requirePostRequest();
         $this->requireAcceptsJson();
 
@@ -211,6 +202,7 @@ class AuthController extends Controller
      */
     public function actionVerifyPasskeyCreation(): Response
     {
+        $this->requireCpRequest();
         $this->requireAcceptsJson();
         $this->requirePostRequest();
         $this->requireElevatedSession();
@@ -236,6 +228,7 @@ class AuthController extends Controller
      */
     public function actionDeletePasskey(): Response
     {
+        $this->requireCpRequest();
         $this->requireAcceptsJson();
         $this->requirePostRequest();
 
@@ -261,6 +254,7 @@ class AuthController extends Controller
      */
     public function actionGenerateRecoveryCodes(): Response
     {
+        $this->requireCpRequest();
         $this->requireAcceptsJson();
         $this->requirePostRequest();
         $this->requireElevatedSession();
@@ -285,6 +279,7 @@ class AuthController extends Controller
      */
     public function actionDownloadRecoveryCodes(): ?Response
     {
+        $this->requireCpRequest();
         $this->requirePostRequest();
         $this->requireLogin();
         $this->requireElevatedSession();

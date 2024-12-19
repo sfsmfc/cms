@@ -1997,7 +1997,7 @@ JS;
      */
     public function endPage($ajaxMode = false): void
     {
-        if (!$ajaxMode && Craft::$app->getRequest()->getIsCpRequest()) {
+        if (!$ajaxMode && $this->_templateMode === static::TEMPLATE_MODE_CP) {
             $this->_setJsProperty('registeredJsFiles', $this->_registeredJsFiles);
             $this->_setJsProperty('registeredAssetBundles', $this->_registeredAssetBundles);
         }
