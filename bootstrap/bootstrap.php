@@ -27,12 +27,12 @@ if (!isset($appType) || ($appType !== 'web' && $appType !== 'console')) {
 // Determine the paths
 // -----------------------------------------------------------------------------
 
-$findConfig = function($constName, $argName) {
+$findConfig = function($constName, $argName) use ($appType) {
     if (defined($constName)) {
         return constant($constName);
     }
 
-    if (!empty($_SERVER['argv'])) {
+    if ($appType === 'console' && !empty($_SERVER['argv'])) {
         foreach ($_SERVER['argv'] as $key => $arg) {
             if (strpos($arg, "--{$argName}=") !== false) {
                 $parts = explode('=', $arg);
