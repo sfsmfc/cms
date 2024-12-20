@@ -2483,10 +2483,15 @@ JS);
         return $this->_rerouteWithFallbackTemplate('setpassword.twig', $variables);
     }
 
-    private function _rerouteWithFallbackTemplate(string $cpTemplate, array $variables = []): Response
+    private function _rerouteWithFallbackTemplate(string $cpTemplate, array $variables = []): ?Response
     {
         // If this is a site request, try handling the request like normal
         if ($this->request->getIsSiteRequest()) {
+            // No special handling for Craft < Pro
+            if (Craft::$app->edition->value < CmsEdition::Pro->value) {
+                return null;
+            }
+
             try {
                 Craft::$app->getUrlManager()->setRouteParams([
                     'variables' => $variables,
