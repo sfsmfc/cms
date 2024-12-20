@@ -184,7 +184,6 @@ class AuthController extends Controller
      */
     public function actionPasskeyRequestOptions(): Response
     {
-        $this->requireCpRequest();
         $this->requirePostRequest();
         $this->requireAcceptsJson();
 
