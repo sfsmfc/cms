@@ -25,7 +25,6 @@ $badgeColor: var(--gray-800);
   --neg-padding: calc(var(--padding) * -1);
   --sidebar-width: #{$sidebarWidth};
   --global-sidebar-width: #{$sidebarWidth};
-  --header-height: calc(44rem / 16);
   --details-width: #{$detailsWidth};
 
   // Sidebar
@@ -126,19 +125,21 @@ $systemInfoHoverBgColor: color.adjust(mixins.$grey800, $lightness: -10%);
   display: grid;
   grid-template-columns: var(--nav-item-prefix-width) auto;
   gap: 10px;
-  height: calc(45rem / 16);
+  height: 100%;
   padding-block: 0;
   padding-inline: var(--nav-item-gutter-width);
   position: relative;
-  flex: 0 0 calc(45rem / 16);
   flex-direction: row;
   align-items: center;
   color: currentcolor;
-  border-block-end: 1px solid var(--hairline-color);
   background-clip: padding-box;
 
   &::after {
     display: none;
+  }
+
+  #global-sidebar & {
+    border-block-end: 1px solid var(--hairline-color);
   }
 }
 
@@ -376,7 +377,7 @@ li.crumb .btn.menubtn,
 
   &:not(.m) {
     width: var(--touch-target-size);
-    min-height: var(--touch-target-size);
+    height: var(--touch-target-size);
   }
 
   &.m {

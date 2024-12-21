@@ -2955,6 +2955,24 @@ class GeneralConfig extends BaseConfig
     public bool $storeUserIps = false;
 
     /**
+     * @var string|null The URL to a CSS file that should be included when rendering system templates on the front end,
+     * such as the Login and Set Password templates.
+     *
+     * ::: code
+     * ```php Static Config
+     * ->systemTemplateCss('/css/cp-theme.css');
+     * ```
+     * ```shell Environment Override
+     * CRAFT_SYSTEM_TEMPLATE_CSS=/css/cp-theme.css
+     * ```
+     * :::
+     *
+     * @group System
+     * @since 5.6.0
+     */
+    public ?string $systemTemplateCss = null;
+
+    /**
      * @var string|null The handle of the filesystem that should be used for storing temporary asset uploads. A local temp folder will
      * be used by default.
      *
@@ -6589,6 +6607,31 @@ class GeneralConfig extends BaseConfig
     public function storeUserIps(bool $value = true): self
     {
         $this->storeUserIps = $value;
+        return $this;
+    }
+
+    /**
+     * The URL to a CSS file that should be included when rendering system templates on the front end,
+     * such as the Login and Set Password templates.
+     *
+     * ::: code
+     * ```php Static Config
+     * ->systemTemplateCss('/css/cp-theme.css');
+     * ```
+     * ```shell Environment Override
+     * CRAFT_SYSTEM_TEMPLATE_CSS=/css/cp-theme.css
+     * ```
+     * :::
+     *
+     * @group System
+     * @param string|null $value
+     * @return self
+     * @see $systemTemplateCss
+     * @since 5.6.0
+     */
+    public function systemTemplateCss(?string $value): self
+    {
+        $this->systemTemplateCss = $value;
         return $this;
     }
 

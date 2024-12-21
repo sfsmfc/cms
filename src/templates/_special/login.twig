@@ -16,7 +16,7 @@
 {% endif %}
 
 <div class="login-container">
-  <div class="pane login-form-container">
+  <div class="pane secondary login-form-container">
     {% tag 'form' with {
       class: {
         'login-form': true,
@@ -46,21 +46,22 @@
         }) }}
       {% endif %}
 
-      {{ forms.passwordField({
-        label: 'Password'|t('app'),
-        fieldClass: staticEmail ? 'first mb-0' : 'mb-0',
-        class: 'login-password',
-        name: 'password',
-        autocomplete: 'current-password',
-        inputAttributes: {
-          aria: {
-            required: 'true',
+      <div>
+        {{ forms.passwordField({
+          label: 'Password'|t('app'),
+          class: 'login-password',
+          name: 'password',
+          autocomplete: 'current-password',
+          inputAttributes: {
+            aria: {
+              required: 'true',
+            },
           },
-        },
-      }) }}
-      {% if showResetPassword %}
-          <a class="login-forgot-password" tabindex="0" role="button">{{ 'Forgot password?'|t('app') }}</a>
-      {% endif %}
+        }) }}
+        {% if showResetPassword %}
+          <button type="button" class="btn login-forgot-password chromeless">{{ 'Forgot password?'|t('app') }}</button>
+        {% endif %}
+      </div>
 
       {% if showRememberMeCheckbox and generalConfig.rememberedUserSessionDuration %}
         {{ forms.checkboxField({
@@ -110,7 +111,7 @@
           {{ forms.button({
             label: (craft.app.locale.getOrientation() == 'ltr' ? '← ' : ' →') ~
               'Back to sign in'|t('app'),
-            class: 'login-reset-back-btn',
+            class: ['login-reset-back-btn', 'chromeless'],
             spinner: true,
           }) }}
         </div>
