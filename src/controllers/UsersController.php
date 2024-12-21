@@ -2402,15 +2402,11 @@ JS);
         $view = $this->getView();
         $templateMode = $view->getTemplateMode();
         $view->setTemplateMode(View::TEMPLATE_MODE_CP);
-//        $view->startCssBuffer();
-//        $view->startJsBuffer();
         try {
             $html = $method->getAuthFormHtml();
         } finally {
             $view->setTemplateMode($templateMode);
         }
-//        $headHtml = $view->clearCssBuffer() ?: '';
-//        $bodyHtml = $view->clearJsBuffer() ?: '';
 
         if ($this->request->getIsCpRequest()) {
             // explicitly set the default return URL here, since checkPermission('accessCp') will be false
