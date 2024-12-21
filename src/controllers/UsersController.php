@@ -535,7 +535,6 @@ class UsersController extends Controller
     {
         $this->requireAcceptsJson();
         $this->requirePostRequest();
-        $this->requireCpRequest();
 
         $forElevatedSession = (bool)$this->request->getBodyParam('forElevatedSession');
 
@@ -550,7 +549,7 @@ class UsersController extends Controller
         $html = $view->renderTemplate('_special/login-modal.twig', [
             'staticEmail' => $staticEmail,
             'forElevatedSession' => $forElevatedSession,
-        ]);
+        ], View::TEMPLATE_MODE_CP);
 
         return $this->asJson([
             'html' => $html,
@@ -868,8 +867,7 @@ class UsersController extends Controller
             return $this->asSuccess(data: $return);
         }
 
-        // Can they access the control panel?
-        if ($user->can('accessCp')) {
+        if ($this->request->getIsCpRequest()) {
             // Send them to the control panel login page by default
             $url = UrlHelper::cpUrl(Request::CP_PATH_LOGIN);
         } else {
@@ -1399,11 +1397,9 @@ JS);
      */
     public function actionSetup2fa(): Response
     {
-        $this->requireCpRequest();
-
         $this->getView()->registerAssetBundle(AuthMethodSetupAsset::class);
 
-        return $this->renderTemplate('_special/setup-2fa.twig');
+        return $this->renderTemplate('_special/setup-2fa.twig', templateMode: View::TEMPLATE_MODE_CP);
     }
 
     /**
