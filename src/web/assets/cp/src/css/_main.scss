@@ -6726,7 +6726,7 @@ body.reduce-focus-visibility {
     border: none;
     background: transparent;
     padding-right: 4rem;
-    box-shadow: none;
+    box-shadow: none !important;
   }
 
   .password-toggle {
