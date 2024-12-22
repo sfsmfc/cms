@@ -39,6 +39,8 @@
 - “Template” field layout UI elements now show suggestions for the Template input.
 - Improved the error output for nested elements when they can’t be resaved via `resave` commands.
 - `resave` commands’ `--drafts`, `--provisional-drafts`, and `--revisions` options can now be set to `null`, causing elements to be resaved regardless of whether they’re drafts/provisional drafts/revisions.
+- Added the `systemTemplateCss` config setting. ([#16344](https://github.com/craftcms/cms/pull/16344))
+- The `loginPath`, `logoutPath`, `setPasswordPath`, and `verifyEmailPath` config settings are now respected in headless mode. ([#16344](https://github.com/craftcms/cms/pull/16344))
 
 ### Development
 - Added support for fallback element partial templates, e.g. `_partials/entry.twig` as opposed to `_partials/entry/typeHandle.twig`. ([#16125](https://github.com/craftcms/cms/pull/16125))
@@ -108,6 +110,9 @@
 
 ### System
 - Craft now keeps track of which site users registered from. When sending an email from the control panel, the current site is now set to the user’s affiliated site, if known. ([#16174](https://github.com/craftcms/cms/pull/16174))
+- The system Login template is now rendered from `/login` (per the `loginPath` config setting) if a site template doesn’t exist in the same location. ([#16344](https://github.com/craftcms/cms/pull/16344))
+- When a user with an active two-step verification method logs in from the front end, they’ll be redirected to `/login` (per the `loginPath` config setting) to complete the verification process. ([#16344](https://github.com/craftcms/cms/pull/16344))
+- System templates (Login, Set Password, and error message screens) now have more generic styling when rendered on the front end, and can now have custom CSS styling via the `systemTemplateCss` config setting. ([#16344](https://github.com/craftcms/cms/pull/16344))
 - Database rows with foreign keys referencing nonexistent rows are now deleted via garbage collection.
 - Pages which contain image transform generation URLs now set no-cache headers. ([#16195](https://github.com/craftcms/cms/discussions/16195))
 - Reduced the size of GraphQL introspection schemas. ([#16326](https://github.com/craftcms/cms/pull/16326))
