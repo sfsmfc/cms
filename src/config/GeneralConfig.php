@@ -1690,8 +1690,6 @@ class GeneralConfig extends BaseConfig
      *
      * This can be set to `false` to disable front-end login.
      *
-     * Note that this config setting is ignored when <config5:headlessMode> is enabled.
-     *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
      * ::: code
@@ -1712,8 +1710,6 @@ class GeneralConfig extends BaseConfig
      * @var mixed The URI Craft should use for user logout on the front end.
      *
      * This can be set to `false` to disable front-end logout.
-     *
-     * Note that this config setting is ignored when <config5:headlessMode> is enabled.
      *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
@@ -2745,8 +2741,6 @@ class GeneralConfig extends BaseConfig
     /**
      * @var mixed The URI or URL that Craft should use for Set Password forms on the front end.
      *
-     * This setting is ignored when <config5:headlessMode> is enabled, unless it’s set to an absolute URL.
-     *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
      * ::: tip
@@ -3310,8 +3304,6 @@ class GeneralConfig extends BaseConfig
 
     /**
      * @var mixed The URI or URL that Craft should use for email verification links on the front end.
-     *
-     * This setting is ignored when <config5:headlessMode> is enabled, unless it’s set to an absolute URL.
      *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
@@ -5167,8 +5159,6 @@ class GeneralConfig extends BaseConfig
      *
      * This can be set to `false` to disable front-end login.
      *
-     * Note that this config setting is ignored when <config5:headlessMode> is enabled.
-     *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
      * ```php
@@ -5191,8 +5181,6 @@ class GeneralConfig extends BaseConfig
      * The URI Craft should use for user logout on the front end.
      *
      * This can be set to `false` to disable front-end logout.
-     *
-     * Note that this config setting is ignored when <config5:headlessMode> is enabled.
      *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
@@ -6374,8 +6362,6 @@ class GeneralConfig extends BaseConfig
     /**
      * The URI or URL that Craft should use for Set Password forms on the front end.
      *
-     * This setting is ignored when <config5:headlessMode> is enabled, unless it’s set to an absolute URL.
-     *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
      * ::: tip
@@ -7017,8 +7003,6 @@ class GeneralConfig extends BaseConfig
 
     /**
      * The URI or URL that Craft should use for email verification links on the front end.
-     *
-     * This setting is ignored when <config5:headlessMode> is enabled, unless it’s set to an absolute URL.
      *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *

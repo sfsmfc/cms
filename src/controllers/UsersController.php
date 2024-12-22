@@ -202,6 +202,11 @@ class UsersController extends Controller
      */
     public function actionLogin(): ?Response
     {
+        // Set the default response format to HTML, in case it was set to JSON for headless mode
+        if (!$this->request->getAcceptsJson()) {
+            $this->response->format = Response::FORMAT_HTML;
+        }
+
         if ($this->request->getIsGet()) {
             // see if they're already logged in
             $user = static::currentUser();
@@ -577,6 +582,11 @@ class UsersController extends Controller
      */
     public function actionLogout(): Response
     {
+        // Set the default response format to HTML, in case it was set to JSON for headless mode
+        if (!$this->request->getAcceptsJson()) {
+            $this->response->format = Response::FORMAT_HTML;
+        }
+
         // Passing false here for reasons.
         Craft::$app->getUser()->logout(false);
 
@@ -791,6 +801,11 @@ class UsersController extends Controller
      */
     public function actionSetPassword(): Response
     {
+        // Set the default response format to HTML, in case it was set to JSON for headless mode
+        if (!$this->request->getAcceptsJson()) {
+            $this->response->format = Response::FORMAT_HTML;
+        }
+
         // Have they just submitted a password, or are we just displaying the page?
         if (!$this->request->getIsPost()) {
             if (!is_array($info = $this->_processTokenRequest())) {
@@ -886,6 +901,11 @@ class UsersController extends Controller
      */
     public function actionVerifyEmail(): Response
     {
+        // Set the default response format to HTML, in case it was set to JSON for headless mode
+        if (!$this->request->getAcceptsJson()) {
+            $this->response->format = Response::FORMAT_HTML;
+        }
+
         if (!is_array($info = $this->_processTokenRequest())) {
             return $info;
         }
