@@ -1741,10 +1741,7 @@ class Request extends \yii\web\Request
         }
 
         // Special path?
-        if (
-            $checkSpecialPaths &&
-            ($this->_isCpRequest || !$this->generalConfig->headlessMode)
-        ) {
+        if ($checkSpecialPaths) {
             $specialPaths = [
                 [
                     $this->_isCpRequest ? self::CP_PATH_LOGIN : $this->generalConfig->getLoginPath(),
