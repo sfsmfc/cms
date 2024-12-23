@@ -9,7 +9,7 @@ class Redirect extends \yii\base\BaseObject
 {
     public string $to;
     public string $from;
-    public int $status = 302;
+    public int $statusCode = 302;
     public \Closure|string $match;
     public bool $caseSensitive = true;
     private string $delimiter = '`';
@@ -31,7 +31,7 @@ class Redirect extends \yii\base\BaseObject
             $callback($this);
         }
 
-        Craft::$app->getResponse()->redirect($this->replaceMatches($this->to), $this->status);
+        Craft::$app->getResponse()->redirect($this->replaceMatches($this->to), $this->statusCode);
         Craft::$app->end();
     }
 
