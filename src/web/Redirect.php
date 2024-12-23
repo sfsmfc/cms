@@ -4,7 +4,6 @@ namespace craft\web;
 
 use Craft;
 use League\Uri\Http;
-use Monolog\Handler\NoopHandler;
 
 class Redirect extends \yii\base\BaseObject
 {
