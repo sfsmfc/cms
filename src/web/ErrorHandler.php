@@ -9,6 +9,7 @@ namespace craft\web;
 
 use Craft;
 use craft\events\ExceptionEvent;
+use craft\events\RedirectEvent;
 use craft\helpers\App;
 use craft\helpers\Json;
 use craft\helpers\Template;
@@ -39,6 +40,11 @@ class ErrorHandler extends \yii\web\ErrorHandler
     public const EVENT_BEFORE_HANDLE_EXCEPTION = 'beforeHandleException';
 
     /**
+     * @event RedirectEvent The event that is triggered before a 404 redirect.
+     */
+    public const EVENT_BEFORE_REDIRECT = 'beforeRedirect';
+
+    /**
      * @inheritdoc
      */
     public function handleException($exception): void
@@ -57,6 +63,31 @@ class ErrorHandler extends \yii\web\ErrorHandler
 
         // 404?
         if ($exception instanceof HttpException && $exception->statusCode === 404) {
+            $redirects = Craft::$app->getConfig()->getConfigFromFile('redirects');
+            if ($redirects) {
+                foreach ($redirects as $from => $redirect) {
+                    if ($redirect instanceof Redirect) {
+                        $redirect();
+                    }
+
+                    $redirectConfig = is_string($redirect) ? ['to' => $redirect] : $redirect;
+
+                    if (!isset($redirectConfig['from']) && is_string($from)) {
+                        $redirectConfig['from'] = $from;
+                    }
+
+                    $callback = function(Redirect $redirect) {
+                        $this->trigger(
+                            self::EVENT_BEFORE_REDIRECT,
+                            new RedirectEvent(['redirect' => $redirect])
+                        );
+                    };
+
+                    Craft::createObject(Redirect::class, [$redirectConfig])($callback);
+                }
+            }
+
+
             $request = Craft::$app->getRequest();
             if ($request->getIsSiteRequest() && $request->getPathInfo() === 'wp-admin') {
                 $exception->statusCode = 418;
