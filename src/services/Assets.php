@@ -312,9 +312,13 @@ class Assets extends Component
 
         foreach ((array)$folderIds as $folderId) {
             $folder = $this->getFolderById((int)$folderId);
+            if (!$folder) {
+                continue;
+            }
+
             $folders[] = $folder;
 
-            if ($folder && $deleteDir) {
+            if ($folder->path && $deleteDir) {
                 $volume = $folder->getVolume();
                 try {
                     $volume->deleteDirectory($folder->path);
@@ -660,7 +664,7 @@ class Assets extends Component
             $height = $width;
         }
 
-        // Maybe a plugin wants to do something here
+        // Fire a 'defineThumbUrl' event
         if ($this->hasEventHandlers(self::EVENT_DEFINE_THUMB_URL)) {
             $event = new DefineAssetThumbUrlEvent([
                 'asset' => $asset,
@@ -668,7 +672,6 @@ class Assets extends Component
                 'height' => $height,
             ]);
             $this->trigger(self::EVENT_DEFINE_THUMB_URL, $event);
-
             // If a plugin set the url, we'll just use that.
             if ($event->url !== null) {
                 return $event->url;
@@ -1051,7 +1054,7 @@ class Assets extends Component
      */
     public function getAssetPreviewHandler(Asset $asset): ?AssetPreviewHandlerInterface
     {
-        // Give plugins a chance to register their own preview handlers
+        // Fire a 'registerPreviewHandler' event
         if ($this->hasEventHandlers(self::EVENT_REGISTER_PREVIEW_HANDLER)) {
             $event = new AssetPreviewEvent(['asset' => $asset]);
             $this->trigger(self::EVENT_REGISTER_PREVIEW_HANDLER, $event);

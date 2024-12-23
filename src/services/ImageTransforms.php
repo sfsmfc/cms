@@ -463,8 +463,7 @@ class ImageTransforms extends Component
 
     /**
      * @template T of ImageTransformerInterface
-     * @param string $type
-     * @phpstan-param class-string<T> $type
+     * @param class-string<T> $type
      * @param array $config
      * @return T
      * @throws InvalidConfigException
@@ -562,13 +561,14 @@ class ImageTransforms extends Component
             ImageTransformer::class,
         ];
 
-        $event = new RegisterComponentTypesEvent([
-            'types' => $transformers,
-        ]);
+        // Fire a 'registerImageTransformers' event
+        if ($this->hasEventHandlers(self::EVENT_REGISTER_IMAGE_TRANSFORMERS)) {
+            $event = new RegisterComponentTypesEvent(['types' => $transformers]);
+            $this->trigger(self::EVENT_REGISTER_IMAGE_TRANSFORMERS, $event);
+            return $event->types;
+        }
 
-        $this->trigger(self::EVENT_REGISTER_IMAGE_TRANSFORMERS, $event);
-
-        return $event->types;
+        return $transformers;
     }
 
     /**

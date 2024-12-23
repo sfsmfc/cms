@@ -21,6 +21,7 @@ use craft\mail\transportadapters\BaseTransportAdapter;
 use craft\mail\transportadapters\Sendmail;
 use craft\mail\transportadapters\TransportAdapterInterface;
 use craft\models\MailSettings;
+use craft\web\assets\admintable\AdminTableAsset;
 use craft\web\assets\generalsettings\GeneralSettingsAsset;
 use craft\web\Controller;
 use yii\base\Exception;
@@ -129,8 +130,7 @@ class SystemSettingsController extends Controller
         $transportTypeOptions = [];
 
         foreach ($allTransportAdapterTypes as $transportAdapterType) {
-            /** @var string|TransportAdapterInterface $transportAdapterType */
-            /** @phpstan-var class-string<TransportAdapterInterface>|TransportAdapterInterface $transportAdapterType */
+            /** @var class-string<TransportAdapterInterface> $transportAdapterType */
             if ($transportAdapterType === get_class($adapter) || $transportAdapterType::isSelectable()) {
                 $allTransportAdapters[] = MailerHelper::createTransportAdapter($transportAdapterType);
                 $transportTypeOptions[] = [
@@ -237,6 +237,36 @@ class SystemSettingsController extends Controller
     }
 
     /**
+     * Global Set index
+     *
+     * @return Response
+     * @since 5.3.0
+     */
+    public function actionGlobalSetIndex(): Response
+    {
+        $view = $this->getView();
+        $view->registerAssetBundle(AdminTableAsset::class);
+        $view->registerTranslations('app', [
+            'Global Set Name',
+            'No global sets exist yet.',
+        ]);
+
+        return $this->renderTemplate('settings/globals/_index.twig', [
+            'title' => Craft::t('app', 'Globals'),
+            'crumbs' => [
+                [
+                    'label' => Craft::t('app', 'Settings'),
+                    'url' => UrlHelper::cpUrl('settings'),
+                ],
+            ],
+            'globalSets' => Craft::$app->getGlobals()->getAllSets(),
+            'buttonLabel' => Craft::t('app', 'New {type}', [
+                'type' => GlobalSet::lowerDisplayName(),
+            ]),
+        ]);
+    }
+
+    /**
      * Global Set edit form.
      *
      * @param int|null $globalSetId The global set’s ID, if any.
@@ -263,7 +293,9 @@ class SystemSettingsController extends Controller
                 'type' => GlobalSet::displayName(),
             ]);
         } else {
-            $title = Craft::t('app', 'Create a new global set');
+            $title = Craft::t('app', 'Create a new {type}', [
+                'type' => GlobalSet::lowerDisplayName(),
+            ]);
         }
 
         // Breadcrumbs

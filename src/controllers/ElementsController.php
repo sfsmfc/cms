@@ -11,8 +11,13 @@ use Craft;
 use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\base\FieldLayoutComponent;
+use craft\base\NestedElementInterface;
 use craft\behaviors\DraftBehavior;
 use craft\behaviors\RevisionBehavior;
+use craft\db\Query;
+use craft\db\Table;
+use craft\elements\db\ElementQueryInterface;
+use craft\elements\db\NestedElementQueryInterface;
 use craft\elements\User;
 use craft\enums\MenuItemType;
 use craft\errors\InvalidElementException;
@@ -21,7 +26,6 @@ use craft\errors\UnsupportedSiteException;
 use craft\events\DefineElementEditorHtmlEvent;
 use craft\events\DraftEvent;
 use craft\fieldlayoutelements\BaseField;
-use craft\fieldlayoutelements\CustomField;
 use craft\fields\Matrix;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Component;
@@ -29,6 +33,7 @@ use craft\helpers\Cp;
 use craft\helpers\Db;
 use craft\helpers\ElementHelper;
 use craft\helpers\Html;
+use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\i18n\Locale;
 use craft\models\ElementActivity;
@@ -71,6 +76,9 @@ class ElementsController extends Controller
     private ?string $_elementUid = null;
     private ?int $_draftId = null;
     private ?int $_revisionId = null;
+    private ?int $_fieldId = null;
+    private ?int $_ownerId = null;
+    private ?int $_newOwnerId = null;
     private ?int $_siteId = null;
 
     private ?bool $_enabled = null;
@@ -88,6 +96,7 @@ class ElementsController extends Controller
     private bool $_addAnother;
     private array $_visibleLayoutElements;
     private ?string $_selectedTab = null;
+    private bool $_applyParams;
     private bool $_prevalidate;
 
     /**
@@ -111,8 +120,11 @@ class ElementsController extends Controller
         $this->_elementUid = $this->_param('elementUid');
         $this->_draftId = $this->_param('draftId');
         $this->_revisionId = $this->_param('revisionId');
+        $this->_fieldId = $this->_param('fieldId') ?: null;
+        $this->_ownerId = $this->_param('ownerId') ?: null;
+        $this->_newOwnerId = $this->_param('newOwnerId') ?: null;
         $this->_siteId = $this->_param('siteId');
-        $this->_enabled = $this->_param('enabled', true);
+        $this->_enabled = $this->_param('enabled', $this->_param('setEnabled', true) ? true : null);
         $this->_enabledForSite = $this->_param('enabledForSite');
         $this->_slug = $this->_param('slug');
         $this->_fresh = (bool)$this->_param('fresh');
@@ -124,6 +136,7 @@ class ElementsController extends Controller
         $this->_addAnother = (bool)$this->_param('addAnother');
         $this->_visibleLayoutElements = $this->_param('visibleLayoutElements') ?? [];
         $this->_selectedTab = $this->_param('selectedTab');
+        $this->_applyParams = $this->_param('applyParams', true) || !$this->request->getIsPost();
         $this->_prevalidate = (bool)$this->_param('prevalidate');
 
         unset($this->_attributes['failMessage']);
@@ -334,7 +347,7 @@ class ElementsController extends Controller
         $type = $element::lowerDisplayName();
         $enabledForSite = $element->getEnabledForSite();
         $hasRoute = $element->getRoute() !== null;
-        $redirectUrl = $element->getPostEditUrl() ?? Craft::$app->getConfig()->getGeneral()->getPostCpLoginRedirect();
+        $redirectUrl = ElementHelper::postEditUrl($element);
 
         // Site statuses
         if ($canEditMultipleSites) {
@@ -363,7 +376,7 @@ class ElementsController extends Controller
             ->editUrl($element->getCpEditUrl())
             ->docTitle($docTitle)
             ->title($title)
-            ->site($element->getSite())
+            ->site($element::isLocalized() ? $element->getSite() : null)
             ->selectableSites(array_map(fn(int $siteId) => [
                 'site' => $sitesService->getSiteById($siteId),
                 'status' => isset($enabledSiteIds[$siteId]) ? 'enabled' : 'disabled',
@@ -422,13 +435,17 @@ class ElementsController extends Controller
                         'isUnpublishedDraft' => $isUnpublishedDraft,
                         'previewTargets' => $previewTargets,
                         'previewToken' => $previewTargets ? $security->generateRandomString() : null,
+                        'previewParamValue' => $previewTargets ? $security->hashData(StringHelper::randomString(10)) : null,
                         'revisionId' => $element->revisionId,
+                        'fieldId' => $element instanceof NestedElementInterface ? $element->getField()?->id : null,
+                        'ownerId' => $element instanceof NestedElementInterface ? $element->getOwnerId() : null,
                         'siteId' => $element->siteId,
                         'siteStatuses' => $siteStatuses,
                         'siteToken' => (!Craft::$app->getIsLive() || !$element->getSite()->enabled) ? $security->hashData((string)$element->siteId) : null,
                         'visibleLayoutElements' => $form ? $form->getVisibleElements() : [],
                         'updatedTimestamp' => $element->dateUpdated?->getTimestamp(),
                         'canonicalUpdatedTimestamp' => $canonical->dateUpdated?->getTimestamp(),
+                        'isStatic' => $isRevision || !$canSave,
                     ]
                 )
             );
@@ -577,25 +594,19 @@ class ElementsController extends Controller
      */
     private function _editElementTitles(ElementInterface $element): array
     {
-        if ($element::hasTitles()) {
+        if ($element::hasTitles() && $element->title !== null && $element->title !== '') {
             $title = $element->title;
-
-            if ($title === '') {
-                if (!$element->id || $element->getIsUnpublishedDraft()) {
-                    $title = Craft::t('app', 'Create a new {type}', [
-                        'type' => $element::lowerDisplayName(),
-                    ]);
-                } else {
-                    $title = sprintf('%s %s', $element::displayName(), $element->id);
-                }
-            }
+        } elseif (!$element->id || $element->getIsUnpublishedDraft()) {
+            $title = Craft::t('app', 'Create a new {type}', [
+                'type' => $element::lowerDisplayName(),
+            ]);
         } else {
             $title = $element->getUiLabel();
         }
 
-        $docTitle = $title;
+        $docTitle = $element->getUiLabel();
 
-        if ($element->getIsDraft()) {
+        if ($element->getIsDraft() && !$element->getIsUnpublishedDraft()) {
             /** @var ElementInterface|DraftBehavior $element */
             if ($element->isProvisionalDraft) {
                 $docTitle .= ' — ' . Craft::t('app', 'Edited');
@@ -613,11 +624,13 @@ class ElementsController extends Controller
     private function _crumbs(ElementInterface $element, bool $current = true): array
     {
         if ($element->isProvisionalDraft) {
-            $element = $element->getCanonical(true);
+            $crumbs = $element->getCanonical(true)->getCrumbs();
+        } else {
+            $crumbs = $element->getCrumbs();
         }
 
         return [
-            ...$element->getCrumbs(),
+            ...$crumbs,
             [
                 'html' => Cp::elementChipHtml($element, ['showDraftName' => !$current]),
                 'current' => $current,
@@ -841,7 +854,6 @@ class ElementsController extends Controller
                         ],
                     ]) .
                     Html::tag('span', Craft::t('app', 'Preview'), ['class' => 'label']) .
-                    Html::tag('span', options: ['class' => ['spinner', 'spinner-absolute']]) .
                     Html::endTag('button')
                     : '') .
                 Html::endTag('div');
@@ -885,7 +897,7 @@ class ElementsController extends Controller
         // Apply draft
         if ($isDraft && !$isCurrent && $canSave && $canSaveCanonical) {
             $components[] = Html::button(Craft::t('app', 'Apply draft'), [
-                'class' => ['btn', 'secondary', 'formsubmit'],
+                'class' => ['btn', 'secondary', 'formsubmit', 'tooltip-draft-btn'],
                 'data' => [
                     'action' => 'elements/apply-draft',
                     'redirect' => Craft::$app->getSecurity()->hashData('{cpEditUrl}'),
@@ -894,14 +906,14 @@ class ElementsController extends Controller
         }
 
         // Revert content from this revision
-        if ($isRevision && $canSaveCanonical) {
+        if ($isRevision && $canSaveCanonical && $element->hasRevisions()) {
             $components[] = Html::beginForm() .
                 Html::actionInput('elements/revert') .
                 Html::redirectInput('{cpEditUrl}') .
                 Html::hiddenInput('elementId', (string)$canonical->id) .
                 Html::hiddenInput('revisionId', (string)$element->revisionId) .
                 Html::button(Craft::t('app', 'Revert content from this revision'), [
-                    'class' => ['btn', 'formsubmit'],
+                    'class' => ['btn', 'formsubmit', 'revision-draft-btn'],
                 ]) .
                 Html::endForm();
         }
@@ -943,7 +955,10 @@ class ElementsController extends Controller
             $components = [];
 
             if ($element->id) {
-                $components[] = Html::hiddenInput('elementId', (string)$element->getCanonicalId());
+                // don't use the canonical ID if this is a normal element that's keeping track of its canonical
+                // e.g. nested Matrix entries that were duplicated for an owner's draft
+                $id = $element->getIsDraft() || $element->getIsRevision() ? $element->getCanonicalId() : $element->id;
+                $components[] = Html::hiddenInput('elementId', (string)$id);
             }
 
             if ($element->siteId) {
@@ -966,11 +981,24 @@ class ElementsController extends Controller
         $behavior->contentHtml($contentHtml);
         $behavior->metaSidebarHtml($sidebarHtml);
 
-        $this->view->registerJsWithVars(fn($settingsJs) => <<<JS
-new Craft.ElementEditor($('#$containerId'), $settingsJs);
+        $settings = $jsSettingsFn($form);
+
+        $isSlideout = Craft::$app->getRequest()->getHeaders()->has('X-Craft-Container-Id');
+        if ($isSlideout) {
+            $this->view->registerJsWithVars(fn($settings) => <<<JS
+$('#$containerId').data('elementEditorSettings', $settings);
 JS, [
-            $jsSettingsFn($form),
-        ]);
+                $settings,
+            ]);
+        } else {
+            $this->view->registerJsWithVars(fn($settings) => <<<JS
+new Craft.ElementEditor($('#$containerId'), $settings);
+JS, [
+                $settings,
+            ]);
+        }
+
+
 
         // Give the element a chance to do things here too
         $element->prepareEditScreen($response, $containerId);
@@ -983,7 +1011,7 @@ JS, [
     ): string {
         $html = $form?->render() ?? '';
 
-        // Trigger a defineEditorContent event
+        // Fire a 'defineEditorContent' event
         if ($this->hasEventHandlers(self::EVENT_DEFINE_EDITOR_CONTENT)) {
             $event = new DefineElementEditorHtmlEvent([
                 'element' => $element,
@@ -1042,18 +1070,19 @@ JS, [
                             foreach ($tab->getElements() as $layoutElement) {
                                 if ($layoutElement instanceof BaseField && $layoutElement->attribute() === $fieldKey) {
                                     $tabUid = $tab->uid;
-
-                                    if ($layoutElement instanceof CustomField) {
-                                        $field = $layoutElement->getField();
-                                        // if we're dealing with a Matrix field, we only want to show the errors
-                                        // if that field is set to inline blocks view mode;
-                                        if ($field instanceof Matrix && $field->viewMode !== $field::VIEW_MODE_BLOCKS) {
-                                            $error = null;
-                                        }
-                                    }
-
-                                    continue 2;
+                                    break 2;
                                 }
+                            }
+                        }
+
+                        // If the error is for a recursively-nested Matrix field,
+                        // manipulate the key to only reference the nested Matrix field, entry and inner field
+                        // Before: foo[<uuid>].bar[<uuid>].baz
+                        // After:  bar[<uuid>].baz
+                        if (substr_count($key, '.') > 1) {
+                            $keyParts = explode('.', $key);
+                            if (preg_match(sprintf('/\[%s\]$/', StringHelper::UUID_PATTERN), $keyParts[count($keyParts) - 3])) {
+                                $key = implode('.', array_slice($keyParts, -2));
                             }
                         }
 
@@ -1221,6 +1250,10 @@ JS, [
             }
         }
 
+        if ($element instanceof NestedElementInterface && property_exists($element, 'updateSearchIndexForOwner')) {
+            $element->updateSearchIndexForOwner = true;
+        }
+
         try {
             $namespace = $this->request->getHeaders()->get('X-Craft-Namespace');
             // crossSiteValidate only if it's multisite, element supports drafts and we're not in a slideout
@@ -1269,6 +1302,132 @@ JS, [
         return $this->_asSuccess(Craft::t('app', '{type} saved.', [
             'type' => $element::displayName(),
         ]), $element, supportsAddAnother: true);
+    }
+
+    /**
+     * Saves a nested element for a derivative of its owner.
+     *
+     * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
+     * @throws ServerErrorHttpException
+     * @since 5.5.0
+     */
+    public function actionSaveNestedElementForDerivative(): ?Response
+    {
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+
+        if (!isset($this->_newOwnerId)) {
+            throw new BadRequestHttpException('No new owner was identified by the request.');
+        }
+
+        /** @var Element|null $element */
+        $element = $this->_element();
+
+        if (
+            !$element instanceof NestedElementInterface ||
+            !$element->getOwnerId() ||
+            !$element->getIsDraft() ||
+            $element->getIsCanonical()
+        ) {
+            throw new BadRequestHttpException('No element was identified by the request.');
+        }
+
+        $this->element = $element;
+        $elementsService = Craft::$app->getElements();
+        $user = static::currentUser();
+
+        // Check save permissions before and after applying POST params to the element
+        // in case the request was tampered with.
+        if (!$elementsService->canSave($element, $user)) {
+            throw new ForbiddenHttpException('User not authorized to save this element.');
+        }
+
+        // Get the new owner and make sure it's a derivative element,
+        // and that its canonical element is the nested element's primary owner
+        $owner = $elementsService->getElementById($this->_newOwnerId, siteId: $element->siteId);
+        if ($owner->getIsCanonical()) {
+            throw new BadRequestHttpException('The owner element must be a derivative.');
+        }
+        if ($owner->getCanonicalId() !== $element->getPrimaryOwnerId()) {
+            throw new BadRequestHttpException('The canonical owner element must be the primary owner of the nested element.');
+        }
+        if (!$elementsService->canSave($owner, $user)) {
+            throw new ForbiddenHttpException('User not authorized to save the owner element.');
+        }
+
+        // Get the old sort order
+        $sortOrder = (new Query())
+            ->select('sortOrder')
+            ->from(Table::ELEMENTS_OWNERS)
+            ->where([
+                'elementId' => $element->id,
+                'ownerId' => $element->getOwnerId(),
+            ])
+            ->scalar() ?: null;
+        $element->setSortOrder($sortOrder);
+
+        $db = Craft::$app->getDb();
+        $transaction = $db->beginTransaction();
+
+        try {
+            // Remove existing ownership data for the element within the canonical owner,
+            // and for its canonical element within the derivative
+            Db::delete(Table::ELEMENTS_OWNERS, [
+                'or',
+                ['elementId' => $element->id, 'ownerId' => $owner->getCanonicalId()],
+                ['elementId' => $element->getCanonicalId(), 'ownerId' => $owner->id],
+            ]);
+
+            // Remove existing ownership data for the element within the canonical owner
+            Db::delete(Table::ELEMENTS_OWNERS, [
+                'elementId' => $element->id,
+                'ownerId' => $owner->getCanonicalId(),
+            ]);
+
+            // Remove the draft data, but preserve the canonicalId
+            $element->setPrimaryOwner($owner);
+            $element->setOwner($owner);
+            $elementsService->saveElement($element);
+
+            $this->_applyParamsToElement($element);
+
+            if (!$elementsService->canSave($element, $user)) {
+                throw new ForbiddenHttpException('User not authorized to save this element.');
+            }
+
+            if ($element->enabled && $element->getEnabledForSite()) {
+                $element->setScenario(Element::SCENARIO_LIVE);
+            }
+
+            try {
+                $success = $elementsService->saveElement($element);
+            } catch (UnsupportedSiteException $e) {
+                $element->addError('siteId', $e->getMessage());
+                $success = false;
+            }
+
+            if (!$success) {
+                $transaction->rollBack();
+                return $this->_asFailure($element, Craft::t('app', 'Couldn’t save {type}.', [
+                    'type' => $element::lowerDisplayName(),
+                ]));
+            }
+
+            if ($element->getIsDraft()) {
+                Craft::$app->getDrafts()->removeDraftData($element);
+            }
+
+            $transaction->commit();
+        } catch (Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+
+        return $this->_asSuccess(Craft::t('app', '{type} saved.', [
+            'type' => $element::displayName(),
+        ]), $element);
     }
 
     /**
@@ -1482,9 +1641,11 @@ JS, [
 
         // Keep track of all newly-created draft IDs
         $draftElementIds = [];
+        $draftElementUids = [];
         $draftsService = Craft::$app->getDrafts();
-        $draftsService->on(Drafts::EVENT_AFTER_CREATE_DRAFT, function(DraftEvent $event) use (&$draftElementIds) {
+        $draftsService->on(Drafts::EVENT_AFTER_CREATE_DRAFT, function(DraftEvent $event) use (&$draftElementIds,  &$draftElementUids) {
             $draftElementIds[$event->canonical->id] = $event->draft->id;
+            $draftElementUids[$event->canonical->uid] = $event->draft->uid;
         });
 
         $db = Craft::$app->getDb();
@@ -1539,15 +1700,18 @@ JS, [
             'draftNotes' => $element->draftNotes,
             'modifiedAttributes' => $element->getModifiedAttributes(),
             'draftElementIds' => $draftElementIds,
+            'draftElementUids' => $draftElementUids,
         ];
 
         if ($this->request->getIsCpRequest()) {
             [$docTitle, $title] = $this->_editElementTitles($element);
+            $previewTargets = $element->getPreviewTargets();
             $data += $this->_fieldLayoutData($element);
             $data += [
                 'docTitle' => $docTitle,
                 'title' => $title,
-                'previewTargets' => $element->getPreviewTargets(),
+                'previewTargets' => $previewTargets,
+                'previewParamValue' => $previewTargets ? Craft::$app->getSecurity()->hashData(StringHelper::randomString(10)) : null,
                 'initialDeltaValues' => Craft::$app->getView()->getInitialDeltaValues(),
                 'updatedTimestamp' => $element->dateUpdated->getTimestamp(),
                 'canonicalUpdatedTimestamp' => $element->getCanonical()->dateUpdated->getTimestamp(),
@@ -1631,8 +1795,13 @@ JS, [
         $this->requirePostRequest();
         $elementsService = Craft::$app->getElements();
 
-        /** @var Element|DraftBehavior|null $element */
+        /** @var Element|DraftBehavior|Response|null $element */
         $element = $this->_element();
+
+        // this can happen if creating element via slideout, and we hit "create entry" before the autosave kicks in
+        if ($element instanceof Response) {
+            return $element;
+        }
 
         if (!$element || !$element->getIsDraft()) {
             throw new BadRequestHttpException('No draft was identified by the request.');
@@ -1675,8 +1844,13 @@ JS, [
             }
         }
 
+        $attributes = [];
+        if ($element instanceof NestedElementInterface) {
+            $attributes['updateSearchIndexForOwner'] = true;
+        }
+
         try {
-            $canonical = Craft::$app->getDrafts()->applyDraft($element);
+            $canonical = Craft::$app->getDrafts()->applyDraft($element, $attributes);
         } catch (InvalidElementException) {
             return $this->_asAppyDraftFailure($element);
         } finally {
@@ -1844,7 +2018,18 @@ JS, [
             $element = $this->_createElement();
         }
 
-        /** @var Element|DraftBehavior|null $element */
+        // Prevalidate?
+        if ($this->_prevalidate && $element->enabled && $element->getEnabledForSite()) {
+            $element->setScenario(Element::SCENARIO_LIVE);
+            $element->validate();
+        }
+
+        /** @var Element|DraftBehavior|Response|null $element */
+        // see https://github.com/craftcms/cms/issues/14635#issuecomment-2349006694 for details
+        if ($element instanceof Response) {
+            return $element;
+        }
+
         if (!$element || $element->getIsRevision()) {
             throw new BadRequestHttpException('No element was identified by the request.');
         }
@@ -1982,6 +2167,7 @@ JS, [
                     'userId' => $record->user->id,
                     'userName' => $record->user->getName(),
                     'userThumb' => $record->user->getThumbHtml(26),
+                    'type' => $record->type,
                     'message' => $message,
                 ];
             }, $activity),
@@ -2010,24 +2196,8 @@ JS, [
         $elementId = $elementId ?? $this->_elementId;
         $elementUid = $elementUid ?? $this->_elementUid;
 
-        $sitesService = Craft::$app->getSites();
         $elementsService = Craft::$app->getElements();
         $user = static::currentUser();
-
-        if ($this->_siteId) {
-            $site = $sitesService->getSiteById($this->_siteId, true);
-            if (!$site) {
-                throw new BadRequestHttpException("Invalid side ID: $this->_siteId");
-            }
-            if (Craft::$app->getIsMultiSite() && !$user->can("editSite:$site->uid")) {
-                throw new ForbiddenHttpException('User not authorized to edit content for this site.');
-            }
-        } else {
-            $site = Cp::requestedSite();
-            if (!$site) {
-                throw new ForbiddenHttpException('User not authorized to edit content in any sites.');
-            }
-        }
 
         if ($this->_elementType) {
             $elementType = $this->_elementType;
@@ -2044,29 +2214,52 @@ JS, [
             throw new BadRequestHttpException('Request missing required param.');
         }
 
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
+        /** @var class-string<ElementInterface> $elementType */
         $this->_validateElementType($elementType);
 
-        if ($strictSite) {
-            $siteId = $site->id;
-            $preferSites = null;
+        if ($elementType::isLocalized()) {
+            if ($this->_siteId) {
+                $site = Craft::$app->getSites()->getSiteById($this->_siteId, true);
+                if (!$site) {
+                    throw new BadRequestHttpException("Invalid side ID: $this->_siteId");
+                }
+                if (Craft::$app->getIsMultiSite() && !$user->can("editSite:$site->uid")) {
+                    throw new ForbiddenHttpException('User not authorized to edit content for this site.');
+                }
+            } else {
+                $site = Cp::requestedSite();
+                if (!$site) {
+                    throw new ForbiddenHttpException('User not authorized to edit content in any sites.');
+                }
+            }
+
+            if ($strictSite) {
+                $siteId = $site->id;
+                $preferSites = null;
+            } else {
+                $siteId = Craft::$app->getSites()->getEditableSiteIds();
+                $preferSites = [$site->id];
+            }
         } else {
-            $siteId = $sitesService->getEditableSiteIds();
-            $preferSites = [$site->id];
+            $siteId = $preferSites = null;
         }
 
         // Loading an existing element?
         if ($this->_draftId || $this->_revisionId) {
-            $element = $elementType::find()
+            $query = $this->_elementQuery($elementType)
                 ->draftId($this->_draftId)
                 ->revisionId($this->_revisionId)
                 ->provisionalDrafts($this->_provisional)
                 ->siteId($siteId)
                 ->preferSites($preferSites)
                 ->unique()
-                ->status(null)
-                ->one();
+                ->status(null);
+
+            if ($this->_revisionId) {
+                $query->trashed(null);
+            }
+
+            $element = $query->one();
 
             if (!$element) {
                 // check for the canonical element as a fallback
@@ -2089,27 +2282,36 @@ JS, [
             throw new ForbiddenHttpException('User not authorized to edit this element.');
         }
 
-        if (!$strictSite && $element->siteId !== $site->id) {
+        if (!$strictSite && isset($site) && $element->siteId !== $site->id) {
             return $this->redirect($element->getCpEditUrl());
         }
 
         return $element;
     }
 
+    /**
+     * @param int|null $elementId
+     * @param string|null $elementUid
+     * @param bool $checkForProvisionalDraft
+     * @param class-string<ElementInterface> $elementType
+     * @param User $user
+     * @param int|array|null $siteId
+     * @param array|null $preferSites
+     * @return ElementInterface|null
+     */
     private function _elementById(
         ?int $elementId,
         ?string $elementUid,
         bool $checkForProvisionalDraft,
         string $elementType,
         User $user,
-        int|array $siteId,
+        int|array|null $siteId,
         ?array $preferSites,
     ): ?ElementInterface {
-        /** @var string|ElementInterface $elementType */
         if ($elementId) {
             // First check for a provisional draft, if we're open to it
             if ($checkForProvisionalDraft) {
-                $element = $elementType::find()
+                $element = $this->_elementQuery($elementType)
                     ->provisionalDrafts()
                     ->draftOf($elementId)
                     ->draftCreator($user)
@@ -2124,7 +2326,7 @@ JS, [
                 }
             }
 
-            $element = $elementType::find()
+            $element = $this->_elementQuery($elementType)
                 ->id($elementId)
                 ->siteId($siteId)
                 ->preferSites($preferSites)
@@ -2138,7 +2340,7 @@ JS, [
 
             // finally, check for an unpublished draft
             // (see https://github.com/craftcms/cms/issues/14199)
-            return $elementType::find()
+            return $this->_elementQuery($elementType)
                 ->id($elementId)
                 ->siteId($siteId)
                 ->preferSites($preferSites)
@@ -2149,16 +2351,47 @@ JS, [
         }
 
         if ($elementUid) {
-            return $elementType::find()
+            $element = $this->_elementQuery($elementType)
                 ->uid($elementUid)
                 ->siteId($siteId)
                 ->preferSites($preferSites)
                 ->unique()
                 ->status(null)
                 ->one();
+
+            if ($element) {
+                return $element;
+            }
+
+            // check for an unpublished draft if we got this far
+            // (e.g. newly added matrix "block" or where autosaveDrafts is off)
+            // https://github.com/craftcms/cms/issues/15985
+            return $this->_elementQuery($elementType)
+                ->uid($elementUid)
+                ->siteId($siteId)
+                ->preferSites($preferSites)
+                ->unique()
+                ->status(null)
+                ->draftOf(false)
+                ->one();
         }
 
         return null;
+    }
+
+    /**
+     * @param class-string<ElementInterface> $elementType
+     * @return ElementQueryInterface
+     */
+    private function _elementQuery(string $elementType): ElementQueryInterface
+    {
+        $query = $elementType::find();
+        if ($query instanceof NestedElementQueryInterface) {
+            $query
+                ->fieldId($this->_fieldId)
+                ->ownerId($this->_ownerId);
+        }
+        return $query;
     }
 
     /**
@@ -2177,10 +2410,13 @@ JS, [
 
         /** @var ElementInterface $element */
         $element = $this->element = Craft::createObject($this->_elementType);
-        if ($this->_siteId && $element::isLocalized()) {
+        if (isset($this->_siteId) && $element::isLocalized()) {
             $element->siteId = $this->_siteId;
         }
-        $element->setAttributesFromRequest($this->_attributes);
+        if (isset($this->_ownerId) && $element instanceof NestedElementInterface) {
+            $element->setOwnerId($this->_ownerId);
+        }
+        $element->setAttributesFromRequest($this->_attributes + array_filter(['fieldId' => $this->_fieldId]));
 
         if (!Craft::$app->getElements()->canSave($element)) {
             throw new ForbiddenHttpException('User not authorized to create this element.');
@@ -2196,8 +2432,7 @@ JS, [
     /**
      * Ensures the given element type is valid.
      *
-     * @param string $elementType
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType
      * @throws BadRequestHttpException
      */
     private function _validateElementType(string $elementType): void
@@ -2216,6 +2451,10 @@ JS, [
      */
     private function _applyParamsToElement(ElementInterface $element): void
     {
+        if (!$this->_applyParams) {
+            return;
+        }
+
         if (isset($this->_enabledForSite)) {
             if (is_array($this->_enabledForSite)) {
                 // Make sure they are allowed to edit all of the posted site IDs
@@ -2255,7 +2494,7 @@ JS, [
 
         $scenario = $element->getScenario();
         $element->setScenario(Element::SCENARIO_LIVE);
-        $element->setAttributesFromRequest($this->_attributes);
+        $element->setAttributesFromRequest($this->_attributes + array_filter(['fieldId' => $this->_fieldId]));
 
         if ($this->_slug !== null) {
             $element->slug = $this->_slug;
@@ -2371,6 +2610,7 @@ JS, [
             'element' => $element->toArray($element->attributes()),
             'errors' => $element->getErrors(),
             'errorSummary' => $this->_errorSummary($element),
+            'invalidNestedElementIds' => $element->getInvalidNestedElementIds(),
         ];
 
         return $this->asFailure($message, $data, ['element' => $element]);

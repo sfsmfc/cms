@@ -20,6 +20,7 @@ use craft\helpers\ArrayHelper;
 use craft\helpers\Component as ComponentHelper;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Json;
+use craft\helpers\Session as SessionHelper;
 use craft\models\UserGroup;
 use craft\records\WebAuthn as WebAuthnRecord;
 use craft\web\Session;
@@ -197,6 +198,13 @@ class Auth extends Component
         // success!
         if ($user) {
             $this->setUser(null);
+
+            // if we're impersonating, pass the user we're impersonating to the complete the login
+            if (SessionHelper::get(User::IMPERSONATE_KEY) !== null) {
+                /** @var User $user */
+                $user = Craft::$app->getUser()->getIdentity();
+            }
+
             Craft::$app->getUser()->login($user, $sessionDuration);
         }
 
@@ -223,15 +231,17 @@ class Auth extends Component
                 RecoveryCodes::class,
             ];
 
-            $event = new RegisterComponentTypesEvent([
-                'types' => $methods,
-            ]);
-            $this->trigger(self::EVENT_REGISTER_METHODS, $event);
+            // Fire a 'registerMethods' event
+            if ($this->hasEventHandlers(self::EVENT_REGISTER_METHODS)) {
+                $event = new RegisterComponentTypesEvent(['types' => $methods]);
+                $this->trigger(self::EVENT_REGISTER_METHODS, $event);
+                $methods = $event->types;
+            }
 
             $this->_methods[$user->id] = array_map(fn(string $class) => ComponentHelper::createComponent([
                 'type' => $class,
                 'user' => $user,
-            ], AuthMethodInterface::class), $event->types);
+            ], AuthMethodInterface::class), $methods);
 
             usort($this->_methods[$user->id], function(AuthMethodInterface $a, AuthMethodInterface $b) {
                 // place Recovery Codes at the end

@@ -94,9 +94,10 @@ class AppHelperTest extends TestCase
     {
         self::assertNull(App::parseEnv(null));
         self::assertSame(CRAFT_TESTS_PATH, App::parseEnv('$CRAFT_TESTS_PATH'));
+        self::assertSame(CRAFT_TESTS_PATH . '/foo/bar', App::parseEnv('$CRAFT_TESTS_PATH/foo/bar'));
         self::assertSame('CRAFT_TESTS_PATH', App::parseEnv('CRAFT_TESTS_PATH'));
         self::assertSame(null, App::parseEnv('$TEST_MISSING'));
-        self::assertSame(Craft::getAlias('@vendor/foo'), App::parseEnv('@vendor/foo'));
+        self::assertSame(Craft::getAlias('@vendor/foo/bar'), App::parseEnv('@vendor/foo/bar'));
     }
 
     /**
@@ -156,6 +157,7 @@ class AppHelperTest extends TestCase
             CmsEdition::Solo->value,
             CmsEdition::Team->value,
             CmsEdition::Pro->value,
+            CmsEdition::Enterprise->value,
         ], App::editions());
     }
 
@@ -463,6 +465,7 @@ class AppHelperTest extends TestCase
             ['solo', CmsEdition::Solo->value],
             ['team', CmsEdition::Team->value],
             ['pro', CmsEdition::Pro->value],
+            ['enterprise', CmsEdition::Enterprise->value],
             [false, -1],
         ];
     }
@@ -476,6 +479,7 @@ class AppHelperTest extends TestCase
             ['Solo', CmsEdition::Solo->value],
             ['Team', CmsEdition::Team->value],
             ['Pro', CmsEdition::Pro->value],
+            ['Enterprise', CmsEdition::Enterprise->value],
             [false, -1],
         ];
     }
@@ -489,6 +493,7 @@ class AppHelperTest extends TestCase
             [CmsEdition::Solo->value, 'solo'],
             [CmsEdition::Team->value, 'team'],
             [CmsEdition::Pro->value, 'pro'],
+            [CmsEdition::Enterprise->value, 'enterprise'],
             [false, 'personal'],
             [false, 'client'],
         ];
@@ -500,9 +505,10 @@ class AppHelperTest extends TestCase
     public static function validEditionsDataProvider(): array
     {
         return [
-            [true, CmsEdition::Pro->value],
-            [true, CmsEdition::Team->value],
             [true, CmsEdition::Solo->value],
+            [true, CmsEdition::Team->value],
+            [true, CmsEdition::Pro->value],
+            [true, CmsEdition::Enterprise->value],
             [true, '1'],
             [true, 0],
             [true, 1],
@@ -511,7 +517,6 @@ class AppHelperTest extends TestCase
             [false, null],
             [false, false],
             [false, 4],
-            [false, 3],
         ];
     }
 
@@ -572,6 +577,7 @@ class AppHelperTest extends TestCase
             [123.4, '123.4'],
             ['foo', 'foo'],
             [null, null],
+            ['2833563543.1341693581393', '2833563543.1341693581393'], // https://github.com/craftcms/cms/issues/15533
         ];
     }
 

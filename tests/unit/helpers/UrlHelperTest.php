@@ -33,6 +33,8 @@ class UrlHelperTest extends TestCase
     public const PROTOCOL_RELATIVE_URL = '//craftcms.com/';
     public const EMAIL_URL = 'mailto:test@abc.com';
     public const TEL_URL = 'tel:+10123456789';
+    public const FILE_PATH_1 = 'C:';
+    public const FILE_PATH_2 = 'C:\foo\bar.txt';
 
     /**
      * @var UnitTester
@@ -162,6 +164,14 @@ class UrlHelperTest extends TestCase
     public function testEncodeParams(string $expected, string $url): void
     {
         self::assertSame($expected, UrlHelper::encodeParams($url));
+    }
+
+    /**
+     * @dataProvider encodeUrlDataProvider
+     */
+    public function testEncodeUrl(string $expected, string $url): void
+    {
+        self::assertSame($expected, UrlHelper::encodeUrl($url));
     }
 
     /**
@@ -307,6 +317,8 @@ class UrlHelperTest extends TestCase
             'non-absolute-url-www' => [false, self::NON_ABSOLUTE_URL_WWW],
             'email-url' => [true, self::EMAIL_URL],
             'tel-url' => [true, self::TEL_URL],
+            'file-path-1' => [false, self::FILE_PATH_1],
+            'file-path-2' => [false, self::FILE_PATH_2],
         ];
     }
 
@@ -572,6 +584,19 @@ class UrlHelperTest extends TestCase
             ['http://example.test?foo=bar+baz', 'http://example.test?foo=bar+baz'],
             ['http://example.test?foo=bar+baz#hash', 'http://example.test?foo=bar baz#hash'],
             ['http://example.test?foo=bar%2Bbaz#hash', 'http://example.test?foo=bar%2Bbaz#hash'],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function encodeUrlDataProvider(): array
+    {
+        return [
+            ['https://domain/fr/offices/gen%C3%AAve', 'https://domain/fr/offices/genêve'],
+            ['https://domain/fr/offices/gen%C3%AAve?foo=bar', 'https://domain/fr/offices/genêve?foo=bar'],
+            ['https://domain/fr/offices/gen%C3%AAve?foo=bar', 'https://domain/fr/offices/gen%C3%AAve?foo=bar'],
+            ['foo+bar', 'foo bar'],
         ];
     }
 

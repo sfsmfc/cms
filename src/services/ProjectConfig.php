@@ -10,6 +10,7 @@ namespace craft\services;
 use Craft;
 use craft\db\Query;
 use craft\db\Table;
+use craft\elements\Address;
 use craft\elements\User;
 use craft\errors\BusyResourceException;
 use craft\errors\OperationAbortedException;
@@ -280,7 +281,7 @@ class ProjectConfig extends Component
     private array $_configFileList = [];
 
     /**
-     * @var int|null The project config cache duration. If null, the <config4:cacheDuration> config setting will be used.
+     * @var int|null The project config cache duration. If null, the <config5:cacheDuration> config setting will be used.
      * @since 4.5.0
      */
     public ?int $cacheDuration = null;
@@ -487,7 +488,7 @@ class ProjectConfig extends Component
         foreach ($config as $key => $item) {
             if (is_array($item)) {
                 $itemPath = sprintf('%s%s', ($path !== null) ? "$path." : '', $key);
-                if ($callback($item)) {
+                if ($callback($item, $itemPath)) {
                     $items[$itemPath] = $item;
                 } else {
                     $this->findInternal($item, $callback, $itemPath, $items);
@@ -882,13 +883,15 @@ class ProjectConfig extends Component
      * Remove values from internal config by a list of paths.
      *
      * @param array $paths
-     * @throws \yii\db\Exception
      */
     protected function removeInternalConfigValuesByPaths(array $paths): void
     {
-        Db::delete(Table::PROJECTCONFIG, [
-            'path' => $paths,
-        ]);
+        $chunks = array_chunk($paths, 1000);
+        foreach ($chunks as $chunk) {
+            Db::delete(Table::PROJECTCONFIG, [
+                'path' => $chunk,
+            ]);
+        }
     }
 
     /**
@@ -937,7 +940,7 @@ class ProjectConfig extends Component
      * Get the list of applied changes
      *
      * @return array
-     * @since 4.9.0
+     * @since 5.1.0
      */
     public function getAppliedChanges(): array
     {
@@ -1224,6 +1227,7 @@ class ProjectConfig extends Component
         // don't touch `meta`
         unset($config[self::PATH_META]);
 
+        $config[self::PATH_ADDRESSES] = $this->_getAddressesData();
         $config[self::PATH_CATEGORY_GROUPS] = $this->_getCategoryGroupData();
         $config[self::PATH_DATE_MODIFIED] = DateTimeHelper::currentTimeStamp();
         $config[self::PATH_ELEMENT_SOURCES] = $this->_getElementSourceData($config[self::PATH_ELEMENT_SOURCES] ?? []);
@@ -1243,16 +1247,17 @@ class ProjectConfig extends Component
         $config[self::PATH_VOLUMES] = $this->_getVolumeData();
 
         // Fire a 'rebuild' event
-        $event = new RebuildConfigEvent([
-            'config' => $config,
-        ]);
-        $this->trigger(self::EVENT_REBUILD, $event);
+        if ($this->hasEventHandlers(self::EVENT_REBUILD)) {
+            $event = new RebuildConfigEvent(['config' => $config]);
+            $this->trigger(self::EVENT_REBUILD, $event);
+            $config = $event->config;
+        }
 
         // Reset the component name map
         $this->_setInternal(self::PATH_META_NAMES, [], updateTimestamp: false, force: true);
 
         // Process the changes
-        foreach ($event->config as $path => $value) {
+        foreach ($config as $path => $value) {
             $this->_setInternal($path, $value, 'Project config rebuild', updateTimestamp: false, force: true);
         }
 
@@ -1619,7 +1624,7 @@ class ProjectConfig extends Component
             return;
         }
 
-        $config = ProjectConfigHelper::splitConfigIntoComponents($this->getCurrentWorkingConfig()->export());
+        $config = $this->getCurrentWorkingConfig();
 
         try {
             $basePath = Craft::$app->getPath()->getProjectConfigPath();
@@ -1629,8 +1634,7 @@ class ProjectConfig extends Component
                 'except' => ['.*', '.*/'],
             ]);
 
-            // get fresh internal config so that all the name comments are properly updated
-            $projectConfigNames = $this->_loadInternalConfig()->get(self::PATH_META_NAMES);
+            $projectConfigNames = $config->get(self::PATH_META_NAMES);
 
             $uids = [];
             $replacements = [];
@@ -1642,16 +1646,15 @@ class ProjectConfig extends Component
                 }
             }
 
-            foreach ($config as $relativeFile => $configData) {
+            $splitConfig = ProjectConfigHelper::splitConfigIntoComponents($config->export());
+            foreach ($splitConfig as $relativeFile => $configData) {
                 $configData = ProjectConfigHelper::cleanupConfig($configData);
                 ksort($configData);
                 $filePath = $basePath . DIRECTORY_SEPARATOR . $relativeFile;
                 $yamlContent = Yaml::dump($configData, 20, 2);
-
                 if (!empty($uids)) {
                     $yamlContent = preg_replace($uids, $replacements, $yamlContent);
                 }
-
                 FileHelper::writeToFile($filePath, $yamlContent);
             }
         } catch (Throwable $e) {
@@ -2050,6 +2053,26 @@ class ProjectConfig extends Component
 
         foreach (Craft::$app->getUserGroups()->getAllGroups() as $group) {
             $data['groups'][$group->uid] = $group->getConfig();
+        }
+
+        return $data;
+    }
+
+
+
+    /**
+     * Return addresses data config array.
+     *
+     * @return array
+     */
+    private function _getAddressesData(): array
+    {
+        $data = [];
+        $fieldLayout = Craft::$app->getFields()->getLayoutByType(Address::class);
+        if ($fieldLayoutConfig = $fieldLayout->getConfig()) {
+            $data['fieldLayouts'] = [
+                $fieldLayout->uid => $fieldLayoutConfig,
+            ];
         }
 
         return $data;

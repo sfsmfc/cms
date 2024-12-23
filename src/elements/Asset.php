@@ -46,7 +46,6 @@ use craft\events\AssetEvent;
 use craft\events\DefineAssetUrlEvent;
 use craft\events\GenerateTransformEvent;
 use craft\fieldlayoutelements\assets\AltField;
-use craft\fs\Temp;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Assets;
 use craft\helpers\Cp;
@@ -383,7 +382,22 @@ class Asset extends Element
             !Craft::$app->getRequest()->getIsConsoleRequest()
         ) {
             $temporaryUploadFolder = Craft::$app->getAssets()->getUserTemporaryUploadFolder();
-            $sources[] = self::_assembleSourceInfoForFolder($temporaryUploadFolder);
+            $temporaryUploadFs = Craft::$app->getAssets()->getTempAssetUploadFs();
+            $sources[] = [
+                'key' => 'temp',
+                'label' => Craft::t('app', 'Temporary Uploads'),
+                'hasThumbs' => true,
+                'criteria' => ['folderId' => $temporaryUploadFolder->id],
+                'defaultSort' => ['dateCreated', 'desc'],
+                'data' => [
+                    'volume-handle' => false,
+                    'folder-id' => $temporaryUploadFolder->id,
+                    'can-upload' => true,
+                    'can-move-to' => false,
+                    'can-move-peer-files-to' => false,
+                    'fs-type' => $temporaryUploadFs::class,
+                ],
+            ];
         }
 
         return $sources;
@@ -433,14 +447,10 @@ class Asset extends Element
      */
     protected static function defineFieldLayouts(?string $source): array
     {
-        if ($source !== null) {
-            $volumes = [];
-            if (preg_match('/^volume:(.+)$/', $source, $matches)) {
-                $volume = Craft::$app->getVolumes()->getVolumeByUid($matches[1]);
-                if ($volume) {
-                    $volumes[] = $volume;
-                }
-            }
+        if ($source !== null && preg_match('/^volume:(.+)$/', $source, $matches)) {
+            $volumes = array_filter([
+                Craft::$app->getVolumes()->getVolumeByUid($matches[1]),
+            ]);
         } else {
             $volumes = Craft::$app->getVolumes()->getAllVolumes();
         }
@@ -572,7 +582,6 @@ class Asset extends Element
                 'orderBy' => 'dateUpdated',
                 'defaultDir' => 'desc',
             ],
-            'id' => Craft::t('app', 'ID'),
             'width' => Craft::t('app', 'Width'),
             'height' => Craft::t('app', 'Height'),
         ];
@@ -595,7 +604,8 @@ class Asset extends Element
      */
     protected static function defineTableAttributes(): array
     {
-        $attributes = [
+        $attributes = array_merge(parent::defineTableAttributes(), [
+            'dateCreated' => ['label' => Craft::t('app', 'Date Uploaded')],
             'filename' => ['label' => Craft::t('app', 'Filename')],
             'size' => ['label' => Craft::t('app', 'File Size')],
             'kind' => ['label' => Craft::t('app', 'File Kind')],
@@ -605,13 +615,9 @@ class Asset extends Element
             'alt' => ['label' => Craft::t('app', 'Alternative Text')],
             'location' => ['label' => Craft::t('app', 'Location')],
             'link' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
-            'id' => ['label' => Craft::t('app', 'ID')],
-            'uid' => ['label' => Craft::t('app', 'UID')],
             'dateModified' => ['label' => Craft::t('app', 'File Modified Date')],
-            'dateCreated' => ['label' => Craft::t('app', 'Date Uploaded')],
-            'dateUpdated' => ['label' => Craft::t('app', 'Date Updated')],
             'uploader' => ['label' => Craft::t('app', 'Uploaded By')],
-        ];
+        ]);
 
         // Hide Author from Craft Solo
         if (Craft::$app->edition === CmsEdition::Solo) {
@@ -645,6 +651,79 @@ class Asset extends Element
         } else {
             parent::prepElementQueryForTableAttribute($elementQuery, $attribute);
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineCardAttributes(): array
+    {
+        $attributes = array_merge(parent::defineCardAttributes(), [
+            'dateCreated' => [
+                'label' => Craft::t('app', 'Date Uploaded'),
+                // placeholder will be merged from parent
+            ],
+            'filename' => [
+                'label' => Craft::t('app', 'Filename'),
+                'placeholder' => Craft::t('app', 'placeholder') . '.png',
+            ],
+            'size' => [
+                'label' => Craft::t('app', 'File Size'),
+                'placeholder' => '2KB',
+            ],
+            'kind' => [
+                'label' => Craft::t('app', 'File Kind'),
+                'placeholder' => Craft::t('app', 'Image'),
+
+            ],
+            'imageSize' => [
+                'label' => Craft::t('app', 'Dimensions'),
+                'placeholder' => '700x500',
+            ],
+            'width' => [
+                'label' => Craft::t('app', 'Image Width'),
+                'placeholder' => '700px',
+            ],
+            'height' => [
+                'label' => Craft::t('app', 'Image Height'),
+                'placeholder' => '500px',
+            ],
+            'location' => [
+                'label' => Craft::t('app', 'Location'),
+                'placeholder' => Craft::t('app', 'Volume'),
+            ],
+            'link' => [
+                'label' => Craft::t('app', 'Link'),
+                'icon' => 'world',
+                'placeholder' => ElementHelper::linkAttributeHtml(null),
+            ],
+            'dateModified' => [
+                'label' => Craft::t('app', 'File Modified Date'),
+                'placeholder' => (new \DateTime())->sub(new \DateInterval('P14D')),
+            ],
+            'uploader' => [
+                'label' => Craft::t('app', 'Uploaded By'),
+                'placeholder' => ($uploader = Craft::$app->getUser()->getIdentity()) ? Cp::elementChipHtml($uploader) : '',
+            ],
+        ]);
+
+        // Hide Author from Craft Solo
+        if (Craft::$app->edition === CmsEdition::Solo) {
+            unset($attributes['uploader']);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function attributePreviewHtml(array $attribute): mixed
+    {
+        return match ($attribute['value']) {
+            'uploader' => $attribute['placeholder'],
+            default => parent::attributePreviewHtml($attribute),
+        };
     }
 
     /**
@@ -1061,6 +1140,14 @@ class Asset extends Element
     public bool $keepFileOnDelete = false;
 
     /**
+     * @var bool|null Whether the associated file should be sanitized on upload, if it's an image. Defaults to `true`,
+     * unless it’s a control panel request and <config4:sanitizeCpImageUploads> is disabled.
+     * @see afterSave()
+     * @since 5.3.0
+     */
+    public ?bool $sanitizeOnUpload = null;
+
+    /**
      * @var int|null Volume ID
      */
     private ?int $_volumeId = null;
@@ -1213,7 +1300,7 @@ class Asset extends Element
             $this->alt = $alt;
         }
 
-        parent::setAttributesFromRequest($values); // TODO: Change the autogenerated stub
+        parent::setAttributesFromRequest($values);
     }
 
     /**
@@ -1455,7 +1542,7 @@ class Asset extends Element
             return null;
         }
 
-        $filename = $this->getFilename(false);
+        $filename = preg_replace('/\s+/', '-', $this->getFilename(false));
         $path = "assets/edit/$this->id-$filename";
 
         return UrlHelper::cpUrl($path);
@@ -1533,7 +1620,7 @@ JS, [
         ]);
 
         // Show in Folder
-        if ($user->can("viewAssets:{$this->getVolume()->uid}")) {
+        if ($this->volumeId && $this->canView($user)) {
             $viewItems[] = [
                 'type' => MenuItemType::Link,
                 'icon' => 'magnifying-glass',
@@ -1560,6 +1647,7 @@ JS, [
                 'id' => $replaceId,
                 'icon' => 'upload',
                 'label' => Craft::t('app', 'Replace file'),
+                'showInChips' => false,
             ];
 
             $view->registerJsWithVars(fn($id, $namespace, $assetId, $fsType, $dimensionsLabel) => <<<JS
@@ -1576,10 +1664,35 @@ $('#' + $id).on('activate', () => {
       },
       fileuploaddone: (event, data) => {
         const result = event instanceof CustomEvent ? event.detail : data.result;
-        $('#' + Craft.namespaceId('new-filename', $namespace)).val(result.filename);
+
+        // Update the filename input and serialized param value
+        const filenameInput = $('#' + Craft.namespaceId('new-filename', $namespace));
+        const oldFilenameValue = encodeURIComponent(filenameInput.val());
+        filenameInput.val(result.filename);
+
+        let form = filenameInput.closest('form');
+
+        // Make sure the form is for this asset
+        let elementEditor = form.data('elementEditor');
+        if (elementEditor?.settings.elementId !== $assetId) {
+          form = null;
+          elementEditor = null;
+        }
+
+        const initialSerializedData = form?.data('initialSerializedValue');
+        if (initialSerializedData) {
+          const inputName = encodeURIComponent(filenameInput.attr('name'));
+          const newFilenameValue = encodeURIComponent(result.filename);
+          form.data('initialSerializedValue', initialSerializedData
+            .replace(inputName + '=' + oldFilenameValue, inputName + '=' + newFilenameValue));
+        }
+
+        // Update the file size value
         $('#' + Craft.namespaceId('file-size-value', $namespace))
           .text(result.formattedSize)
           .attr('title', result.formattedSizeInBytes);
+
+        // Update the dimensions value
         let dimensionsVal = $('#' + Craft.namespaceId('dimensions-value', $namespace));
         if (result.dimensions) {
           if (!dimensionsVal.length) {
@@ -1596,12 +1709,27 @@ $('#' + $id).on('activate', () => {
           dimensionsVal.parent().remove();
         }
 
+        // Update the timestamp on the element editor
+        if (elementEditor && result.updatedTimestamp) {
+          elementEditor.settings.updatedTimestamp = result.updatedTimestamp;
+          elementEditor.settings.canonicalUpdatedTimestamp = result.updatedTimestamp;
+        }
+
         $updatePreviewThumbJs
         Craft.cp.runQueue();
 
+        if (Craft.broadcaster) {
+          Craft.broadcaster.postMessage({
+            event: 'saveElement',
+            id: $assetId,
+          });
+        }
+        
         if (result.error) {
           $('#' + Craft.namespaceId('thumb-container', $namespace)).removeClass('loading');
           alert(result.error);
+        } else {
+          Craft.cp.displayNotice(Craft.t('app', 'New file uploaded.'));
         }
       },
       fileuploadfail: (event, data) => {
@@ -1902,12 +2030,11 @@ JS,[
      */
     public function getFieldLayout(): ?FieldLayout
     {
-        if (($fieldLayout = parent::getFieldLayout()) !== null) {
-            return $fieldLayout;
+        try {
+            return $this->getVolume()->getFieldLayout();
+        } catch (InvalidConfigException) {
+            return null;
         }
-
-        $volume = $this->getVolume();
-        return $volume->getFieldLayout();
     }
 
     /**
@@ -2021,20 +2148,24 @@ JS,[
             return null;
         }
 
-        // Give plugins/modules a chance to provide a custom URL
-        $event = new DefineAssetUrlEvent([
-            'transform' => $transform,
-            'asset' => $this,
-        ]);
-        $this->trigger(self::EVENT_BEFORE_DEFINE_URL, $event);
-        $url = $event->url;
+        // Fire a 'beforeDefineUrl' event
+        if ($this->hasEventHandlers(self::EVENT_BEFORE_DEFINE_URL)) {
+            $event = new DefineAssetUrlEvent([
+                'transform' => $transform,
+                'asset' => $this,
+            ]);
+            $this->trigger(self::EVENT_BEFORE_DEFINE_URL, $event);
+            $url = $event->url;
+        } else {
+            $url = null;
+        }
 
         // If DefineAssetUrlEvent::$url is set to null, only respect that if $handled is true
-        if ($url === null && !$event->handled) {
+        if ($url === null && !($event->handled ?? false)) {
             $url = $this->_url($transform, $immediately);
         }
 
-        // Give plugins/modules a chance to customize it
+        // Fire a 'defineUrl' event
         if ($this->hasEventHandlers(self::EVENT_DEFINE_URL)) {
             $event = new DefineAssetUrlEvent([
                 'url' => $url,
@@ -2088,14 +2219,13 @@ JS,[
                 $immediately = Craft::$app->getConfig()->getGeneral()->generateTransformsBeforePageLoad;
             }
 
+            // Fire a 'beforeGenerateTransform' event
             if ($this->hasEventHandlers(self::EVENT_BEFORE_GENERATE_TRANSFORM)) {
                 $event = new GenerateTransformEvent([
                     'asset' => $this,
                     'transform' => $transform,
                 ]);
-
                 $this->trigger(self::EVENT_BEFORE_GENERATE_TRANSFORM, $event);
-
                 // If a plugin set the url, we'll just use that.
                 if ($event->url !== null) {
                     return Html::encodeSpaces($event->url);
@@ -2114,13 +2244,13 @@ JS,[
                 return null;
             }
 
+            // Fire an 'afterGenerateTransform' event
             if ($this->hasEventHandlers(self::EVENT_AFTER_GENERATE_TRANSFORM)) {
                 $event = new GenerateTransformEvent([
                     'asset' => $this,
                     'transform' => $transform,
                     'url' => $url,
                 ]);
-
                 $this->trigger(self::EVENT_AFTER_GENERATE_TRANSFORM, $event);
             }
 
@@ -2648,6 +2778,22 @@ JS,[
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function inlineAttributeInputHtml(string $attribute): string
+    {
+        switch ($attribute) {
+            case 'alt':
+                return Cp::textareaHtml([
+                    'name' => 'alt',
+                    'value' => $this->alt,
+                ]);
+            default:
+                return parent::inlineAttributeInputHtml($attribute);
+        }
+    }
+
+    /**
      * Returns the HTML for asset previews.
      *
      * @return string
@@ -2670,6 +2816,35 @@ JS,[
                 ($userSession->getId() == $this->uploaderId || $userSession->checkPermission("editPeerImages:$volume->uid"))
             );
 
+            switch ($this->kind) {
+                case Asset::KIND_VIDEO:
+                    $previewInner =
+                        Html::tag('video', Html::tag('source', '', [
+                            'type' => $this->getMimeType(),
+                            'src' => $this->url,
+                        ]), [
+                            'class' => 'preview-thumb',
+                            'controls' => true,
+                            'preload' => 'metadata',
+                        ]);
+                    break;
+                case Asset::KIND_AUDIO:
+                    $previewInner =
+                        Html::tag('audio', Html::tag('source', '', [
+                            'src' => $this->url,
+                            'type' => $this->getMimeType(),
+                        ]), [
+                            'controls' => true,
+                            'preload' => 'metadata',
+                        ]);
+                    break;
+                default:
+                    $previewInner =
+                        Html::tag('div', $this->getPreviewThumbImg(350, 190), [
+                            'class' => 'preview-thumb',
+                        ]);
+            }
+
             $previewThumbHtml =
                 Html::beginTag('div', [
                     'id' => 'thumb-container',
@@ -2679,9 +2854,7 @@ JS,[
                         $this->hasCheckeredThumb() ? 'checkered' : null,
                     ]),
                 ]) .
-                Html::tag('div', $this->getPreviewThumbImg(350, 190), [
-                    'class' => 'preview-thumb',
-                ]) .
+                $previewInner .
                 Html::endTag('div'); // .preview-thumb-container
 
             if ($previewable || $editable) {
@@ -2904,17 +3077,25 @@ JS;
      */
     public function attributes(): array
     {
-        $names = parent::attributes();
-        $names[] = 'extension';
-        $names[] = 'filename';
-        $names[] = 'focalPoint';
-        $names[] = 'hasFocalPoint';
-        $names[] = 'height';
-        $names[] = 'mimeType';
-        $names[] = 'path';
-        $names[] = 'volumeId';
-        $names[] = 'width';
-        return $names;
+        $names = array_flip(parent::attributes());
+
+        unset(
+            $names['avoidFilenameConflicts'],
+            $names['keepFileOnDelete'],
+            $names['sanitizeOnUpload'],
+        );
+
+        $names['extension'] = true;
+        $names['filename'] = true;
+        $names['focalPoint'] = true;
+        $names['hasFocalPoint'] = true;
+        $names['height'] = true;
+        $names['mimeType'] = true;
+        $names['path'] = true;
+        $names['volumeId'] = true;
+        $names['width'] = true;
+
+        return array_keys($names);
     }
 
     /**
@@ -3026,14 +3207,15 @@ JS;
     public function afterSave(bool $isNew): void
     {
         if (!$this->propagating) {
-            $isCpRequest = Craft::$app->getRequest()->getIsCpRequest();
-            $sanitizeCpImageUploads = Craft::$app->getConfig()->getGeneral()->sanitizeCpImageUploads;
-
+            // Are we uploading an image that needs to be sanitized?
             if (
                 isset($this->tempFilePath) &&
                 in_array($this->getScenario(), [self::SCENARIO_REPLACE, self::SCENARIO_CREATE], true) &&
                 Assets::getFileKindByExtension($this->tempFilePath) === static::KIND_IMAGE &&
-                !($isCpRequest && !$sanitizeCpImageUploads)
+                ($this->sanitizeOnUpload ?? (
+                    !Craft::$app->getRequest()->getIsCpRequest() ||
+                    Craft::$app->getConfig()->getGeneral()->sanitizeCpImageUploads
+                ))
             ) {
                 Image::cleanImageByPath($this->tempFilePath);
             }

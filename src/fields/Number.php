@@ -11,7 +11,9 @@ use Craft;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\base\InlineEditableFieldInterface;
+use craft\base\MergeableFieldInterface;
 use craft\base\SortableFieldInterface;
+use craft\elements\Entry;
 use craft\fields\conditions\NumberFieldConditionRule;
 use craft\gql\types\Number as NumberType;
 use craft\helpers\Db;
@@ -28,7 +30,7 @@ use yii\db\Schema;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 3.0.0
  */
-class Number extends Field implements InlineEditableFieldInterface, SortableFieldInterface
+class Number extends Field implements InlineEditableFieldInterface, SortableFieldInterface, MergeableFieldInterface
 {
     /**
      * @since 3.5.11
@@ -72,7 +74,8 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
      */
     public static function dbType(): string
     {
-        return Schema::TYPE_DECIMAL;
+        $db = Craft::$app->getDb();
+        return $db->getIsMysql() ? sprintf('%s(65,16)', Schema::TYPE_DECIMAL) : Schema::TYPE_DECIMAL;
     }
 
     /**
@@ -85,11 +88,6 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
     }
 
     /**
-     * @var int|float|null The default value for new elements
-     */
-    public int|null|float $defaultValue = null;
-
-    /**
      * @var int|float|null The minimum allowed number
      */
     public int|null|float $min = 0;
@@ -100,6 +98,12 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
     public int|null|float $max = null;
 
     /**
+     * @var int|float|null The step value for the input
+     * @since 5.5.0
+     */
+    public int|float|null $step = null;
+
+    /**
      * @var int The number of digits allowed after the decimal point
      */
     public int $decimals = 0;
@@ -108,6 +112,11 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
      * @var int|null The size of the field
      */
     public ?int $size = null;
+
+    /**
+     * @var int|float|null The default value for new elements
+     */
+    public int|null|float $defaultValue = null;
 
     /**
      * @var string|null Text that should be displayed before the input
@@ -139,7 +148,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
     public function __construct($config = [])
     {
         // Config normalization
-        foreach (['defaultValue', 'min', 'max'] as $name) {
+        foreach (['defaultValue', 'min', 'max', 'step'] as $name) {
             if (isset($config[$name])) {
                 $config[$name] = $this->_normalizeNumber($config[$name]);
             }
@@ -154,7 +163,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
     protected function defineRules(): array
     {
         $rules = parent::defineRules();
-        $rules[] = [['defaultValue', 'min', 'max'], 'number'];
+        $rules[] = [['min', 'max', 'step', 'defaultValue'], 'number'];
         $rules[] = [['decimals', 'size'], 'integer'];
 
         $rules[] = [
@@ -184,10 +193,9 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
      */
     public function getSettingsHtml(): ?string
     {
-        return Craft::$app->getView()->renderTemplate('_components/fieldtypes/Number/settings.twig',
-            [
-                'field' => $this,
-            ]);
+        return Craft::$app->getView()->renderTemplate('_components/fieldtypes/Number/settings.twig', [
+            'field' => $this,
+        ]);
     }
 
     /**
@@ -220,13 +228,11 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
             return null;
         }
 
-        if (is_string($value) && is_numeric($value)) {
-            if ((int)$value == $value) {
-                return (int)$value;
-            }
-            if ((float)$value == $value) {
-                return (float)$value;
-            }
+        if (is_numeric($value)) {
+            // ensure we only store the selected number of decimals and that the result is the same as in v4
+            // https://github.com/craftcms/cms/issues/16181
+            $value = round((float)$value, $this->decimals);
+            return $this->decimals === 0 ? (int)$value : $value;
         }
 
         return $value;
@@ -241,7 +247,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
         $formatter = Craft::$app->getFormatter();
 
         try {
-            $formatNumber = !$formatter->willBeMisrepresented($value);
+            $formatNumber = !$this->step && !$formatter->willBeMisrepresented($value);
         } catch (InvalidArgumentException $e) {
             $formatNumber = false;
         }
@@ -253,7 +259,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
                         $value = Craft::$app->getFormatter()->asDecimal($value, $this->decimals);
                     } catch (InvalidArgumentException) {
                     }
-                } elseif ($this->decimals) {
+                } elseif ($this->decimals !== 0) {
                     // Just make sure we're using the right decimal symbol
                     $decimalSeparator = Craft::$app->getFormattingLocale()->getNumberSymbol(Locale::SYMBOL_DECIMAL_SEPARATOR);
                     try {
@@ -309,6 +315,13 @@ JS;
      */
     public function getElementConditionRuleType(): array|string|null
     {
+        if ($this->decimals) {
+            return [
+                'class' => NumberFieldConditionRule::class,
+                'step' => null,
+            ];
+        }
+
         return NumberFieldConditionRule::class;
     }
 
@@ -326,6 +339,18 @@ JS;
             self::FORMAT_CURRENCY => Craft::$app->getFormatter()->asCurrency($value, $this->previewCurrency, [], [], !$this->decimals),
             default => $value,
         };
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
+    {
+        if (!$value) {
+            $value = 1234;
+        }
+
+        return $this->getPreviewHtml($value, $element ?? new Entry());
     }
 
     /**

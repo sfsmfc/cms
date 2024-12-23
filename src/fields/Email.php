@@ -11,6 +11,8 @@ use Craft;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\base\InlineEditableFieldInterface;
+use craft\base\MergeableFieldInterface;
+use craft\elements\Entry;
 use craft\fields\conditions\TextFieldConditionRule;
 use craft\helpers\App;
 use craft\helpers\Cp;
@@ -24,7 +26,7 @@ use yii\db\Schema;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 3.0.0
  */
-class Email extends Field implements InlineEditableFieldInterface
+class Email extends Field implements InlineEditableFieldInterface, MergeableFieldInterface
 {
     /**
      * @inheritdoc
@@ -150,5 +152,17 @@ class Email extends Field implements InlineEditableFieldInterface
         }
         $value = Html::encode($value);
         return "<a href=\"mailto:$value\">$value</a>";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
+    {
+        if (!$value) {
+            $value = Craft::$app->getUser()->getIdentity()->email;
+        }
+
+        return $this->getPreviewHtml($value, $element ?? new Entry());
     }
 }

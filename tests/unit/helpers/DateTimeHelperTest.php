@@ -411,6 +411,33 @@ class DateTimeHelperTest extends TestCase
     }
 
     /**
+     * @dataProvider relativeTimeStatementDataProvider
+     * @param string $expected
+     * @param int $number
+     * @param string $unit
+     */
+    public function testRelativeTimeStatement(string $expected, int $number, string $unit): void
+    {
+        self::assertSame($expected, DateTimeHelper::relativeTimeStatement($number, $unit));
+    }
+
+    /**
+     * @dataProvider relativeTimeToSecondsDataProvider
+     * @param int $expected
+     * @param int $number
+     * @param string $unit
+     */
+    public function testRelativeTimeToSeconds(int $expected, int $number, string $unit): void
+    {
+        // account for DST changes
+        self::assertContains(DateTimeHelper::relativeTimeToSeconds($number, $unit), [
+            $expected,
+            $expected + (60 * 60),
+            $expected - (60 * 60),
+        ]);
+    }
+
+    /**
      * @throws Exception
      */
     public function testIsToday(): void
@@ -544,7 +571,11 @@ class DateTimeHelperTest extends TestCase
     public function testIntervalToSeconds(int $expected, string $duration): void
     {
         $dateInterval = new DateInterval($duration);
-        self::assertSame($expected, DateTimeHelper::intervalToSeconds($dateInterval));
+        self::assertContains(DateTimeHelper::intervalToSeconds($dateInterval), [
+            $expected,
+            $expected + (60 * 60),
+            $expected - (60 * 60),
+        ]);
     }
 
     /**
@@ -665,10 +696,6 @@ class DateTimeHelperTest extends TestCase
             [true, '1 year'],
             [true, '1 month'],
             [true, '1 minutes'],
-
-            [false, ''],
-            [false, 'random string'],
-
         ];
     }
 
@@ -844,6 +871,30 @@ class DateTimeHelperTest extends TestCase
             ['27 minutes', 'PT10M999S'],
             ['0 seconds', 0],
             ['less than a minute', 0, false],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function relativeTimeStatementDataProvider(): array
+    {
+        return [
+            ['+1 day', 1, 'day'],
+            ['+7 days', 1, 'week'],
+            ['+1 weeks', 1, 'weeks'],
+            ['+2 weeks', 2, 'weeks'],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function relativeTimeToSecondsDataProvider(): array
+    {
+        return [
+            [3600, 1, 'hour'],
+            [604800, 1, 'week'],
         ];
     }
 

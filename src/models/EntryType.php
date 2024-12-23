@@ -244,7 +244,7 @@ JS, [
         return [
             'handle' => Craft::t('app', 'Handle'),
             'name' => Craft::t('app', 'Name'),
-            'titleFormat' => Craft::t('app', 'Title Format'),
+            'titleFormat' => Craft::t('app', 'Default Title Format'),
             'showStatusField' => Craft::t('app', 'Show the Status field'),
             'showSlugField' => Craft::t('app', 'Show the Slug field'),
         ];
@@ -263,13 +263,6 @@ JS, [
             ['handle'],
             HandleValidator::class,
             'reservedWords' => ['id', 'dateCreated', 'dateUpdated', 'uid', 'title'],
-        ];
-        $rules[] = [
-            ['name'],
-            UniqueValidator::class,
-            'targetClass' => EntryTypeRecord::class,
-            'targetAttribute' => 'name',
-            'message' => Craft::t('yii', '{attribute} "{value}" has already been taken.'),
         ];
         $rules[] = [
             ['handle'],
@@ -293,7 +286,11 @@ JS, [
         $fieldLayout = $this->getFieldLayout();
         $fieldLayout->reservedFieldHandles = [
             'author',
+            'authorId',
+            'authorIds',
+            'authors',
             'section',
+            'sectionId',
             'type',
         ];
 
@@ -367,15 +364,15 @@ JS, [
         $config = [
             'name' => $this->name,
             'handle' => $this->handle,
-            'icon' => $this->icon,
+            'icon' => $this->icon ?: null,
             'color' => $this->color?->value,
             'hasTitleField' => $this->hasTitleField,
             'titleTranslationMethod' => $this->titleTranslationMethod,
-            'titleTranslationKeyFormat' => $this->titleTranslationKeyFormat,
-            'titleFormat' => $this->titleFormat,
+            'titleTranslationKeyFormat' => $this->titleTranslationKeyFormat ?: null,
+            'titleFormat' => $this->titleFormat ?: null,
             'showSlugField' => $this->showSlugField,
             'slugTranslationMethod' => $this->slugTranslationMethod,
-            'slugTranslationKeyFormat' => $this->slugTranslationKeyFormat,
+            'slugTranslationKeyFormat' => $this->slugTranslationKeyFormat ?: null,
             'showStatusField' => $this->showStatusField,
         ];
 

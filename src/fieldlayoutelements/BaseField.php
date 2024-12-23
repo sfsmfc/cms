@@ -206,7 +206,7 @@ abstract class BaseField extends FieldLayoutElement
 
         if ($indicatorHtml) {
             $innerHtml .= Html::tag('div', $indicatorHtml, [
-                'class' => ['flex', 'flex-nowrap', 'gap-xs'],
+                'class' => ['fld-field-indicators', 'flex', 'flex-nowrap', 'gap-xs'],
             ]);
         }
 
@@ -282,6 +282,22 @@ abstract class BaseField extends FieldLayoutElement
                 'label' => Craft::t('app', 'This field is required'),
                 'icon' => 'asterisk',
                 'iconColor' => 'rose',
+            ];
+        }
+
+        if (isset($this->tip)) {
+            $indicators[] = [
+                'label' => Craft::t('app', 'This field has a tip'),
+                'icon' => 'lightbulb',
+                'iconColor' => 'sky',
+            ];
+        }
+
+        if (isset($this->warning)) {
+            $indicators[] = [
+                'label' => Craft::t('app', 'This field has a warning'),
+                'icon' => 'alert',
+                'iconColor' => 'amber',
             ];
         }
 
@@ -760,5 +776,31 @@ abstract class BaseField extends FieldLayoutElement
     protected function translationDescription(?ElementInterface $element = null, bool $static = false): ?string
     {
         return null;
+    }
+
+    /**
+     * Return the HTML that should be shown for the native field in the card preview.
+     * It can be used outside an element context, e.g. in a card view designer.
+     *
+     * @param mixed $value
+     * @param ElementInterface|null $element
+     * @return string
+     * @since 5.5.0
+     */
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
+    {
+        if (!$this->previewable()) {
+            return '';
+        }
+
+        if ($value !== null) {
+            return $value;
+        }
+
+        if ($element !== null) {
+            return $element->{$this->attribute()};
+        }
+
+        return $this->label();
     }
 }
