@@ -21,7 +21,6 @@ class Redirect extends \yii\base\BaseObject
     {
         $this->match = $config['match'] ?? Craft::$app->getRequest()->getFullPath();
         $matchType = $config['matchType'] ?? MatchType::Exact;
-
         $this->matchType = match (true) {
             $matchType instanceof MatchType => $matchType,
             default => MatchType::tryFrom($matchType),
