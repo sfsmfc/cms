@@ -17,6 +17,7 @@ parameters:
     scanFiles:
         - lib/craft/behaviors/CustomFieldBehavior.php
         - tests/_support/_generated/AcceptanceTesterActions.php
+        - tests/_support/_generated/ApiTesterActions.php
         - tests/_support/_generated/FunctionalTesterActions.php
         - tests/_support/_generated/GqlTesterActions.php
         - tests/_support/_generated/UnitTesterActions.php
