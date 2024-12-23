@@ -15,7 +15,7 @@ class RedirectCest
     /**
      * @dataProvider redirectDataProvider
      */
-    public function testRedirect(ApiTester $I, Example $example)
+    public function testRedirect(ApiTester $I, Example $example): void
     {
         $I->stopFollowingRedirects();
         $I->sendGet($example['fromPath'], $example['fromParams'] ?? []);
@@ -25,7 +25,10 @@ class RedirectCest
         }
     }
 
-    private function redirectDataProvider()
+    /**
+     * @phpstan-ignore-next-line
+     */
+    private function redirectDataProvider(): array
     {
         return [
             [
