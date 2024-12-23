@@ -8,9 +8,9 @@ use Monolog\Handler\NoopHandler;
 
 class Redirect extends \yii\base\BaseObject
 {
-    public int $status = 302;
     public string $to;
     public string $from;
+    public int $status = 302;
     public \Closure|string $match;
     public bool $caseSensitive = true;
     private string $delimiter = '`';

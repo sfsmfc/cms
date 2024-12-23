@@ -66,8 +66,16 @@ class ErrorHandler extends \yii\web\ErrorHandler
             $redirects = Craft::$app->getConfig()->getConfigFromFile('redirects');
             if ($redirects) {
                 foreach ($redirects as $from => $redirect) {
+                    $callback = function(Redirect $redirect) {
+                        $this->trigger(
+                            self::EVENT_BEFORE_REDIRECT,
+                            new RedirectEvent(['redirect' => $redirect])
+                        );
+                    };
+
                     if ($redirect instanceof Redirect) {
-                        $redirect();
+                        $redirect($callback);
+                        continue;
                     }
 
                     $redirectConfig = is_string($redirect) ? ['to' => $redirect] : $redirect;
@@ -75,13 +83,6 @@ class ErrorHandler extends \yii\web\ErrorHandler
                     if (!isset($redirectConfig['from']) && is_string($from)) {
                         $redirectConfig['from'] = $from;
                     }
-
-                    $callback = function(Redirect $redirect) {
-                        $this->trigger(
-                            self::EVENT_BEFORE_REDIRECT,
-                            new RedirectEvent(['redirect' => $redirect])
-                        );
-                    };
 
                     Craft::createObject(Redirect::class, [$redirectConfig])($callback);
                 }
