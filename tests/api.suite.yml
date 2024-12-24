@@ -9,5 +9,17 @@ modules:
   enabled:
     - \Helper\Acceptance
     - REST:
-        url: 'https://craft-5-project.ddev.site/'
-        depends: PhpBrowser
+        url: 'http://localhost/index.php'
+        depends:
+          - PhpBrowser
+          - \craft\test\Craft
+  config:
+    \craft\test\Craft:
+      configFile: 'tests/_craft/config/test.php'
+      entryUrl: 'http://localhost/index.php'
+      projectConfig: { }
+      migrations: [ ]
+      plugins: [ ]
+      cleanup: true
+      transaction: true
+      dbSetup: { clean: true, setupCraft: true }
