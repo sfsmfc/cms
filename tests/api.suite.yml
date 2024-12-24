@@ -17,9 +17,9 @@ modules:
     \craft\test\Craft:
       configFile: 'tests/_craft/config/test.php'
       entryUrl: 'http://localhost/index.php'
-      projectConfig: { }
-      migrations: [ ]
-      plugins: [ ]
+      projectConfig: {}
+      migrations: []
+      plugins: []
       cleanup: true
       transaction: true
-      dbSetup: { clean: true, setupCraft: true }
+      dbSetup: {clean: true, setupCraft: true}
