@@ -1,5 +1,5 @@
 <?php
-// config/redirects.php
+
 return [
     // Exact path match
     'redirect/from' => 'redirect/to',
