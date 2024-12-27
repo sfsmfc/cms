@@ -11,6 +11,7 @@
 - Fixed a bug where element index View menus could include a “Use defaults” button when no view customizations had been made.
 - Fixed a bug where new entries’ slugs weren’t getting propagated to other sites, if their entry type had a dynamic title format. ([#16347](https://github.com/craftcms/cms/issues/16347))
 - Fixed a bug where address cards were only showing the first two lines of the address. ([#16353](https://github.com/craftcms/cms/issues/16353))
+- Fixed a bug where `@transform` GraphQL directives weren’t always working on Assets fields with overridden handles. ([#15718](https://github.com/craftcms/cms/issues/15718))
 - Fixed an RCE vulnerability.
 
 ## 5.5.7 - 2024-12-17
