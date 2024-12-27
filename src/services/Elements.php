@@ -619,7 +619,7 @@ class Elements extends Component
             return;
         }
 
-        $duration = $expiryDate->getTimestamp() - time();
+        $duration = $expiryDate->getTimestamp() - DateTimeHelper::currentTimeStamp();
 
         if ($duration > 0 && (!$this->_cacheDuration || $duration < $this->_cacheDuration)) {
             $this->_cacheDuration = $duration;

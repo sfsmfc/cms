@@ -1427,21 +1427,7 @@ abstract class Element extends Component implements ElementInterface
      */
     private static function _mapDescendants(array $sourceElements, bool $children): ?array
     {
-        // Get the source element IDs
-        $sourceElementIds = array_map(fn(ElementInterface $element) => $element->id, $sourceElements);
-
-        // Get the structure data for these elements
-        $selectColumns = ['structureId', 'elementId', 'lft', 'rgt'];
-
-        if ($children) {
-            $selectColumns[] = 'level';
-        }
-
-        $elementStructureData = (new Query())
-            ->select($selectColumns)
-            ->from([Table::STRUCTUREELEMENTS])
-            ->where(['elementId' => $sourceElementIds])
-            ->all();
+        $elementStructureData = self::_structureDataForElements($sourceElements, $children);
 
         if (empty($elementStructureData)) {
             return null;
@@ -1513,21 +1499,7 @@ abstract class Element extends Component implements ElementInterface
      */
     private static function _mapAncestors(array $sourceElements, bool $parents): ?array
     {
-        // Get the source element IDs
-        $sourceElementIds = array_map(fn(ElementInterface $element) => $element->id, $sourceElements);
-
-        // Get the structure data for these elements
-        $selectColumns = ['structureId', 'elementId', 'lft', 'rgt'];
-
-        if ($parents) {
-            $selectColumns[] = 'level';
-        }
-
-        $elementStructureData = (new Query())
-            ->select($selectColumns)
-            ->from([Table::STRUCTUREELEMENTS])
-            ->where(['elementId' => $sourceElementIds])
-            ->all();
+        $elementStructureData = self::_structureDataForElements($sourceElements, $parents);
 
         if (empty($elementStructureData)) {
             return null;
@@ -1593,6 +1565,47 @@ abstract class Element extends Component implements ElementInterface
             'elementType' => static::class,
             'map' => $map,
         ];
+    }
+
+    /**
+     * @param ElementInterface[] $elements
+     * @return array
+     */
+    private static function _structureDataForElements(array $elements, bool $withLevel): array
+    {
+        $data = [];
+        $fetchDataForIds = [];
+
+        foreach ($elements as $element) {
+            if (isset($element->structureId, $element->lft, $element->rgt, $element->level)) {
+                $data[] = [
+                    'structureId' => $element->structureId,
+                    'elementId' => $element->id,
+                    'lft' => $element->lft,
+                    'rgt' => $element->rgt,
+                    'level' => $element->level,
+                ];
+            } else {
+                $fetchDataForIds[] = $element->id;
+            }
+        }
+
+        if (!empty($fetchDataForIds)) {
+            // Get the structure data for these elements
+            $selectColumns = ['structureId', 'elementId', 'lft', 'rgt'];
+
+            if ($withLevel) {
+                $selectColumns[] = 'level';
+            }
+
+            array_push($data, ...(new Query())
+                ->select($selectColumns)
+                ->from([Table::STRUCTUREELEMENTS])
+                ->where(['elementId' => $fetchDataForIds])
+                ->all());
+        }
+
+        return $data;
     }
 
     /**
@@ -2434,8 +2447,8 @@ abstract class Element extends Component implements ElementInterface
         $rules[] = [['isFresh'], BooleanValidator::class];
 
         if (static::hasTitles()) {
-            $rules[] = [['title'], 'trim', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_LIVE]];
-            $rules[] = [['title'], StringValidator::class, 'max' => 255, 'disallowMb4' => true, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_LIVE]];
+            $rules[] = [['title'], 'trim'];
+            $rules[] = [['title'], StringValidator::class, 'max' => 255, 'disallowMb4' => true];
             $rules[] = [['title'], 'required', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_LIVE]];
         }
 

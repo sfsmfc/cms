@@ -2,7 +2,18 @@
 
 ## Unreleased
 
+- Fixed a bug where asset edit page URLs contained spaces if the asset filename contained spaces. ([#15236](https://github.com/craftcms/cms/issues/15236))
+- Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
+- Fixed a bug where the password input on the Set Password page wasn’t including the “Show” button.
+- Fixed a SQL error that could occur if an element was saved with a title longer than 255 characters.
+- Fixed an RCE vulnerability.
+
+## 4.13.7 - 2024-12-17
+
 - Fixed a bug where elements’ `getPrev()` and `getNext()` methods could cause duplicate queries. ([#16329](https://github.com/craftcms/cms/discussions/16329))
+- Fixed a bug where assets that were shorter than the preview thumb container weren’t getting vertically centered within it.
+- Fixed a bug where it was possible to set a focal point on SVGs, even though focal points on SVGs aren’t supported. ([#16258](https://github.com/craftcms/cms/issues/16258))
+- Fixed a bug where `ancestors`, `children`, `descendants`, and `parent` eager-loading wasn’t working for previewed elements. ([#16327](https://github.com/craftcms/cms/issues/16327))
 
 ## 4.13.6 - 2024-12-10
 
@@ -32,7 +43,7 @@
 - Fixed a bug where `craft\events\ApplyFieldSaveEvent::$field` wasn’t being set consistently by `craft\services\Fields::EVENT_BEFORE_APPLY_FIELD_SAVE`. ([#16156](https://github.com/craftcms/cms/issues/16156))
 - Fixed a bug where the address field layout’s project config data wasn’t getting recreated when running `project-config/rebuild`. ([#16189](https://github.com/craftcms/cms/issues/16189))
 
-## 4.13.2 - 2024-11-19
+## 4.13.2 - 2024-11-19 [CRITICAL]
 
 - Fixed an error that could occur if an invalid folder ID was passed to `craft\services\Assets::deleteFoldersByIds()`. ([#16147](https://github.com/craftcms/cms/pull/16147))
 - Fixed an RCE vulnerability.

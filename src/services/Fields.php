@@ -50,6 +50,7 @@ use craft\fields\Url;
 use craft\fields\Users as UsersField;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Component as ComponentHelper;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\ElementHelper;
 use craft\helpers\FieldHelper;
@@ -1840,7 +1841,7 @@ class Fields extends Component
         $shortTableName = Db::rawTableShortName($table);
         $schema = $db->getSchema();
         $prefix = "{$shortTableName}_$column";
-        $timestamp = time();
+        $timestamp = DateTimeHelper::currentTimeStamp();
         $n = 1;
         do {
             $suffix = $n === 1 ? '' : "_$n";

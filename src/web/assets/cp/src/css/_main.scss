@@ -5246,6 +5246,7 @@ $min2ColWidth: 400px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     width: 100%;
     height: 100%;
 
@@ -6725,7 +6726,7 @@ body.reduce-focus-visibility {
     border: none;
     background: transparent;
     padding-right: 4rem;
-    box-shadow: none;
+    box-shadow: none !important;
   }
 
   .password-toggle {

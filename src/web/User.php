@@ -14,6 +14,7 @@ use craft\elements\User as UserElement;
 use craft\errors\UserLockedException;
 use craft\events\LoginFailureEvent;
 use craft\helpers\ConfigHelper;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\Session as SessionHelper;
 use craft\helpers\UrlHelper;
@@ -99,7 +100,7 @@ class User extends \yii\web\User
             $cookie = new Cookie($this->usernameCookie);
             $cookie->value = $user->username;
             $seconds = ConfigHelper::durationInSeconds($generalConfig->rememberUsernameDuration);
-            $cookie->expire = time() + $seconds;
+            $cookie->expire = DateTimeHelper::currentTimeStamp() + $seconds;
             Craft::$app->getResponse()->getCookies()->add($cookie);
         } else {
             Craft::$app->getResponse()->getCookies()->remove(new Cookie($this->usernameCookie));
@@ -234,7 +235,7 @@ class User extends \yii\web\User
             }
 
             $expire = SessionHelper::get($this->authTimeoutParam);
-            $time = time();
+            $time = DateTimeHelper::currentTimeStamp();
 
             if ($expire !== null && $expire > $time) {
                 return $expire - $time;
@@ -285,7 +286,7 @@ class User extends \yii\web\User
             $expires = SessionHelper::get($this->elevatedSessionTimeoutParam);
 
             if ($expires !== null) {
-                $currentTime = time();
+                $currentTime = DateTimeHelper::currentTimeStamp();
 
                 if ($expires > $currentTime) {
                     return $expires - $currentTime;
@@ -364,7 +365,7 @@ class User extends \yii\web\User
         }
 
         // Set the elevated session expiration date
-        $timeout = time() + $generalConfig->elevatedSessionDuration;
+        $timeout = DateTimeHelper::currentTimeStamp() + $generalConfig->elevatedSessionDuration;
         SessionHelper::set($this->elevatedSessionTimeoutParam, $timeout);
 
         return true;

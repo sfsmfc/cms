@@ -12,6 +12,7 @@ use craft\db\Table;
 use craft\helpers\App;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Component;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use GuzzleHttp\Client;
@@ -334,7 +335,7 @@ EOD;
 
             // Delete any CustomFieldBehavior files that are over 10 seconds old
             $basename = basename($filePath);
-            $time = time() - 10;
+            $time = DateTimeHelper::currentTimeStamp() - 10;
             FileHelper::clearDirectory($dir, [
                 'filter' => function(string $path) use ($basename, $time): bool {
                     $b = basename($path);

@@ -442,7 +442,6 @@ return [
     'Current Password' => 'Aktuální heslo',
     'Current User Condition' => 'Aktuální stav uživatele',
     'Current' => 'Aktuální',
-    'Currently SVG images do not support focal point.' => 'Obrázky SVG aktuálně nepodporují ústřední bod.',
     'Custom' => 'Vlastní',
     'Customize sources' => 'Přizpůsobit zdroje',
     'Custom…' => 'Vlastní...',

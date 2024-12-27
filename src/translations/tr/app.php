@@ -442,7 +442,6 @@ return [
     'Current Password' => 'Mevcut Parola',
     'Current User Condition' => 'Mevcut Kullanıcı Koşulu',
     'Current' => 'Yürürlükteki',
-    'Currently SVG images do not support focal point.' => 'SVG resimler şu anda odak noktasını desteklemiyor.',
     'Custom' => 'Özel',
     'Customize sources' => 'Özel kaynaklar',
     'Custom…' => 'Özel…',
