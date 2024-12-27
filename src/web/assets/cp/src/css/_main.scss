@@ -1023,7 +1023,7 @@ button {
     margin-inline-start: var(--xs);
     background-color: transparent !important;
     color: var(--blue-800) !important;
-    border: 2px solid var(--blue-600);
+    border: 2px solid var(--blue-600) !important;
 
     &:hover,
     &:focus {
@@ -3191,7 +3191,7 @@ table {
             position: relative;
             font: inherit;
             width: 100%;
-            padding-block: var(--pane-padding, var(--m));
+            padding-block: var(--m);
             padding-inline: var(--m) 35px;
             text-align: start;
 
@@ -5439,11 +5439,6 @@ table.data tbody tr:not(.disabled).active-drop-target {
     box-shadow: none;
   }
 
-  .pane &,
-  .slideout &,
-  #content & {
-  }
-
   &.dashed {
     background-color: transparent !important;
     box-shadow: none;
@@ -5897,14 +5892,14 @@ $min2ColWidth: 400px;
     }
 
     & > .field > .heading {
-      @media screen and (width <= calc(#{$min2ColWidth} - 1px)) {
+      @media screen and (width < $min2ColWidth) {
         padding-block-start: var(--xs);
         padding-inline: 10px;
       }
 
       @media screen and (min-width: $min2ColWidth) {
         padding-block: 12px;
-        padding-inline: var(--m) 10px;
+        padding-inline: var(--m) var(--s);
         border-inline-end: 1px solid var(--hairline-color);
       }
 
@@ -5925,19 +5920,23 @@ $min2ColWidth: 400px;
 
     & > .field > .input,
     & > .data > .value {
-      padding-block: 5px;
-      padding-inline: 0;
+      padding-block: var(--s);
       width: 100%;
+
+      @media screen and (width < $min2ColWidth) {
+        padding-inline: 10px;
+      }
 
       @media screen and (min-width: $min2ColWidth) {
         width: calc(100% - var(--heading-width));
+        padding-inline: var(--s) var(--m);
       }
     }
 
     & > .data > .value {
       display: flex;
       align-items: center;
-      width: calc(100% - (var(--heading-width) + 10px));
+      width: calc(100% - (var(--heading-width) + 6px));
 
       & > [data-icon='draft'] {
         margin-block-start: -2px;
@@ -5990,16 +5989,24 @@ $min2ColWidth: 400px;
         & > .datetimewrapper > .timewrapper {
           & > .text {
             display: block;
-            margin-block: -5px;
-            margin-inline: 0;
+            margin-block: calc(var(--s) * -1);
             padding-block: 12px;
             border-radius: 0;
             background-color: transparent;
             border: none !important;
-            padding-inline: 10px;
+
+            @media screen and (width < $min2ColWidth) {
+              margin-inline: -10px;
+              padding-inline: 10px;
+            }
+
+            @media screen and (min-width: $min2ColWidth) {
+              margin-inline: calc(var(--s) * -1) 0;
+              padding-inline-start: var(--m);
+            }
 
             &:placeholder-shown + div[data-icon] {
-              inset-inline-start: 10px;
+              inset-inline-start: 6px;
             }
           }
         }
@@ -6346,7 +6353,7 @@ $min2ColWidth: 400px;
     margin-inline: var(--neg-padding);
     padding-block: 5px;
     padding-inline: var(--padding);
-    border-top: var(--slideout-footer-border);
+    border-block-start: var(--slideout-footer-border);
     background: var(--slideout-footer-bg);
     box-shadow: var(--slideout-footer-shadow);
     z-index: 3;
@@ -6961,13 +6968,8 @@ $min2ColWidth: 400px;
     padding-block: var(--s);
   }
 
-  .table-columns-field {
+  .table-columns-field .heading {
     align-items: flex-start;
-
-    .input {
-      padding-block: 13px;
-      padding-inline: 0;
-    }
   }
 
   .menu-footer {
@@ -9079,8 +9081,6 @@ ul.errors li {
   justify-content: center;
   align-items: center;
   position: fixed;
-  top: 0;
-  left: 0;
   z-index: 100;
   inset-block-start: 0;
   inset-inline-start: 0;

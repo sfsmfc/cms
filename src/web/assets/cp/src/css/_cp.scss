@@ -1121,11 +1121,14 @@ li.breadcrumb-toggle-wrapper {
 
 .content-pane {
   @include mixins.pane;
-  border-radius: var(--large-border-radius);
+
+  --border-radius: var(--large-border-radius);
+  border-radius: var(--border-radius);
   position: relative;
   background-clip: padding-box;
-  padding-block: var(--xl);
-  padding-inline: var(--padding);
+  padding: var(--padding);
+
+  --pane-padding: var(--padding);
   word-wrap: break-word;
   container-type: inline-size;
 
