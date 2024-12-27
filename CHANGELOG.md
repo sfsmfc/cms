@@ -5,6 +5,7 @@
 - Fixed a bug where asset edit page URLs contained spaces if the asset filename contained spaces. ([#15236](https://github.com/craftcms/cms/issues/15236))
 - Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
 - Fixed a bug where the password input on the Set Password page wasn’t including the “Show” button.
+- Fixed a SQL error that could occur if an element was saved with a title longer than 255 characters.
 - Fixed an RCE vulnerability.
 
 ## 4.13.7 - 2024-12-17

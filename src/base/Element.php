@@ -2447,8 +2447,8 @@ abstract class Element extends Component implements ElementInterface
         $rules[] = [['isFresh'], BooleanValidator::class];
 
         if (static::hasTitles()) {
-            $rules[] = [['title'], 'trim', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_LIVE]];
-            $rules[] = [['title'], StringValidator::class, 'max' => 255, 'disallowMb4' => true, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_LIVE]];
+            $rules[] = [['title'], 'trim'];
+            $rules[] = [['title'], StringValidator::class, 'max' => 255, 'disallowMb4' => true];
             $rules[] = [['title'], 'required', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_LIVE]];
         }
 
