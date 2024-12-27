@@ -2806,7 +2806,6 @@ abstract class Element extends Component implements ElementInterface
             StringValidator::class,
             'max' => 255,
             'disallowMb4' => true,
-            'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_LIVE],
         ];
         $rules[] = [
             ['title'],
