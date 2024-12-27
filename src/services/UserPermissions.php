@@ -532,7 +532,7 @@ class UserPermissions extends Component
                                 'label' => StringHelper::upperCaseFirst(Craft::t('app', 'View other users’ {type}', ['type' => $pluralType])),
                                 'nested' => [
                                     "savePeerEntries:$section->uid" => [
-                                        'label' => StringHelper::lowercaseFirst(Craft::t('app', 'Save other users’ {type}', ['type' => $pluralType])),
+                                        'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Save other users’ {type}', ['type' => $pluralType])),
                                     ],
                                     "deletePeerEntries:$section->uid" => [
                                         'label' => Craft::t('app', 'Delete other users’ {type}', ['type' => $pluralType]),
@@ -545,7 +545,7 @@ class UserPermissions extends Component
                                 ])),
                                 'nested' => [
                                     "savePeerEntryDrafts:$section->uid" => [
-                                        'label' => StringHelper::lowercaseFirst(Craft::t('app', 'Save other users’ {type}', [
+                                        'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Save other users’ {type}', [
                                             'type' => Craft::t('app', 'drafts'),
                                         ])),
                                     ],
@@ -625,7 +625,7 @@ class UserPermissions extends Component
                                 ])),
                                 'nested' => [
                                     "savePeerCategoryDrafts:$group->uid" => [
-                                        'label' => StringHelper::lowercaseFirst(Craft::t('app', 'Save other users’ {type}', [
+                                        'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Save other users’ {type}', [
                                             'type' => Craft::t('app', 'drafts'),
                                         ])),
                                     ],
