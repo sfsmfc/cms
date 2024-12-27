@@ -1388,7 +1388,6 @@ abstract class Element extends Component implements ElementInterface
                 'mode' => 'structure',
                 'title' => Craft::t('app', 'Display in a structured table'),
                 'icon' => Craft::$app->getLocale()->getOrientation() === 'rtl' ? 'structurertl' : 'structure',
-                'availableOnMobile' => false,
                 'structuresOnly' => true,
             ],
             [

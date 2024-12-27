@@ -10,7 +10,8 @@
 - Addresses and Matrix fields now show provisional drafts when previewing an owner element. ([#16295](https://github.com/craftcms/cms/issues/16295))
 - Color fields with a predefined color palette now primarily show a color select dropdown, rather than a manual color input. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Improved how fields are sized in responsive field layouts. ([#16303](https://github.com/craftcms/cms/pull/16303))
-- Entry indexes now only show table column options and sort options for custom fields associated with the selected sections/entry types within custom entry sources’ conditions. 
+- Entry indexes now only show table column options and sort options for custom fields associated with the selected sections/entry types within custom entry sources’ conditions.
+- Structure views are now available to element indexes on mobile browsers. ([#16190](https://github.com/craftcms/cms/discussions/16190))
 
 ### Accessibility
 - Improved the accessibility of Checkboxes and Radio Buttons fields that allow custom options. ([#16080](https://github.com/craftcms/cms/pull/16080))
