@@ -1098,10 +1098,7 @@ class Fields extends Component
     {
         if (!isset($this->_layouts)) {
             if (Craft::$app->getIsInstalled()) {
-                $layoutConfigs = $this->_createLayoutQuery()->collect()
-                    ->filter(fn(array $config) => ComponentHelper::validateComponentClass($config['type'], ElementInterface::class))
-                    ->values()
-                    ->all();
+                $layoutConfigs = $this->_createLayoutQuery()->all();
                 $layoutTabConfigs = ArrayHelper::index($this->_createLayoutTabQuery()->all(), null, ['layoutId']);
             } else {
                 $layoutConfigs = [];
