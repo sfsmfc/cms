@@ -4067,12 +4067,6 @@ const ViewMenu = Garnish.Base.extend({
   updateMenuContent: function () {
     this.updateSortField();
     this.updateTableFieldVisibility();
-    if (
-      this.elementIndex.getSelectedSourceState('mode') !==
-      this.elementIndex.defaultViewMode
-    ) {
-      this._createRevertBtn();
-    }
   },
 
   menuHasContent: function () {

@@ -6,6 +6,7 @@
 - Fixed a bug where the password input on the Set Password page wasn’t including the “Show” button.
 - Fixed a SQL error that could occur if an element was saved with a title longer than 255 characters.
 - Fixed an error that could occur when creating nested entries within Matrix fields. ([#16331](https://github.com/craftcms/cms/issues/16331))
+- Fixed a bug where element index View menus could include a “Use defaults” button when no view customizations had been made.
 - Fixed an RCE vulnerability.
 
 ## 5.5.7 - 2024-12-17
