@@ -2202,16 +2202,20 @@ Craft.ElementEditor = Garnish.Base.extend(
                   });
 
                   Craft.cp.displayNotice(
-                    Craft.t('app', 'This {type} has been updated.', {
-                      type:
-                        elementUpdated &&
-                        this.settings.draftId &&
-                        !this.settings.isProvisionalDraft
-                          ? Craft.t('app', 'draft')
-                          : Craft.elementTypeNames[this.settings.elementType]
-                          ? Craft.elementTypeNames[this.settings.elementType][2]
-                          : Craft.t('app', 'element'),
-                    }),
+                    Craft.uppercaseFirst(
+                      Craft.t('app', 'This {type} has been updated.', {
+                        type:
+                          elementUpdated &&
+                          this.settings.draftId &&
+                          !this.settings.isProvisionalDraft
+                            ? Craft.t('app', 'draft')
+                            : Craft.elementTypeNames[this.settings.elementType]
+                            ? Craft.elementTypeNames[
+                                this.settings.elementType
+                              ][2]
+                            : Craft.t('app', 'element'),
+                      })
+                    ),
                     {
                       details: $reloadBtn,
                     }

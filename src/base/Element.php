@@ -989,9 +989,9 @@ abstract class Element extends Component implements ElementInterface
         if (!$hasActionType(Edit::class)) {
             $actions->prepend([
                 'type' => Edit::class,
-                'label' => Craft::t('app', 'Edit {type}', [
+                'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Edit {type}', [
                     'type' => static::lowerDisplayName(),
-                ]),
+                ])),
             ]);
         }
 
@@ -999,9 +999,9 @@ abstract class Element extends Component implements ElementInterface
         if (static::hasUris() && !$hasActionType(View::class)) {
             $actions->prepend([
                 'type' => View::class,
-                'label' => Craft::t('app', 'View {type}', [
+                'label' => StringHelper::upperCaseFirst(Craft::t('app', 'View {type}', [
                     'type' => static::lowerDisplayName(),
-                ]),
+                ])),
             ]);
         }
 
