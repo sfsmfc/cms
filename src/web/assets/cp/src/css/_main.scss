@@ -3773,7 +3773,7 @@ table {
         display: none;
       }
 
-      & > .card-attribute-preview {
+      & > .card-attribute-preview:not(:has(> .no-truncate)) {
         --max-lines: 2;
         margin: 0;
         max-height: calc(var(--lh) * var(--max-lines));
