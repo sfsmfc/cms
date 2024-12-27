@@ -2070,9 +2070,9 @@ JS, [
                     $items[] = [
                         'id' => $deleteId,
                         'icon' => 'trash',
-                        'label' => Craft::t('app', 'Delete {type}', [
+                        'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Delete {type}', [
                             'type' => static::lowerDisplayName(),
-                        ]),
+                        ])),
                     ];
 
                     $view->registerJsWithVars(fn($id, $userId, $redirect) => <<<JS

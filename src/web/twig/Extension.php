@@ -473,6 +473,7 @@ class Extension extends AbstractExtension implements GlobalsInterface
      * @param TwigEnvironment $env
      * @param string $string
      * @return string
+     * @deprecated in 3.5.0
      */
     public function ucwordsFilter(TwigEnvironment $env, string $string): string
     {
