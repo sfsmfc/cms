@@ -457,9 +457,11 @@ class Extension extends AbstractExtension implements GlobalsInterface
      *
      * @param mixed $string The multibyte string.
      * @return string The string with the first character converted to upercase.
+     * @deprecated in 4.14.0
      */
     public function ucfirstFilter(mixed $string): string
     {
+        Craft::$app->getDeprecator()->log('ucfirst', 'The `|ucfirst` filter has been deprecated. Use `|capitalize` instead.');
         return StringHelper::upperCaseFirst((string)$string);
     }
 
