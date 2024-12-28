@@ -1123,11 +1123,14 @@ li.breadcrumb-toggle-wrapper {
   padding-block: var(--xl);
   padding-inline: var(--padding);
   word-wrap: break-word;
-  container-type: inline-size;
 
   & > hr {
     margin-inline: calc(var(--xl) * -1);
   }
+}
+
+.content-pane:has(.flex-fields) {
+  container-type: inline-size;
 }
 
 #footer,
