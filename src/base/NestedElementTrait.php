@@ -159,9 +159,23 @@ trait NestedElementTrait
                 return null;
             }
 
-            $this->_primaryOwner = Craft::$app->getElements()->getElementById($primaryOwnerId, null, $this->siteId, [
-                'trashed' => null,
-            ]) ?? false;
+            $ownerType = Craft::$app->getElements()->getElementTypeById($primaryOwnerId);
+            if (!$ownerType) {
+                return null;
+            }
+
+            $this->_primaryOwner = $ownerType::find()
+                ->id($primaryOwnerId)
+                ->site('*')
+                ->preferSites([$this->siteId])
+                ->unique()
+                ->status(null)
+                ->drafts(null)
+                ->provisionalDrafts(null)
+                ->revisions(null)
+                ->trashed(null)
+                ->one() ?? false;
+
             if (!$this->_primaryOwner) {
                 throw new InvalidConfigException("Invalid owner ID: $primaryOwnerId");
             }
@@ -211,9 +225,23 @@ trait NestedElementTrait
                 return $this->getPrimaryOwner();
             }
 
-            $this->_owner = Craft::$app->getElements()->getElementById($ownerId, null, $this->siteId, [
-                'trashed' => null,
-            ]) ?? false;
+            $ownerType = Craft::$app->getElements()->getElementTypeById($ownerId);
+            if (!$ownerType) {
+                return null;
+            }
+
+            $this->_owner = $ownerType::find()
+                ->id($ownerId)
+                ->site('*')
+                ->preferSites([$this->siteId])
+                ->unique()
+                ->status(null)
+                ->drafts(null)
+                ->provisionalDrafts(null)
+                ->revisions(null)
+                ->trashed(null)
+                ->one() ?? false;
+
             if (!$this->_owner) {
                 throw new InvalidConfigException("Invalid owner ID: $ownerId");
             }
