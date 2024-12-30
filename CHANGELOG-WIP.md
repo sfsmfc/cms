@@ -121,4 +121,5 @@
 - Action requests (such as `actions/app/health-check`) now send no-cache headers by default. ([#16364](https://github.com/craftcms/cms/pull/16364))
 - Reduced the size of GraphQL introspection schemas. ([#16326](https://github.com/craftcms/cms/pull/16326))
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
+- Fixed a bug where `craft\config\GeneralConfig::safeMode()` set Safe Mode to `false` by default.
 - Fixed a bug where embedded element index filter HUDs were including condition rules for fields that weren’t applicable to the nested elements. ([#16289](https://github.com/craftcms/cms/discussions/16289))

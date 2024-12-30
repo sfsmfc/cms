@@ -6231,7 +6231,7 @@ class GeneralConfig extends BaseConfig
      * @see $safeMode
      * @since 5.1.0
      */
-    public function safeMode(bool $value = false): self
+    public function safeMode(bool $value = true): self
     {
         $this->safeMode = $value;
         return $this;
