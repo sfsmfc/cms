@@ -6,6 +6,7 @@
 - Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
 - Fixed a bug where the password input on the Set Password page wasn’t including the “Show” button.
 - Fixed a SQL error that could occur if an element was saved with a title longer than 255 characters.
+- Fixed a bug where some UI messages began with a lowercase letter in some languages. ([#16354](https://github.com/craftcms/cms/issues/16354))
 - Fixed an RCE vulnerability.
 
 ## 4.13.7 - 2024-12-17

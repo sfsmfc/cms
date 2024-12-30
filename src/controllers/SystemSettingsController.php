@@ -14,6 +14,7 @@ use craft\helpers\App;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Component;
 use craft\helpers\MailerHelper;
+use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\mail\Mailer;
 use craft\mail\transportadapters\BaseTransportAdapter;
@@ -259,9 +260,9 @@ class SystemSettingsController extends Controller
                 ],
             ],
             'globalSets' => Craft::$app->getGlobals()->getAllSets(),
-            'buttonLabel' => Craft::t('app', 'New {type}', [
+            'buttonLabel' => StringHelper::upperCaseFirst(Craft::t('app', 'New {type}', [
                 'type' => GlobalSet::lowerDisplayName(),
-            ]),
+            ])),
         ]);
     }
 
