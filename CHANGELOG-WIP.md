@@ -118,7 +118,7 @@
 - Verification emails now link to the front-end Set Password form, if the email was sent from the front end. ([#16340](https://github.com/craftcms/cms/issues/16340))
 - Database rows with foreign keys referencing nonexistent rows are now deleted via garbage collection.
 - Pages which contain image transform generation URLs now set no-cache headers. ([#16195](https://github.com/craftcms/cms/discussions/16195))
-- The `app/health-check` action now sends no-cache headers. ([#16364](https://github.com/craftcms/cms/pull/16364))
+- Action requests (such as `actions/app/health-check`) now send no-cache headers by default. ([#16364](https://github.com/craftcms/cms/pull/16364))
 - Reduced the size of GraphQL introspection schemas. ([#16326](https://github.com/craftcms/cms/pull/16326))
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
 - Fixed a bug where embedded element index filter HUDs were including condition rules for fields that weren’t applicable to the nested elements. ([#16289](https://github.com/craftcms/cms/discussions/16289))
