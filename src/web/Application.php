@@ -179,7 +179,8 @@ class Application extends \yii\web\Application
                 $this->getDb()->enableReplicas = false;
             }
 
-            $headers = $this->getResponse()->getHeaders();
+            $response = $this->getResponse();
+            $headers = $response->getHeaders();
             $generalConfig = $this->getConfig()->getGeneral();
 
             if ($generalConfig->permissionsPolicyHeader && $request->getIsSiteRequest()) {
@@ -243,7 +244,7 @@ class Application extends \yii\web\Application
             // getIsCraftDbMigrationNeeded will return true if we’re in the middle of a manual or auto-update for Craft itself.
             // If we’re in maintenance mode and it’s not a site request, show the manual update template.
             if ($this->getUpdates()->getIsCraftUpdatePending()) {
-                return $this->_processUpdateLogic($request) ?: $this->getResponse();
+                return $this->_processUpdateLogic($request) ?: $response;
             }
 
             // If there’s a new version, but the schema hasn’t changed, just update the info table
@@ -263,7 +264,7 @@ class Application extends \yii\web\Application
 
             // Check if a plugin needs to update the database.
             if ($this->getUpdates()->getIsPluginUpdatePending()) {
-                return $this->_processUpdateLogic($request) ?: $this->getResponse();
+                return $this->_processUpdateLogic($request) ?: $response;
             }
 
             if ($request->getIsCpRequest() && !$request->getIsActionRequest()) {
