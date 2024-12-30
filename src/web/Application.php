@@ -183,6 +183,12 @@ class Application extends \yii\web\Application
             $headers = $response->getHeaders();
             $generalConfig = $this->getConfig()->getGeneral();
 
+            // Set no-cache headers for all action and CP requests
+            if ($request->getIsActionRequest() || $request->getIsCpRequest()) {
+                $response->setNoCacheHeaders();
+            }
+
+            // Set the permissions policy
             if ($generalConfig->permissionsPolicyHeader && $request->getIsSiteRequest()) {
                 $headers->set('Permissions-Policy', $generalConfig->permissionsPolicyHeader);
             }
