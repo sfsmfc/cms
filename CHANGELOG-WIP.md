@@ -123,3 +123,4 @@
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
 - Fixed a bug where `craft\config\GeneralConfig::safeMode()` set Safe Mode to `false` by default.
 - Fixed a bug where embedded element index filter HUDs were including condition rules for fields that weren’t applicable to the nested elements. ([#16289](https://github.com/craftcms/cms/discussions/16289))
+- Fixed a bug where element queries were ignoring params for custom fields that weren’t involved with the query, rather than returning zero results.
