@@ -276,7 +276,19 @@ class Request extends \yii\web\Request
             }
         }
 
-        // Set the current site for the request
+        // Finally if this isn't a control panel request and the site header has been passed, set the current site
+        $siteHandle = $this->getHeaders()->get('X-Craft-Site');
+        if (!$this->_isCpRequest && $siteHandle !== null) {
+            $site = $this->sites->getSiteByHandle($siteHandle, false);
+            // Fail silently if Craft isn’t installed yet or is in the middle of updating
+            if ($site === null && Craft::$app->getIsInstalled() && !Craft::$app->getUpdates()->getIsCraftUpdatePending()) {
+                /** @noinspection PhpUnhandledExceptionInspection */
+                throw new SiteNotFoundException('Site does not exist.');
+            }
+
+            $baseUrl = rtrim($site->getBaseUrl() ?? '', '/');
+        }
+            // Set the current site for the request
         if ($this->sites instanceof Sites) {
             $this->sites->setCurrentSite($site ?? null);
         }
