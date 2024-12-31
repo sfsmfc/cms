@@ -288,7 +288,8 @@ class Request extends \yii\web\Request
 
             $baseUrl = rtrim($site->getBaseUrl() ?? '', '/');
         }
-            // Set the current site for the request
+
+        // Set the current site for the request
         if ($this->sites instanceof Sites) {
             $this->sites->setCurrentSite($site ?? null);
         }
