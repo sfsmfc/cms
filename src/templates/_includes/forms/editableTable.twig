@@ -102,7 +102,7 @@
                             &nbsp;
                         {%- endif %}
                         {%- if col.info is defined -%}
-                            <span class="info">{{ col.info|md|raw }}</span>
+                            <span class="info{% if static %} disabled{% endif %}"{% if static %} disabled=""{% endif %}>{{ col.info|md|raw }}</span>
                         {%- endif -%}
                     </th>
                 {% endfor %}

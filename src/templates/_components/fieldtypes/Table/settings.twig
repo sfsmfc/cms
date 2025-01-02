@@ -3,12 +3,17 @@
 {{ columnsField|raw }}
 {{ defaultsField|raw }}
 
+{% if readOnly is not defined %}
+    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% endif %}
+
 {{ forms.lightswitchField({
     label: 'Static Rows'|t('app'),
     instructions: 'Whether the table rows should be restricted to those defined by the “Default Values” setting.'|t('app'),
     name: 'staticRows',
     on: field.staticRows,
     reverseToggle: 'dynamic-row-settings',
+    disabled: readOnly,
 }) }}
 
 <fieldset id="dynamic-row-settings"{% if field.staticRows %} class="hidden indent"{% endif %}>
@@ -21,6 +26,7 @@
         size: 3,
         errors: field.getErrors('minRows'),
         data: {'error-key': 'minRows'},
+        disabled: readOnly,
     }) }}
 
     {{ forms.textField({
@@ -32,6 +38,7 @@
         size: 3,
         errors: field.getErrors('maxRows'),
         data: {'error-key': 'maxRows'},
+        disabled: readOnly,
     }) }}
 
     {{ forms.textField({
@@ -41,7 +48,8 @@
         name: 'addRowLabel',
         value: field.addRowLabel,
         size: 20,
-        errors: field.getErrors('addRowLabel')
+        errors: field.getErrors('addRowLabel'),
+        disabled: readOnly,
     }) }}
 </fieldset>
 
