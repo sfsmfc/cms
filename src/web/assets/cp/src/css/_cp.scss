@@ -1639,7 +1639,8 @@ li.breadcrumb-toggle-wrapper {
         &.active-drop-target {
           cursor: default;
           background-color: var(--gray-500);
-          @include mixins.dark-btn-light-bg-focus-ring;
+
+          --focus-ring: var(--focus-ring-outset);
 
           &,
           & + .toggle {

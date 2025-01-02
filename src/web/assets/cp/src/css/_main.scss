@@ -65,9 +65,10 @@
   --focus-ring: 0 0 0 2px var(--focus-ring-color),
     0 0 5px 1px
       hsl(from var(--focus-ring-color) h s l / var(--focus-ring-alpha));
-  --focus-ring-outset: inset 0 0 0 1px currentcolor,
-    0 0 0 3px hsl(from var(--focus-ring-color) h s l / var(--focus-ring-alpha));
-  --inner-focus-ring: inset 0 0 0 1px var(--focu-ring-color),
+  --focus-ring-outset: 0 0 0 1px currentcolor, 0 0 0 3px var(--focus-ring-color),
+    0 0 6px 2px
+      hsl(from var(--focus-ring-color) h s l / var(--focus-ring-alpha));
+  --inner-focus-ring: inset 0 0 0 1px var(--focus-ring-color),
     inset 0 0 0 3px
       hsl(from var(--focus-ring-color) h s l / var(--focus-ring-alpha));
   --touch-target-size: calc(24rem / 16);
@@ -1590,8 +1591,7 @@ td.right {
   }
 
   &.sel {
-    @include mixins.dark-btn-light-bg-focus-ring;
-
+    --focus-ring: var(--focus-ring-outset);
     --ui-control-color: var(--selected-item-color);
     background-color: var(--dark-sel-color);
     color: var(--selected-item-color);
@@ -1949,18 +1949,27 @@ ul.icons {
   font-size: inherit;
   text-wrap: nowrap;
   background-color: var(--button-bg);
-  box-shadow: var(--button-shadow);
+
+  &:not(:focus) {
+    box-shadow: var(--button-shadow);
+  }
 
   &:hover {
     border: var(--button-border--hover);
     background: var(--button-bg--hover);
-    box-shadow: var(--button-shadow--hover);
+
+    &:not(:focus) {
+      box-shadow: var(--button-shadow--hover);
+    }
   }
 
   &:active {
     border: var(--button-border--active);
     background: var(--button-bg--active);
-    box-shadow: var(--button-shadow--active);
+
+    &:not(:focus) {
+      box-shadow: var(--button-shadow--active);
+    }
   }
 
   &:not([aria-current]) {
@@ -2191,7 +2200,6 @@ ul.icons {
     --focus-ring: var(--focus-ring-outset);
     background-color: var(--gray-500);
     color: var(--white);
-    @include mixins.dark-btn-light-bg-focus-ring;
   }
 }
 
