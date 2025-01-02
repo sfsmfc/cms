@@ -1005,6 +1005,16 @@ interface ElementInterface extends
     public function getAdditionalButtons(): string;
 
     /**
+     * Returns alternative form actions for the element.
+     *
+     * See [[\craft\web\CpScreenResponseBehavior::altActions()]] for documentation on supported action properties.
+     *
+     * @return array
+     * @since 5.6.0
+     */
+    public function getAltActions(): array;
+
+    /**
      * Returns the additional locations that should be available for previewing the element, besides its primary [[getUrl()|URL]].
      *
      * Each target should be represented by a sub-array with the following keys:

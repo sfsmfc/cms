@@ -1557,6 +1557,11 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         criteria.status = this.status;
       }
 
+      const viewState = $.extend({}, this.getSelectedSourceState());
+      if (Garnish.isMobileBrowser(true)) {
+        viewState.tableColumns = [];
+      }
+
       const params = {
         context: this.settings.context,
         elementType: this.elementType,
@@ -1568,7 +1573,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         baseCriteria,
         criteria,
         disabledElementIds: this.settings.disabledElementIds,
-        viewState: $.extend({}, this.getSelectedSourceState()),
+        viewState,
         paginated: this.paginated,
         selectable: this.selectable,
         sortable: this.sortable,
@@ -4071,11 +4076,10 @@ const ViewMenu = Garnish.Base.extend({
 
   menuHasContent: function () {
     this.updateMenuContent();
-    if (this.$sortField == null && this.$tableColumnsField.hasClass('hidden')) {
-      return false;
-    }
-
-    return true;
+    return (
+      (this.$sortField && !this.$sortField.hasClass('hidden')) ||
+      (this.$tableColumnsField && !this.$tableColumnsField.hasClass('hidden'))
+    );
   },
 
   showTrigger: function () {
@@ -4103,15 +4107,9 @@ const ViewMenu = Garnish.Base.extend({
   updateTableFieldVisibility: function () {
     // we only want to show the "Table Columns" checkboxes and "Use defaults" btn in table and structure views
     if (
-      this.elementIndex.viewMode !== 'table' &&
-      this.elementIndex.viewMode !== 'structure'
+      ['table', 'structure'].includes(this.elementIndex.viewMode) &&
+      !Garnish.isMobileBrowser(true)
     ) {
-      if (this.$tableColumnsContainer) {
-        this.$tableColumnsContainer
-          .closest('.table-columns-field')
-          .addClass('hidden');
-      }
-    } else {
       if (this.$tableColumnsContainer) {
         this.$tableColumnsContainer
           .closest('.table-columns-field')
@@ -4119,6 +4117,12 @@ const ViewMenu = Garnish.Base.extend({
       }
       if (this.$revertBtn) {
         this.$revertBtn.removeClass('hidden');
+      }
+    } else {
+      if (this.$tableColumnsContainer) {
+        this.$tableColumnsContainer
+          .closest('.table-columns-field')
+          .addClass('hidden');
       }
     }
   },
@@ -4606,6 +4610,7 @@ const FilterHud = Garnish.HUD.extend({
         condition: this.elementIndex.settings.condition,
         conditionConfig: this.conditionConfig,
         serialized: this.serialized,
+        fieldLayouts: this.elementIndex.$source.data('field-layouts'),
         id: `${this.id}-filters`,
       },
     })

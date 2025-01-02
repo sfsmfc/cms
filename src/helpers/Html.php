@@ -27,6 +27,11 @@ use yii\base\InvalidConfigException;
 class Html extends \yii\helpers\Html
 {
     /**
+     * @since 5.6.0
+     */
+    public const TITLE_TAG_RE = '/<title(\s+([\s\S]*?))?>.*?<\/title>\s*/is';
+
+    /**
      * @var array List of tag attributes that should be specially handled when their values are of array type.
      * In particular, if the value of the `data` attribute is `['name' => 'xyz', 'age' => 13]`, two attributes
      * will be generated instead of one: `data-name="xyz" data-age="13"`.
@@ -999,7 +1004,7 @@ class Html extends \yii\helpers\Html
         $svg = $sanitizer->sanitize($svg);
         // Remove comments, title & desc
         $svg = preg_replace('/<!--.*?-->\s*/s', '', $svg);
-        $svg = preg_replace('/<title>.*?<\/title>\s*/is', '', $svg);
+        $svg = preg_replace(self::TITLE_TAG_RE, '', $svg);
         return preg_replace('/<desc>.*?<\/desc>\s*/is', '', $svg);
     }
 

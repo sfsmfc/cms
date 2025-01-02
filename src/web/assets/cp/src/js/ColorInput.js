@@ -40,6 +40,7 @@ Craft.ColorInput = Garnish.Base.extend(
         .attr({
           'aria-controls': this.$input.attr('id'),
           'aria-label': Craft.t('app', 'Color picker'),
+          'aria-labelledby': this.$input.attr('aria-labelledby'),
         })
         .appendTo(this.$colorPreview);
 
