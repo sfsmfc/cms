@@ -12,6 +12,7 @@
 - Improved how fields are sized in responsive field layouts. ([#16303](https://github.com/craftcms/cms/pull/16303))
 - Entry indexes now only show table column options and sort options for custom fields associated with the selected sections/entry types within custom entry sources’ conditions.
 - Structure views are now available to element indexes on mobile browsers. ([#16190](https://github.com/craftcms/cms/discussions/16190))
+- Heads-up displays now reposition themselves on window scroll.
 
 ### Accessibility
 - Improved the accessibility of Checkboxes and Radio Buttons fields that allow custom options. ([#16080](https://github.com/craftcms/cms/pull/16080))
@@ -36,6 +37,9 @@
 - The Updates utility now shows an action menu for each plugin, with “Copy plugin handle” and “Copy package name” options. ([#16281](https://github.com/craftcms/cms/discussions/16281))
 - The Queue Manager utility now shows jobs’ class names. ([#16228](https://github.com/craftcms/cms/pull/16228))
 - Improved the wording of field instance action labels. ([#16261](https://github.com/craftcms/cms/discussions/16261))
+- Field layout designers no longer show the element library in a persisting sidebar. Instead, tabs always show “Add” buttons, which open the element library within a heads-up display. ([#16374](https://github.com/craftcms/cms/pull/16374))
+- It’s now possible to add new field layout elements to tabs by clicking/tapping or pressing <kbd>Return</kbd>/<kbd>Spacebar</kbd> on them. ([#16374](https://github.com/craftcms/cms/pull/16374))
+- After creating a new field from a field layout designer, the field is now immediately added to the field layout tab. ([#16374](https://github.com/craftcms/cms/pull/16374))
 - Templates rendered for “Template” field layout UI elements can now call control panel template functions like `elementChip()` and `elementCard()`. ([#16267](https://github.com/craftcms/cms/issues/16267))
 - “Template” field layout UI elements now show suggestions for the Template input.
 - Improved the error output for nested elements when they can’t be resaved via `resave` commands.
@@ -128,3 +132,4 @@
 - Fixed a bug where `craft\config\GeneralConfig::safeMode()` set Safe Mode to `false` by default.
 - Fixed a bug where embedded element index filter HUDs were including condition rules for fields that weren’t applicable to the nested elements. ([#16289](https://github.com/craftcms/cms/discussions/16289))
 - Fixed a bug where element queries were ignoring params for custom fields that weren’t involved with the query, rather than returning zero results.
+- Fixed a bug where opening heads-up displays could cause the page to scroll to the focused element. 
