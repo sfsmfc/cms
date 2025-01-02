@@ -21,6 +21,7 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
     $fields: null,
     $createFieldBtn: null,
 
+    libraryPicker: null,
     tabGrid: null,
     elementDrag: null,
 
@@ -82,7 +83,7 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
       // Set up the library
       if (this.settings.customizableUi) {
         const $libraryPicker = this.$libraryContainer.children('.btngroup');
-        new Craft.Listbox($libraryPicker, {
+        this.libraryPicker = new Craft.Listbox($libraryPicker, {
           onChange: ($selectedOption) => {
             const library = $selectedOption.data('library');
             switch (library) {
@@ -119,7 +120,7 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
 
       // Clear the search when the X button is clicked
       this.addListener(this.$clearFieldSearchBtn, 'click', () => {
-        this.$fieldSearch.val('').trigger('input');
+        this.clearSearch();
       });
 
       this.refreshSelectedFields();
@@ -175,6 +176,10 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
       }
     },
 
+    clearSearch: function () {
+      this.$fieldSearch.val('').trigger('input');
+    },
+
     initCvd: function () {
       let cvd = new Craft.FieldLayoutDesigner.CardViewDesigner(this, this.$cvd);
 
@@ -214,7 +219,6 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
         return;
       }
 
-      const menuId = `menu-${Math.floor(Math.random() * 1000000)}`;
       const $tab = $(`
 <div class="fld-tab">
   <div class="tabs">
@@ -223,10 +227,9 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
     </div>
   </div>
   <div class="fld-tabcontent">
-    <button class="btn add icon dashed fullwidth fld-add-btn" type="button" aria-controls="${menuId}">
+    <button class="btn add icon dashed fullwidth fld-add-btn" type="button">
       ${Craft.t('app', 'Add')}
     </button>
-    <div id="${menuId}" class="menu menu--disclosure fld-library-menu"></div>
   </div>
 </div>
 `);
@@ -303,9 +306,8 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
         this.refreshLibraryFields();
         this.initLibraryElements($selector);
 
-        // set the search value to the new field name
-        this.$fieldSearch.val(response.data.field.name);
-        this.updateFieldSearchResults();
+        // add it to the active tab
+        this.addLibraryElementToActiveTab($selector);
       });
     },
 
@@ -313,28 +315,18 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
       this.elementDrag.addItems($elements);
 
       this.addListener($elements, 'activate', (ev) => {
-        // if the library is in a disclosure menu, go ahead and add it to the tab
-        const $parent = this.$libraryContainer.parent();
-        if ($parent.is('.fld-library-menu')) {
-          const disclosureMenu = $parent.data('disclosureMenu');
-          const $libraryElement = $(ev.currentTarget);
-          const $element =
-            this.cloneLibraryElementForSelection($libraryElement);
-          const tab = disclosureMenu.$trigger
-            .closest('.fld-tab')
-            .data('fld-tab');
-          $element.insertBefore(disclosureMenu.$trigger);
-          const element = tab.initElement($element);
-          element.updatePositionInConfig();
-          this.tabGrid.refreshCols(true);
-          disclosureMenu.hide();
-        }
+        ev.stopPropagation();
+        this.addLibraryElementToActiveTab(ev.currentTarget);
       });
     },
 
-    cloneLibraryElementForSelection($libraryElement) {
+    cloneLibraryElementForSelection(libraryElement) {
       // Create a new element based on that one
-      const $element = $libraryElement.clone().removeClass('unused');
+      const $libraryElement = $(libraryElement);
+      const $element = $libraryElement
+        .clone()
+        .removeClass('unused')
+        .removeAttr('tabindex');
 
       if (!Garnish.hasAttr($libraryElement, 'data-is-multi-instance')) {
         // Hide the library element
@@ -352,6 +344,28 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
       this.elementDrag.addItems($element);
 
       return $element;
+    },
+
+    getActiveHud: function () {
+      return this.$libraryContainer.closest('.fld-library-hud').data('hud');
+    },
+
+    addLibraryElementToActiveTab: function (libraryElement) {
+      const hud = this.getActiveHud();
+      if (!hud) {
+        return;
+      }
+
+      const $element = this.cloneLibraryElementForSelection(libraryElement);
+      const tab = hud.$trigger.closest('.fld-tab').data('fld-tab');
+      $element.insertBefore(hud.$trigger);
+      const element = tab.initElement($element);
+      element.updatePositionInConfig();
+      this.tabGrid.refreshCols(true);
+
+      Garnish.requestAnimationFrame(() => {
+        hud.hide();
+      });
     },
   },
   {
@@ -452,12 +466,25 @@ Craft.FieldLayoutDesigner.Tab = Garnish.Base.extend({
     const $tabContent = this.$container.children('.fld-tabcontent');
     this.$addBtn = $tabContent.children('.fld-add-btn');
 
-    const disclosureMenu = this.$addBtn.disclosureMenu().data('disclosureMenu');
-    disclosureMenu.on('beforeShow', () => {
-      this.designer.$libraryContainer.appendTo(disclosureMenu.$container);
+    const hud = new Garnish.HUD(this.$addBtn, {
+      hudClass: 'hud fld-library-hud',
+      listenToMainResize: false,
+      showOnInit: false,
     });
-    disclosureMenu.on('hide', () => {
+    hud.on('show', () => {
+      this.designer.$libraryContainer.appendTo(hud.$main);
+      this.designer.libraryPicker?.select(0);
+      this.designer.$fieldSearch.focus();
+      this.designer.clearSearch();
+      this.designer.$fieldLibrary.scrollTop(0);
+    });
+    hud.on('hide', () => {
       this.designer.$libraryContainer.appendTo(this.designer.$innerContainer);
+      this.$addBtn.focus();
+    });
+
+    this.$addBtn.on('activate', () => {
+      hud.show();
     });
 
     const $elements = $tabContent.children().not(this.$addBtn);
@@ -741,6 +768,14 @@ Craft.FieldLayoutDesigner.Tab = Garnish.Base.extend({
     let $elements = this.$container.find('.fld-element');
     for (let i = 0; i < $elements.length; i++) {
       $elements.eq(i).data('fld-element').destroy();
+    }
+
+    // Set focus to the closest tab's first focusable element
+    const $focusElement = this.$container.siblings().find(':focusable:first');
+    if ($focusElement.length) {
+      $focusElement.focus();
+    } else {
+      this.designer.$newTabBtn.focus();
     }
 
     this.designer.tabGrid.removeItems(this.$container);
@@ -1337,6 +1372,14 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
       return config;
     });
 
+    // Set focus to the closest element's first focusable element
+    const $focusElement = this.$container.siblings().find(':focusable:first');
+    if ($focusElement.length) {
+      $focusElement.focus();
+    } else {
+      this.tab.$addBtn.focus();
+    }
+
     this.tab.designer.elementDrag.removeItems(this.$container);
     this.$container.remove();
 
@@ -1669,12 +1712,12 @@ Craft.FieldLayoutDesigner.ElementDrag =
 
       this.setMidpoints();
 
-      // If we're dragging an element from the library, and it's within a disclosure menu,
-      // hide the menu
+      // If we're dragging an element from the library, and it's within an HUD,
+      // hide the HUD
       if (this.draggingLibraryElement) {
-        const $menu = this.$draggee.closest('.fld-library-menu');
-        if ($menu.length) {
-          $menu.data('disclosureMenu').hide();
+        const $hud = this.$draggee.closest('.fld-library-hud');
+        if ($hud.length) {
+          $hud.data('hud').hide();
         }
       }
     },
