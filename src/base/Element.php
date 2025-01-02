@@ -1062,9 +1062,9 @@ abstract class Element extends Component implements ElementInterface
         if (!$hasActionType(Edit::class)) {
             $actions->prepend([
                 'type' => Edit::class,
-                'label' => Craft::t('app', 'Edit {type}', [
+                'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Edit {type}', [
                     'type' => static::lowerDisplayName(),
-                ]),
+                ])),
             ]);
         }
 
@@ -1072,9 +1072,9 @@ abstract class Element extends Component implements ElementInterface
         if (static::hasUris() && !$hasActionType(ViewAction::class)) {
             $actions->prepend([
                 'type' => ViewAction::class,
-                'label' => Craft::t('app', 'View {type}', [
+                'label' => StringHelper::upperCaseFirst(Craft::t('app', 'View {type}', [
                     'type' => static::lowerDisplayName(),
-                ]),
+                ])),
             ]);
         }
 
@@ -1388,7 +1388,6 @@ abstract class Element extends Component implements ElementInterface
                 'mode' => 'structure',
                 'title' => Craft::t('app', 'Display in a structured table'),
                 'icon' => Craft::$app->getLocale()->getOrientation() === 'rtl' ? 'structurertl' : 'structure',
-                'availableOnMobile' => false,
                 'structuresOnly' => true,
             ],
             [
@@ -1748,21 +1747,7 @@ abstract class Element extends Component implements ElementInterface
      */
     private static function _mapDescendants(array $sourceElements, bool $children): ?array
     {
-        // Get the source element IDs
-        $sourceElementIds = array_map(fn(ElementInterface $element) => $element->id, $sourceElements);
-
-        // Get the structure data for these elements
-        $selectColumns = ['structureId', 'elementId', 'lft', 'rgt'];
-
-        if ($children) {
-            $selectColumns[] = 'level';
-        }
-
-        $elementStructureData = (new Query())
-            ->select($selectColumns)
-            ->from([Table::STRUCTUREELEMENTS])
-            ->where(['elementId' => $sourceElementIds])
-            ->all();
+        $elementStructureData = self::_structureDataForElements($sourceElements, $children);
 
         if (empty($elementStructureData)) {
             return null;
@@ -1834,21 +1819,7 @@ abstract class Element extends Component implements ElementInterface
      */
     private static function _mapAncestors(array $sourceElements, bool $parents): ?array
     {
-        // Get the source element IDs
-        $sourceElementIds = array_map(fn(ElementInterface $element) => $element->id, $sourceElements);
-
-        // Get the structure data for these elements
-        $selectColumns = ['structureId', 'elementId', 'lft', 'rgt'];
-
-        if ($parents) {
-            $selectColumns[] = 'level';
-        }
-
-        $elementStructureData = (new Query())
-            ->select($selectColumns)
-            ->from([Table::STRUCTUREELEMENTS])
-            ->where(['elementId' => $sourceElementIds])
-            ->all();
+        $elementStructureData = self::_structureDataForElements($sourceElements, $parents);
 
         if (empty($elementStructureData)) {
             return null;
@@ -1914,6 +1885,47 @@ abstract class Element extends Component implements ElementInterface
             'elementType' => static::class,
             'map' => $map,
         ];
+    }
+
+    /**
+     * @param ElementInterface[] $elements
+     * @return array
+     */
+    private static function _structureDataForElements(array $elements, bool $withLevel): array
+    {
+        $data = [];
+        $fetchDataForIds = [];
+
+        foreach ($elements as $element) {
+            if (isset($element->structureId, $element->lft, $element->rgt, $element->level)) {
+                $data[] = [
+                    'structureId' => $element->structureId,
+                    'elementId' => $element->id,
+                    'lft' => $element->lft,
+                    'rgt' => $element->rgt,
+                    'level' => $element->level,
+                ];
+            } else {
+                $fetchDataForIds[] = $element->id;
+            }
+        }
+
+        if (!empty($fetchDataForIds)) {
+            // Get the structure data for these elements
+            $selectColumns = ['structureId', 'elementId', 'lft', 'rgt'];
+
+            if ($withLevel) {
+                $selectColumns[] = 'level';
+            }
+
+            array_push($data, ...(new Query())
+                ->select($selectColumns)
+                ->from([Table::STRUCTUREELEMENTS])
+                ->where(['elementId' => $fetchDataForIds])
+                ->all());
+        }
+
+        return $data;
     }
 
     /**
@@ -2793,7 +2805,6 @@ abstract class Element extends Component implements ElementInterface
             StringValidator::class,
             'max' => 255,
             'disallowMb4' => true,
-            'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_LIVE],
         ];
         $rules[] = [
             ['title'],
@@ -3782,9 +3793,9 @@ abstract class Element extends Component implements ElementInterface
 
             if ($canSaveCanonical && $isUnpublishedDraft) {
                 $altActions[] = [
-                    'label' => Craft::t('app', 'Save {type}', [
+                    'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Save {type}', [
                         'type' => Craft::t('app', 'draft'),
-                    ]),
+                    ])),
                     'action' => 'elements/save-draft',
                     'redirect' => sprintf('%s#', ElementHelper::postEditUrl($this)),
                     'eventData' => ['autosave' => false],
@@ -3869,9 +3880,9 @@ abstract class Element extends Component implements ElementInterface
             $items[] = [
                 'id' => $editId,
                 'icon' => 'edit',
-                'label' => Craft::t('app', 'Edit {type}', [
+                'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Edit {type}', [
                     'type' => static::lowerDisplayName(),
-                ]),
+                ])),
             ];
 
             $view = Craft::$app->getView();
@@ -3956,9 +3967,9 @@ JS, [
             if ($canDeleteForSite) {
                 $items[] = [
                     'icon' => 'remove',
-                    'label' => Craft::t('app', 'Delete {type} for this site', [
+                    'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Delete {type} for this site', [
                         'type' => $isUnpublishedDraft ? Craft::t('app', 'draft') : static::lowerDisplayName(),
-                    ]),
+                    ])),
                     'action' => 'elements/delete-for-site',
                     'params' => [
                         'elementId' => $this->getCanonicalId(),
@@ -3976,9 +3987,9 @@ JS, [
             if ($canDeleteCanonical) {
                 $items[] = [
                     'icon' => 'trash',
-                    'label' => Craft::t('app', 'Delete {type}', [
+                    'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Delete {type}', [
                         'type' => $isUnpublishedDraft ? Craft::t('app', 'draft') : static::lowerDisplayName(),
-                    ]),
+                    ])),
                     'action' => $isUnpublishedDraft ? 'elements/delete-draft' : 'elements/delete',
                     'params' => [
                         'elementId' => $this->getCanonicalId(),
@@ -3996,9 +4007,9 @@ JS, [
             if ($canDeleteForSite) {
                 $items[] = [
                     'icon' => 'remove',
-                    'label' => Craft::t('app', 'Delete {type} for this site', [
+                    'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Delete {type} for this site', [
                         'type' => Craft::t('app', 'draft'),
-                    ]),
+                    ])),
                     'action' => 'elements/delete-for-site',
                     'params' => [
                         'elementId' => $this->getCanonicalId(),
@@ -4016,9 +4027,9 @@ JS, [
             // Delete draft
             $items[] = [
                 'icon' => 'trash',
-                'label' => Craft::t('app', 'Delete {type}', [
+                'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Delete {type}', [
                     'type' => Craft::t('app', 'draft'),
-                ]),
+                ])),
                 'action' => 'elements/delete-draft',
                 'params' => [
                     'elementId' => $this->getCanonicalId(),

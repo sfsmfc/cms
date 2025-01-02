@@ -197,7 +197,7 @@
                       {% switch issue %}
                       {% case 'wrong_edition' %}
                         {{ 'This license is for the {name} edition.'|t('app', {
-                          name: config.licensedEdition|ucfirst
+                          name: config.licensedEdition|capitalize,
                         }) }}
                       {% case 'no_trials' %}
                         {{ 'Plugin trials are not allowed on this domain.'|t('app') }}

@@ -878,7 +878,11 @@ JS . "\n";
             }
 
             $js .= <<<JS
-  input.elementEditor?.resume();
+  setTimeout(() => {
+    Garnish.requestAnimationFrame(() => {
+      input.elementEditor?.resume();
+    });
+  }, 100);
 });
 JS;
         }

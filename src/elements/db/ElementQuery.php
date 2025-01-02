@@ -2715,17 +2715,21 @@ class ElementQuery extends Query implements ElementQueryInterface
                 $fieldsByHandle[$field->handle][$field->uid][] = $field;
             }
 
-            foreach ($fieldsByHandle as $handle => $instancesByUid) {
-                // In theory all field handles will be accounted for on the CustomFieldBehavior, but just to be safe...
-                // ($fieldAttributes->$handle will return true even if it's set to null, so can't use isset() alone here)
+            foreach (array_keys(CustomFieldBehavior::$fieldHandles) as $handle) {
+                // $fieldAttributes->$handle will return true even if it's set to null, so can't use isset() here
                 if ($handle === 'owner' || ($fieldAttributes->$handle ?? null) === null) {
                     continue;
+                }
+
+                // Make sure the custom field exists in one of the field layouts
+                if (!isset($fieldsByHandle[$handle])) {
+                    throw new QueryAbortedException("No custom field with the handle \"$handle\" exists in the field layouts involved with this element query.");
                 }
 
                 $conditions = [];
                 $params = [];
 
-                foreach ($instancesByUid as $instances) {
+                foreach ($fieldsByHandle[$handle] as $instances) {
                     $firstInstance = $instances[0];
                     $condition = $firstInstance::queryCondition($instances, $fieldAttributes->$handle, $params);
 
