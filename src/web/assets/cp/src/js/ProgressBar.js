@@ -9,6 +9,8 @@ Craft.ProgressBar = Garnish.Base.extend({
   $progressBarStatus: null,
 
   _itemCount: 0,
+  _intervalId: null,
+  _progressPercentage: null,
   _processedItemCount: 0,
   _displaySteps: false,
 
@@ -55,11 +57,29 @@ Craft.ProgressBar = Garnish.Base.extend({
   hideProgressBar: function () {
     this.$progressBar.addClass('hidden');
     this.$progressBarStatus.addClass('hidden');
+    this.stopProgressAnnouncements();
   },
 
   showProgressBar: function () {
     this.$progressBar.removeClass('hidden');
     this.$progressBarStatus.removeClass('hidden');
+    this.startProgressAnnouncements();
+  },
+
+  startProgressAnnouncements: function () {
+    this._intervalId = setInterval(() => {
+      if (this._progressPercentage !== 100) {
+        console.log(`progress is at ${this._progressPercentage}%`);
+      } else {
+        Craft.cp.announce(Craft.t('app', 'Processing'));
+      }
+    }, 100);
+  },
+
+  stopProgressAnnouncements: function () {
+    Craft.cp.announce(Craft.t('app', 'Process complete'));
+    clearInterval(this._intervalId);
+    this._intervalId = null;
   },
 
   setItemCount: function (count) {
@@ -97,6 +117,8 @@ Craft.ProgressBar = Garnish.Base.extend({
   },
 
   setProgressPercentage: function (percentage, animate) {
+    this._progressPercentage = percentage;
+
     if (percentage === 0) {
       this.$progressBar.addClass('pending');
     } else {

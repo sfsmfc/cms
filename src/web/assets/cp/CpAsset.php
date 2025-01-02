@@ -299,6 +299,8 @@ JS;
             'Previewing {type} device in {orientation}',
             'Previewing {type} device',
             'Previous Page',
+            'Process complete',
+            'Processing',
             'Really delete folder “{folder}”?',
             'Recent Activity',
             'Refresh',

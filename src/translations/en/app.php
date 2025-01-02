@@ -1234,6 +1234,8 @@ return [
     'Primary fields' => 'Primary fields',
     'Primary {type} page' => 'Primary {type} page',
     'Primary' => 'Primary',
+    'Process complete' => 'Process complete',
+    'Processing' => 'Processing',
     'Profile Twig templates when Dev Mode is disabled' => 'Profile Twig templates when Dev Mode is disabled',
     'Profile' => 'Profile',
     'Progress' => 'Progress',
