@@ -223,6 +223,11 @@ export default Base.extend(
         }
       }
 
+      // Blur the active element, if there is one, to prenent the page from jumping
+      if (document.activeElement !== document.body) {
+        $(document.activeElement).blur();
+      }
+
       // Move it to the end of <body> so it gets the highest sub-z-index
       if (this.settings.withShade) {
         this.$shade.appendTo(Garnish.$bod);
