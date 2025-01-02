@@ -9,6 +9,7 @@
 ## Development
 - Added the `primarySite` global Twig variable. ([#16370](https://github.com/craftcms/cms/discussions/16370))
 - The `duration` Twig filter now has a `language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
+- Added support for specifying the current site via an `X-Craft-Site` header set to a site ID or handle. ([#16367](https://github.com/craftcms/cms/pull/16367))
 - Deprecated the `ucfirst` Twig filter. `capitalize` should be used instead.
 
 ## Extensibility
