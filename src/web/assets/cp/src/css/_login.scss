@@ -168,7 +168,8 @@ body.login {
   }
 
   .login-alt-container {
-    margin-block: calc(var(--s) - var(--pane-padding)) calc(var(--s) - var(--pane-padding));
+    margin-block: calc(var(--s) - var(--pane-padding))
+      calc(var(--s) - var(--pane-padding));
     margin-inline: 0;
 
     button {
