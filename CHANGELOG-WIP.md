@@ -94,6 +94,7 @@
 - Added `craft\web\User::getImpersonatorId()`.
 - Added `craft\web\User::setImpersonatorId()`.
 - Added `craft\web\View::setTwig()`.
+- `GuzzleHttp\Client` is now instantiated via `Craft::createObject()`. ([#16366](https://github.com/craftcms/cms/pull/16366))
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
 - `craft\helpers\Cp::elementIndexHtml()` now supports passing `defaultSort` in the `$config` array, when `sources` is `null`. ([#16236](https://github.com/craftcms/cms/discussions/16236))
