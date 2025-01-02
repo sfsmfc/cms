@@ -175,7 +175,6 @@ return [
         ],
         'sites' => [
             'class' => craft\services\Sites::class,
-            'currentSite' => craft\helpers\App::env('CRAFT_SITE'),
         ],
         'sso' => [
             'class' => craft\services\Sso::class,

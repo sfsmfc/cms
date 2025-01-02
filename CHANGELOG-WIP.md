@@ -60,6 +60,7 @@
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
 - It’s now possible to reference custom field handles in element queries’ `where` params. ([#16318](https://github.com/craftcms/cms/pull/16318))
 - Number fields’ scalar values now return an integer if Decimals is set to `0`, and a number formatted with the correct decimal points when using MySQL. ([16369](https://github.com/craftcms/cms/issues/16369))
+- Added support for specifying the current site via an `X-Craft-Site` header set to a site ID or handle. ([#16367](https://github.com/craftcms/cms/pull/16367))
 - Deprecated the `ucfirst` Twig filter. `capitalize` should be used instead.
 
 ### Extensibility
