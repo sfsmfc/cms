@@ -968,7 +968,7 @@ JS, [
 
     private function _valueSql(?string $key): ?string
     {
-        $dbType = static::dbType();
+        $dbType = $this->dbTypeForValueSql();
 
         if ($dbType === null) {
             return null;
@@ -1041,6 +1041,18 @@ JS, [
         }
 
         return $sql;
+    }
+
+    /**
+     * Returns the DB data type(s) that this field will store within the `elements_sites.content` column.
+     *
+     * @see dbType()
+     * @return string|string[]|null The data type(s).
+     * @since 5.6.0
+     */
+    protected function dbTypeForValueSql(): array|string|null
+    {
+        return static::dbType();
     }
 
     /**
