@@ -1713,21 +1713,23 @@ class Extension extends AbstractExtension implements GlobalsInterface
         $setPasswordRequestPath = $generalConfig->getSetPasswordRequestPath();
 
         if ($isInstalled && !Craft::$app->getUpdates()->getIsCraftUpdatePending()) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $currentSite = Craft::$app->getSites()->getCurrentSite();
+            $sitesService = Craft::$app->getSites();
+            $currentSite = $sitesService->getCurrentSite();
+            $primarySite = $sitesService->getPrimarySite();
 
             $currentUser = Craft::$app->getUser()->getIdentity();
             $siteName = Craft::t('site', $currentSite->getName());
             $siteUrl = $currentSite->getBaseUrl();
             $systemName = Craft::$app->getSystemName();
         } else {
-            $currentSite = $currentUser = $siteName = $siteUrl = $systemName = null;
+            $currentSite = $primarySite = $currentUser = $siteName = $siteUrl = $systemName = null;
         }
 
         return [
             'craft' => new CraftVariable(),
             'currentSite' => $currentSite,
             'currentUser' => $currentUser,
+            'primarySite' => $primarySite,
             'siteName' => $siteName,
             'siteUrl' => $siteUrl,
             'systemName' => $systemName,

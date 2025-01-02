@@ -7,6 +7,7 @@
 - The Queue Manager utility now shows jobs’ class names. ([#16228](https://github.com/craftcms/cms/pull/16228)) 
 
 ## Development
+- Added the `primarySite` global Twig variable. ([#16370](https://github.com/craftcms/cms/discussions/16370))
 - The `duration` Twig filter now has a `language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 - Deprecated the `ucfirst` Twig filter. `capitalize` should be used instead.
 
