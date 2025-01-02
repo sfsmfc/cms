@@ -25,6 +25,7 @@
 - Database rows with foreign keys referencing nonexistent rows are now deleted via garbage collection.
 - Pages which contain image transform generation URLs now set no-cache headers. ([#16195](https://github.com/craftcms/cms/discussions/16195))
 - Action requests (such as `actions/app/health-check`) now send no-cache headers by default. ([#16364](https://github.com/craftcms/cms/pull/16364))
+- Image cleansing now preserves the original image quality, if known.
 - Fixed a bug where `craft\config\GeneralConfig::safeMode()` set Safe Mode to `false` by default.
 - Fixed a bug where Craft wasn’t auto-rotating or flipping images uploaded with a mirrored EXIF orientation.
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
