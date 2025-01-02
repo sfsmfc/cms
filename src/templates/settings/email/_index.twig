@@ -189,7 +189,7 @@
         {# Craft's transport adapters are set to show disabled fields when admin changes are not allowed,
            but we need to add a 'disabled' class here for external adapters, so that their fields are not accidentally editable #}
         {% if readOnly and not _adapter.readOnlySettingsReady() %}
-            {% set classes = classes|merge(['disabled']) %}
+            {% set classes = classes|merge(['disabled-settings', 'disabled']) %}
         {% endif %}
 
         <div id="{{ className(_adapter)|id }}" {% if classes|length %}class="{{ classes|join(' ') }}"{% endif %}>

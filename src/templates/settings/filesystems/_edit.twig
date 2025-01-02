@@ -56,7 +56,7 @@
     {% endif %}
     {# we need to add a 'disabled' class here, so that Fs-specific fields are not accidentally editable #}
     {% if readOnly and not filesystem.readOnlySettingsReady() %}
-        {% set classes = classes|merge(['disabled']) %}
+        {% set classes = classes|merge(['disabled-settings', 'disabled']) %}
     {% endif %}
 
     <div id="{{ fsType|id }}"{% if classes|length %} class="{{ classes|join(' ') }}"{% endif %}>
