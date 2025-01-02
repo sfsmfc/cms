@@ -45,6 +45,7 @@
 
 ### Development
 - Added support for fallback element partial templates, e.g. `_partials/entry.twig` as opposed to `_partials/entry/typeHandle.twig`. ([#16125](https://github.com/craftcms/cms/pull/16125))
+- Added the `primarySite` global Twig variable. ([#16370](https://github.com/craftcms/cms/discussions/16370))
 - Added the `affiliatedSite` and `affiliatedSiteId` user query and GraphQL params. ([#16174](https://github.com/craftcms/cms/pull/16174))
 - Added the `affiliatedSiteHandle` and `affiliatedSiteId` user GraphQL field. ([#16174](https://github.com/craftcms/cms/pull/16174))
 - Added the `PHP_INT_MAX` global Twig variable.
