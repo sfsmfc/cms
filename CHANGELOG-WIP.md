@@ -93,6 +93,11 @@
 - Added `craft\gql\types\LinkData`.
 - Added `craft\gql\types\generators\LinkDataType`.
 - Added `craft\helpers\Cp::colorHtml()`.
+- Added `craft\helpers\Image::EXIF_IFD0_ROTATE_0_MIRRORED`.
+- Added `craft\helpers\Image::EXIF_IFD0_ROTATE_0`.
+- Added `craft\helpers\Image::EXIF_IFD0_ROTATE_180_MIRRORED`.
+- Added `craft\helpers\Image::EXIF_IFD0_ROTATE_270_MIRRORED`.
+- Added `craft\helpers\Image::EXIF_IFD0_ROTATE_90_MIRRORED`.
 - Added `craft\mail\Mailer::$siteId`.
 - Added `craft\mail\Mailer::$siteOverrides`.
 - Added `craft\models\MailSettings::$siteOverrides`.
@@ -130,7 +135,9 @@
 - Action requests (such as `actions/app/health-check`) now send no-cache headers by default. ([#16364](https://github.com/craftcms/cms/pull/16364))
 - Reduced the size of GraphQL introspection schemas. ([#16326](https://github.com/craftcms/cms/pull/16326))
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
+- Image cleansing now preserves the original image quality, if known.
 - Fixed a bug where `craft\config\GeneralConfig::safeMode()` set Safe Mode to `false` by default.
+- Fixed a bug where Craft wasn’t auto-rotating or flipping images uploaded with a mirrored EXIF orientation.
 - Fixed a bug where embedded element index filter HUDs were including condition rules for fields that weren’t applicable to the nested elements. ([#16289](https://github.com/craftcms/cms/discussions/16289))
 - Fixed a bug where element queries were ignoring params for custom fields that weren’t involved with the query, rather than returning zero results.
 - Fixed a bug where opening heads-up displays could cause the page to scroll to the focused element. 
