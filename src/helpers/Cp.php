@@ -2850,7 +2850,6 @@ JS;
      */
     private static function _fldTabHtml(FieldLayoutTab $tab, bool $customizable): string
     {
-        $menuId = sprintf('menu-%s', mt_rand());
         return
             Html::beginTag('div', [
                 'class' => 'fld-tab',
@@ -2871,11 +2870,6 @@ JS;
             implode('', array_map(fn(FieldLayoutElement $element) => self::layoutElementSelectorHtml($element, false), $tab->getElements())) .
             Html::button(Craft::t('app', 'Add'), [
                 'class' => ['btn', 'add', 'icon', 'dashed', 'fullwidth', 'fld-add-btn'],
-                'aria' => ['controls' => $menuId],
-            ]) .
-            Html::tag('div', options: [
-                'id' => $menuId,
-                'class' => ['menu', 'menu--disclosure', 'fld-library-menu'],
             ]) .
             Html::endTag('div') . // .fld-tabcontent
             Html::endTag('div'); // .fld-tab
