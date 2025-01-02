@@ -2402,16 +2402,15 @@ ul.icons {
   padding-block: 0 !important;
   padding-inline: var(--s) !important;
   font-size: 12px;
-  line-height: 22px;
-  height: 22px;
-  min-height: 22px;
+  line-height: calc(22rem / 16);
+  height: calc(22rem / 16);
 }
 
 .btngroup.small,
 .btngroup.small input.btn,
 .btn.small,
 .btn.small + .spinner {
-  min-height: 22px;
+  height: calc(22rem / 16);
 }
 
 /* big buttons */
@@ -2433,14 +2432,14 @@ ul.icons {
 .btngroup.big input.btn,
 .btn.big,
 .btn.big + .spinner {
-  min-height: 36px;
+  min-height: calc(36rem / 16);
 }
 
 /* huge buttons */
 .btn.huge {
   padding: var(--l);
-  line-height: 48px;
-  height: 48px;
+  line-height: calc(48rem / 16);
+  height: calc(48rem / 16);
 }
 
 /* special buttons */
@@ -8855,6 +8854,14 @@ body {
 
 .ui-datepicker-title {
   text-align: center;
+
+  select.ui-datepicker-year {
+    background-color: hsl(212deg 25% 90%);
+    padding-block: 0;
+    padding-inline: var(--xs);
+    border-radius: var(--large-border-radius);
+    height: calc(22rem / 16);
+  }
 }
 
 .ui-datepicker-calendar th,
