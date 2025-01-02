@@ -388,13 +388,13 @@ Craft.CP = Garnish.Base.extend(
     },
 
     // disable fs/email/field settings when plugin doesn't set readOnlySettingsReady to true
-    disableSettings: function() {
+    disableSettings: function () {
       if ($('.disabled-settings.disabled').length > 0) {
-          $('.disabled-settings.disabled')
-            .find('.input *:focusable')
-            .each((key, element) => {
-              $(element).attr('disabled', '');
-            });
+        $('.disabled-settings.disabled')
+          .find('.input *:focusable')
+          .each((key, element) => {
+            $(element).attr('disabled', '');
+          });
       }
     },
 
