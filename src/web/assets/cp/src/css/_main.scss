@@ -5446,6 +5446,7 @@ table.data tbody tr:not(.disabled).active-drop-target {
   .slideout &,
   #content & {
     border: 1px solid var(--hairline-color);
+    background: var(--secondary-pane-bg);
     box-shadow: none;
   }
 
@@ -7947,8 +7948,8 @@ fieldset {
 
 .expand-status-btn {
   margin-inline-start: 5px;
-  width: 30px;
-  min-height: 17px;
+  width: calc(30rem / 16);
+  height: calc(17rem / 16);
   padding: 0;
   line-height: 16px;
   border-radius: var(--small-border-radius);
