@@ -17,6 +17,7 @@ use craft\helpers\Session as SessionHelper;
 use craft\helpers\StringHelper;
 use craft\models\Site;
 use craft\services\Sites;
+use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\db\Exception as DbException;
 use yii\di\Instance;
@@ -274,19 +275,6 @@ class Request extends \yii\web\Request
                     }
                 }
             }
-        }
-
-        // Finally if this isn't a control panel request and the site header has been passed, set the current site
-        $siteHandle = $this->getHeaders()->get('X-Craft-Site');
-        if (!$this->_isCpRequest && $siteHandle !== null) {
-            $site = $this->sites->getSiteByHandle($siteHandle, false);
-            // Fail silently if Craft isn’t installed yet or is in the middle of updating
-            if ($site === null && Craft::$app->getIsInstalled() && !Craft::$app->getUpdates()->getIsCraftUpdatePending()) {
-                /** @noinspection PhpUnhandledExceptionInspection */
-                throw new SiteNotFoundException('Site does not exist.');
-            }
-
-            $baseUrl = rtrim($site->getBaseUrl() ?? '', '/');
         }
 
         // Set the current site for the request
@@ -1526,6 +1514,20 @@ class Request extends \yii\web\Request
         // Was a site token provided?
         $site = $this->_validateSiteToken();
         if ($site !== null) {
+            return $site;
+        }
+
+        // Is CRAFT_SITE or X-Craft-Site present?
+        $siteId = App::env('CRAFT_SITE') ?? $this->getHeaders()->get('X-Craft-Site');
+        if ($siteId !== null) {
+            if (is_numeric($siteId)) {
+                $site = $this->sites->getSiteById($siteId, false);
+            } else {
+                $site = $this->sites->getSiteByHandle($siteId, false);
+            }
+            if (!$site && Craft::$app->getIsInstalled() && !Craft::$app->getUpdates()->getIsCraftUpdatePending()) {
+                throw new InvalidArgumentException("Invalid site: $siteId");
+            }
             return $site;
         }
 
