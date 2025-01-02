@@ -11,6 +11,7 @@
 - Deprecated the `ucfirst` Twig filter. `capitalize` should be used instead.
 
 ## Extensibility
+- `GuzzleHttp\Client` is now instantiated via `Craft::createObject()`. ([#16366](https://github.com/craftcms/cms/pull/16366))
 - `craft\helpers\DateTimeHelper::humanDuration()` now has a `$language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 
 ## System
