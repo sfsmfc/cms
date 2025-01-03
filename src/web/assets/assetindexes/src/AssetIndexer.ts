@@ -700,6 +700,7 @@ class AssetIndexingSession {
       $progressCell.find('.progressContainer'),
       false
     );
+    console.log('new progress bar');
 
     progressBar.setItemCount(this.indexingSessionData.totalEntries);
     progressBar.setProcessedItemCount(

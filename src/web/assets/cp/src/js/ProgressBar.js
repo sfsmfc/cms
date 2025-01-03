@@ -13,11 +13,14 @@ Craft.ProgressBar = Garnish.Base.extend({
   _progressPercentage: null,
   _processedItemCount: 0,
   _displaySteps: false,
+  _announceProgress: true,
 
-  init: function ($element, displaySteps) {
+  init: function ($element, displaySteps, announceProgress) {
     if (displaySteps) {
       this._displaySteps = true;
     }
+
+    this._announceProgress = announceProgress;
 
     this.$progressBar = $('<div class="progressbar pending hidden"/>').appendTo(
       $element
@@ -57,13 +60,19 @@ Craft.ProgressBar = Garnish.Base.extend({
   hideProgressBar: function () {
     this.$progressBar.addClass('hidden');
     this.$progressBarStatus.addClass('hidden');
-    this.stopProgressAnnouncements();
+
+    if (this._announceProgress) {
+      this.stopProgressAnnouncements();
+    }
   },
 
   showProgressBar: function () {
     this.$progressBar.removeClass('hidden');
     this.$progressBarStatus.removeClass('hidden');
-    this.startProgressAnnouncements();
+
+    if (this._announceProgress) {
+      this.startProgressAnnouncements();
+    }
   },
 
   startProgressAnnouncements: function () {
