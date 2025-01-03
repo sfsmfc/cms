@@ -425,6 +425,7 @@ JS;
             '{name} active, more info',
             '{name} folder',
             '{name} sorted by {attribute}, {direction}',
+            '{num} percent complete',
             '{num, number} {num, plural, =1{Available Update} other{Available Updates}}',
             '{num, number} {num, plural, =1{degree} other{degrees}}',
             '{num, number} {num, plural, =1{notification} other{notifications}}',

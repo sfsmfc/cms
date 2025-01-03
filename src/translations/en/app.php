@@ -2184,6 +2184,7 @@ return [
     '{name} should be at least {value}.' => '{name} should be at least {value}.',
     '{name} sorted by {attribute}, {direction}' => '{name} sorted by {attribute}, {direction}',
     '{nestedType} can only be created after the {ownerType} has been saved.' => '{nestedType} can only be created after the {ownerType} has been saved.',
+    '{num} percent complete' => '{num} percent complete',
     '{num, number} {num, plural, =1{Available Update} other{Available Updates}}' => '{num, number} {num, plural, =1{Available Update} other{Available Updates}}',
     '{num, number} {num, plural, =1{column} other{columns}}' => '{num, number} {num, plural, =1{column} other{columns}}',
     '{num, number} {num, plural, =1{day} other{days}}' => '{num, number} {num, plural, =1{day} other{days}}',

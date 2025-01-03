@@ -69,11 +69,15 @@ Craft.ProgressBar = Garnish.Base.extend({
   startProgressAnnouncements: function () {
     this._intervalId = setInterval(() => {
       if (this._progressPercentage !== 100) {
-        console.log(`progress is at ${this._progressPercentage}%`);
+        Craft.cp.announce(
+          Craft.t('app', '{num} percent complete', {
+            num: this._progressPercentage,
+          })
+        );
       } else {
         Craft.cp.announce(Craft.t('app', 'Processing'));
       }
-    }, 100);
+    }, 400);
   },
 
   stopProgressAnnouncements: function () {
