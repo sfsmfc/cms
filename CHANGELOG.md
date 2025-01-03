@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 5
 
+## Unreleased
+
+- Fixed a JavaScript error that could occur if there was a problem applying changes to field layout elements. ([#16380](https://github.com/craftcms/cms/issues/16380))
+
 ## 5.5.8 - 2025-01-02
 
 - Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
