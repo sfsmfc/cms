@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed a JavaScript error that could occur if there was a problem applying changes to field layout elements. ([#16380](https://github.com/craftcms/cms/issues/16380))
+- Fixed a bug where field layout designers were validating field names, handles, and instructions, even if they weren’t overridden within the field instance. ([#16380](https://github.com/craftcms/cms/issues/16380))
 
 ## 5.5.8 - 2025-01-02
 
