@@ -77,7 +77,6 @@ Craft.ProgressBar = Garnish.Base.extend({
   },
 
   stopProgressAnnouncements: function () {
-    Craft.cp.announce(Craft.t('app', 'Process complete'));
     clearInterval(this._intervalId);
     this._intervalId = null;
   },

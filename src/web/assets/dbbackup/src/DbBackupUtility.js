@@ -94,6 +94,9 @@
         this.$allDone.css('opacity', 0);
       }
 
+      // Add equivalent announcement for screen reader users
+      Craft.cp.announce(Craft.t('app', 'Success'));
+
       this.progressBar.hideProgressBar();
       if (typeof showAllDone === 'undefined' || showAllDone === true) {
         this.$allDone.velocity({opacity: 1}, {duration: 'fast'});

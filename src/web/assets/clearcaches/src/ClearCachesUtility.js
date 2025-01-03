@@ -69,6 +69,7 @@
 
                   progressBar.hideProgressBar();
                   $allDone.velocity({opacity: 1}, {duration: 'fast'});
+                  Craft.cp.announce(Craft.t('app', 'Success'));
                   $trigger.removeClass('disabled');
                   $trigger.focus();
                 }, 300);
