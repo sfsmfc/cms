@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed a bug where custom fields could cause validation errors when running the `users/create` command.
+- Fixed a bug where deleting a volume folder wasn’t fully deleting asset data in descendant folders.
 
 ## 4.13.8 - 2025-01-02
 
