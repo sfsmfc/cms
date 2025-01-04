@@ -107,7 +107,7 @@ class m230617_070415_entrify_matrix_blocks extends Migration
                     'showSlugField' => false,
                 ]);
 
-                $fieldLayoutUid = ArrayHelper::firstKey($blockTypeConfig['fieldLayouts'] ?? []);
+                $fieldLayoutUid = array_key_first($blockTypeConfig['fieldLayouts'] ?? []);
                 $fieldLayout = $fieldLayoutUid ? $fieldsService->getLayoutByUid($fieldLayoutUid) : new FieldLayout();
                 $fieldLayout->type = Entry::class;
                 $entryType->setFieldLayout($fieldLayout);
