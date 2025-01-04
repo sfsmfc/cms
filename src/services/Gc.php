@@ -346,8 +346,8 @@ class Gc extends Component
     {
         $this->_stdout('    > removing empty temp folders ... ');
 
-        $emptyFolders = (new Query())
-            ->select(['folders.id', 'folders.path'])
+        $emptyFolderIds = (new Query())
+            ->select(['folders.id'])
             ->from(['folders' => Table::VOLUMEFOLDERS])
             ->leftJoin(['assets' => Table::ASSETS], '[[assets.folderId]] = [[folders.id]]')
             ->where([
@@ -356,17 +356,12 @@ class Gc extends Component
             ])
             ->andWhere(['not', ['folders.parentId' => null]])
             ->andWhere(['not', ['folders.path' => null]])
-            ->pairs();
+            ->column();
 
-        $fs = Craft::createObject(Temp::class);
-
-        foreach ($emptyFolders as $emptyFolderPath) {
-            if ($fs->directoryExists($emptyFolderPath)) {
-                $fs->deleteDirectory($emptyFolderPath);
-            }
+        if (!empty($emptyFolderIds)) {
+            Craft::$app->getAssets()->deleteFoldersByIds($emptyFolderIds);
         }
 
-        VolumeFolder::deleteAll(['id' => array_keys($emptyFolders)]);
         $this->_stdout("done\n", Console::FG_GREEN);
     }
 
