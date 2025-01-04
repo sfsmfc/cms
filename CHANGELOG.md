@@ -2,9 +2,24 @@
 
 ## Unreleased
 
+- Fixed a JavaScript error that could occur if there was a problem applying changes to field layout elements. ([#16380](https://github.com/craftcms/cms/issues/16380))
+- Fixed a bug where field layout designers were validating field names, handles, and instructions, even if they weren’t overridden within the field instance. ([#16380](https://github.com/craftcms/cms/issues/16380))
+
+## 5.5.8 - 2025-01-02
+
 - Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
 - Fixed a bug where the password input on the Set Password page wasn’t including the “Show” button.
+- Fixed a SQL error that could occur if an element was saved with a title longer than 255 characters.
+- Fixed a bug where some UI messages began with a lowercase letter in some languages. ([#16354](https://github.com/craftcms/cms/issues/16354))
+- Fixed errors that could occur when working with field layouts for element types that are no longer installed. ([#16352](https://github.com/craftcms/cms/issues/16352))
 - Fixed an error that could occur when creating nested entries within Matrix fields. ([#16331](https://github.com/craftcms/cms/issues/16331))
+- Fixed a bug where element index View menus could include a “Use defaults” button when no view customizations had been made.
+- Fixed a bug where new entries’ slugs weren’t getting propagated to other sites, if their entry type had a dynamic title format. ([#16347](https://github.com/craftcms/cms/issues/16347))
+- Fixed a bug where address cards were only showing the first two lines of the address. ([#16353](https://github.com/craftcms/cms/issues/16353))
+- Fixed a bug where `@transform` GraphQL directives weren’t always working on Assets fields with overridden handles. ([#15718](https://github.com/craftcms/cms/issues/15718))
+- Fixed an error that occurred when adding “Full Name” to user cards. ([#16358](https://github.com/craftcms/cms/issues/16358))
+- Fixed an error that could occur if `craft\base\NestedElementTrait::getOwner()` or `getPrimaryOwner()` were called on a nested element whose owner didn’t exist in the same site. ([#16359](https://github.com/craftcms/cms/issues/16359))
+- Fixed a styling issue. ([#16342](https://github.com/craftcms/cms/issues/16342))
 - Fixed an RCE vulnerability.
 
 ## 5.5.7 - 2024-12-17

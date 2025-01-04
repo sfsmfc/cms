@@ -1054,9 +1054,9 @@ abstract class Element extends Component implements ElementInterface
         if (!$hasActionType(Edit::class)) {
             $actions->prepend([
                 'type' => Edit::class,
-                'label' => Craft::t('app', 'Edit {type}', [
+                'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Edit {type}', [
                     'type' => static::lowerDisplayName(),
-                ]),
+                ])),
             ]);
         }
 
@@ -1064,9 +1064,9 @@ abstract class Element extends Component implements ElementInterface
         if (static::hasUris() && !$hasActionType(ViewAction::class)) {
             $actions->prepend([
                 'type' => ViewAction::class,
-                'label' => Craft::t('app', 'View {type}', [
+                'label' => StringHelper::upperCaseFirst(Craft::t('app', 'View {type}', [
                     'type' => static::lowerDisplayName(),
-                ]),
+                ])),
             ]);
         }
 
@@ -2790,7 +2790,6 @@ abstract class Element extends Component implements ElementInterface
             StringValidator::class,
             'max' => 255,
             'disallowMb4' => true,
-            'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_LIVE],
         ];
         $rules[] = [
             ['title'],
@@ -3796,9 +3795,9 @@ abstract class Element extends Component implements ElementInterface
             $items[] = [
                 'id' => $editId,
                 'icon' => 'edit',
-                'label' => Craft::t('app', 'Edit {type}', [
+                'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Edit {type}', [
                     'type' => static::lowerDisplayName(),
-                ]),
+                ])),
             ];
 
             $view = Craft::$app->getView();
@@ -3883,9 +3882,9 @@ JS, [
             if ($canDeleteForSite) {
                 $items[] = [
                     'icon' => 'remove',
-                    'label' => Craft::t('app', 'Delete {type} for this site', [
+                    'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Delete {type} for this site', [
                         'type' => $isUnpublishedDraft ? Craft::t('app', 'draft') : static::lowerDisplayName(),
-                    ]),
+                    ])),
                     'action' => 'elements/delete-for-site',
                     'params' => [
                         'elementId' => $this->getCanonicalId(),
@@ -3903,9 +3902,9 @@ JS, [
             if ($canDeleteCanonical) {
                 $items[] = [
                     'icon' => 'trash',
-                    'label' => Craft::t('app', 'Delete {type}', [
+                    'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Delete {type}', [
                         'type' => $isUnpublishedDraft ? Craft::t('app', 'draft') : static::lowerDisplayName(),
-                    ]),
+                    ])),
                     'action' => $isUnpublishedDraft ? 'elements/delete-draft' : 'elements/delete',
                     'params' => [
                         'elementId' => $this->getCanonicalId(),
@@ -3923,9 +3922,9 @@ JS, [
             if ($canDeleteForSite) {
                 $items[] = [
                     'icon' => 'remove',
-                    'label' => Craft::t('app', 'Delete {type} for this site', [
+                    'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Delete {type} for this site', [
                         'type' => Craft::t('app', 'draft'),
-                    ]),
+                    ])),
                     'action' => 'elements/delete-for-site',
                     'params' => [
                         'elementId' => $this->getCanonicalId(),
@@ -3943,9 +3942,9 @@ JS, [
             // Delete draft
             $items[] = [
                 'icon' => 'trash',
-                'label' => Craft::t('app', 'Delete {type}', [
+                'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Delete {type}', [
                     'type' => Craft::t('app', 'draft'),
-                ]),
+                ])),
                 'action' => 'elements/delete-draft',
                 'params' => [
                     'elementId' => $this->getCanonicalId(),

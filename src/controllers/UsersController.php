@@ -33,6 +33,7 @@ use craft\helpers\Html;
 use craft\helpers\Image;
 use craft\helpers\Json;
 use craft\helpers\Session;
+use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\helpers\User as UserHelper;
 use craft\i18n\Locale;
@@ -728,9 +729,9 @@ class UsersController extends Controller
         $user->passwordResetRequired = true;
 
         if (!Craft::$app->getElements()->saveElement($user, false)) {
-            return $this->asFailure(Craft::t('app', 'Couldn’t save {type}.', [
+            return $this->asFailure(StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t save {type}.', [
                 'type' => User::lowerDisplayName(),
-            ]));
+            ])));
         }
 
         return $this->asSuccess(Craft::t('app', '{type} saved.', [
@@ -758,9 +759,9 @@ class UsersController extends Controller
         $user->passwordResetRequired = false;
 
         if (!Craft::$app->getElements()->saveElement($user, false)) {
-            return $this->asFailure(Craft::t('app', 'Couldn’t save {type}.', [
+            return $this->asFailure(StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t save {type}.', [
                 'type' => User::lowerDisplayName(),
-            ]));
+            ])));
         }
 
         return $this->asSuccess(Craft::t('app', '{type} saved.', [
@@ -935,9 +936,9 @@ class UsersController extends Controller
         $user->archived = false;
 
         if (!$elementsService->saveElement($user, false)) {
-            return $this->asFailure(Craft::t('app', 'Couldn’t save {type}.', [
+            return $this->asFailure(StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t save {type}.', [
                 'type' => User::lowerDisplayName(),
-            ]));
+            ])));
         }
 
         return $this->asSuccess(Craft::t('app', '{type} saved.', [
@@ -994,9 +995,9 @@ class UsersController extends Controller
         $this->requirePermission('editUsers');
         return $this->renderTemplate('users/_index.twig', [
             'title' => Craft::t('app', 'Users'),
-            'buttonLabel' => Craft::t('app', 'New {type}', [
+            'buttonLabel' => StringHelper::upperCaseFirst(Craft::t('app', 'New {type}', [
                 'type' => User::lowerDisplayName(),
-            ]),
+            ])),
             'source' => $source,
         ]);
     }
@@ -1020,9 +1021,9 @@ class UsersController extends Controller
 
         $user->setScenario(Element::SCENARIO_ESSENTIALS);
         if (!Craft::$app->getDrafts()->saveElementAsDraft($user, Craft::$app->getUser()->getId(), null, null, false)) {
-            return $this->asModelFailure($user, Craft::t('app', 'Couldn’t create {type}.', [
+            return $this->asModelFailure($user, StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t create {type}.', [
                 'type' => User::lowerDisplayName(),
-            ]), 'user');
+            ])), 'user');
         }
 
         $editUrl = $user->getCpEditUrl();
@@ -1634,9 +1635,9 @@ JS);
 
             return $this->asModelFailure(
                 $user,
-                Craft::t('app', 'Couldn’t save {type}.', [
+                StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t save {type}.', [
                     'type' => User::lowerDisplayName(),
-                ]),
+                ])),
                 $userVariable
             );
         }
@@ -2201,9 +2202,9 @@ JS);
         $address->setFieldValuesFromRequest($fieldsLocation);
 
         if (!$elementsService->saveElement($address)) {
-            return $this->asModelFailure($address, Craft::t('app', 'Couldn’t save {type}.', [
+            return $this->asModelFailure($address, StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t save {type}.', [
                 'type' => Address::lowerDisplayName(),
-            ]), 'address');
+            ])), 'address');
         }
 
         return $this->asModelSuccess($address, Craft::t('app', '{type} saved.', [

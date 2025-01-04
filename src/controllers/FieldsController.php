@@ -478,14 +478,22 @@ JS, [
     public function actionApplyLayoutElementSettings(): Response
     {
         /** @var FieldLayoutElement $element */
-        $element = $this->_fldComponent();
+        $element = $this->_fldComponent($settings);
 
-        if ($element instanceof CustomField) {
+        if (!empty($settings)) {
+            $validateAttributes = array_intersect(
+                array_keys(array_filter($settings)),
+                ['name', 'handle', 'instructions'],
+            );
+        }
+
+        if (!empty($validateAttributes) && $element instanceof CustomField) {
             $field = $element->getField();
             if ($field instanceof Field) {
                 $field->validateHandleUniqueness = false;
             }
-            if (!$field->validate(['name', 'handle', 'instructions'])) {
+
+            if (!$field->validate($validateAttributes)) {
                 if ($field->hasErrors('name')) {
                     $field->addErrors(['label' => $field->getErrors('name')]);
                     $field->clearErrors('name');
@@ -574,9 +582,10 @@ JS, [
     /**
      * Returns the field layout component being edited, populated with the posted config/settings.
      *
+     * @param array|null $settings The `settings` array that might have been posted
      * @return FieldLayoutComponent
      */
-    private function _fldComponent(): FieldLayoutComponent
+    private function _fldComponent(?array &$settings = null): FieldLayoutComponent
     {
         $uid = $this->request->getRequiredBodyParam('uid');
         $elementType = $this->request->getRequiredBodyParam('elementType');
@@ -593,9 +602,10 @@ JS, [
         $settingsStr = $this->request->getBodyParam('settings');
 
         if ($settingsStr !== null) {
-            parse_str($settingsStr, $settings);
+            parse_str($settingsStr, $postedSettings);
             $settingsNamespace = $this->request->getRequiredBodyParam('settingsNamespace');
-            $componentConfig = array_merge($componentConfig, ArrayHelper::getValue($settings, $settingsNamespace, []));
+            $settings = ArrayHelper::getValue($postedSettings, $settingsNamespace, []);
+            $componentConfig = array_merge($componentConfig, $settings);
         }
 
         $isTab = false;

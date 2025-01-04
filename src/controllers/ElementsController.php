@@ -210,9 +210,9 @@ class ElementsController extends Controller
         // Save it
         $element->setScenario(Element::SCENARIO_ESSENTIALS);
         if (!Craft::$app->getDrafts()->saveElementAsDraft($element, $user->id, null, null, false)) {
-            return $this->_asFailure($element, Craft::t('app', 'Couldn’t create {type}.', [
+            return $this->_asFailure($element, StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t create {type}.', [
                 'type' => $element::lowerDisplayName(),
-            ]));
+            ])));
         }
 
         // Redirect to its edit page
@@ -454,9 +454,9 @@ class ElementsController extends Controller
             if ($isUnpublishedDraft) {
                 if ($canSaveCanonical) {
                     $response
-                        ->submitButtonLabel(Craft::t('app', 'Create {type}', [
+                        ->submitButtonLabel(StringHelper::upperCaseFirst(Craft::t('app', 'Create {type}', [
                             'type' => $element::lowerDisplayName(),
-                        ]))
+                        ])))
                         ->action('elements/apply-draft')
                         ->redirectUrl("$redirectUrl#");
                 } else {
@@ -470,9 +470,9 @@ class ElementsController extends Controller
                     ->redirectUrl("$redirectUrl#");
             } elseif ($isDraft) {
                 $response
-                    ->submitButtonLabel(Craft::t('app', 'Save {type}', [
+                    ->submitButtonLabel(StringHelper::upperCaseFirst(Craft::t('app', 'Save {type}', [
                         'type' => Craft::t('app', 'draft'),
-                    ]))
+                    ])))
                     ->action('elements/save-draft')
                     ->redirectUrl("{cpEditUrl}");
             } else {
@@ -512,9 +512,9 @@ class ElementsController extends Controller
                 }
 
                 if ($canSaveCanonical && $isUnpublishedDraft) {
-                    $response->addAltAction(Craft::t('app', 'Save {type}', [
+                    $response->addAltAction(StringHelper::upperCaseFirst(Craft::t('app', 'Save {type}', [
                         'type' => Craft::t('app', 'draft'),
-                    ]), [
+                    ])), [
                         'action' => 'elements/save-draft',
                         'redirect' => "$redirectUrl#",
                         'eventData' => ['autosave' => false],
@@ -1271,9 +1271,9 @@ JS, [
         }
 
         if (!$success) {
-            return $this->_asFailure($element, Craft::t('app', 'Couldn’t save {type}.', [
+            return $this->_asFailure($element, StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t save {type}.', [
                 'type' => $element::lowerDisplayName(),
-            ]));
+            ])));
         }
 
         $elementsService->trackActivity($element, ElementActivity::TYPE_SAVE);
@@ -1410,9 +1410,9 @@ JS, [
 
             if (!$success) {
                 $transaction->rollBack();
-                return $this->_asFailure($element, Craft::t('app', 'Couldn’t save {type}.', [
+                return $this->_asFailure($element, StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t save {type}.', [
                     'type' => $element::lowerDisplayName(),
-                ]));
+                ])));
             }
 
             if ($element->getIsDraft()) {
@@ -1675,9 +1675,9 @@ JS, [
 
             if (!$elementsService->saveElement($element)) {
                 $transaction->rollBack();
-                return $this->_asFailure($element, Craft::t('app', 'Couldn’t save {type}.', [
+                return $this->_asFailure($element, StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t save {type}.', [
                     'type' => Craft::t('app', 'draft'),
-                ]));
+                ])));
             }
 
             $transaction->commit();
@@ -1895,13 +1895,13 @@ JS, [
     private function _asAppyDraftFailure(ElementInterface $element): ?Response
     {
         if ($element->getIsUnpublishedDraft()) {
-            $message = Craft::t('app', 'Couldn’t create {type}.', [
+            $message = StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t create {type}.', [
                 'type' => $element::lowerDisplayName(),
-            ]);
+            ]));
         } elseif ($element->isProvisionalDraft) {
-            $message = Craft::t('app', 'Couldn’t save {type}.', [
+            $message = StringHelper::upperCaseFirst(Craft::t('app', 'Couldn’t save {type}.', [
                 'type' => $element::lowerDisplayName(),
-            ]);
+            ]));
         } else {
             $message = Craft::t('app', 'Couldn’t apply draft.');
         }

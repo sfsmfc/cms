@@ -116,6 +116,7 @@ interface FieldInterface extends SavableComponentInterface, Chippable, Grippable
      * [[normalizeValue()]] and [[afterElementSave()]]/[[afterElementPropagate()]].
      *
      * @return string|string[]|null The column type(s).
+     * @since 5.0.0
      */
     public static function dbType(): array|string|null;
 

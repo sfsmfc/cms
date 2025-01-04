@@ -519,6 +519,10 @@ class User extends Element implements IdentityInterface
                 'label' => Craft::t('app', 'Last Name'),
                 'placeholder' => Craft::t('app', 'Last Name'),
             ],
+            'fullName' => [
+                'label' => Craft::t('app', 'Full Name'),
+                'placeholder' => Craft::t('app', 'Full Name'),
+            ],
             'groups' => [
                 'label' => Craft::t('app', 'Groups'),
                 'placeholder' => Craft::t('app', 'Group Name'),
@@ -2070,9 +2074,9 @@ JS, [
                     $items[] = [
                         'id' => $deleteId,
                         'icon' => 'trash',
-                        'label' => Craft::t('app', 'Delete {type}', [
+                        'label' => StringHelper::upperCaseFirst(Craft::t('app', 'Delete {type}', [
                             'type' => static::lowerDisplayName(),
-                        ]),
+                        ])),
                     ];
 
                     $view->registerJsWithVars(fn($id, $userId, $redirect) => <<<JS
