@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Fixed a bug where custom fields could cause validation errors when running the `users/create` command.
+- Fixed a bug where deleting a volume folder wasn’t fully deleting asset data in descendant folders.
+
+## 4.13.8 - 2025-01-02
+
 - Fixed a bug where asset edit page URLs contained spaces if the asset filename contained spaces. ([#15236](https://github.com/craftcms/cms/issues/15236))
 - Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
 - Fixed a bug where the password input on the Set Password page wasn’t including the “Show” button.
