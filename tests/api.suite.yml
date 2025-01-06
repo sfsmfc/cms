@@ -9,7 +9,7 @@ modules:
   enabled:
     - \Helper\Acceptance
     - REST:
-        url: 'http://localhost/index.php'
+        url: 'https://craft-5-project.ddev.site/index.php'
         depends:
           - PhpBrowser
           - \craft\test\Craft

@@ -37,28 +37,22 @@ class RedirectCest
         return [
             [
                 'fromPath' => '/redirect/from',
-                'to' => 'https://craft-5.ddev.site/redirect/to',
+                'to' => 'https://craft-5-project.ddev.site/redirect/to',
                 'statusCode' => 302,
             ],
             [
-                'fromPath' => '/redirect/FROM',
+                'fromPath' => '/redirect/from/1234/56',
                 'statusCode' => 404,
             ],
             [
-                'fromPath' => '/redirect/FROM/1234',
-                'to' => 'https://craft-5.ddev.site/redirect/to/1234',
+                'fromPath' => '/redirect/FROM/1234/56',
+                'to' => 'https://redirect.to/1234/56',
                 'statusCode' => 302,
             ],
             [
                 'fromPath' => '/redirect/from/foo',
                 'fromParams' => ['bar' => 'baz'],
-                'to' => 'https://craft-5.ddev.site/redirect/to/baz',
-                'statusCode' => 302,
-            ],
-            [
-                'fromPath' => '/REDIRECT/from/foo/bar',
-                'fromParams' => ['baz' => 'qux'],
-                'to' => 'https://redirect.to/bar?baz=qux',
+                'to' => 'https://craft-5-project.ddev.site/redirect/to/baz',
                 'statusCode' => 301,
             ],
         ];

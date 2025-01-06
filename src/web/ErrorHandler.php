@@ -9,7 +9,7 @@ namespace craft\web;
 
 use Craft;
 use craft\events\ExceptionEvent;
-use craft\events\RedirectEvent;
+use craft\events\RedirectRuleEvent;
 use craft\helpers\App;
 use craft\helpers\Json;
 use craft\helpers\Template;
@@ -63,31 +63,30 @@ class ErrorHandler extends \yii\web\ErrorHandler
 
         // 404?
         if ($exception instanceof HttpException && $exception->statusCode === 404) {
-            $redirects = Craft::$app->getConfig()->getConfigFromFile('redirects');
-            if ($redirects) {
-                foreach ($redirects as $from => $redirect) {
-                    $callback = function(Redirect $redirect) {
+            $redirectRules = Craft::$app->getConfig()->getConfigFromFile('redirects');
+            if ($redirectRules) {
+                foreach ($redirectRules as $from => $rule) {
+                    $callback = function(RedirectRule $redirectRule) {
                         $this->trigger(
                             self::EVENT_BEFORE_REDIRECT,
-                            new RedirectEvent(['redirect' => $redirect])
+                            new RedirectRuleEvent(['redirectRule' => $redirectRule])
                         );
                     };
 
-                    if ($redirect instanceof Redirect) {
-                        $redirect($callback);
+                    if ($rule instanceof RedirectRule) {
+                        $rule($callback);
                         continue;
                     }
 
-                    $redirectConfig = is_string($redirect) ? ['to' => $redirect] : $redirect;
+                    $config = is_string($rule) ? ['to' => $rule] : $rule;
 
-                    if (!isset($redirectConfig['from']) && is_string($from)) {
-                        $redirectConfig['from'] = $from;
+                    if (!isset($config['from']) && is_string($from)) {
+                        $config['from'] = $from;
                     }
 
-                    Craft::createObject(Redirect::class, [$redirectConfig])($callback);
+                    Craft::createObject(RedirectRule::class, [$config])($callback);
                 }
             }
-
 
             $request = Craft::$app->getRequest();
             if ($request->getIsSiteRequest() && $request->getPathInfo() === 'wp-admin') {

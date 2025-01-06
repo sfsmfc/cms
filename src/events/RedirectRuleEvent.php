@@ -8,14 +8,14 @@
 namespace craft\events;
 
 use craft\base\Event;
-use craft\web\Redirect;
+use craft\web\RedirectRule;
 
 /**
- * Redirect event class.
+ * Redirect Rule event class.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  */
-class RedirectEvent extends Event
+class RedirectRuleEvent extends Event
 {
-    public Redirect $redirect;
+    public RedirectRule $redirectRule;
 }
