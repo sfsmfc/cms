@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Fixed a JavaScript error that could occur if there was a problem applying changes to field layout elements. ([#16380](https://github.com/craftcms/cms/issues/16380))
+- Fixed a bug where field layout designers were validating field names, handles, and instructions, even if they weren’t overridden within the field instance. ([#16380](https://github.com/craftcms/cms/issues/16380))
+
+## 5.5.8 - 2025-01-02
+
 - Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
 - Fixed a bug where the password input on the Set Password page wasn’t including the “Show” button.
 - Fixed a SQL error that could occur if an element was saved with a title longer than 255 characters.

@@ -345,13 +345,7 @@ $menuBorderRadius: $mediumBorderRadius;
 }
 
 @mixin dark-btn-light-bg-focus-ring() {
-  --focus-ring: 0 0 0 1px
-      hsl(
-        #{color.hue($blue200)},
-        #{color.saturation($blue200)},
-        #{color.lightness($blue200)}
-      ),
-    0 0 0 3px hsla(var(--dark-focus-hsl), 0.8);
+  --focus-ring: var(--focus-ring-outset);
 }
 
 @mixin custom-color-focus-ring($primary, $secondary: null) {
@@ -520,7 +514,7 @@ $menuBorderRadius: $mediumBorderRadius;
 
 @mixin header-btn {
   width: calc(30rem / 16);
-  min-height: calc(30rem / 16);
+  height: calc(30rem / 16);
   padding-left: 0;
   padding-right: 0;
 

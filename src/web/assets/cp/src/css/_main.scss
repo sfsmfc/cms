@@ -65,9 +65,10 @@
   --focus-ring: 0 0 0 2px var(--focus-ring-color),
     0 0 5px 1px
       hsl(from var(--focus-ring-color) h s l / var(--focus-ring-alpha));
-  --focus-ring-outset: inset 0 0 0 1px currentcolor,
-    0 0 0 3px hsl(from var(--focus-ring-color) h s l / var(--focus-ring-alpha));
-  --inner-focus-ring: inset 0 0 0 1px var(--focu-ring-color),
+  --focus-ring-outset: 0 0 0 1px currentcolor, 0 0 0 3px var(--focus-ring-color),
+    0 0 6px 2px
+      hsl(from var(--focus-ring-color) h s l / var(--focus-ring-alpha));
+  --inner-focus-ring: inset 0 0 0 1px var(--focus-ring-color),
     inset 0 0 0 3px
       hsl(from var(--focus-ring-color) h s l / var(--focus-ring-alpha));
   --touch-target-size: calc(24rem / 16);
@@ -1590,8 +1591,7 @@ td.right {
   }
 
   &.sel {
-    @include mixins.dark-btn-light-bg-focus-ring;
-
+    --focus-ring: var(--focus-ring-outset);
     --ui-control-color: var(--selected-item-color);
     background-color: var(--dark-sel-color);
     color: var(--selected-item-color);
@@ -1949,18 +1949,27 @@ ul.icons {
   font-size: inherit;
   text-wrap: nowrap;
   background-color: var(--button-bg);
-  box-shadow: var(--button-shadow);
+
+  &:not(:focus) {
+    box-shadow: var(--button-shadow);
+  }
 
   &:hover {
     border: var(--button-border--hover);
     background: var(--button-bg--hover);
-    box-shadow: var(--button-shadow--hover);
+
+    &:not(:focus) {
+      box-shadow: var(--button-shadow--hover);
+    }
   }
 
   &:active {
     border: var(--button-border--active);
     background: var(--button-bg--active);
-    box-shadow: var(--button-shadow--active);
+
+    &:not(:focus) {
+      box-shadow: var(--button-shadow--active);
+    }
   }
 
   &:not([aria-current]) {
@@ -2195,7 +2204,6 @@ ul.icons {
     --focus-ring: var(--focus-ring-outset);
     background-color: var(--gray-500);
     color: var(--white);
-    @include mixins.dark-btn-light-bg-focus-ring;
   }
 }
 
@@ -2398,16 +2406,15 @@ ul.icons {
   padding-block: 0 !important;
   padding-inline: var(--s) !important;
   font-size: 12px;
-  line-height: 22px;
-  height: 22px;
-  min-height: 22px;
+  line-height: calc(22rem / 16);
+  height: calc(22rem / 16);
 }
 
 .btngroup.small,
 .btngroup.small input.btn,
 .btn.small,
 .btn.small + .spinner {
-  min-height: 22px;
+  height: calc(22rem / 16);
 }
 
 /* big buttons */
@@ -2429,14 +2436,14 @@ ul.icons {
 .btngroup.big input.btn,
 .btn.big,
 .btn.big + .spinner {
-  min-height: 36px;
+  min-height: calc(36rem / 16);
 }
 
 /* huge buttons */
 .btn.huge {
   padding: var(--l);
-  line-height: 48px;
-  height: 48px;
+  line-height: calc(48rem / 16);
+  height: calc(48rem / 16);
 }
 
 /* special buttons */
@@ -5442,6 +5449,7 @@ table.data tbody tr:not(.disabled).active-drop-target {
   .slideout &,
   #content & {
     border: 1px solid var(--hairline-color);
+    background: var(--secondary-pane-bg);
     box-shadow: none;
   }
 
@@ -7945,8 +7953,8 @@ fieldset {
 
 .expand-status-btn {
   margin-inline-start: 5px;
-  width: 30px;
-  min-height: 17px;
+  width: calc(30rem / 16);
+  height: calc(17rem / 16);
   padding: 0;
   line-height: 16px;
   border-radius: var(--small-border-radius);
@@ -8852,6 +8860,14 @@ body {
 
 .ui-datepicker-title {
   text-align: center;
+
+  select.ui-datepicker-year {
+    background-color: hsl(212deg 25% 90%);
+    padding-block: 0;
+    padding-inline: var(--xs);
+    border-radius: var(--large-border-radius);
+    height: calc(22rem / 16);
+  }
 }
 
 .ui-datepicker-calendar th,
