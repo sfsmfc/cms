@@ -11,7 +11,7 @@ use craft\base\Event;
 use craft\web\RedirectRule;
 
 /**
- * Redirect Rule event class.
+ * RedirectRuleEvent class.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  */
