@@ -130,7 +130,13 @@ class CraftTooltip extends HTMLElement {
     this.tooltip = document.createElement('span');
     this.tooltip.classList.add('craft-tooltip');
     this.tooltip.style['max-width'] = this.maxWidth;
-    this.appendChild(this.tooltip);
+
+    /**
+     * We need to append the tooltip to the body because
+     * the `container-size` property will create a new context
+     * for position: fixed which is a problem when using `strategy: fixed`
+     */
+    window.document.body.appendChild(this.tooltip);
   }
 
   /**
