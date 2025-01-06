@@ -698,9 +698,11 @@ class AssetIndexingSession {
     ).css('position', 'relative');
     const progressBar = new Craft.ProgressBar(
       $progressCell.find('.progressContainer'),
-      false
+      false,
+      {
+        announceProgress: false,
+      }
     );
-    console.log('new progress bar');
 
     progressBar.setItemCount(this.indexingSessionData.totalEntries);
     progressBar.setProcessedItemCount(

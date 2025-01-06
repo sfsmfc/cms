@@ -1,6 +1,10 @@
 // Set up interfaces and types
 interface ProgressBarInterface {
-  new ($element: JQuery, displaySteps?: boolean): ProgressBarInterface;
+  new (
+    $element: JQuery,
+    displaySteps?: boolean,
+    settings?: Object
+  ): ProgressBarInterface;
 
   $progressBar: JQuery;
 
