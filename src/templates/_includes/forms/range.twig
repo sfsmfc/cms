@@ -5,10 +5,15 @@
 ]|filter) %}
 {% set id = id ?? "range#{random()}" %}
 {% set numberInputId = numberInputId ?? "#{id}-num" %}
+{% set descriptionId = descriptionId ?? "#{id}-desc" %}
 {% set step = step ?? 1 %}
 {% set value = value ?? null %}
+{% set labelledBy = (inputAttributes.aria.label ?? false) ? false : (labelledBy ?? labelId ?? false) %}
 
 {% set orientation = orientation ?? inputAttributes.dir ?? craft.app.locale.getOrientation() %}
+
+{%- set suffix = suffix ?? false %}
+{%- set hasSuffix = suffix is not same as(false) %}
 
 {% set inputAttributes = {
     class: class,
@@ -23,8 +28,11 @@
     max: max,
     dir: orientation,
     aria: {
-        labelledby: (inputAttributes.aria.label ?? false) ? false : (labelledBy ?? false),
-        describedby: describedBy ?? false,
+        labelledby: labelledBy,
+        describedby: [
+            describedBy ?? null,
+            hasSuffix ? descriptionId : null,
+        ]|filter|join(' ') ?: false,
     },
 }|merge(inputAttributes ?? [], recursive=true) %}
 
@@ -47,13 +55,14 @@
         {{ text({
             type: 'number',
             id: numberInputId,
+            descriptionId,
             value: value,
             inputmode: 'numeric',
             min: min,
             max: max,
             step: step,
-            size: numberInputSize ?? null,
-            suffix: suffix ?? null,
+            suffix,
+            labelledBy: labelledBy,
         }) }}
     </div>
 </div>

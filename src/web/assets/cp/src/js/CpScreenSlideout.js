@@ -89,8 +89,14 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
         ev.preventDefault();
         if (!this.showingSidebar) {
           this.showSidebar();
+          if (this.showExpandedView) {
+            Craft.setCookie('sidebar-slideout', 'expanded');
+          }
         } else {
           this.hideSidebar();
+          if (this.showExpandedView) {
+            Craft.setCookie('sidebar-slideout', 'collapsed');
+          }
         }
       });
 
@@ -356,7 +362,10 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
 
           this.hasSidebar = true;
 
-          if (this.showExpandedView) {
+          if (
+            this.showExpandedView &&
+            (Craft.getCookie('sidebar-slideout') || 'expanded') === 'expanded'
+          ) {
             this.showSidebar(false);
           } else {
             this.hideSidebar();
@@ -394,6 +403,7 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
 
           resolve();
           this.trigger('load');
+          this.settings.onLoad();
         });
       });
     },
@@ -794,6 +804,7 @@ Craft.CpScreenSlideout = Craft.Slideout.extend(
       requestOptions: {},
       showHeader: null,
       closeOnSubmit: true,
+      onLoad: () => {},
       onSubmit: () => {},
     },
   }

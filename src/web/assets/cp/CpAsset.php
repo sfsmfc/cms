@@ -39,6 +39,7 @@ use craft\web\assets\jqueryui\JqueryUiAsset;
 use craft\web\assets\picturefill\PicturefillAsset;
 use craft\web\assets\selectize\SelectizeAsset;
 use craft\web\assets\tailwindreset\TailwindResetAsset;
+use craft\web\assets\theme\ThemeAsset;
 use craft\web\assets\velocity\VelocityAsset;
 use craft\web\assets\xregexp\XregexpAsset;
 use craft\web\View;
@@ -74,6 +75,7 @@ class CpAsset extends AssetBundle
         XregexpAsset::class,
         FabricAsset::class,
         IframeResizerAsset::class,
+        ThemeAsset::class,
     ];
 
     /**
@@ -164,11 +166,12 @@ JS;
             'Couldn’t delete “{name}”.',
             'Couldn’t reorder items.',
             'Couldn’t save new order.',
-            'Create',
             'Create {type}',
+            'Create',
             'Customize sources',
             'Default Sort',
             'Default Table Columns',
+            'Default View Mode',
             'Delete custom source',
             'Delete folder',
             'Delete heading',
@@ -191,6 +194,7 @@ JS;
             'Don’t use for element thumbnails',
             'Draft Name',
             'Edit draft settings',
+            'Edit global field settings',
             'Edit {type}',
             'Edit',
             'Edited',
@@ -226,6 +230,7 @@ JS;
             'Hide',
             'Incorrect password.',
             'Information',
+            'Instance settings',
             'Instructions',
             'Invalid email.',
             'Invalid username or email.',
@@ -238,8 +243,8 @@ JS;
             'Level {num}',
             'License transferred.',
             'Limit',
-            'Loading',
             'Loading complete',
+            'Loading',
             'Make not required',
             'Make optional',
             'Make required',
@@ -388,6 +393,7 @@ JS;
             'User Groups',
             'View in a new tab',
             'View in a new tab',
+            'View mode options',
             'View settings',
             'View',
             'Volume path',
@@ -421,10 +427,10 @@ JS;
             '{name} active, more info',
             '{name} folder',
             '{name} sorted by {attribute}, {direction}',
-            '{num, number} {num, plural, =1{result} other{results}}',
             '{num, number} {num, plural, =1{Available Update} other{Available Updates}}',
             '{num, number} {num, plural, =1{degree} other{degrees}}',
             '{num, number} {num, plural, =1{notification} other{notifications}}',
+            '{num, number} {num, plural, =1{result} other{results}}',
             '{pct} width',
             '{total, number} {total, plural, =1{error} other{errors}} found in {num, number} {num, plural, =1{tab} other{tabs}}.',
             '{total, number} {total, plural, =1{{item}} other{{items}}}',
@@ -507,8 +513,7 @@ JS;
 
         $elementTypeNames = [];
         foreach (Craft::$app->getElements()->getAllElementTypes() as $elementType) {
-            /** @var string|ElementInterface $elementType */
-            /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
+            /** @var class-string<ElementInterface> $elementType */
             $elementTypeNames[$elementType] = [
                 $elementType::displayName(),
                 $elementType::pluralDisplayName(),
@@ -552,7 +557,7 @@ JS;
             'siteToken' => $generalConfig->siteToken,
             'slugWordSeparator' => $generalConfig->slugWordSeparator,
             'userEmail' => $currentUser->email,
-            'userHasPasskeys' => Craft::$app->getAuth()->hasPasskeys($currentUser),
+            'userHasPasskeys' => Craft::$app->getAuth()->hasPasskeys($userSession->getImpersonator() ?? $currentUser),
             'userIsAdmin' => $currentUser->admin,
             'username' => $currentUser->username,
         ];
@@ -564,6 +569,7 @@ JS;
     {
         return [
             'constrainInput' => false,
+            'changeYear' => true,
             'dateFormat' => $formattingLocale->getDateFormat(Locale::LENGTH_SHORT, Locale::FORMAT_JUI),
             'dayNames' => $locale->getWeekDayNames(Locale::LENGTH_FULL),
             'dayNamesMin' => $locale->getWeekDayNames(Locale::LENGTH_ABBREVIATED),

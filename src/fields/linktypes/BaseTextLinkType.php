@@ -42,6 +42,8 @@ abstract class BaseTextLinkType extends BaseLinkType
 
     public function normalizeValue(string $value): string
     {
+        $value = str_replace(' ', '+', $value);
+
         if ($this->supports($value)) {
             return $value;
         }

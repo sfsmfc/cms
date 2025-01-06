@@ -952,16 +952,41 @@ class Entries extends Component
         // Get/save the entry with updated title, slug, and URI format
         // ---------------------------------------------------------------------
 
-        // If there are any existing entries, find the first one with a valid typeId
-        /** @var Entry|null $entry */
-        $entry = Entry::find()
-            ->typeId($entryTypeIds)
+        $baseEntryQuery = Entry::find()
             ->sectionId($section->id)
             ->siteId($siteIds)
-            ->status(null)
+            ->status(null);
+
+        // If there are any existing entries, find the first one with a valid typeId
+        /** @var Entry|null $entry */
+        $entry = $baseEntryQuery
+            ->typeId($entryTypeIds)
             ->one();
 
-        // Otherwise create a new one
+        // if we didn't find any, try without the typeId,
+        // in case that changed to something completely new
+        if ($entry === null) {
+            $entry = $baseEntryQuery->one();
+
+            if ($entry !== null) {
+                $entry->setTypeId($entryTypeIds[0]);
+            }
+        }
+
+        // if we still don't have any,
+        // try without the typeId with trashed where they were deleted with entry type
+        if ($entry === null) {
+            $entry = $baseEntryQuery
+                ->trashed(null)
+                ->where(['entries.deletedWithEntryType' => true])
+                ->one();
+
+            if ($entry !== null) {
+                $entry->setTypeId($entryTypeIds[0]);
+            }
+        }
+
+        // Finally, if we still don't have an entry, create a new one
         if ($entry === null) {
             // Create one
             $entry = new Entry();
@@ -1119,13 +1144,13 @@ SQL)->execute();
 UPDATE $entriesTable [[entries]]
 SET [[deletedWithSection]] = TRUE
 FROM $elementsTable [[elements]]
-WHERE $conditionSql
+WHERE [[entries.id]] = [[elements.id]] AND $conditionSql
 SQL)->execute();
                 $db->createCommand(<<<SQL
 UPDATE $elementsTable [[elements]]
 SET [[dateDeleted]] = '$now'
 FROM $entriesTable [[entries]]
-WHERE $conditionSql
+WHERE [[entries.id]] = [[elements.id]] AND $conditionSql
 SQL)->execute();
             }
 
@@ -1285,7 +1310,7 @@ SQL)->execute();
         if ($searchTerm !== null && $searchTerm !== '') {
             $searchParams = $this->_getSearchParams($searchTerm);
             if (!empty($searchParams)) {
-                $query->where(['or', ...$searchParams]);
+                $query->andWhere(['or', ...$searchParams]);
             }
         }
 
@@ -2091,34 +2116,60 @@ SQL)->execute();
                     throw new InvalidElementException($entry, 'Element ' . $entry->id . ' could not be moved for site ' . $entry->siteId);
                 }
 
-                $structuresService = Craft::$app->getStructures();
+                $draftsQuery = Entry::find()
+                    ->draftOf($entry)
+                    ->provisionalDrafts(null)
+                    ->status(null)
+                    ->site('*')
+                    ->unique();
 
-                if ($entry->getIsCanonical()) {
-                    $canonical = $entry->getCanonical(true);
+                $revisionsQuery = Entry::find()
+                    ->revisionOf($entry)
+                    ->status(null)
+                    ->site('*')
+                    ->unique();
 
-                    // if we're moving it to a Structure section, place it at the root
-                    if ($section->type === Section::TYPE_STRUCTURE && $canonical->structureId) {
-                        if ($section->defaultPlacement === Section::DEFAULT_PLACEMENT_BEGINNING) {
-                            $structuresService->prependToRoot($section->structureId, $canonical, Structures::MODE_INSERT);
-                        } else {
-                            $structuresService->appendToRoot($section->structureId, $canonical, Structures::MODE_INSERT);
+                if (
+                    $entry->getIsCanonical() &&
+                    in_array(Section::TYPE_STRUCTURE, [$oldSection->type, $section->type])
+                ) {
+                    $structuresService = Craft::$app->getStructures();
+
+                    // if we're moving it from a Structure section, remove it from the structure
+                    if ($oldSection->type === Section::TYPE_STRUCTURE) {
+                        $structuresService->remove($oldSection->structureId, $entry);
+
+                        // remove drafts and revisions from the structure, too
+                        foreach (Db::each($draftsQuery) as $draft) {
+                            /** @var Entry $draft */
+                            if ($draft->lft) {
+                                $structuresService->remove($oldSection->structureId, $draft);
+                            }
+                        }
+
+                        foreach (Db::each($revisionsQuery) as $revision) {
+                            /** @var Entry $revision */
+                            if ($revision->lft) {
+                                $structuresService->remove($oldSection->structureId, $revision);
+                            }
                         }
                     }
 
-                    // if we're moving it from a Structure section, remove it from the structure
-                    if ($oldSection->structureId) {
-                        $structuresService->remove($oldSection->structureId, $canonical);
+                    // if we're moving it to a Structure section, place it at the root
+                    if ($section->type === Section::TYPE_STRUCTURE) {
+                        if ($section->defaultPlacement === Section::DEFAULT_PLACEMENT_BEGINNING) {
+                            $structuresService->prependToRoot($section->structureId, $entry, Structures::MODE_INSERT);
+                        } else {
+                            $structuresService->appendToRoot($section->structureId, $entry, Structures::MODE_INSERT);
+                        }
                     }
                 }
 
                 $entry->newSiteIds = [];
                 $entry->afterPropagate(false);
 
-                // now update drafts & revisions too
-                $ids = array_merge(
-                    Entry::find()->draftOf($entry)->status(null)->site('*')->unique()->ids(),
-                    Entry::find()->revisionOf($entry)->status(null)->site('*')->unique()->ids(),
-                );
+                // now assign drafts & revisions to the new section too
+                $ids = array_merge($draftsQuery->ids(), $revisionsQuery->ids());
                 if (!empty($ids)) {
                     Db::update(Table::ENTRIES, [
                         'sectionId' => $section->id,

@@ -223,7 +223,7 @@ class ElementCollection extends Collection
         $freshElements = [];
 
         foreach ($idsByClass as $class => $ids) {
-            /** @var string|TElement $class */
+            /** @var class-string<TElement>|class-string<ElementInterface> $class */
             $freshElements[$class] = $class::find()
                 ->site('*')
                 ->siteSettingsId($ids)

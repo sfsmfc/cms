@@ -475,10 +475,22 @@
 
 
 {% macro fieldLayoutDesignerField(config) %}
-    {{ _self.field({
-        label: 'Field Layout'|t('app'),
-        errors: (config.fieldLayout ?? false) ? config.fieldLayout.getErrorSummary(true),
-    }|merge(config), 'template:_includes/forms/fieldLayoutDesigner') }}
+    <div class="fld-cvd">
+        {{ _self.field({
+            label: 'Field Layout'|t('app'),
+            errors: (config.fieldLayout ?? false) ? config.fieldLayout.getErrorSummary(true),
+        }|merge(config), 'template:_includes/forms/fieldLayoutDesigner') }}
+
+        {% if config.withCardViewDesigner is defined and config.withCardViewDesigner %}
+            {# we need to unset the id or we'll have two fields with the same one #}
+            {% if config.id is defined %}
+                {% set config = config|filter((v, k) => k != 'id') %}
+            {% endif %}
+
+            {% include '_includes/forms/cardViewDesigner' with {'fieldLayout' : config.fieldLayout} %}
+
+        {% endif %}
+    </div>
 {% endmacro %}
 
 

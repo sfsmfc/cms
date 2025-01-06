@@ -5,6 +5,7 @@
  */
 Craft.SortableCheckboxSelect = Garnish.Base.extend({
   $container: null,
+  dragSort: null,
 
   init: function (container) {
     this.$container = $(container);
@@ -13,14 +14,25 @@ Craft.SortableCheckboxSelect = Garnish.Base.extend({
     const $sortItems = this.$container.children(
       '.checkbox-select-item:not(.all)'
     );
-    if ($sortItems.length) {
-      new Garnish.DragSort($sortItems, {
-        axis: Garnish.Y_AXIS,
-        handle: '.draggable-handle',
-      });
 
+    this.initDrag($sortItems);
+
+    if ($sortItems.length) {
       $sortItems.each((key, item) => {
         this.initItem(item);
+      });
+    }
+  },
+
+  initDrag: function ($sortItems = []) {
+    if ($sortItems.length === 0) {
+      $sortItems = this.$container.children('.checkbox-select-item:not(.all)');
+    }
+
+    if ($sortItems.length) {
+      this.dragSort = new Garnish.DragSort($sortItems, {
+        axis: Garnish.Y_AXIS,
+        handle: '.draggable-handle',
       });
     }
   },
@@ -110,14 +122,33 @@ Craft.SortableCheckboxSelect.Item = Garnish.Base.extend({
         this.actionDisclosure.hideItem(this.moveDownBtn);
       }
     });
+
+    const allCheckedSiblings = this.getAllCheckedSiblings();
+    // if there are no other checked siblings, hide current item's action menu btn
+    if (allCheckedSiblings.length == 0) {
+      this.$actionMenuBtn.hide();
+    } else if (allCheckedSiblings.length == 1) {
+      // if there's only one other checked sibling,
+      // we need to show that sibling's action menu btn as it would have been hidden so far
+      $(allCheckedSiblings[0]).find('.btn.action-btn').show();
+    }
+
+    this.$item.trigger('checked');
   },
 
   onUncheck: function () {
+    const allCheckedSiblings = this.getAllCheckedSiblings();
+    // if there's only one other checked sibling, hide that sibling's action menu btn
+    if (allCheckedSiblings.length == 1) {
+      $(allCheckedSiblings[0]).find('.btn.action-btn').hide();
+    }
+
     this.$moveHandle?.addClass('disabled');
     this.$actionMenuBtn?.remove();
     this.$actionMenu?.remove();
     this.actionDisclosure?.destroy();
     this.$actionMenuBtn = this.actionDisclosure = null;
+    this.$item.trigger('unchecked');
   },
 
   getPrevCheckedItem: function () {
@@ -134,10 +165,17 @@ Craft.SortableCheckboxSelect.Item = Garnish.Base.extend({
     return $item.length ? $item : null;
   },
 
+  getAllCheckedSiblings: function () {
+    return this.$item.siblings(
+      '.checkbox-select-item:not(.all):has(input[type=checkbox]:checked)'
+    );
+  },
+
   moveUp: function () {
     const $prev = this.getPrevCheckedItem();
     if ($prev) {
       this.$item.insertBefore($prev);
+      this.$item.trigger('movedUp');
     }
   },
 
@@ -145,6 +183,7 @@ Craft.SortableCheckboxSelect.Item = Garnish.Base.extend({
     const $next = this.getNextCheckedItem();
     if ($next) {
       this.$item.insertAfter($next);
+      this.$item.trigger('movedDown');
     }
   },
 });

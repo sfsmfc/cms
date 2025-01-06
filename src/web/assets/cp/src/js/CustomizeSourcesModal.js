@@ -30,6 +30,7 @@ Craft.CustomizeSourcesModal = Garnish.Modal.extend({
   baseSortOptions: null,
   availableTableAttributes: null,
   customFieldAttributes: null,
+  viewModes: null,
 
   conditionBuilderHtml: null,
   conditionBuilderJs: null,
@@ -119,6 +120,7 @@ Craft.CustomizeSourcesModal = Garnish.Modal.extend({
     this.conditionBuilderJs = response.conditionBuilderJs;
     this.sites = response.sites;
     this.userGroups = response.userGroups;
+    this.viewModes = response.viewModes;
 
     if (response.headHtml) {
       await Craft.appendHeadHtml(response.headHtml);
@@ -621,6 +623,9 @@ Craft.CustomizeSourcesModal.BaseSource = Garnish.Base.extend({
 
 Craft.CustomizeSourcesModal.Source =
   Craft.CustomizeSourcesModal.BaseSource.extend({
+    $viewModeInput: null,
+    viewModeListbox: null,
+
     $sortAttributeSelect: null,
     $sortDirectionPicker: null,
     $sortDirectionInput: null,
@@ -638,8 +643,69 @@ Craft.CustomizeSourcesModal.Source =
           on: !this.sourceData.disabled,
         })
         .appendTo($container);
+      this.createViewModeField($container);
       this.createSortField($container);
       this.createTableAttributesField($container);
+    },
+
+    createViewModeField: function ($container) {
+      const $inputContainer = $('<section/>', {
+        class: 'btngroup btngroup--exclusive',
+        'aria-label': Craft.t('app', 'View mode options'),
+      });
+
+      const viewModes = this.modal.viewModes.filter(
+        (viewMode) => !viewMode.structuresOnly || this.sourceData.structureId
+      );
+      let defaultViewMode = this.sourceData.defaultViewMode;
+      if (
+        !defaultViewMode ||
+        !viewModes.some((viewMode) => viewMode.mode === defaultViewMode)
+      ) {
+        defaultViewMode = viewModes[0]?.mode;
+      }
+
+      for (let viewMode of viewModes) {
+        const $btn = $('<button/>', {
+          type: 'button',
+          class: 'btn',
+          title: viewMode.title,
+          'aria-label': viewMode.title,
+          'data-mode': viewMode.mode,
+        }).appendTo($inputContainer);
+        $('<div/>', {
+          class: 'cp-icon small',
+        })
+          .append(viewMode.iconSvg)
+          .appendTo($btn);
+        if (viewMode.mode === defaultViewMode) {
+          $btn.addClass('active').attr('aria-pressed', 'true');
+        } else {
+          $btn.attr('aria-pressed', 'false');
+        }
+      }
+
+      $inputContainer.children('button:last').addClass('btngroup-btn-last');
+
+      this.$viewModeInput = $('<input/>', {
+        type: 'hidden',
+        name: `sources[${this.sourceData.key}][defaultViewMode]`,
+        value: this.sourceData.defaultViewMode,
+      }).appendTo($inputContainer);
+
+      this.viewModeListbox = new Craft.Listbox($inputContainer, {
+        onChange: ($selectedOption) => {
+          this.$viewModeInput.val($selectedOption.data('mode'));
+        },
+      });
+
+      Craft.ui
+        .createField($inputContainer, {
+          label: Craft.t('app', 'Default View Mode'),
+          fieldset: true,
+        })
+        .appendTo($container)
+        .addClass('view-mode-field');
     },
 
     createSortField: function ($container) {
@@ -871,6 +937,7 @@ Craft.CustomizeSourcesModal.CustomSource =
 
       this.createSortField($container);
       this.createTableAttributesField($container);
+      this.createViewModeField($container);
 
       if (Craft.sites.length > 1) {
         Craft.ui
@@ -924,7 +991,15 @@ Craft.CustomizeSourcesModal.CustomSource =
     availableTableAttributes: function () {
       const attributes = this.base();
       if (this.isNew) {
-        attributes.push(...this.modal.customFieldAttributes);
+        let existingFieldAttributes = [];
+        let customFieldAttributes = [];
+        this.modal.customFieldAttributes.forEach((item) => {
+          if (existingFieldAttributes.indexOf(item[0]) == -1) {
+            existingFieldAttributes.push(item[0]);
+            customFieldAttributes.push(item);
+          }
+        });
+        attributes.push(...customFieldAttributes);
       }
       return attributes;
     },

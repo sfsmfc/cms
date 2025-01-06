@@ -10,8 +10,10 @@ namespace craft\elements;
 use Craft;
 use craft\base\Colorable;
 use craft\base\Element;
+use craft\base\ElementContainerFieldInterface;
 use craft\base\ExpirableElementInterface;
 use craft\base\Field;
+use craft\base\FieldInterface;
 use craft\base\Iconic;
 use craft\base\NestedElementInterface;
 use craft\base\NestedElementTrait;
@@ -61,6 +63,7 @@ use craft\validators\ArrayValidator;
 use craft\validators\DateCompareValidator;
 use craft\validators\DateTimeValidator;
 use DateTime;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Throwable;
 use yii\base\Exception;
@@ -368,21 +371,17 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
      */
     protected static function defineFieldLayouts(?string $source): array
     {
-        if ($source !== null) {
-            if ($source === '*') {
-                $sections = Craft::$app->getEntries()->getAllSections();
-            } elseif ($source === 'singles') {
-                $sections = Craft::$app->getEntries()->getSectionsByType(Section::TYPE_SINGLE);
-            } else {
-                $sections = [];
-                if (preg_match('/^section:(.+)$/', $source, $matches)) {
-                    $section = Craft::$app->getEntries()->getSectionByUid($matches[1]);
-                    if ($section) {
-                        $sections[] = $section;
-                    }
-                }
-            }
+        if ($source === '*') {
+            $sections = Craft::$app->getEntries()->getAllSections();
+        } elseif ($source === 'singles') {
+            $sections = Craft::$app->getEntries()->getSectionsByType(Section::TYPE_SINGLE);
+        } elseif ($source !== null && preg_match('/^section:(.+)$/', $source, $matches)) {
+            $sections = array_filter([
+                Craft::$app->getEntries()->getSectionByUid($matches[1]),
+            ]);
+        }
 
+        if (isset($sections)) {
             $entryTypes = array_values(array_unique(array_merge(
                 ...array_map(fn(Section $section) => $section->getEntryTypes(), $sections),
             )));
@@ -577,7 +576,6 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
                 'orderBy' => 'dateUpdated',
                 'defaultDir' => 'desc',
             ],
-            'id' => Craft::t('app', 'ID'),
         ];
     }
 
@@ -627,6 +625,79 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
         $attributes[] = 'link';
 
         return $attributes;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineCardAttributes(): array
+    {
+        $currentUser = Craft::$app->getUser()->getIdentity();
+
+        $attributes = array_merge(parent::defineCardAttributes(), [
+            'section' => [
+                'label' => Craft::t('app', 'Section'),
+                'placeholder' => fn() => Craft::t('app', 'Section'),
+            ],
+            'type' => [
+                'label' => Craft::t('app', 'Entry Type'),
+                'placeholder' => fn() => Craft::t('app', 'Entry Type'),
+            ],
+            'authors' => [
+                'label' => Craft::t('app', 'Authors'),
+                'placeholder' => fn() => $currentUser ? Cp::elementChipHtml($currentUser) : '',
+            ],
+            'parent' => [
+                'label' => Craft::t('app', 'Parent'),
+                'placeholder' => fn() => Html::tag(
+                    'span',
+                    Craft::t('app', 'Parent {type} Title', ['type' => self::displayName()]),
+                    ['class' => 'card-placeholder'],
+                ),
+            ],
+            'postDate' => [
+                'label' => Craft::t('app', 'Post Date'),
+                'placeholder' => fn() => (new \DateTime())->sub(new \DateInterval('P15D')),
+            ],
+            'expiryDate' => [
+                'label' => Craft::t('app', 'Expiry Date'),
+                'placeholder' => fn() => (new \DateTime())->add(new \DateInterval('P15D')),
+            ],
+            'revisionNotes' => [
+                'label' => Craft::t('app', 'Revision Notes'),
+                'placeholder' => fn() => Craft::t('app', 'Revision Notes'),
+            ],
+            'revisionCreator' => [
+                'label' => Craft::t('app', 'Last Edited By'),
+                'placeholder' => fn() => $currentUser ? Cp::elementChipHtml($currentUser) : '',
+            ],
+            'drafts' => [
+                'label' => Craft::t('app', 'Drafts'),
+                'placeholder' => fn() => Html::tag(
+                    'span',
+                    Craft::t('app', 'Draft {num}', ['num' => 1]),
+                    ['class' => 'card-placeholder'],
+                ),
+            ],
+        ]);
+
+        // Hide Author & Last Edited By from Craft Solo
+        if (Craft::$app->edition === CmsEdition::Solo) {
+            unset($attributes['authors'], $attributes['revisionCreator']);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function attributePreviewHtml(array $attribute): mixed
+    {
+        return match ($attribute['value']) {
+            'authors', 'parent', 'revisionCreator', 'drafts' => $attribute['placeholder'],
+            default => parent::attributePreviewHtml($attribute),
+        };
     }
 
     /**
@@ -864,6 +935,7 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
             },
             'skipOnEmpty' => false,
             'when' => fn() => $this->getIsCanonical(),
+            'on' => self::SCENARIO_LIVE,
         ];
         $rules[] = [['fieldId'], function(string $attribute) {
             if (isset($this->sectionId)) {
@@ -895,6 +967,19 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
         }
 
         return $rules;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAttributesFromRequest(array $values): void
+    {
+        parent::setAttributesFromRequest($values);
+
+        // Did the entry type just change?
+        if (isset($this->_typeId, $this->_oldTypeId) && $this->_typeId !== $this->_oldTypeId) {
+            $this->handleChangedTypeId();
+        }
     }
 
     /**
@@ -1954,7 +2039,11 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
                 return $section ? Html::encode(Craft::t('site', $section->name)) : '';
             case 'type':
                 try {
-                    return Cp::chipHtml($this->getType());
+                    $config = [];
+                    if ($this->viewMode === 'cards') {
+                        $config['showThumb'] = false;
+                    }
+                    return Cp::chipHtml($this->getType(), $config);
                 } catch (InvalidConfigException) {
                     return Craft::t('app', 'Unknown');
                 }
@@ -2545,14 +2634,14 @@ JS;
 
             $this->saveOwnership($isNew, Table::ENTRIES);
 
-            if ($this->getIsCanonical() && isset($this->sectionId) && $section->type == Section::TYPE_STRUCTURE) {
+            if (!$this->duplicateOf && isset($this->sectionId) && $section->type == Section::TYPE_STRUCTURE) {
                 // Has the parent changed?
                 if ($this->hasNewParent()) {
                     $this->_placeInStructure($isNew, $section);
                 }
 
                 // Update the entry’s descendants, who may be using this entry’s URI in their own URIs
-                if (!$isNew) {
+                if (!$isNew && $this->getIsCanonical()) {
                     Craft::$app->getElements()->updateDescendantSlugsAndUris($this, true, true);
                 }
             }
@@ -2784,5 +2873,35 @@ JS;
         }
 
         return in_array($this->typeId, array_map(fn($entryType) => $entryType->id, $entryTypes));
+    }
+
+    private function handleChangedTypeId(): void
+    {
+        $oldLayout = Craft::$app->getEntries()->getEntryTypeById($this->_oldTypeId)?->getFieldLayout();
+        if (!$oldLayout) {
+            return;
+        }
+
+        $newFields = $this->getType()->getFieldLayout()->getCustomFields();
+        $oldFields = Arr::keyBy($oldLayout->getCustomFields(), fn(FieldInterface $field) => $field->handle);
+        $fieldsService = Craft::$app->getFields();
+
+        foreach ($newFields as $newField) {
+            if (isset($oldFields[$newField->handle])) {
+                $oldField = $oldFields[$newField->handle];
+                if (
+                    !$fieldsService->areFieldTypesCompatible($newField::class, $oldField::class) ||
+                    (
+                        (
+                            $newField instanceof ElementContainerFieldInterface ||
+                            $oldField instanceof ElementContainerFieldInterface
+                        ) &&
+                        $newField->id !== $oldField->id
+                    )
+                ) {
+                    $this->setFieldValue($newField->handle, null);
+                }
+            }
+        }
     }
 }

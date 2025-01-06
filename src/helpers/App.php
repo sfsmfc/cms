@@ -143,8 +143,7 @@ class App
      * For example, if an object has a `fooBar` property, and `X`/`X_` is passed as the prefix, the resulting array
      * may contain a `fooBar` key set to an `X_FOO_BAR` environment variable value, if it exists.
      *
-     * @param string $class The class name
-     * @phpstan-param class-string $class
+     * @param class-string $class The class name
      * @param string|null $envPrefix The environment variable name prefix
      * @return array
      * @phpstan-return array<string, mixed>
@@ -720,8 +719,7 @@ class App
     /**
      * Returns a humanized class name.
      *
-     * @param string $class
-     * @phpstan-param class-string $class
+     * @param class-string $class
      * @return string
      */
     public static function humanizeClass(string $class): string
@@ -1047,6 +1045,7 @@ class App
             ],
             'replyTo' => App::parseEnv($settings->replyToEmail),
             'template' => App::parseEnv($settings->template),
+            'siteOverrides' => $settings->siteOverrides,
             'transport' => $adapter->defineTransport(),
         ];
     }
@@ -1158,11 +1157,12 @@ class App
             'authTimeout' => $generalConfig->userSessionDuration ?: null,
             'identityCookie' => Craft::cookieConfig(['name' => $stateKeyPrefix . '_identity']),
             'usernameCookie' => Craft::cookieConfig(['name' => $stateKeyPrefix . '_username']),
-            'idParam' => $stateKeyPrefix . '__id',
-            'tokenParam' => $stateKeyPrefix . '__token',
-            'authTimeoutParam' => $stateKeyPrefix . '__expire',
             'absoluteAuthTimeoutParam' => $stateKeyPrefix . '__absoluteExpire',
+            'authTimeoutParam' => $stateKeyPrefix . '__expire',
+            'idParam' => $stateKeyPrefix . '__id',
+            'impersonatorIdParam' => $stateKeyPrefix . '__impersonator_id',
             'returnUrlParam' => $stateKeyPrefix . '__returnUrl',
+            'tokenParam' => $stateKeyPrefix . '__token',
         ];
     }
 
@@ -1179,8 +1179,8 @@ class App
         ];
 
         $request = Craft::$app->getRequest();
-
-        if ($request->getIsCpRequest()) {
+        if (!$request->getIsConsoleRequest()) {
+            // Check these headers for site requests too, in case we're rendering a system fallback template
             $headers = $request->getHeaders();
             $config['registeredAssetBundles'] = array_filter(explode(',', $headers->get('X-Registered-Asset-Bundles', '')));
             $config['registeredJsFiles'] = array_filter(explode(',', $headers->get('X-Registered-Js-Files', '')));

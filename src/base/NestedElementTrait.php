@@ -37,9 +37,14 @@ trait NestedElementTrait
         switch ($handle) {
             case 'owner':
             case 'primaryOwner':
-                /** @var NestedElementInterface[] $sourceElements */
+                /** @var array<NestedElementInterface&self> $sourceElements */
+                $ownerType = $sourceElements[0]->ownerType();
+                if (!$ownerType) {
+                    return false;
+                }
+
                 return [
-                    'elementType' => get_class(reset($sourceElements)),
+                    'elementType' => $ownerType,
                     'map' => array_map(fn(NestedElementInterface $element) => [
                         'source' => $element->id,
                         'target' => match ($handle) {
@@ -65,6 +70,11 @@ trait NestedElementTrait
      * @var int|null Owner ID
      */
     private ?int $ownerId = null;
+
+    /**
+     * @var class-string<ElementInterface> Owner type
+     */
+    private string $ownerType;
 
     /**
      * @var int|null Field ID
@@ -154,9 +164,23 @@ trait NestedElementTrait
                 return null;
             }
 
-            $this->_primaryOwner = Craft::$app->getElements()->getElementById($primaryOwnerId, null, $this->siteId, [
-                'trashed' => null,
-            ]) ?? false;
+            $ownerType = $this->ownerType();
+            if (!$ownerType) {
+                return null;
+            }
+
+            $this->_primaryOwner = $ownerType::find()
+                ->id($primaryOwnerId)
+                ->site('*')
+                ->preferSites([$this->siteId])
+                ->unique()
+                ->status(null)
+                ->drafts(null)
+                ->provisionalDrafts(null)
+                ->revisions(null)
+                ->trashed(null)
+                ->one() ?? false;
+
             if (!$this->_primaryOwner) {
                 throw new InvalidConfigException("Invalid owner ID: $primaryOwnerId");
             }
@@ -206,9 +230,23 @@ trait NestedElementTrait
                 return $this->getPrimaryOwner();
             }
 
-            $this->_owner = Craft::$app->getElements()->getElementById($ownerId, null, $this->siteId, [
-                'trashed' => null,
-            ]) ?? false;
+            $ownerType = $this->ownerType();
+            if (!$ownerType) {
+                return null;
+            }
+
+            $this->_owner = $ownerType::find()
+                ->id($ownerId)
+                ->site('*')
+                ->preferSites([$this->siteId])
+                ->unique()
+                ->status(null)
+                ->drafts(null)
+                ->provisionalDrafts(null)
+                ->revisions(null)
+                ->trashed(null)
+                ->one() ?? false;
+
             if (!$this->_owner) {
                 throw new InvalidConfigException("Invalid owner ID: $ownerId");
             }
@@ -299,6 +337,24 @@ trait NestedElementTrait
     }
 
     /**
+     * Returns the owner element’s type.
+     *
+     * @return class-string<ElementInterface>|null
+     * @since 5.6.0
+     */
+    protected function ownerType(): ?string
+    {
+        if (!isset($this->ownerType)) {
+            $ownerId = $this->getOwnerId();
+            if (!$ownerId) {
+                return null;
+            }
+            $this->ownerType = Craft::$app->getElements()->getElementTypeById($ownerId);
+        }
+        return $this->ownerType;
+    }
+
+    /**
      * Saves the element’s ownership data, if it belongs to a field + owner element
      */
     private function saveOwnership(bool $isNew, string $elementTable, string $fieldIdColumn = 'fieldId'): void
@@ -352,19 +408,17 @@ trait NestedElementTrait
             $this->sortOrder = $max ? $max + 1 : 1;
         }
 
-        if ($isNew) {
-            Db::insert(Table::ELEMENTS_OWNERS, [
-                'elementId' => $this->id,
-                'ownerId' => $ownerId,
-                'sortOrder' => $this->sortOrder,
-            ]);
-        } else {
-            Db::update(Table::ELEMENTS_OWNERS, [
-                'sortOrder' => $this->sortOrder,
-            ], [
+        if (!$isNew) {
+            Db::delete(Table::ELEMENTS_OWNERS, [
                 'elementId' => $this->id,
                 'ownerId' => $ownerId,
             ]);
         }
+
+        Db::insert(Table::ELEMENTS_OWNERS, [
+            'elementId' => $this->id,
+            'ownerId' => $ownerId,
+            'sortOrder' => $this->sortOrder,
+        ]);
     }
 }

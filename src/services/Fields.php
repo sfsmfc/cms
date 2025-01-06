@@ -260,12 +260,13 @@ class Fields extends Component
      * Returns all field types that have a column in the content table.
      *
      * @return string[] The field type classes
+     * @phpstan-return class-string<FieldInterface>[]
      */
     public function getFieldTypesWithContent(): array
     {
         return ArrayHelper::where(
             $this->getAllFieldTypes(),
-            fn(string $class) => /** @var string|FieldInterface $class */ $class::dbType() !== null,
+            fn(string $class) => /** @var class-string<FieldInterface> $class */ $class::dbType() !== null,
             keepKeys: false,
         );
     }
@@ -276,6 +277,7 @@ class Fields extends Component
      * @param FieldInterface $field The current field to base compatible fields on
      * @param bool $includeCurrent Whether $field's class should be included
      * @return string[] The compatible field type classes
+     * @phpstan-return class-string<FieldInterface>[]
      */
     public function getCompatibleFieldTypes(FieldInterface $field, bool $includeCurrent = true): array
     {
@@ -289,8 +291,7 @@ class Fields extends Component
 
         if (is_string($dbType)) {
             foreach ($this->getAllFieldTypes() as $class) {
-                /** @var string|FieldInterface $class */
-                /** @phpstan-var class-string<FieldInterface>|FieldInterface $class */
+                /** @var class-string<FieldInterface> $class */
                 if (
                     ($includeCurrent || $class !== $field::class) &&
                     $this->areFieldTypesCompatible($field::class, $class)
@@ -321,10 +322,8 @@ class Fields extends Component
     /**
      * Returns whether the two given field types are considered compatible with each other.
      *
-     * @param string|FieldInterface $fieldA
-     * @param string|FieldInterface $fieldB
-     * @phpstan-param class-string<FieldInterface> $fieldA
-     * @phpstan-param class-string<FieldInterface> $fieldB
+     * @param class-string<FieldInterface> $fieldA
+     * @param class-string<FieldInterface> $fieldB
      * @return bool
      * @since 5.3.0
      */
@@ -392,7 +391,7 @@ class Fields extends Component
      * Creates a field with a given config.
      *
      * @template T of FieldInterface
-     * @param string|array $config The field’s class name, or its config, with a `type` value and optionally a `settings` value
+     * @param class-string<T>|array $config The field’s class name, or its config, with a `type` value and optionally a `settings` value
      * @phpstan-param class-string<T>|array{type:class-string<T>,id?:int|string,uid?:string} $config
      * @return T The field
      */
@@ -498,8 +497,7 @@ class Fields extends Component
     /**
      * Returns all fields of a certain type.
      *
-     * @param string $type The field type
-     * @phpstan-param class-string<FieldInterface> $type
+     * @param class-string<FieldInterface> $type The field type
      * @param string|string[]|false|null $context The field context(s) to fetch fields from. Defaults to [[\craft\services\Fields::$fieldContext]].
      * Set to `false` to get all fields regardless of context.
      * @return FieldInterface[] The fields
@@ -885,7 +883,10 @@ class Fields extends Component
     {
         if (!isset($this->_layouts)) {
             if (Craft::$app->getIsInstalled()) {
-                $layoutConfigs = $this->_createLayoutQuery()->all();
+                $layoutConfigs = $this->_createLayoutQuery()->collect()
+                    ->filter(fn(array $config) => ComponentHelper::validateComponentClass($config['type'], ElementInterface::class))
+                    ->values()
+                    ->all();
             } else {
                 $layoutConfigs = [];
             }
@@ -1033,8 +1034,7 @@ class Fields extends Component
     /**
      * Returns a field layout by its associated element type.
      *
-     * @param string $type The associated element type
-     * @phpstan-param class-string<ElementInterface> $type
+     * @param class-string<ElementInterface> $type The associated element type
      * @return FieldLayout The field layout
      */
     public function getLayoutByType(string $type): FieldLayout
@@ -1046,8 +1046,7 @@ class Fields extends Component
     /**
      * Returns all of the field layouts associated with a given element type.
      *
-     * @param string $type
-     * @phpstan-param class-string<ElementInterface> $type
+     * @param class-string<ElementInterface> $type
      * @return FieldLayout[] The field layouts
      * @since 3.5.0
      */
@@ -1103,6 +1102,8 @@ class Fields extends Component
     {
         $paramPrefix = $namespace ? rtrim($namespace, '.') . '.' : '';
         $config = Json::decode(Craft::$app->getRequest()->getBodyParam($paramPrefix . 'fieldLayout'));
+        $cardView = Craft::$app->getRequest()->getBodyParam($paramPrefix . 'cardView');
+        $config['cardView'] = empty($cardView) ? null : $cardView;
         $layout = $this->createLayout($config);
 
         // Make sure all the elements have a dateAdded value set
@@ -1261,8 +1262,7 @@ class Fields extends Component
     /**
      * Deletes field layouts associated with a given element type.
      *
-     * @param string $type The element type
-     * @phpstan-param class-string<ElementInterface> $type
+     * @param class-string<ElementInterface> $type The element type
      * @return bool Whether the field layouts were deleted successfully
      */
     public function deleteLayoutsByType(string $type): bool
@@ -1343,20 +1343,15 @@ class Fields extends Component
         $fieldRecord = $this->_getFieldRecord($fieldUid, true);
         $isNewField = $fieldRecord->getIsNewRecord();
         $oldSettings = $fieldRecord->getOldAttribute('settings');
+        $oldField = !$isNewField ? $this->getFieldById($fieldRecord->id) : null;
 
         // For control panel save requests, make sure we have all the custom data already saved on the object.
-        if (isset($this->_savingFields[$fieldUid])) {
-            $field = $this->_savingFields[$fieldUid];
-        } elseif (!$isNewField) {
-            $field = $this->getFieldById($fieldRecord->id);
-        } else {
-            $field = null;
-        }
+        $field = $this->_savingFields[$fieldUid] ?? $oldField;
 
         // Fire a 'beforeApplyFieldSave' event
         if ($this->hasEventHandlers(self::EVENT_BEFORE_APPLY_FIELD_SAVE)) {
             $this->trigger(self::EVENT_BEFORE_APPLY_FIELD_SAVE, new ApplyFieldSaveEvent([
-                'field' => $field,
+                'field' => $oldField,
                 'config' => $data,
             ]));
         }
@@ -1408,7 +1403,7 @@ class Fields extends Component
         // Tell the current CustomFieldBehavior class about the field
         CustomFieldBehavior::$fieldHandles[$fieldRecord->handle] = true;
 
-        if ($isNewField) {
+        if ($isNewField || $field === null) {
             // Try fetching the field again, if it didn’t exist to begin with
             $field ??= $this->getFieldById($fieldRecord->id);
             $field->id = $fieldRecord->id;

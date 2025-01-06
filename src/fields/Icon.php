@@ -14,6 +14,7 @@ use craft\base\Field;
 use craft\base\InlineEditableFieldInterface;
 use craft\base\MergeableFieldInterface;
 use craft\base\ThumbableFieldInterface;
+use craft\elements\Entry;
 use craft\helpers\Cp;
 use craft\helpers\Html;
 use yii\db\Schema;
@@ -128,6 +129,18 @@ class Icon extends Field implements InlineEditableFieldInterface, ThumbableField
     public function getPreviewHtml(mixed $value, ElementInterface $element): string
     {
         return $value ? Html::tag('div', Cp::iconSvg($value), ['class' => 'cp-icon']) : '';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
+    {
+        if (!$value) {
+            $value = 'info';
+        }
+
+        return $this->getPreviewHtml($value, $element ?? new Entry());
     }
 
     /**

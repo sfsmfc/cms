@@ -486,6 +486,27 @@ class Assets extends BaseRelationField
         );
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
+    {
+        $asset = new Asset();
+        $asset->title = Craft::t('app', 'Related {type} Title', ['type' => $asset->displayName()]);
+
+        if ($this->restrictFiles) {
+            $extensions = $this->_getAllowedExtensions();
+            $filename = 'test.' . $extensions[0];
+        } else {
+            $filename = 'test.txt';
+        }
+
+        $asset->filename = $filename;
+        $collection = new ElementCollection([$asset]);
+
+        return $this->previewHtml($collection);
+    }
+
     // Events
     // -------------------------------------------------------------------------
 
@@ -902,6 +923,9 @@ class Assets extends BaseRelationField
         if ($isDynamic) {
             // Prepare the path by parsing tokens and normalizing slashes.
             try {
+                if ($element?->duplicateOf) {
+                    $element = $element->duplicateOf;
+                }
                 $renderedSubpath = Craft::$app->getView()->renderObjectTemplate($subpath, $element);
             } catch (InvalidConfigException|RuntimeError $e) {
                 throw new InvalidSubpathException($subpath, null, 0, $e);

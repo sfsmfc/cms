@@ -46,16 +46,6 @@
     data: {'error-key': 'step'},
 }) }}
 
-{{ forms.textField({
-    label: 'Number Input Size'|t('app'),
-    id: 'number-input-size',
-    name: 'numberInputSize',
-    value: field.numberInputSize,
-    size: 5,
-    required: true,
-    errors: field.getErrors('numberInputSize')
-}) }}
-
 {{ _self.numberField({
     label: 'Default Value'|t('app'),
     id: 'default-value',

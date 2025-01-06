@@ -9,6 +9,7 @@ namespace craft\web;
 
 use Craft;
 use craft\helpers\ArrayHelper;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\Session;
 use craft\helpers\UrlHelper;
 use Throwable;
@@ -122,7 +123,8 @@ class Response extends \yii\web\Response
             return $this;
         }
 
-        $this->setHeader('Expires', sprintf('%s GMT', gmdate('D, d M Y H:i:s', time() + $duration)), $overwrite);
+        $expires = DateTimeHelper::currentTimeStamp() + $duration;
+        $this->setHeader('Expires', sprintf('%s GMT', gmdate('D, d M Y H:i:s', $expires)), $overwrite);
         $this->setHeader('Pragma', 'cache', $overwrite);
         $this->setHeader('Cache-Control', "public, max-age=$duration", $overwrite);
         return $this;

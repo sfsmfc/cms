@@ -63,8 +63,8 @@ trait EditUserTrait
         }
 
         if (!$user->getIsCurrent()) {
-            // Make sure they have permission to edit other users
-            $this->requirePermission('editUsers');
+            // Make sure they have permission to view other users
+            $this->requirePermission('viewUsers');
         }
 
         return $user;
@@ -123,10 +123,7 @@ trait EditUserTrait
             $response->docTitle($pageName);
         } else {
             $username = $user->getUiLabel();
-            $extendedTitle = Craft::t('app', 'User {page}', [
-                'page' => $pageName,
-            ]);
-            $docTitle = "$username - $extendedTitle";
+            $docTitle = "$username - $pageName";
             $response->title($username);
             $response->docTitle($docTitle);
         }

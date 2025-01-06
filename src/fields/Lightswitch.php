@@ -14,6 +14,8 @@ use craft\base\Field;
 use craft\base\InlineEditableFieldInterface;
 use craft\base\MergeableFieldInterface;
 use craft\base\SortableFieldInterface;
+use craft\elements\Entry;
+use craft\enums\Color as ColorEnum;
 use craft\fields\conditions\LightswitchFieldConditionRule;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Cp;
@@ -235,6 +237,14 @@ class Lightswitch extends Field implements InlineEditableFieldInterface, Sortabl
      */
     public function getPreviewHtml(mixed $value, ElementInterface $element): string
     {
+        if ($element->viewMode === 'cards') {
+            return Cp::statusLabelHtml([
+                'color' => $value ? ColorEnum::Teal : ColorEnum::Gray,
+                'label' => $this->getUiLabel(),
+                'icon' => $value ? 'check' : 'xmark',
+            ]);
+        }
+
         if (!$value) {
             return '';
         }
@@ -253,5 +263,17 @@ class Lightswitch extends Field implements InlineEditableFieldInterface, Sortabl
             Html::tag('span', $this->getUiLabel(), [
                 'class' => 'checkbox-preview-label',
             ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
+    {
+        if (!$value) {
+            $value = 1;
+        }
+
+        return $this->getPreviewHtml($value, $element ?? new Entry(['viewMode' => 'cards']));
     }
 }
