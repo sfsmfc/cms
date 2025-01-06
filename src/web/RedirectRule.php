@@ -38,11 +38,6 @@ class RedirectRule extends \yii\base\BaseObject
         Craft::$app->end();
     }
 
-    public function getSubject(): string
-    {
-        return Craft::$app->getRequest()->getFullPath();
-    }
-
     public function setMatch(\Closure $match): void
     {
         $this->_match = $match;
@@ -54,10 +49,12 @@ class RedirectRule extends \yii\base\BaseObject
             return ($this->_match)(Http::new(Craft::$app->getRequest()->getAbsoluteUrl()));
         }
 
+        $subject = Craft::$app->getRequest()->getFullPath();
+
         if (str_contains($this->from, '<')) {
             if (preg_match(
                 $this->toRegexPattern($this->from),
-                $this->getSubject(),
+                $subject,
                 $matches,
             )) {
                 return $this->replaceParams($this->to, $matches);
@@ -67,10 +64,10 @@ class RedirectRule extends \yii\base\BaseObject
         }
 
         if ($this->caseSensitive) {
-            return strcmp($this->from, $this->getSubject()) === 0 ? $this->to : null;
+            return strcmp($this->from, $subject) === 0 ? $this->to : null;
         }
 
-        return strcasecmp($this->from, $this->getSubject()) === 0 ? $this->to : null;
+        return strcasecmp($this->from, $subject) === 0 ? $this->to : null;
     }
 
     private function replaceParams(string $value, array $params): string
