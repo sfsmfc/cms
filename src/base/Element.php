@@ -1469,7 +1469,7 @@ abstract class Element extends Component implements ElementInterface
         foreach ($elementStructureData as $elementStructureDatum) {
             foreach ($descendantStructureData as $descendantStructureDatum) {
                 if (
-                    $descendantStructureDatum['structureId'] === $elementStructureDatum['structureId'] &&
+                    $descendantStructureDatum['structureId'] == $elementStructureDatum['structureId'] &&
                     $descendantStructureDatum['lft'] > $elementStructureDatum['lft'] &&
                     $descendantStructureDatum['rgt'] < $elementStructureDatum['rgt'] &&
                     (!$children || $descendantStructureDatum['level'] == $elementStructureDatum['level'] + 1)
