@@ -62,6 +62,9 @@
   --light-focus-hsl: #{color.hue(mixins.$lightFocusColor)},
     #{color.saturation(mixins.$lightFocusColor)},
     #{color.lightness(mixins.$lightFocusColor)};
+  --dark-focus-hsl: #{color.hue(mixins.$darkFocusColor)},
+    #{color.saturation(mixins.$darkFocusColor)},
+    #{color.lightness(mixins.$darkFocusColor)};
   --focus-ring: 0 0 0 2px var(--focus-ring-color),
     0 0 5px 1px
       hsl(from var(--focus-ring-color) h s l / var(--focus-ring-alpha));
