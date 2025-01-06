@@ -646,6 +646,10 @@ class AssetIndexingSession {
     return this.indexingSessionData.listEmptyFolders;
   }
 
+  public getProgressInfo(): string {
+    return `${this.indexingSessionData.processedEntries} / ${this.indexingSessionData.totalEntries}`;
+  }
+
   /**
    * Get the remaining entry count for this sessions.
    */
@@ -713,9 +717,7 @@ class AssetIndexingSession {
     $progressCell.data('progressBar', progressBar);
     $progressCell
       .find('.progressContainer')
-      .append(
-        `<div class="progressInfo">${this.indexingSessionData.processedEntries} / ${this.indexingSessionData.totalEntries}</div>`
-      );
+      .append(`<div class="progressInfo">${this.getProgressInfo()}</div>`);
     $tr.append($progressCell);
 
     $tr.append('<td>' + this.getSessionStatusMessage() + '</td>');

@@ -16,7 +16,6 @@ Craft.ProgressBar = Garnish.Base.extend(
     _progressPercentage: null,
     _processedItemCount: 0,
     _displaySteps: false,
-    _announceProgress: true,
 
     init: function ($element, displaySteps, settings) {
       this.setSettings(settings, Craft.ProgressBar.defaults);
