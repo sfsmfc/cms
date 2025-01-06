@@ -1,6 +1,6 @@
 # Release Notes for Craft CMS 4
 
-## Unreleased
+## 4.13.9 - 2025-01-06
 
 - Fixed a bug where custom fields could cause validation errors when running the `users/create` command.
 - Fixed a bug where deleting a volume folder wasn’t fully deleting asset data in descendant folders.
