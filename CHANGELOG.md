@@ -8,6 +8,7 @@
 - Fixed a bug where field layout designers were validating field names, handles, and instructions, even if they weren’t overridden within the field instance. ([#16380](https://github.com/craftcms/cms/issues/16380))
 - Fixed an error that occurred when upgrading to Craft 5. ([#16383](https://github.com/craftcms/cms/issues/16383))
 - Fixed a bug where “Full Name” could appear twice in the user card attributes list. ([#16358](https://github.com/craftcms/cms/issues/16358))
+- Fixed a bug where multi-site element queries could return an incorrect number of results if the `search` param was used in conjunction with `offset` or `limit`. ([#16183](https://github.com/craftcms/cms/issues/16183))
 
 ## 5.5.8 - 2025-01-02
 
