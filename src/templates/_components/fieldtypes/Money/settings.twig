@@ -1,9 +1,5 @@
 {% import "_includes/forms" as forms %}
 
-{% if readOnly is not defined %}
-    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
-
 {% macro numberField(config, decimals) %}
     {% from '_includes/forms' import textField %}
     {{ hiddenInput("#{config.name}[locale]", craft.app.formattingLocale.id) }}

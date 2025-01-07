@@ -115,8 +115,19 @@ class Lightswitch extends Field implements InlineEditableFieldInterface, Sortabl
      */
     public function getSettingsHtml(): ?string
     {
-        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
+        return $this->settingsHtml(false);
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         return
             Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Default Value'),
@@ -279,13 +290,5 @@ class Lightswitch extends Field implements InlineEditableFieldInterface, Sortabl
         }
 
         return $this->getPreviewHtml($value, $element ?? new Entry(['viewMode' => 'cards']));
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
     }
 }

@@ -1,9 +1,5 @@
 {% import "_includes/forms" as forms %}
 
-{% if readOnly is not defined %}
-    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
-
 {{ forms.entryTypeSelectField({
     label: 'Entry Types'|t('app'),
     instructions: 'Choose the types of entries that can be created in this field.'|t('app'),

@@ -140,11 +140,23 @@ class Local extends Fs implements LocalFsInterface
      */
     public function getSettingsHtml(): ?string
     {
-        return Craft::$app->getView()->renderTemplate('_components/fs/Local/settings.twig',
-            [
-                'volume' => $this,
-                'disabled' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
-            ]);
+        return $this->settingsHtml(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
+        return Craft::$app->getView()->renderTemplate('_components/fs/Local/settings.twig', [
+            'volume' => $this,
+            'readOnly' => $readOnly,
+        ]);
     }
 
     /**
@@ -433,13 +445,5 @@ class Local extends Fs implements LocalFsInterface
         }
 
         return $this->visibilityMap[$type][$config[self::CONFIG_VISIBILITY]];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
     }
 }

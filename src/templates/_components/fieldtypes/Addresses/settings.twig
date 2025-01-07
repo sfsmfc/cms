@@ -1,9 +1,5 @@
 {% import "_includes/forms" as forms %}
 
-{% if readOnly is not defined %}
-  {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
-
 {{ forms.textField({
   label: 'Min {type}'|t('app', {
     type: 'Addresses'|t('app'),

@@ -1,8 +1,6 @@
 {% import '_includes/forms.twig' as forms %}
 
-{% if readOnly is not defined %}
-  {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
+{% set readOnly = readOnly ?? false %}
 
 {% if not readOnly and fieldId is defined and fieldId %}
   {{ hiddenInput('fieldId', fieldId) }}
@@ -123,7 +121,7 @@
 
 <hr>
 
-<div id="settings"{% if readOnly and not field.readOnlySettingsReady() %} class="disabled-settings disabled"{% endif %}>
+<div id="settings">
   <div id="{{ className(field)|id }}">
     {% include 'settings/fields/_type-settings' with {
       namespace: 'types['~className(field)|id~']'

@@ -77,7 +77,23 @@ class Icon extends Field implements InlineEditableFieldInterface, ThumbableField
         parent::__construct($config);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getSettingsHtml(): ?string
+    {
+        return $this->settingsHtml(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
     {
         return Cp::lightswitchFieldHtml([
             'label' => Craft::t('app', 'Include Pro icons'),
@@ -86,7 +102,7 @@ class Icon extends Field implements InlineEditableFieldInterface, ThumbableField
             ]),
             'name' => 'includeProIcons',
             'on' => $this->includeProIcons,
-            'disabled' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
+            'disabled' => $readOnly,
         ]);
     }
 
@@ -149,13 +165,5 @@ class Icon extends Field implements InlineEditableFieldInterface, ThumbableField
     public function getThumbHtml(mixed $value, ElementInterface $element, int $size): ?string
     {
         return $value ? Html::tag('div', Cp::iconSvg($value), ['class' => 'cp-icon']) : null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
     }
 }

@@ -1,9 +1,5 @@
 {% import "_includes/forms" as forms %}
 
-{% if readOnly is not defined %}
-    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
-
 {{ forms.selectField({
     label: 'UI Mode'|t('app'),
     instructions: 'How the field should be presented in the control panel.'|t('app'),

@@ -147,6 +147,19 @@ class Money extends Field implements InlineEditableFieldInterface, SortableField
      */
     public function getSettingsHtml(): ?string
     {
+        return $this->settingsHtml(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         foreach (['defaultValue', 'min', 'max'] as $attr) {
             if ($this->$attr !== null) {
                 $value = MoneyHelper::toDecimal(new MoneyLibrary($this->$attr, new Currency($this->currency)));
@@ -158,7 +171,7 @@ class Money extends Field implements InlineEditableFieldInterface, SortableField
             'field' => $this,
             'currencies' => $this->_isoCurrencies,
             'subUnits' => $this->subunits(),
-            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
+            'readOnly' => $readOnly,
         ]);
     }
 
@@ -400,13 +413,5 @@ class Money extends Field implements InlineEditableFieldInterface, SortableField
             'type' => MoneyType::getType(),
             'description' => $this->instructions,
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
     }
 }

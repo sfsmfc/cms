@@ -246,8 +246,19 @@ class Table extends Field
      */
     public function getSettingsHtml(): ?string
     {
-        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
+        return $this->settingsHtml(false);
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         $typeOptions = [
             'checkbox' => Craft::t('app', 'Checkbox'),
             'color' => Craft::t('app', 'Color'),
@@ -748,13 +759,5 @@ class Table extends Field
             'addRowLabel' => Craft::t('site', $this->addRowLabel),
             'describedBy' => $this->describedBy,
         ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
     }
 }

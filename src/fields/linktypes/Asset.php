@@ -59,8 +59,6 @@ class Asset extends BaseElementLinkType
 
     public function getSettingsHtml(): ?string
     {
-        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
-
         return
             parent::getSettingsHtml() .
             Cp::checkboxSelectFieldHtml([
@@ -74,21 +72,18 @@ class Asset extends BaseElementLinkType
                     ->all(),
                 'values' => $this->allowedKinds ?? '*',
                 'showAllOption' => true,
-                'disabled' => $readOnly,
             ]) .
             Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Show unpermitted volumes'),
                 'instructions' => Craft::t('app', 'Whether to show volumes that the user doesn’t have permission to view.'),
                 'name' => 'showUnpermittedVolumes',
                 'on' => $this->showUnpermittedVolumes,
-                'disabled' => $readOnly,
             ]) .
             Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Show unpermitted files'),
                 'instructions' => Craft::t('app', 'Whether to show files that the user doesn’t have permission to view, per the “View files uploaded by other users” permission.'),
                 'name' => 'showUnpermittedFiles',
                 'on' => $this->showUnpermittedFiles,
-                'disabled' => $readOnly,
             ]);
     }
 

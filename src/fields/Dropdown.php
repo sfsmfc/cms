@@ -158,12 +158,4 @@ class Dropdown extends BaseOptionsField implements SortableFieldInterface, Inlin
 
         return in_array($option['value'], $selectedValues, true);
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
-    }
 }

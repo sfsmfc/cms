@@ -2,9 +2,7 @@
 
 {% extends "_layouts/cp" %}
 {% set title = "Plugins"|t('app') %}
-{% if readOnly is not defined %}
-    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
+{% set readOnly = not craft.app.config.general.allowAdminChanges %}
 
 {% do view.registerAssetBundle("craft\\web\\assets\\plugins\\PluginsAsset") %}
 
@@ -163,7 +161,7 @@
                             }) }}
                           </li>
                         {% endif %}
-                        {% if config.hasCpSettings and not readOnly %}
+                        {% if config.hasCpSettings and (not readOnly or config.hasReadOnlyCpSettings) %}
                           <li class="link-settings">
                             {{ tag('a', {
                               href: url('settings/plugins/'~config.moduleId),

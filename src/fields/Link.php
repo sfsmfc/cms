@@ -332,8 +332,19 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
      */
     public function getSettingsHtml(): ?string
     {
-        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
+        return $this->settingsHtml(false);
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         // Sort types by the order from the config and if anything remains by the label, with URL at the top
         // get only the selected types
         /** @var Collection<string,class-string<BaseLinkType>> $selectedTypes */
@@ -902,13 +913,5 @@ JS;
             $targetIds[] = $element->id;
         }
         return $targetIds;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
     }
 }

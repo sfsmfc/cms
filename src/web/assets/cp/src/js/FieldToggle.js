@@ -242,12 +242,6 @@ Craft.FieldToggle = Garnish.Base.extend({
 
       // Trigger a resize event in case there are any grids in the target that need to initialize
       Garnish.$win.trigger('resize');
-
-      if ($target.parents('.disabled-settings.disabled').length > 0) {
-        $target.find('.input *:focusable').each((key, element) => {
-          $(element).attr('disabled', '');
-        });
-      }
     }
   },
 

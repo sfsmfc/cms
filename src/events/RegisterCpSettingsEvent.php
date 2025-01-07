@@ -18,13 +18,6 @@ use craft\base\Event;
 class RegisterCpSettingsEvent extends Event
 {
     /**
-     * @var bool
-     * Whether the settings adjusted via this event are ready to be displayed when allowAdminChanges is disabled.
-     * @since 5.6.0
-     */
-    public bool $readOnlyModeReady = false;
-
-    /**
      * @var array The registered control panel settings
      */
     public array $settings = [];

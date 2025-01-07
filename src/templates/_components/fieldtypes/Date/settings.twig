@@ -1,10 +1,6 @@
 {% import "_includes/forms" as forms %}
 
 {% set targetPrefix = "datetime#{random()}-" %}
-{% if readOnly is not defined %}
-    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
-
 {{ forms.radioGroupField({
     id: 'dateTime',
     name: 'dateTime',

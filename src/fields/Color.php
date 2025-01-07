@@ -165,11 +165,24 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
         );
     }
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     */
     public function getSettingsHtml(): ?string
     {
-        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
+        return $this->settingsHtml(false);
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         return
             Cp::editableTableFieldHtml([
                 'label' => Craft::t('app', 'Palette'),
@@ -452,13 +465,5 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
         }
 
         return $this->getPreviewHtml($value, $element ?? new Entry());
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
     }
 }

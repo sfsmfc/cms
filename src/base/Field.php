@@ -743,11 +743,11 @@ JS, [
     {
         // Just return the input HTML with disabled inputs by default
         Craft::$app->getView()->startJsBuffer();
-        $inputHtml = $this->getInputHtml($value, $element);
-        $inputHtml = preg_replace('/<(?:input|textarea|select)\s[^>]*/i', '$0 disabled', $inputHtml);
-        Craft::$app->getView()->clearJsBuffer();
-
-        return $inputHtml;
+        try {
+            return Html::disableInputs($this->getInputHtml($value, $element));
+        } finally {
+            Craft::$app->getView()->clearJsBuffer();
+        }
     }
 
     /**
@@ -1287,16 +1287,5 @@ JS, [
         }
 
         return true;
-    }
-
-    /**
-     * Returns whether the field's settings are ready to show its fields in a disabled mode.
-     *
-     * @return bool
-     * @since 5.6.0
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return false;
     }
 }

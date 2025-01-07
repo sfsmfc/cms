@@ -49,7 +49,6 @@
         on: field.restrictLocation,
         toggle: 'restricted-location-settings',
         reverseToggle: 'unrestricted-location-settings',
-        disabled: readOnly,
     }) }}
 
     {% tag('div') with {
@@ -66,7 +65,6 @@
             sourceValue: field.restrictedLocationSource,
             subpathValue: field.restrictedLocationSubpath,
             errors: field.getErrors('restrictedLocationSubpath'),
-            disabled: readOnly,
         }) }}
 
         {{ forms.lightswitchField({
@@ -74,7 +72,6 @@
             name: 'allowSubfolders',
             on: field.allowSubfolders,
             toggle: 'allow-subfolders-settings',
-            disabled: readOnly,
         }) }}
 
         {% tag('div') with {
@@ -89,7 +86,6 @@
                 instructions: 'Where assets should be stored (relative to **Asset Location**) when they are uploaded directly to the field.'|t('app'),
                 tip: dynamicPathTip,
                 placeholder: 'path/to/subfolder'|t('app'),
-                disabled: readOnly,
             }) }}
         {% endtag %}
     {% endtag %}
@@ -110,7 +106,6 @@
             sourceValue: field.defaultUploadLocationSource,
             subpathValue: field.defaultUploadLocationSubpath,
             errors: field.getErrors('defaultUploadLocationSubpath'),
-            disabled: readOnly,
         }) }}
     {% endtag %}
 
@@ -124,7 +119,6 @@
         id: 'showUnpermittedVolumes',
         name: 'showUnpermittedVolumes',
         on: field.showUnpermittedVolumes,
-        disabled: readOnly,
     }) }}
 
     {{ forms.lightswitchField({
@@ -133,7 +127,6 @@
         id: 'showUnpermittedFiles',
         name: 'showUnpermittedFiles',
         on: field.showUnpermittedFiles,
-        disabled: readOnly,
     }) }}
 
     {{ forms.lightswitchField({
@@ -144,7 +137,6 @@
         value: 1,
         on: field.restrictFiles,
         toggle: 'restrict-allowed-types',
-        disabled: readOnly,
     }) }}
 
     <fieldset id="restrict-allowed-types"{% if not field.restrictFiles %} class="hidden indent"{% endif %} data-error-key="allowedKinds">
@@ -155,7 +147,6 @@
                 name: 'allowedKinds[]',
                 value: option.value,
                 checked: (option.value in field.allowedKinds),
-                disabled: readOnly,
             }) }}
         {% endfor %}
         {{ forms.errorList(field.getErrors('allowedKinds')) }}
@@ -167,7 +158,6 @@
         id: 'allow-uploads',
         name: 'allowUploads',
         on: field.allowUploads,
-        disabled: readOnly,
     }) }}
 
     {{ block('limitFields') }}
@@ -191,7 +181,6 @@
         value: field.previewMode,
         errors: field.getErrors('previewMode'),
         data: {'error-key': 'previewMode'},
-        disabled: readOnly,
     }) }}
 
     {{ block('advancedSettings') }}

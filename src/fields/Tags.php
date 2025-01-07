@@ -211,20 +211,4 @@ class Tags extends BaseRelationField
 
         return $this->_tagGroupUid ?: null;
     }
-
-    /**
-     * @inheritdoc
-     */
-    protected function settingsTemplateVariables(): array
-    {
-        return parent::settingsTemplateVariables() + ['readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
-    }
 }

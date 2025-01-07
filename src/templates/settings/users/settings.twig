@@ -2,9 +2,7 @@
 
 {% extends "settings/users/_layout" %}
 {% set selectedNavItem = 'settings' %}
-{% if readOnly is not defined %}
-  {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
+{% set readOnly = not craft.app.config.general.allowAdminChanges %}
 {% set fullPageForm = not readOnly %}
 
 {% import "_includes/forms" as forms %}

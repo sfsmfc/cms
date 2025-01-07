@@ -53,20 +53,16 @@ class Url extends BaseTextLinkType
 
     public function getSettingsHtml(): ?string
     {
-        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
-
         return
             Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Allow root-relative URLs'),
                 'name' => 'allowRootRelativeUrls',
                 'on' => $this->allowRootRelativeUrls,
-                'disabled' => $readOnly,
             ]) .
             Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Allow anchors'),
                 'name' => 'allowAnchors',
                 'on' => $this->allowAnchors,
-                'disabled' => $readOnly,
             ]);
     }
 

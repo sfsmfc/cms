@@ -3,10 +3,6 @@
 {{ columnsField|raw }}
 {{ defaultsField|raw }}
 
-{% if readOnly is not defined %}
-    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
-
 {{ forms.lightswitchField({
     label: 'Static Rows'|t('app'),
     instructions: 'Whether the table rows should be restricted to those defined by the “Default Values” setting.'|t('app'),

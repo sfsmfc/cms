@@ -4,9 +4,7 @@
 
 {% set title = 'Email Settings'|t('app') %}
 
-{% if readOnly is not defined %}
-    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
+{% set readOnly = not craft.app.config.general.allowAdminChanges %}
 
 {% set fullPageForm = not readOnly %}
 
@@ -181,20 +179,17 @@
 
     {% for _adapter in allTransportAdapters %}
         {% set isCurrent = (className(_adapter) == className(adapter)) %}
+        {% set a = isCurrent ? adapter : _adapter %}
         {% set classes = [] %}
         {% if not isCurrent %}
             {% set classes = classes|merge(['hidden']) %}
         {% endif %}
 
-        {# Craft's transport adapters are set to show disabled fields when admin changes are not allowed,
-           but we need to add a 'disabled' class here for external adapters, so that their fields are not accidentally editable #}
-        {% if readOnly and not _adapter.readOnlySettingsReady() %}
-            {% set classes = classes|merge(['disabled-settings', 'disabled']) %}
-        {% endif %}
-
         <div id="{{ className(_adapter)|id }}" {% if classes|length %}class="{{ classes|join(' ') }}"{% endif %}>
             {% namespace 'transportTypes['~className(_adapter)|id~']' %}
-                {{ (isCurrent ? adapter : _adapter).getSettingsHtml()|raw }}
+                {% autoescape false %}
+                    {{ readOnly ? a.getReadOnlySettingsHtml() : a.getSettingsHtml() }}
+                {% endautoescape %}
             {% endnamespace %}
         </div>
     {% endfor %}

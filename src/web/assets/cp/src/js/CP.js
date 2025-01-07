@@ -380,22 +380,6 @@ Craft.CP = Garnish.Base.extend(
       this.on('notificationClose', () => {
         this.updateNotificationHeadingDisplay();
       });
-
-      // disable fs/email/field settings when plugin doesn't set readOnlySettingsReady to true
-      Garnish.$doc.ready(() => {
-        this.disableSettings();
-      });
-    },
-
-    // disable fs/email/field settings when plugin doesn't set readOnlySettingsReady to true
-    disableSettings: function () {
-      if ($('.disabled-settings.disabled').length > 0) {
-        $('.disabled-settings.disabled')
-          .find('.input *:focusable')
-          .each((key, element) => {
-            $(element).attr('disabled', '');
-          });
-      }
     },
 
     get $contentHeader() {

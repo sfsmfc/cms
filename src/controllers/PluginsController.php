@@ -110,8 +110,12 @@ class PluginsController extends Controller
             throw new NotFoundHttpException('Plugin not found');
         }
 
-        if (!Craft::$app->getConfig()->getGeneral()->allowAdminChanges && !$plugin->canViewReadOnlySettings()) {
-            throw new ForbiddenHttpException('Administrative changes are disallowed in this environment.');
+        // Read-only?
+        if (!Craft::$app->getConfig()->getGeneral()->allowAdminChanges) {
+            if (!$plugin->hasReadOnlyCpSettings) {
+                throw new ForbiddenHttpException('Administrative changes are disallowed in this environment.');
+            }
+            return $plugin->getReadOnlySettingsResponse();
         }
 
         return $plugin->getSettingsResponse();

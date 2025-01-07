@@ -81,6 +81,19 @@ class Email extends Field implements InlineEditableFieldInterface, MergeableFiel
      */
     public function getSettingsHtml(): ?string
     {
+        return $this->settingsHtml(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         return Cp::textFieldHtml([
             'label' => Craft::t('app', 'Placeholder Text'),
             'instructions' => Craft::t('app', 'The text that will be shown if the field doesn’t have a value.'),
@@ -88,7 +101,7 @@ class Email extends Field implements InlineEditableFieldInterface, MergeableFiel
             'name' => 'placeholder',
             'value' => $this->placeholder,
             'errors' => $this->getErrors('placeholder'),
-            'disabled' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
+            'disabled' => $readOnly,
         ]);
     }
 
@@ -165,13 +178,5 @@ class Email extends Field implements InlineEditableFieldInterface, MergeableFiel
         }
 
         return $this->getPreviewHtml($value, $element ?? new Entry());
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
     }
 }

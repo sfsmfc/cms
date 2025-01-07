@@ -1,5 +1,7 @@
 {% import "_includes/forms" as forms %}
 
+{% set readOnly = readOnly ?? false %}
+
 {{ forms.autosuggestField({
     label: "Username"|t('app'),
     id: 'username',
@@ -7,7 +9,7 @@
     suggestEnvVars: true,
     value: adapter.username,
     errors: adapter.getErrors('username'),
-    disabled: disabled,
+    disabled: readOnly,
 }) }}
 
 {{ forms.autosuggestField({
@@ -17,5 +19,5 @@
     suggestEnvVars: true,
     value: adapter.password,
     errors: adapter.getErrors('password'),
-    disabled: disabled,
+    disabled: readOnly,
 }) }}

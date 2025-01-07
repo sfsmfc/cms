@@ -229,8 +229,6 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
      */
     public function getSettingsHtml(): ?string
     {
-        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
-
         if (empty($this->options)) {
             // Give it a default row
             $this->options = [['label' => '', 'value' => '']];
@@ -284,7 +282,6 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
             'rows' => $rows,
             'errors' => $this->getErrors('options'),
             'data' => ['error-key' => 'options'],
-            'static' => $readOnly,
         ]);
 
         if (static::$allowCustomOptions) {
@@ -293,7 +290,6 @@ abstract class BaseOptionsField extends Field implements PreviewableFieldInterfa
                 'id' => 'custom-options',
                 'name' => 'customOptions',
                 'on' => $this->customOptions,
-                'disabled' => $readOnly,
             ]);
         }
 

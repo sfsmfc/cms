@@ -126,6 +126,15 @@ interface PluginInterface
     public function getSettingsResponse(): mixed;
 
     /**
+     * Returns a read-only version of the settings page response.
+     *
+     * This method is called when admin changes are disallowed, if [[$hasReadOnlyCpSettings]] is `true`.
+     *
+     * @return mixed The result that should be returned from [[\craft\controllers\PluginsController::actionEditPluginSettings()]]
+     */
+    public function getReadOnlySettingsResponse(): mixed;
+
+    /**
      * Returns the control panel nav item definition for this plugin, if it has a section in the control panel.
      *
      * The returned array should contain the following keys:
@@ -185,12 +194,4 @@ interface PluginInterface
      * @since 3.0.16
      */
     public function afterSaveSettings(): void;
-
-    /**
-     * Returns whether plugin is prepared to view its settings when `allowAdminChanges` is disabled.
-     *
-     * @return bool
-     * @since 5.6.0
-     */
-    public function canViewReadOnlySettings(): bool;
 }

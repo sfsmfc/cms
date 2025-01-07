@@ -1,10 +1,6 @@
 {% import "_includes/forms" as forms %}
 
 {% set decimals = not field.getErrors('decimals') ? field.decimals : null %}
-{% if readOnly is not defined %}
-    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
-
 {% macro numberField(config, decimals) %}
     {% from '_includes/forms' import textField %}
     {# Only format the value if it isn’t going to be misrepresented #}

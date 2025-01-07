@@ -1,7 +1,5 @@
 {% import '_includes/forms.twig' as forms %}
-{% if readOnly is not defined %}
-    {% set readOnly = not craft.app.config.general.allowAdminChanges %}
-{% endif %}
+{% set readOnly = not craft.app.config.general.allowAdminChanges %}
 
 {% if not isNewVolume %}{{ hiddenInput('volumeId', volume.id) }}{% endif %}
 

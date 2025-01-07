@@ -301,14 +301,9 @@ JS, [$view->namespaceInputId($this->id)]);
             $html .= Html::hiddenInput('class', get_class($this));
             $html .= Html::hiddenInput('config', Json::encode($this->getBuilderConfig()));
 
-            $request = Craft::$app->getRequest();
-            $disabled = $request->isCpRequest &&
-                $request->segments[0] == 'settings' &&
-                !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
-
             foreach ($this->getConditionRules() as $rule) {
                 try {
-                    $allRulesHtml .= $view->namespaceInputs(function() use ($rule, $ruleNum, $selectableRules, $disabled) {
+                    $allRulesHtml .= $view->namespaceInputs(function() use ($rule, $ruleNum, $selectableRules) {
                         $ruleHtml =
                             Html::tag('legend', Craft::t('app', 'Condition {num, number}', [
                                 'num' => $ruleNum,
@@ -370,7 +365,6 @@ JS, [$view->namespaceInputId($this->id)]);
                         return Html::tag('fieldset', $ruleHtml, [
                             'id' => 'condition-rule',
                             'class' => ['condition-rule', 'flex', 'flex-start', 'draggable'],
-                            'disabled' => $disabled,
                         ]);
                     }, 'conditionRules[' . $ruleNum . ']');
                 } catch (InvalidConfigException) {
@@ -412,7 +406,6 @@ JS, [$view->namespaceInputId($this->id)]);
                         'label' => $this->addRuleLabel,
                     ],
                     'autofocus' => $autofocusAddButton,
-                    'disabled' => $disabled,
                 ]) .
                 Html::tag('div', '', [
                     'id' => 'spinner',

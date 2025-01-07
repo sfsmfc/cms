@@ -91,7 +91,6 @@ abstract class BaseElementLinkType extends BaseLinkType
             'options' => $sources->all(),
             'values' => $this->sources ?? '*',
             'showAllOption' => true,
-            'disabled' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 

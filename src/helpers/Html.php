@@ -90,6 +90,22 @@ class Html extends \yii\helpers\Html
     }
 
     /**
+     * Disables any form inputs in the given HTML.
+     *
+     * @param string|null $html
+     * @return string|null
+     * @since 5.6.0
+     */
+    public static function disableInputs(?string $html): ?string
+    {
+        if ($html === null) {
+            return null;
+        }
+
+        return preg_replace('/<(?:input|textarea|select)\s[^>]*/i', '$0 disabled', $html);
+    }
+
+    /**
      * Generates a hidden CSRF input tag.
      *
      * @param array $options The tag options in terms of name-value pairs. These will be rendered as

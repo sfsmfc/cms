@@ -147,6 +147,14 @@ class Cp extends Component
     public const EVENT_REGISTER_CP_SETTINGS = 'registerCpSettings';
 
     /**
+     * @event RegisterCpSettingsEvent The event that is triggered when registering links that should render on the
+     * Settings page in the control panel, when admin changes are disallowed.
+     * @see EVENT_REGISTER_CP_SETTINGS
+     * @since 5.6.0
+     */
+    public const EVENT_REGISTER_READ_ONLY_CP_SETTINGS = 'registerReadOnlyCpSettings';
+
+    /**
      * Returns the site the control panel is currently working with, via a `site` query string param if sent.
      *
      * @return Site|null The site, or `null` if the user doesn’t have permission to edit any sites.
@@ -397,7 +405,7 @@ class Cp extends Component
      */
     public function settings(): array
     {
-        $allowAdminChanges = Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
+        $readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
         $settings = [];
 
         $label = Craft::t('app', 'System');
@@ -480,7 +488,7 @@ class Cp extends Component
         $pluginsService = Craft::$app->getPlugins();
 
         foreach ($pluginsService->getAllPlugins() as $plugin) {
-            if ($plugin->hasCpSettings && ($allowAdminChanges || $plugin->canViewReadOnlySettings())) {
+            if ($plugin->hasCpSettings && (!$readOnly || $plugin->hasReadOnlyCpSettings)) {
                 $settings[$label][$plugin->id] = [
                     'url' => 'settings/plugins/' . $plugin->id,
                     'icon' => $pluginsService->getPluginIconSvg($plugin->id),
@@ -490,12 +498,11 @@ class Cp extends Component
         }
 
         // Fire a 'registerCpSettings' event
-        if ($this->hasEventHandlers(self::EVENT_REGISTER_CP_SETTINGS)) {
+        $eventName = $readOnly ? self::EVENT_REGISTER_READ_ONLY_CP_SETTINGS : self::EVENT_REGISTER_CP_SETTINGS;
+        if ($this->hasEventHandlers($eventName)) {
             $event = new RegisterCpSettingsEvent(['settings' => $settings]);
-            $this->trigger(self::EVENT_REGISTER_CP_SETTINGS, $event);
-            if ($allowAdminChanges || $event->readOnlyModeReady) {
-                return $event->settings;
-            }
+            $this->trigger($eventName, $event);
+            return $event->settings;
         }
 
         return $settings;

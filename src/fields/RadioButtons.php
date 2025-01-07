@@ -84,12 +84,4 @@ class RadioButtons extends BaseOptionsField implements SortableFieldInterface
     {
         return Craft::t('app', 'Radio Button Options');
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
-    }
 }

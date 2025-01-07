@@ -183,20 +183,4 @@ class Categories extends BaseRelationField
             'groupId' => $groupIds,
         ];
     }
-
-    /**
-     * @inheritdoc
-     */
-    protected function settingsTemplateVariables(): array
-    {
-        return parent::settingsTemplateVariables() + ['readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function readOnlySettingsReady(): bool
-    {
-        return true;
-    }
 }
