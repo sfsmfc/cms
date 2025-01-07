@@ -152,7 +152,7 @@ class VolumesController extends Controller
                 ])
                 ->editUrl($volume->getCpEditUrl());
         } else {
-            $response->noticeHtml(Cp::allowAdminChangesReadOnlyNotice());
+            $response->noticeHtml(Cp::readOnlyNoticeHtml());
         }
 
         return $response;

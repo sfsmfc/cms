@@ -3456,7 +3456,7 @@ JS;
      * @return string
      * @since 5.6.0
      */
-    public static function allowAdminChangesReadOnlyNotice(): string
+    public static function readOnlyNoticeHtml(): string
     {
         return
             Html::beginTag('div', [

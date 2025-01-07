@@ -12,7 +12,7 @@
 ]) %}
 
 {% if readOnly %}
-    {% set contentNotice = craft.cp.allowAdminChangesReadOnlyNotice() %}
+    {% set contentNotice = readOnlyNotice() %}
 {% endif %}
 
 {% block content %}

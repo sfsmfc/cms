@@ -214,7 +214,7 @@ class FieldsController extends Controller
                 ])
                 ->editUrl($field->id ? "settings/fields/edit/$field->id" : null);
         } else {
-            $response->noticeHtml(Cp::allowAdminChangesReadOnlyNotice());
+            $response->noticeHtml(Cp::readOnlyNoticeHtml());
         }
 
         $response

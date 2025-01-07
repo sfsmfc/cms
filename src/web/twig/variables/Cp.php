@@ -1107,16 +1107,4 @@ class Cp extends Component
     {
         return CpHelper::fieldLayoutDesignerHtml($fieldLayout, $config);
     }
-
-    /**
-     * Returns the notice that should show when admin is viewing the available settings pages
-     * while `allowAdminChanges` is set to false.
-     *
-     * @return string
-     * @since 5.6.0
-     */
-    public function allowAdminChangesReadOnlyNotice(): string
-    {
-        return CpHelper::allowAdminChangesReadOnlyNotice();
-    }
 }

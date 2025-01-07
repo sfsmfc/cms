@@ -16,7 +16,7 @@
 {% set groups = craft.app.userGroups.getAllGroups() %}
 
 {% if readOnly %}
-    {% set contentNotice = craft.cp.allowAdminChangesReadOnlyNotice() %}
+    {% set contentNotice = readOnlyNotice() %}
 {% endif %}
 
 {% block content %}

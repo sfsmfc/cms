@@ -43,7 +43,7 @@
     <div id="routes">
         {% if readOnly %}
             <div id="content-notice">
-                {{ craft.cp.allowAdminChangesReadOnlyNotice()|raw }}
+                {{ readOnlyNotice()|raw }}
             </div>
         {% endif %}
         {% for route in routes %}

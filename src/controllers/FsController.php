@@ -148,7 +148,7 @@ class FsController extends Controller
                     'retainScroll' => true,
                 ]);
         } else {
-            $response->noticeHtml(Cp::allowAdminChangesReadOnlyNotice());
+            $response->noticeHtml(Cp::readOnlyNoticeHtml());
         }
 
         return $response;

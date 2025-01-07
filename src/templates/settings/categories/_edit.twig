@@ -17,7 +17,7 @@
 {% set headlessMode = craft.app.config.general.headlessMode %}
 
 {% if readOnly %}
-    {% set contentNotice = craft.cp.allowAdminChangesReadOnlyNotice() %}
+    {% set contentNotice = readOnlyNotice() %}
 {% endif %}
 
 {% block content %}

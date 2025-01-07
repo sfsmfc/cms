@@ -127,7 +127,7 @@ class EntryTypesController extends Controller
                     'retainScroll' => true,
                 ]);
         } else {
-            $response->noticeHtml(Cp::allowAdminChangesReadOnlyNotice());
+            $response->noticeHtml(Cp::readOnlyNoticeHtml());
         }
 
         if ($entryType->id) {
