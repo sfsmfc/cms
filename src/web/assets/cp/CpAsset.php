@@ -227,6 +227,7 @@ JS;
             'Hide sidebar',
             'Hide',
             'Incorrect password.',
+            'Indexing assets: {progress}',
             'Information',
             'Instance settings',
             'Instructions',

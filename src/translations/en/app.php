@@ -822,6 +822,7 @@ return [
     'Includes suspending, unsuspending, and unlocking user accounts.' => 'Includes suspending, unsuspending, and unlocking user accounts.',
     'Incorrect current password.' => 'Incorrect current password.',
     'Incorrect password.' => 'Incorrect password.',
+    'Indexing assets: {progress}' => 'Indexing assets: {progress}',
     'Indigo' => 'Indigo',
     'Information' => 'Information',
     'Initial Rows' => 'Initial Rows',
