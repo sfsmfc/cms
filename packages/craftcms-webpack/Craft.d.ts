@@ -17,9 +17,14 @@ interface ProgressBarInterface {
   showProgressBar(): void;
 }
 
+interface IntervalManagerInterface {
+  new (settings?: Object): IntervalManagerInterface;
+}
+
 // Declare existing variables, mock the things we'll use.
 declare var Craft: {
   ProgressBar: ProgressBarInterface;
+  IntervalManager: IntervalManagerInterface;
   t(category: string, message: string, params?: object): string;
   sendActionRequest(method: string, action: string, options?: object): Promise;
   initUiElements($container: JQuery): void;

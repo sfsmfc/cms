@@ -60,6 +60,7 @@ export class AssetIndexer {
   private _priorityTasks: ConcurrentTask[] = [];
   private _prunedSessionIds: number[] = [];
   private _currentlyReviewing = false;
+  private intervalManager: IntervalManagerInterface | null = null;
 
   private indexingSessions: {
     [key: number]: AssetIndexingSession;
@@ -77,6 +78,7 @@ export class AssetIndexer {
     this._maxConcurrentConnections = maxConcurrentConnections;
     this.$indexingSessionTable = $indexingSessionTable;
     this.indexingSessions = {};
+
     let reviewSessionId: number = 0;
 
     for (const sessionModel of sessions) {
@@ -107,6 +109,17 @@ export class AssetIndexer {
 
   get currentIndexingSession(): number | null {
     return this._currentIndexingSession;
+  }
+
+  /**
+   * Get progress info for the current session
+   */
+  get currentSessionProgressInfo(): string | null {
+    if (this._currentIndexingSession !== null) {
+      const session = this.indexingSessions[this._currentIndexingSession];
+      return session.getProgressInfo();
+    }
+    return null;
   }
 
   /**
@@ -478,6 +491,13 @@ export class AssetIndexer {
       .then((response) => this.processSuccessResponse(response))
       .catch(({response}) => this.processFailureResponse(response))
       .finally(() => cb());
+
+    // Begin making intermittent announcements
+    this.intervalManager = new Craft.IntervalManager({
+      onInterval: () => {
+        console.log('hello');
+      },
+    });
   }
 
   public performIndexingStep(): void {

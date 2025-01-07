@@ -1,25 +1,21 @@
 /** global: Craft */
 /** global: Garnish */
 /**
- * IntervalAnnouncer class
+ * IntervalManager class
  */
-Craft.IntervalAnnouncer = Garnish.Base.extend(
+Craft.IntervalManager = Garnish.Base.extend(
   {
     _intervalId: null,
-    messageCallback: null,
 
-    init: function (messageCallback, settings) {
-      this.setSettings(settings, Craft.IntervalAnnouncer.defaults);
+    init: function (settings) {
+      this.setSettings(settings, Craft.IntervalManager.defaults);
 
-      this.messageCallback = messageCallback;
       this.start();
     },
 
     start: function () {
-      if (!this.messageCallback) return;
-
       this._intervalId = setInterval(() => {
-        Craft.cp.announce(this.messageCallback);
+        this.settings.onInterval();
       }, this.settings.interval);
     },
 
@@ -31,6 +27,7 @@ Craft.IntervalAnnouncer = Garnish.Base.extend(
   {
     defaults: {
       interval: 100,
+      onInterval: $.noop,
     },
   }
 );

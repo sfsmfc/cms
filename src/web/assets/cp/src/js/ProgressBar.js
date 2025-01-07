@@ -9,10 +9,9 @@ Craft.ProgressBar = Garnish.Base.extend(
     $innerProgressBar: null,
     $progressBarStatus: null,
 
-    intervalAnnouncer: null,
+    intervalManager: null,
 
     _itemCount: 0,
-    _intervalId: null,
     _progressPercentage: null,
     _processedItemCount: 0,
     _displaySteps: false,
@@ -78,18 +77,21 @@ Craft.ProgressBar = Garnish.Base.extend(
     },
 
     startProgressAnnouncements: function () {
-      if (this.intervalAnnouncer) {
-        this.intervalAnnouncer.start();
+      if (this.intervalManager) {
+        this.intervalManager.start();
       } else {
-        this.intervalAnnouncer = new Craft.IntervalAnnouncer(
-          this.progressMessage
-        );
+        console.log('starting interval manager');
+        this.intervalManager = new Craft.IntervalManager({
+          onInterval: () => {
+            console.log(this.progressMessage);
+          },
+        });
       }
     },
 
     stopProgressAnnouncements: function () {
-      if (this.intervalAnnouncer) {
-        this.intervalAnnouncer.stop();
+      if (this.intervalManager) {
+        this.intervalManager.stop();
       }
     },
 
