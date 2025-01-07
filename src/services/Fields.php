@@ -840,10 +840,13 @@ class Fields extends Component
         $layouts = [];
 
         foreach ($this->getAllLayouts() as $layout) {
-            if ($layout->isFieldIncluded(fn(BaseField $layoutField) => (
-                $layoutField instanceof CustomField &&
-                $layoutField->getFieldUid() === $field->uid
-            ))) {
+            if (
+                ComponentHelper::validateComponentClass($layout->type, ElementInterface::class) &&
+                $layout->isFieldIncluded(fn(BaseField $layoutField) => (
+                    $layoutField instanceof CustomField &&
+                    $layoutField->getFieldUid() === $field->uid
+                ))
+            ) {
                 $layouts[] = $layout;
             }
         }
@@ -883,10 +886,7 @@ class Fields extends Component
     {
         if (!isset($this->_layouts)) {
             if (Craft::$app->getIsInstalled()) {
-                $layoutConfigs = $this->_createLayoutQuery()->collect()
-                    ->filter(fn(array $config) => ComponentHelper::validateComponentClass($config['type'], ElementInterface::class))
-                    ->values()
-                    ->all();
+                $layoutConfigs = $this->_createLayoutQuery()->all();
             } else {
                 $layoutConfigs = [];
             }

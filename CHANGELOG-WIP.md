@@ -12,6 +12,7 @@
 - Improved how fields are sized in responsive field layouts. ([#16303](https://github.com/craftcms/cms/pull/16303))
 - Entry indexes now only show table column options and sort options for custom fields associated with the selected sections/entry types within custom entry sources’ conditions.
 - Structure views are now available to element indexes on mobile browsers. ([#16190](https://github.com/craftcms/cms/discussions/16190))
+- Datepickers now include a dropdown menu for selecting the year. ([#16376](https://github.com/craftcms/cms/pull/16376))
 - Heads-up displays now reposition themselves on window scroll.
 
 ### Accessibility
@@ -42,6 +43,7 @@
 - After creating a new field from a field layout designer, the field is now immediately added to the field layout tab. ([#16374](https://github.com/craftcms/cms/pull/16374))
 - Templates rendered for “Template” field layout UI elements can now call control panel template functions like `elementChip()` and `elementCard()`. ([#16267](https://github.com/craftcms/cms/issues/16267))
 - “Template” field layout UI elements now show suggestions for the Template input.
+- Added the `utils/delete-empty-volume-folders` command. ([#16388](https://github.com/craftcms/cms/issues/16388))
 - Improved the error output for nested elements when they can’t be resaved via `resave` commands.
 - `resave` commands’ `--drafts`, `--provisional-drafts`, and `--revisions` options can now be set to `null`, causing elements to be resaved regardless of whether they’re drafts/provisional drafts/revisions.
 - Added the `systemTemplateCss` config setting. ([#16344](https://github.com/craftcms/cms/pull/16344))
@@ -60,6 +62,7 @@
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
 - It’s now possible to reference custom field handles in element queries’ `where` params. ([#16318](https://github.com/craftcms/cms/pull/16318))
 - Number fields’ scalar values now return an integer if Decimals is set to `0`, and a number formatted with the correct decimal points when using MySQL. ([16369](https://github.com/craftcms/cms/issues/16369))
+- Added support for specifying the current site via an `X-Craft-Site` header set to a site ID or handle. ([#16367](https://github.com/craftcms/cms/pull/16367))
 - Deprecated the `ucfirst` Twig filter. `capitalize` should be used instead.
 
 ### Extensibility
@@ -92,6 +95,11 @@
 - Added `craft\gql\types\LinkData`.
 - Added `craft\gql\types\generators\LinkDataType`.
 - Added `craft\helpers\Cp::colorHtml()`.
+- Added `craft\helpers\Image::EXIF_IFD0_ROTATE_0_MIRRORED`.
+- Added `craft\helpers\Image::EXIF_IFD0_ROTATE_0`.
+- Added `craft\helpers\Image::EXIF_IFD0_ROTATE_180_MIRRORED`.
+- Added `craft\helpers\Image::EXIF_IFD0_ROTATE_270_MIRRORED`.
+- Added `craft\helpers\Image::EXIF_IFD0_ROTATE_90_MIRRORED`.
 - Added `craft\mail\Mailer::$siteId`.
 - Added `craft\mail\Mailer::$siteOverrides`.
 - Added `craft\models\MailSettings::$siteOverrides`.
@@ -129,7 +137,9 @@
 - Action requests (such as `actions/app/health-check`) now send no-cache headers by default. ([#16364](https://github.com/craftcms/cms/pull/16364))
 - Reduced the size of GraphQL introspection schemas. ([#16326](https://github.com/craftcms/cms/pull/16326))
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
+- Image cleansing now preserves the original image quality, if known.
 - Fixed a bug where `craft\config\GeneralConfig::safeMode()` set Safe Mode to `false` by default.
+- Fixed a bug where Craft wasn’t auto-rotating or flipping images uploaded with a mirrored EXIF orientation.
 - Fixed a bug where embedded element index filter HUDs were including condition rules for fields that weren’t applicable to the nested elements. ([#16289](https://github.com/craftcms/cms/discussions/16289))
 - Fixed a bug where element queries were ignoring params for custom fields that weren’t involved with the query, rather than returning zero results.
 - Fixed a bug where opening heads-up displays could cause the page to scroll to the focused element. 

@@ -1,6 +1,17 @@
 # Release Notes for Craft CMS 5
 
-## Unreleased
+## 5.5.9 - 2025-01-06
+
+- Fixed a bug where custom fields could cause validation errors when running the `users/create` command.
+- Fixed a bug where deleting a volume folder wasn’t fully deleting asset data in descendant folders.
+- Fixed a bug where `ancestors`, `children`, `descendants`, and `parent` eager-loading wasn’t working on some environments. ([#16381](https://github.com/craftcms/cms/issues/16381), [#16382](https://github.com/craftcms/cms/issues/16382))
+- Fixed a JavaScript error that could occur if there was a problem applying changes to field layout elements. ([#16380](https://github.com/craftcms/cms/issues/16380))
+- Fixed a bug where field layout designers were validating field names, handles, and instructions, even if they weren’t overridden within the field instance. ([#16380](https://github.com/craftcms/cms/issues/16380))
+- Fixed an error that occurred when upgrading to Craft 5. ([#16383](https://github.com/craftcms/cms/issues/16383))
+- Fixed a bug where “Full Name” could appear twice in the user card attributes list. ([#16358](https://github.com/craftcms/cms/issues/16358))
+- Fixed a bug where multi-site element queries could return an incorrect number of results if the `search` param was used in conjunction with `offset` or `limit`. ([#16183](https://github.com/craftcms/cms/issues/16183))
+
+## 5.5.8 - 2025-01-02
 
 - Fixed a bug where custom fields were getting included in rendered field layout forms, even if their `getInputHtml()` method returned an empty string.
 - Fixed a bug where the password input on the Set Password page wasn’t including the “Show” button.

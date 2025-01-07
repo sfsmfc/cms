@@ -62,6 +62,9 @@
   --light-focus-hsl: #{color.hue(mixins.$lightFocusColor)},
     #{color.saturation(mixins.$lightFocusColor)},
     #{color.lightness(mixins.$lightFocusColor)};
+  --dark-focus-hsl: #{color.hue(mixins.$darkFocusColor)},
+    #{color.saturation(mixins.$darkFocusColor)},
+    #{color.lightness(mixins.$darkFocusColor)};
   --focus-ring: 0 0 0 2px var(--focus-ring-color),
     0 0 5px 1px
       hsl(from var(--focus-ring-color) h s l / var(--focus-ring-alpha));
@@ -2402,16 +2405,15 @@ ul.icons {
   padding-block: 0 !important;
   padding-inline: var(--s) !important;
   font-size: 12px;
-  line-height: 22px;
-  height: 22px;
-  min-height: 22px;
+  line-height: calc(22rem / 16);
+  height: calc(22rem / 16);
 }
 
 .btngroup.small,
 .btngroup.small input.btn,
 .btn.small,
 .btn.small + .spinner {
-  min-height: 22px;
+  height: calc(22rem / 16);
 }
 
 /* big buttons */
@@ -2433,14 +2435,14 @@ ul.icons {
 .btngroup.big input.btn,
 .btn.big,
 .btn.big + .spinner {
-  min-height: 36px;
+  min-height: calc(36rem / 16);
 }
 
 /* huge buttons */
 .btn.huge {
   padding: var(--l);
-  line-height: 48px;
-  height: 48px;
+  line-height: calc(48rem / 16);
+  height: calc(48rem / 16);
 }
 
 /* special buttons */
@@ -5446,6 +5448,7 @@ table.data tbody tr:not(.disabled).active-drop-target {
   .slideout &,
   #content & {
     border: 1px solid var(--hairline-color);
+    background: var(--secondary-pane-bg);
     box-shadow: none;
   }
 
@@ -7947,8 +7950,8 @@ fieldset {
 
 .expand-status-btn {
   margin-inline-start: 5px;
-  width: 30px;
-  min-height: 17px;
+  width: calc(30rem / 16);
+  height: calc(17rem / 16);
   padding: 0;
   line-height: 16px;
   border-radius: var(--small-border-radius);
@@ -8854,6 +8857,14 @@ body {
 
 .ui-datepicker-title {
   text-align: center;
+
+  select.ui-datepicker-year {
+    background-color: hsl(212deg 25% 90%);
+    padding-block: 0;
+    padding-inline: var(--xs);
+    border-radius: var(--large-border-radius);
+    height: calc(22rem / 16);
+  }
 }
 
 .ui-datepicker-calendar th,

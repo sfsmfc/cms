@@ -1232,18 +1232,19 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
       );
       data = response.data;
     } catch (e) {
-      let errors = e?.response?.data?.errors;
-
-      if (errors) {
-        Object.entries(errors).forEach(([name, fieldErrors]) => {
-          const $field = this.slideout.$container.find(
-            `[data-error-key="${name}"]`
-          );
-          if ($field) {
-            Craft.ui.addErrorsToField($field, fieldErrors);
-            this.fieldsWithErrors.push($field);
-          }
-        });
+      if (withSettings) {
+        let errors = e?.response?.data?.errors;
+        if (errors) {
+          Object.entries(errors).forEach(([name, fieldErrors]) => {
+            const $field = this.slideout.$container.find(
+              `[data-error-key="${name}"]`
+            );
+            if ($field) {
+              Craft.ui.addErrorsToField($field, fieldErrors);
+              this.fieldsWithErrors.push($field);
+            }
+          });
+        }
       }
 
       Craft.cp.displayError(e?.response?.data?.message);
