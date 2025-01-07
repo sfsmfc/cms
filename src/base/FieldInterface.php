@@ -291,7 +291,7 @@ interface FieldInterface extends SavableComponentInterface
     /**
      * Returns a read-only version of the field’s input HTML.
      *
-     * This function is called to output field values when viewing element revisions.
+     * This method is called to output field values when viewing element revisions.
      *
      * @param mixed $value The field’s value
      * @param ElementInterface $element The element the field is associated with
