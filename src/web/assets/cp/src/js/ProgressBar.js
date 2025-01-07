@@ -80,10 +80,9 @@ Craft.ProgressBar = Garnish.Base.extend(
       if (this.intervalManager) {
         this.intervalManager.start();
       } else {
-        console.log('starting interval manager');
         this.intervalManager = new Craft.IntervalManager({
           onInterval: () => {
-            console.log(this.progressMessage);
+            Craft.cp.announce(this.getProgressMessage.bind(this));
           },
         });
       }
@@ -95,7 +94,7 @@ Craft.ProgressBar = Garnish.Base.extend(
       }
     },
 
-    get progressMessage() {
+    getProgressMessage() {
       if (this._progressPercentage !== 100) {
         return Craft.t('app', '{num} percent complete', {
           num: this._progressPercentage,
