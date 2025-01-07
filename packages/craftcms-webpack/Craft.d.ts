@@ -19,6 +19,10 @@ interface ProgressBarInterface {
 
 interface IntervalManagerInterface {
   new (settings?: Object): IntervalManagerInterface;
+
+  stop(): void;
+
+  start(): void;
 }
 
 // Declare existing variables, mock the things we'll use.

@@ -60,7 +60,7 @@ export class AssetIndexer {
   private _priorityTasks: ConcurrentTask[] = [];
   private _prunedSessionIds: number[] = [];
   private _currentlyReviewing = false;
-  private intervalManager: IntervalManagerInterface | null = null;
+  private intervalAnnouncer: IntervalManagerInterface | null = null;
 
   private indexingSessions: {
     [key: number]: AssetIndexingSession;
@@ -103,6 +103,8 @@ export class AssetIndexer {
     }
 
     if (this._currentIndexingSession) {
+      this._createProgressAnnouncer();
+      this._startProgressAnnouncer();
       this.performIndexingStep();
     }
   }
@@ -114,9 +116,9 @@ export class AssetIndexer {
   /**
    * Get progress info for the current session
    */
-  get currentSessionProgressInfo(): string | null {
-    if (this._currentIndexingSession !== null) {
-      const session = this.indexingSessions[this._currentIndexingSession];
+  getCurrentSessionProgressInfo(): string | null {
+    if (this.currentIndexingSession !== null) {
+      const session = this.indexingSessions[this.currentIndexingSession];
       return session.getProgressInfo();
     }
     return null;
@@ -273,6 +275,8 @@ export class AssetIndexer {
     if (this._currentlyReviewing) {
       return;
     }
+
+    this._stopProgressAnnouncer();
 
     this._currentlyReviewing = true;
     this.pruneWaitingTasks(session.getSessionId());
@@ -493,11 +497,32 @@ export class AssetIndexer {
       .finally(() => cb());
 
     // Begin making intermittent announcements
-    this.intervalManager = new Craft.IntervalManager({
+    if (!this.intervalAnnouncer) {
+      this._createProgressAnnouncer();
+      this._startProgressAnnouncer();
+    }
+  }
+
+  private _createProgressAnnouncer(): void {
+    this.intervalAnnouncer = new Craft.IntervalManager({
       onInterval: () => {
-        console.log('hello');
+        if (this.currentIndexingSession !== null) {
+          Craft.cp.announce(
+            Craft.t('app', 'Indexing assets: {progress}', {
+              progress: this.getCurrentSessionProgressInfo(),
+            })
+          );
+        }
       },
     });
+  }
+
+  private _stopProgressAnnouncer(): void {
+    this.intervalAnnouncer?.stop();
+  }
+
+  private _startProgressAnnouncer(): void {
+    this.intervalAnnouncer?.start();
   }
 
   public performIndexingStep(): void {

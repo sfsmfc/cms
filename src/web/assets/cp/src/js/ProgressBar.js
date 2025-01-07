@@ -33,6 +33,12 @@ Craft.ProgressBar = Garnish.Base.extend(
         '<div class="progressbar-status hidden" />'
       ).insertAfter(this.$progressBar);
 
+      this.intervalManager = new Craft.IntervalManager({
+        onInterval: () => {
+          Craft.cp.announce(this.getProgressMessage.bind(this));
+        },
+      });
+
       this.resetProgressBar();
     },
 
@@ -63,7 +69,7 @@ Craft.ProgressBar = Garnish.Base.extend(
       this.$progressBarStatus.addClass('hidden');
 
       if (this.settings.announceProgress) {
-        this.stopProgressAnnouncements();
+        this.intervalManager.stop();
       }
     },
 
@@ -72,25 +78,7 @@ Craft.ProgressBar = Garnish.Base.extend(
       this.$progressBarStatus.removeClass('hidden');
 
       if (this.settings.announceProgress) {
-        this.startProgressAnnouncements();
-      }
-    },
-
-    startProgressAnnouncements: function () {
-      if (this.intervalManager) {
         this.intervalManager.start();
-      } else {
-        this.intervalManager = new Craft.IntervalManager({
-          onInterval: () => {
-            Craft.cp.announce(this.getProgressMessage.bind(this));
-          },
-        });
-      }
-    },
-
-    stopProgressAnnouncements: function () {
-      if (this.intervalManager) {
-        this.intervalManager.stop();
       }
     },
 

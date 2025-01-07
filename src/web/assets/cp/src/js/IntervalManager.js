@@ -9,8 +9,6 @@ Craft.IntervalManager = Garnish.Base.extend(
 
     init: function (settings) {
       this.setSettings(settings, Craft.IntervalManager.defaults);
-
-      this.start();
     },
 
     start: function () {
@@ -26,7 +24,7 @@ Craft.IntervalManager = Garnish.Base.extend(
   },
   {
     defaults: {
-      interval: 100,
+      interval: 5000,
       onInterval: $.noop,
     },
   }
