@@ -5,7 +5,7 @@
  * @license https://craftcms.github.io/license/
  */
 
-namespace acceptance;
+namespace crafttests\api;
 
 use ApiTester;
 use Codeception\Example;

@@ -16,7 +16,7 @@ modules:
   config:
     \craft\test\Craft:
       configFile: 'tests/_craft/config/test.php'
-      entryUrl: 'http://localhost/index.php'
+      entryUrl: 'https://craft-5-project.ddev.site/index.php'
       projectConfig: {}
       migrations: []
       plugins: []
