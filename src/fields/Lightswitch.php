@@ -116,12 +116,26 @@ class Lightswitch extends Field implements InlineEditableFieldInterface, Sortabl
      */
     public function getSettingsHtml(): ?string
     {
+        return $this->settingsHtml(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         return
             Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Default Value'),
                 'id' => 'default',
                 'name' => 'default',
                 'on' => $this->default,
+                'disabled' => $readOnly,
             ]) .
             Cp::textFieldHtml([
                 'label' => Craft::t('app', 'OFF Label'),
@@ -129,6 +143,7 @@ class Lightswitch extends Field implements InlineEditableFieldInterface, Sortabl
                 'id' => 'off-label',
                 'name' => 'offLabel',
                 'value' => $this->offLabel,
+                'disabled' => $readOnly,
             ]) .
             Cp::textFieldHtml([
                 'label' => Craft::t('app', 'ON Label'),
@@ -136,6 +151,7 @@ class Lightswitch extends Field implements InlineEditableFieldInterface, Sortabl
                 'id' => 'on-label',
                 'name' => 'onLabel',
                 'value' => $this->onLabel,
+                'disabled' => $readOnly,
             ]);
     }
 

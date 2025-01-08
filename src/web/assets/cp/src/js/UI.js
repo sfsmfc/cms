@@ -39,6 +39,11 @@ Craft.ui = {
     if (config.spinner) {
       $btn.append($('<div class="spinner spinner-absolute"/>'));
     }
+
+    if (config.disabled) {
+      $btn.attr('disabled', 'disabled');
+    }
+
     return $btn;
   },
 
@@ -492,6 +497,7 @@ Craft.ui = {
             value: allValue,
             checked: allChecked,
             autofocus: config.autofocus,
+            disabled: config.disabled,
           })
         );
 
@@ -537,7 +543,7 @@ Craft.ui = {
         name: config.name ? Craft.ensureEndsWith(config.name, '[]') : null,
         value: option.value,
         checked: allChecked || values.includes(option.value),
-        disabled: allChecked,
+        disabled: allChecked || config.disabled,
       }).appendTo($option);
     }
 

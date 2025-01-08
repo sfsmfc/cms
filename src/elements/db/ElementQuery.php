@@ -3276,11 +3276,19 @@ class ElementQuery extends Query implements ElementQueryInterface
 
             $this->_searchResults = $searchResults;
 
-            $elementIds = array_map(function(string $key) {
-                [$elementId] = explode('-', $key, 2);
-                return $elementId;
-            }, array_keys($searchResults));
-            $this->subQuery->andWhere(['elements.id' => $elementIds]);
+            $elementIdsBySiteId = [];
+            foreach (array_keys($searchResults) as $key) {
+                [$elementId, $siteId] = explode('-', $key, 2);
+                $elementIdsBySiteId[$siteId][] = $elementId;
+            }
+            $condition = ['or'];
+            foreach ($elementIdsBySiteId as $siteId => $elementIds) {
+                $condition[] = [
+                    'elements_sites.siteId' => $siteId,
+                    'elements.id' => $elementIds,
+                ];
+            }
+            $this->subQuery->andWhere($condition);
         } else {
             // Just filter the main query by the search query
             $searchQuery = $searchService->createDbQuery($this->search, $this);

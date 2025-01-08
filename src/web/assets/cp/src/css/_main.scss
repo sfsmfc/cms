@@ -62,6 +62,9 @@
   --light-focus-hsl: #{color.hue(mixins.$lightFocusColor)},
     #{color.saturation(mixins.$lightFocusColor)},
     #{color.lightness(mixins.$lightFocusColor)};
+  --dark-focus-hsl: #{color.hue(mixins.$darkFocusColor)},
+    #{color.saturation(mixins.$darkFocusColor)},
+    #{color.lightness(mixins.$darkFocusColor)};
   --focus-ring: 0 0 0 2px var(--focus-ring-color),
     0 0 5px 1px
       hsl(from var(--focus-ring-color) h s l / var(--focus-ring-alpha));
@@ -1037,7 +1040,7 @@ button {
   }
 }
 
-.revision-notice {
+.content-notice {
   display: flex;
   align-items: center;
   place-content: stretch center;
@@ -1054,7 +1057,7 @@ button {
     margin: 0;
   }
 
-  .revision-icon {
+  .content-notice-icon {
     position: relative;
     flex-shrink: 0;
     width: 34px;
@@ -2127,9 +2130,13 @@ ul.icons {
 }
 
 .disabled:not(.status, .status-label) {
-  opacity: 0.25;
-  pointer-events: none;
+  opacity: 0.5;
   user-select: none;
+  cursor: not-allowed !important;
+
+  .layoutdesigner {
+    pointer-events: none;
+  }
 }
 
 .noteditable {
@@ -7887,7 +7894,9 @@ fieldset {
     }
 
     input:disabled,
-    textarea:disabled {
+    textarea:disabled,
+    select:disabled,
+    button:disabled {
       cursor: not-allowed;
     }
   }
@@ -8604,7 +8613,7 @@ tr.indexingSession td.progress div.progressContainer div.progressInfo {
 }
 
 .select:not(.selectize) select {
-  &:hover {
+  &:hover:not(:disabled) {
     @include mixins.select-input-focused-styles;
   }
 

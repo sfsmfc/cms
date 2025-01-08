@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Changelog',
     'Changes discarded.' => 'Changes discarded.',
     'Changes saved.' => 'Changes saved.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Changing this may result in data loss.',
     'Channel' => 'Channel',
     'Channels' => 'Channels',

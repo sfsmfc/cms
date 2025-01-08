@@ -353,8 +353,22 @@ class Addresses extends Field implements
      */
     public function getSettingsHtml(): ?string
     {
+        return $this->settingsHtml(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         return Craft::$app->getView()->renderTemplate('_components/fieldtypes/Addresses/settings.twig', [
             'field' => $this,
+            'readOnly' => $readOnly,
         ]);
     }
 

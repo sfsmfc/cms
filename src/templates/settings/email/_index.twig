@@ -1,9 +1,10 @@
-{% requireAdmin %}
+{% requireAdmin false %}
 
 {% extends '_layouts/cp.twig' %}
 
 {% set title = 'Email Settings'|t('app') %}
-{% set fullPageForm = true %}
+{% set readOnly = readOnly ?? false %}
+{% set fullPageForm = not readOnly %}
 
 {% set crumbs = [
     { label: "Settings"|t('app'), url: url('settings') }
@@ -33,6 +34,10 @@
 {% endif %}
 
 
+{% if readOnly %}
+    {% set contentNotice = readOnlyNotice() %}
+{% endif %}
+
 {% block content %}
     {% if customMailerFiles|length %}
         <div class="readable">
@@ -47,8 +52,10 @@
         <hr>
     {% endif %}
 
-    {{ actionInput('system-settings/save-email-settings') }}
-    {{ redirectInput('settings') }}
+    {% if not readOnly %}
+        {{ actionInput('system-settings/save-email-settings') }}
+        {{ redirectInput('settings') }}
+    {% endif %}
 
     {{ forms.autosuggestField({
         first: true,
@@ -60,7 +67,8 @@
         value: settings.fromEmail,
         autofocus: true,
         required: true,
-        errors: (freshSettings ? null : settings.getErrors('fromEmail'))
+        errors: (freshSettings ? null : settings.getErrors('fromEmail')),
+        disabled: readOnly,
     }) }}
 
     {{ forms.autosuggestField({
@@ -71,7 +79,8 @@
         name: 'replyToEmail',
         suggestEnvVars: true,
         value: settings.replyToEmail,
-        errors: (freshSettings ? null : settings.getErrors('replyToEmail'))
+        errors: (freshSettings ? null : settings.getErrors('replyToEmail')),
+        disabled: readOnly,
     }) }}
 
     {{ forms.autosuggestField({
@@ -82,7 +91,8 @@
         suggestEnvVars: true,
         value: settings.fromName,
         required: true,
-        errors: (freshSettings ? null : settings.getErrors('fromName'))
+        errors: (freshSettings ? null : settings.getErrors('fromName')),
+        disabled: readOnly,
     }) }}
 
     {% if CraftEdition >= CraftPro %}
@@ -94,7 +104,8 @@
             suggestTemplates: true,
             suggestEnvVars: true,
             value: settings.template,
-            errors: (freshSettings ? null : settings.getErrors('template'))
+            errors: (freshSettings ? null : settings.getErrors('template')),
+            disabled: readOnly,
         }) }}
     {% endif %}
 
@@ -145,6 +156,7 @@
             allowDelete: false,
             allowReorder: false,
             errors: (freshSettings ? null : settings.getErrors('siteOverrides')|unique),
+            static: readOnly,
         }) }}
     {% endif %}
 
@@ -158,22 +170,33 @@
         options: transportTypeOptions,
         value: className(adapter),
         errors: adapter.getErrors('type') ?? null,
-        toggle: true
+        toggle: true,
+        disabled: readOnly,
     }) }}
 
 
     {% for _adapter in allTransportAdapters %}
         {% set isCurrent = (className(_adapter) == className(adapter)) %}
-        <div id="{{ className(_adapter)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+        {% set a = isCurrent ? adapter : _adapter %}
+        {% set classes = [] %}
+        {% if not isCurrent %}
+            {% set classes = classes|merge(['hidden']) %}
+        {% endif %}
+
+        <div id="{{ className(_adapter)|id }}" {% if classes|length %}class="{{ classes|join(' ') }}"{% endif %}>
             {% namespace 'transportTypes['~className(_adapter)|id~']' %}
-                {{ (isCurrent ? adapter : _adapter).getSettingsHtml()|raw }}
+                {% autoescape false %}
+                    {{ readOnly ? a.getReadOnlySettingsHtml() : a.getSettingsHtml() }}
+                {% endautoescape %}
             {% endnamespace %}
         </div>
     {% endfor %}
 
-    <hr>
+    {% if not readOnly %}
+        <hr>
 
-    <div class="buttons">
-        <button type="button" id="test" class="btn formsubmit" data-action="system-settings/test-email-settings">{{ "Test"|t('app') }}</button>
-    </div>
+        <div class="buttons">
+            <button type="button" id="test" class="btn formsubmit" data-action="system-settings/test-email-settings">{{ "Test"|t('app') }}</button>
+        </div>
+    {% endif %}
 {% endblock %}

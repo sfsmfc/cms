@@ -33,6 +33,7 @@
 - Added the “Palette” setting to Color fields, which replaces “Presets”. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added the “Allow custom colors” setting to Color fields. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added the “Field” entry condition rule, which replaces “Matrix field”, includes a “has a value” operator. ([#16270](https://github.com/craftcms/cms/discussions/16270))
+- It’s now possible to view (but not edit) system and plugin settings on environments where `allowAdminChanges` is disabled. ([#16265](https://github.com/craftcms/cms/pull/16265)) 
 - Section condition rules now have a “has a value” operator. ([#16270](https://github.com/craftcms/cms/discussions/16270))
 - Added “Copy plugin handle” and “Copy package name” options to plugins’ action menus on the Plugins index page. ([#16281](https://github.com/craftcms/cms/discussions/16281))
 - The Updates utility now shows an action menu for each plugin, with “Copy plugin handle” and “Copy package name” options. ([#16281](https://github.com/craftcms/cms/discussions/16281))
@@ -43,6 +44,7 @@
 - After creating a new field from a field layout designer, the field is now immediately added to the field layout tab. ([#16374](https://github.com/craftcms/cms/pull/16374))
 - Templates rendered for “Template” field layout UI elements can now call control panel template functions like `elementChip()` and `elementCard()`. ([#16267](https://github.com/craftcms/cms/issues/16267))
 - “Template” field layout UI elements now show suggestions for the Template input.
+- Added the `utils/delete-empty-volume-folders` command. ([#16388](https://github.com/craftcms/cms/issues/16388))
 - Improved the error output for nested elements when they can’t be resaved via `resave` commands.
 - `resave` commands’ `--drafts`, `--provisional-drafts`, and `--revisions` options can now be set to `null`, causing elements to be resaved regardless of whether they’re drafts/provisional drafts/revisions.
 - Added the `systemTemplateCss` config setting. ([#16344](https://github.com/craftcms/cms/pull/16344))
@@ -59,17 +61,21 @@
 - It’s now possible to set Link field values to arrays with `value` keys set to element instances or IDs. ([#16255](https://github.com/craftcms/cms/pull/16255))
 - The `duration` Twig filter now has a `language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
+- The `{% requireAdmin %}` tag now supports passing a boolean value, which determines whether administrative changes must be allowed (defaults to `true`).
 - It’s now possible to reference custom field handles in element queries’ `where` params. ([#16318](https://github.com/craftcms/cms/pull/16318))
 - Number fields’ scalar values now return an integer if Decimals is set to `0`, and a number formatted with the correct decimal points when using MySQL. ([16369](https://github.com/craftcms/cms/issues/16369))
 - Added support for specifying the current site via an `X-Craft-Site` header set to a site ID or handle. ([#16367](https://github.com/craftcms/cms/pull/16367))
 - Deprecated the `ucfirst` Twig filter. `capitalize` should be used instead.
 
 ### Extensibility
+- Added `craft\base\ConfigurableComponentInterface::getReadOnlySettingsHtml()`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - Added `craft\base\Element::EVENT_DEFINE_ALT_ACTIONS`. ([#16294](https://github.com/craftcms/cms/pull/16294))
 - Added `craft\base\ElementInterface::getAltActions()`. ([#16294](https://github.com/craftcms/cms/pull/16294))
 - Added `craft\base\ElementTrait::$viewMode`. ([#16324](https://github.com/craftcms/cms/pull/16324))
 - Added `craft\base\Field::dbTypeForValueSql()`.
 - Added `craft\base\NestedElementTrait::ownerType()`.
+- Added `craft\base\PluginTrait::$hasReadOnlyCpSettings`. ([#16265](https://github.com/craftcms/cms/pull/16265))
+- Added `craft\base\Plugininterface::getReadOnlySettingsResponse()`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - Added `craft\base\conditions\BaseElementSelectConditionRule::allowMultiple()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::getElementIds()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::setElementIds()`.
@@ -94,11 +100,13 @@
 - Added `craft\gql\types\LinkData`.
 - Added `craft\gql\types\generators\LinkDataType`.
 - Added `craft\helpers\Cp::colorHtml()`.
+- Added `craft\helpers\Cp::readOnlyNoticeHtml()`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_0_MIRRORED`.
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_0`.
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_180_MIRRORED`.
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_270_MIRRORED`.
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_90_MIRRORED`.
+- Added `craft\helpes\Html::disableInputs()`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - Added `craft\mail\Mailer::$siteId`.
 - Added `craft\mail\Mailer::$siteOverrides`.
 - Added `craft\models\MailSettings::$siteOverrides`.
@@ -108,6 +116,7 @@
 - Added `craft\web\User::getImpersonatorId()`.
 - Added `craft\web\User::setImpersonatorId()`.
 - Added `craft\web\View::setTwig()`.
+- Added `craft\web\twig\variables\Cp::EVENT_REGISTER_READ_ONLY_CP_SETTINGS`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - `GuzzleHttp\Client` is now instantiated via `Craft::createObject()`. ([#16366](https://github.com/craftcms/cms/pull/16366))
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
@@ -137,6 +146,8 @@
 - Reduced the size of GraphQL introspection schemas. ([#16326](https://github.com/craftcms/cms/pull/16326))
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
 - Image cleansing now preserves the original image quality, if known.
+- Added the Symfony CssSelector component.
+- Added the Symfony DomCrawler component.
 - Fixed a bug where `craft\config\GeneralConfig::safeMode()` set Safe Mode to `false` by default.
 - Fixed a bug where Craft wasn’t auto-rotating or flipping images uploaded with a mirrored EXIF orientation.
 - Fixed a bug where embedded element index filter HUDs were including condition rules for fields that weren’t applicable to the nested elements. ([#16289](https://github.com/craftcms/cms/discussions/16289))
