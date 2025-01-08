@@ -131,6 +131,7 @@ interface PluginInterface
      * This method is called when admin changes are disallowed, if [[$hasReadOnlyCpSettings]] is `true`.
      *
      * @return mixed The result that should be returned from [[\craft\controllers\PluginsController::actionEditPluginSettings()]]
+     * @since 5.6.0
      */
     public function getReadOnlySettingsResponse(): mixed;
 
