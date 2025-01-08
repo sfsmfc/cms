@@ -36,16 +36,17 @@
 {% set routes = craft.routes.getProjectConfigRoutes() %}
 
 {% block main %}
-    <p id="noroutes"{% if routes %} class="hidden"{% endif %}>
-        {{ "No routes exist yet."|t('app') }}
-    </p>
-
     <div id="routes">
         {% if readOnly %}
             <div id="content-notice">
                 {{ readOnlyNotice()|raw }}
             </div>
         {% endif %}
+
+        <p id="noroutes"{% if routes %} class="hidden"{% endif %}>
+            {{ "No routes exist yet."|t('app') }}
+        </p>
+
         {% for route in routes %}
             <div class="route{{ readOnly ? ' inactive' : '' }}" data-uid="{{ route.uid }}"{% if route.siteUid %} data-site-uid="{{ route.siteUid }}"{% endif %}>
                 <div class="uri-container">
