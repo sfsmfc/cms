@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Değişiklik Günlüğü',
     'Changes discarded.' => 'Değişiklikler iptal edildi.',
     'Changes saved.' => 'Değişiklikler kaydedildi.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Bunu değiştirmek veri kaybına neden olabilir.',
     'Channel' => 'Kanal',
     'Channels' => 'Kanallar',
