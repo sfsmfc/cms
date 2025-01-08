@@ -33,11 +33,13 @@ Craft.ProgressBar = Garnish.Base.extend(
         '<div class="progressbar-status hidden" />'
       ).insertAfter(this.$progressBar);
 
-      this.intervalManager = new Craft.IntervalManager({
-        onInterval: () => {
-          Craft.cp.announce(this.getProgressMessage.bind(this));
-        },
-      });
+      if (this.settings.announceProgress) {
+        this.intervalManager = new Craft.IntervalManager({
+          onInterval: () => {
+            Craft.cp.announce(this.getProgressMessage.bind(this));
+          },
+        });
+      }
 
       this.resetProgressBar();
     },
