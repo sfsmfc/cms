@@ -1296,6 +1296,21 @@ class App
     }
 
     /**
+     * Returns the cache key that licensing info should be stored with.
+     *
+     * @return string
+     * @internal
+     */
+    public static function licenseInfoCacheKey(): string
+    {
+        $request = Craft::$app->getRequest();
+        if ($request->getIsConsoleRequest()) {
+            return 'licenseInfo';
+        }
+        return sprintf('licenseInfo@%s', $request->getHostName());
+    }
+
+    /**
      * Returns all known licensing issues.
      *
      * @param bool $withUnresolvables
@@ -1312,7 +1327,8 @@ class App
 
         $updatesService = Craft::$app->getUpdates();
         $cache = Craft::$app->getCache();
-        $isInfoCached = $cache->exists('licenseInfo') && $updatesService->getIsUpdateInfoCached();
+        $licenseInfoCacheKey = static::licenseInfoCacheKey();
+        $isInfoCached = $cache->exists($licenseInfoCacheKey) && $updatesService->getIsUpdateInfoCached();
 
         if (!$isInfoCached) {
             if (!$fetch) {
@@ -1324,7 +1340,7 @@ class App
 
         $issues = [];
 
-        $allLicenseInfo = $cache->get('licenseInfo') ?: [];
+        $allLicenseInfo = $cache->get($licenseInfoCacheKey) ?: [];
         $pluginsService = Craft::$app->getPlugins();
         $generalConfig = Craft::$app->getConfig()->getGeneral();
         $consoleUrl = rtrim(Craft::$app->getPluginStore()->craftIdEndpoint, '/');
