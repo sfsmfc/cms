@@ -90,11 +90,6 @@ abstract class ConfigurableComponent extends Component implements ConfigurableCo
     public function getReadOnlySettingsHtml(): ?string
     {
         // Just return the settings HTML with disabled inputs by default
-        Craft::$app->getView()->startJsBuffer();
-        try {
-            return Html::disableInputs($this->getSettingsHtml());
-        } finally {
-            Craft::$app->getView()->clearJsBuffer();
-        }
+        return Html::disableInputs(fn() => $this->getSettingsHtml());
     }
 }

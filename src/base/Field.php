@@ -742,12 +742,7 @@ JS, [
     public function getStaticHtml(mixed $value, ElementInterface $element): string
     {
         // Just return the input HTML with disabled inputs by default
-        Craft::$app->getView()->startJsBuffer();
-        try {
-            return Html::disableInputs($this->getInputHtml($value, $element));
-        } finally {
-            Craft::$app->getView()->clearJsBuffer();
-        }
+        return Html::disableInputs(fn() => $this->getInputHtml($value, $element));
     }
 
     /**

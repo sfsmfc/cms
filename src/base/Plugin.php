@@ -235,12 +235,7 @@ class Plugin extends Module implements PluginInterface
         $settingsHtml = $view->namespaceInputs(function() use ($readOnly) {
             if ($readOnly) {
                 // Just return the settings HTML with disabled inputs by default
-                Craft::$app->getView()->startJsBuffer();
-                try {
-                    return (string)Html::disableInputs($this->settingsHtml());
-                } finally {
-                    Craft::$app->getView()->clearJsBuffer();
-                }
+                return (string)Html::disableInputs(fn() => $this->settingsHtml());
             }
 
             return (string)$this->settingsHtml();

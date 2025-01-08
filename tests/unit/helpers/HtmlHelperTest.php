@@ -44,10 +44,10 @@ class HtmlHelperTest extends TestCase
 
     /**
      * @dataProvider disableInputsDataProvider
-     * @param string $expected
-     * @param string $html
+     * @param string|null $expected
+     * @param callable|string|null $html
      */
-    public function testDisableInputs(?string $expected, ?string $html): void
+    public function testDisableInputs(?string $expected, callable|string|null $html): void
     {
         self::assertSame($expected, Html::disableInputs($html));
     }
@@ -349,6 +349,10 @@ class HtmlHelperTest extends TestCase
                 null,
             ],
             [
+                '',
+                '',
+            ],
+            [
                 '<input type="text" name="foo" disabled>',
                 '<input type="text" name="foo">',
             ],
@@ -371,6 +375,18 @@ class HtmlHelperTest extends TestCase
             [
                 '<div class="field"><div class="input ltr disabled"><input type="text" name="foo" disabled></div></div>',
                 '<div class="field"><div class="input ltr disabled"><input type="text" name="foo"></div></div>',
+            ],
+            [
+                null,
+                fn() => null,
+            ],
+            [
+                '',
+                fn() => '',
+            ],
+            [
+                '<input type="text" name="foo" disabled>',
+                fn() => '<input type="text" name="foo">',
             ],
         ];
     }

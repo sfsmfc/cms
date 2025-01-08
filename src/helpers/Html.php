@@ -94,14 +94,24 @@ class Html extends \yii\helpers\Html
     /**
      * Disables any form inputs in the given HTML.
      *
-     * @param string|null $html
+     * @param callable|string|null $html
      * @return string|null
      * @since 5.6.0
      */
-    public static function disableInputs(?string $html): ?string
+    public static function disableInputs(callable|string|null $html): ?string
     {
-        if ($html === null) {
-            return null;
+        if (is_callable($html)) {
+            // Call it to get the HTML, but disregard the JS
+            Craft::$app->getView()->startJsBuffer();
+            try {
+                $html = $html();
+            } finally {
+                Craft::$app->getView()->clearJsBuffer();
+            }
+        }
+
+        if ($html === null || $html === '') {
+            return $html;
         }
 
         $crawler = new Crawler($html);
