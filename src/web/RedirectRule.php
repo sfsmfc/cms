@@ -8,6 +8,7 @@
 namespace craft\web;
 
 use Craft;
+use craft\helpers\StringHelper;
 use Illuminate\Support\Collection;
 use League\Uri\Http;
 
@@ -18,6 +19,7 @@ class RedirectRule extends \yii\base\BaseObject
     public int $statusCode = 302;
     public bool $caseSensitive = false;
     private \Closure $_match;
+    private array $regexTokens = [];
 
     public function __invoke(?callable $callback = null): void
     {
@@ -80,13 +82,29 @@ class RedirectRule extends \yii\base\BaseObject
 
     private function toRegexPattern(string $from): string
     {
-        $regexFlags = $this->caseSensitive ? 'u' : 'iu';
-        $pattern = "`^{$from}$`{$regexFlags}";
-
-        return preg_replace_callback('/<([\w._-]+):?([^>]+)?>/', function($match) {
+        // Tokenize the patterns first, so we only escape regex chars outside of patterns
+        $tokenizedPattern = preg_replace_callback('/<([\w._-]+):?([^>]+)?>/', function($match) {
             $name = $match[1];
-            $pattern = $match[2] ?? '[^\/]+';
-            return "(?P<$name>$pattern)";
-        }, $pattern);
+            $pattern = strtr($match[2] ?? '[^\/]+', StringHelper::regexTokens());
+            $token = "<$name>";
+            $this->regexTokens[$token] = "(?P<$name>$pattern)";
+
+            return $token;
+        }, $from);
+
+        $replacements = array_merge($this->regexTokens, [
+            '.' => '\\.',
+            '*' => '\\*',
+            '$' => '\\$',
+            '[' => '\\[',
+            ']' => '\\]',
+            '(' => '\\(',
+            ')' => '\\)',
+        ]);
+
+        $pattern = strtr($tokenizedPattern, $replacements);
+        $flags = $this->caseSensitive ? 'u' : 'iu';
+
+        return "`^{$pattern}$`{$flags}";
     }
 }

@@ -41,6 +41,11 @@ class RedirectCest
                 'statusCode' => 302,
             ],
             [
+                'fromPath' => '/redirect/from/$special.chars',
+                'to' => 'https://craft-5-project.ddev.site/redirect/to',
+                'statusCode' => 302,
+            ],
+            [
                 'fromPath' => '/redirect/from/1234/56',
                 'statusCode' => 404,
             ],
@@ -50,7 +55,7 @@ class RedirectCest
                 'statusCode' => 302,
             ],
             [
-                'fromPath' => '/redirect/from/foo',
+                'fromPath' => '/foo',
                 'fromParams' => ['bar' => 'baz'],
                 'to' => 'https://craft-5-project.ddev.site/redirect/to/baz',
                 'statusCode' => 301,

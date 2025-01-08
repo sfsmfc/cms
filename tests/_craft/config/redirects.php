@@ -4,8 +4,13 @@ return [
     // Path match (case-insensitive by default)
     'redirect/from' => 'redirect/to',
 
-    // Path match using Yii's URL rule pattern matching:
-    // https://www.yiiframework.com/doc/guide/2.0/en/runtime-routing#url-rules
+    // Path match with Yii URL Rule named parameters
+    // https://www.yiiframework.com/doc/guide/2.0/en/runtime-routing#named-parameters
+    'redirect/from/foo/<bar:{slug}>' => 'redirect/to/<bar>',
+
+    'redirect/from/$special.chars' => 'redirect/to',
+
+    // Path match (case-sensitive)
     [
         'from' => 'redirect/FROM/<year:\d{4}>/<month>',
         'to' => 'https://redirect.to/<year>/<month>',
