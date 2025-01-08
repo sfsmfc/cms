@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Änderungsprotokoll',
     'Changes discarded.' => 'Änderungen verworfen.',
     'Changes saved.' => 'Änderungen gespeichert.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Eine Änderung an dieser Einstellung kann zu Datenverlust führen.',
     'Channel' => 'Kanal',
     'Channels' => 'Kanäle',

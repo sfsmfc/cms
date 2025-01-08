@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Registro modifiche',
     'Changes discarded.' => 'Modifiche scartate.',
     'Changes saved.' => 'Modifiche salvate.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Modificando questo, si potrebbe verificare una perdita di dati.',
     'Channel' => 'Canale',
     'Channels' => 'Canali',

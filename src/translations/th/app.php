@@ -257,6 +257,7 @@ return [
     'Changelog' => 'บันทึกการเปลี่ยนแปลง',
     'Changes discarded.' => 'ละทิ้งการเปลี่ยนแปลงแล้ว',
     'Changes saved.' => 'บันทึกการเปลี่ยนแปลงแล้ว',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'การเปลี่ยนแปลงนี้อาจส่งผลให้เกิดการสูญเสียข้อมูล',
     'Channel' => 'แชนเนิล',
     'Channels' => 'แชนเนิล',

@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Ändringslogg',
     'Changes discarded.' => 'Ändringarna har kasserats.',
     'Changes saved.' => 'Ändringar sparade.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Ändring av detta kan resultera i att data försvinner.',
     'Channel' => 'Kanal',
     'Channels' => 'Kanaler',

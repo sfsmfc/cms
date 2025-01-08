@@ -257,6 +257,7 @@ return [
     'Changelog' => 'لیست تغییرات',
     'Changes discarded.' => 'تغییرات لغو گردید.',
     'Changes saved.' => 'تغییرات ذخیره شدند.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'تغییر دادن ممکن است منجر به از دست دادن داده شود.',
     'Channel' => 'کانال',
     'Channels' => 'کانال ها',

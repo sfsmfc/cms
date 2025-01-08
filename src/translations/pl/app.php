@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Dziennik zmian',
     'Changes discarded.' => 'Zmiany odrzucono.',
     'Changes saved.' => 'Zmiany zapisano.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Zmiana ta może spowodować utratę danych.',
     'Channel' => 'Kanał',
     'Channels' => 'Kanały',
