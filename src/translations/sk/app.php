@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Denník zmien',
     'Changes discarded.' => 'Zmeny odstránené.',
     'Changes saved.' => 'Zmeny boli uložené.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Zmena tohoto môže mať za následok stratu údajov.',
     'Channel' => 'Kanál',
     'Channels' => 'Kanály',
