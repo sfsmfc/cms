@@ -2930,7 +2930,6 @@ JS;
                 'has-custom-width' => $element->hasCustomWidth(),
                 'has-settings' => $element->hasSettings(),
             ],
-            'disabled' => true,
         ]);
 
         return Html::modifyTagAttributes($element->selectorHtml(), $attributes);
