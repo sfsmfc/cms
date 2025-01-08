@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Logfil med ændringer',
     'Changes discarded.' => 'Ændringer kasseret.',
     'Changes saved.' => 'Ændringer gemt.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Ændring af dette kan føre til datatab',
     'Channel' => 'Kanal',
     'Channels' => 'Kanaler',
