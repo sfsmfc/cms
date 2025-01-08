@@ -12,7 +12,9 @@ use craft\elements\Asset;
 use craft\errors\InvalidHtmlTagException;
 use craft\image\SvgAllowedAttributes;
 use craft\web\View;
+use DOMElement;
 use enshrined\svgSanitize\Sanitizer;
+use Symfony\Component\DomCrawler\Crawler;
 use Throwable;
 use yii\base\Exception;
 use yii\base\InvalidArgumentException;
@@ -102,7 +104,25 @@ class Html extends \yii\helpers\Html
             return null;
         }
 
-        return preg_replace('/<(?:input|textarea|select)\s[^>]*/i', '$0 disabled', $html);
+        $crawler = new Crawler($html);
+
+        $inputContainers = $crawler->filter('.field > .input');
+        foreach ($inputContainers as $inputContainer) {
+            /** @var DOMElement $inputContainer */
+            $class = array_filter(explode(' ', $inputContainer->getAttribute('class')));
+            $class = array_unique([...$class, 'disabled']);
+            $inputContainer->setAttribute('class', implode(' ', $class));
+        }
+
+        $inputs = $crawler->filter('input,textarea,select,button:not(.fieldtoggle)');
+        foreach ($inputs as $input) {
+            /** @var DOMElement $input */
+            if (!$input->hasAttribute('disabled')) {
+                $input->setAttribute('disabled', '');
+            }
+        }
+
+        return $crawler->filter('body')->first()->html();
     }
 
     /**
