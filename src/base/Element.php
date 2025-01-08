@@ -2628,6 +2628,7 @@ abstract class Element extends Component implements ElementInterface
 
         unset(
             $names['awaitingFieldValues'],
+            $names['copying'],
             $names['duplicateOf'],
             $names['elementQueryResult'],
             $names['firstSave'],
