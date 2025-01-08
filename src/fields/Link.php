@@ -401,17 +401,13 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
         $view = Craft::$app->getView();
 
         foreach ($types->all() as $typeId => $typeClass) {
+            /** @var BaseLinkType $linkType */
             $linkType = $linkTypes[$typeId] ?? Component::createComponent($typeClass, BaseLinkType::class);
-            $typeSettingsHtml = $view->namespaceInputs(fn() => $linkType->getSettingsHtml(), "typeSettings[$typeId]");
+            $typeSettingsHtml = $view->namespaceInputs(
+                fn() => $readOnly ? $linkType->getReadOnlySettingsHtml() : $linkType->getSettingsHtml(),
+                "typeSettings[$typeId]",
+            );
             if ($typeSettingsHtml) {
-                if ($readOnly) {
-                    Craft::$app->getView()->startJsBuffer();
-                    try {
-                        $typeSettingsHtml = Html::disableInputs($typeSettingsHtml);
-                    } finally {
-                        Craft::$app->getView()->clearJsBuffer();
-                    }
-                }
                 $html .=
                     Html::beginTag('div', [
                         'id' => "types-$typeId",
