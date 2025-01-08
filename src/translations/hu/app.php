@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Változásnapló',
     'Changes discarded.' => 'Változtatások elvetve.',
     'Changes saved.' => 'Változtatások elmentve.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Ennek megváltoztatása adatveszteséggel járhat.',
     'Channel' => 'Csatorna',
     'Channels' => 'Csatornák',
