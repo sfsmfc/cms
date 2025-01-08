@@ -2,7 +2,7 @@
 {% set selectedNavItem = 'teamGroup' %}
 {% import '_includes/forms' as forms %}
 
-{% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% set readOnly = readOnly ?? false %}
 {% set fullPageForm = not readOnly %}
 
 

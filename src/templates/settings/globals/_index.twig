@@ -2,7 +2,7 @@
 
 {% extends "_layouts/cp" %}
 
-{% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% set readOnly = readOnly ?? false %}
 
 {% block actionButton %}
     {% if not readOnly %}

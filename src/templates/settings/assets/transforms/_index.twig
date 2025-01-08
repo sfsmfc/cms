@@ -1,6 +1,6 @@
 {% extends "settings/assets/_layout" %}
 {% set selectedNavItem = 'transforms' %}
-{% set readOnly = not craft.app.config.general.allowAdminChanges %}
+{% set readOnly = readOnly ?? false %}
 
 {% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
 

@@ -3,9 +3,7 @@
 {% extends '_layouts/cp.twig' %}
 
 {% set title = 'Email Settings'|t('app') %}
-
-{% set readOnly = not craft.app.config.general.allowAdminChanges %}
-
+{% set readOnly = readOnly ?? false %}
 {% set fullPageForm = not readOnly %}
 
 {% set crumbs = [
