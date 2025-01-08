@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 5
 
+## Unreleased
+
+- Fixed a bug where field layout elements’ action menus could have an empty action group.
+
 ## 5.5.9 - 2025-01-06
 
 - Fixed a bug where custom fields could cause validation errors when running the `users/create` command.
