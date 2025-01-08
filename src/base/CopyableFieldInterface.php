@@ -12,7 +12,7 @@ namespace craft\base;
  * that wish to support copying their values between sites in a multisite installation.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 5.5.0
+ * @since 5.6.0
  */
 interface CopyableFieldInterface
 {

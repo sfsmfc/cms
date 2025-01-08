@@ -615,7 +615,7 @@ JS, [
 
     /**
      * @see CopyableFieldInterface::getIsCopyable()
-     * @since 5.5.0
+     * @since 5.6.0
      */
     public function getIsCopyable(?ElementInterface $element = null): bool
     {
@@ -624,7 +624,7 @@ JS, [
 
     /**
      * @see CopyableFieldInterface::copyValueBetweenSites()
-     * @since 5.5.0
+     * @since 5.6.0
      */
     public function copyValueBetweenSites(ElementInterface $from, ElementInterface $to): bool
     {
@@ -641,7 +641,7 @@ JS, [
 
     /**
      * Returns whether field contains nested elements, and uses the nested element manager.
-     * @since 5.5.0
+     * @since 5.6.0
      */
     public function getIsNested(?ElementInterface $element = null): bool
     {

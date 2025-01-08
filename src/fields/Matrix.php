@@ -1642,7 +1642,7 @@ JS;
 
     /**
      * @see CopyableFieldInterface::copyValueBetweenSites()
-     * @since 5.5.0
+     * @since 5.6.0
      */
     public function copyValueBetweenSites(ElementInterface $from, ElementInterface $to): bool
     {

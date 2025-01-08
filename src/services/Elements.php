@@ -2669,7 +2669,7 @@ class Elements extends Component
      * @return array Array of field handles updated. The key will be the handle and value a boolean
      * @throws ElementNotFoundException
      * @throws Throwable
-     * @since 5.5.0
+     * @since 5.6.0
      */
     public function copyFieldValuesFromSite(ElementInterface $element, ?string $fieldHandle, int $copyFromSiteId): array
     {

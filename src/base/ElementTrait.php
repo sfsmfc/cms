@@ -261,7 +261,7 @@ trait ElementTrait
 
     /**
      * @var bool Whether the element is having its values copied across sites.
-     * @since 5.5.0
+     * @since 5.6.0
      */
     public bool $copying = false;
 }

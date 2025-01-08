@@ -1676,7 +1676,7 @@ interface ElementInterface extends
      * and if the element actually exists in other sites.
      *
      * @return bool
-     * @since 5.5.0
+     * @since 5.6.0
      */
     public function getIsCopyable(): bool;
 
