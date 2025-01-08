@@ -5523,14 +5523,13 @@ JS, [
     public function getIsCopyable(): bool
     {
         if (!isset($this->_isCopyable)) {
-            $this->_isCopyable = !(
-                !Craft::$app->getIsMultiSite() ||
-                // check if user can edit this element in other site ids
-                count(ElementHelper::editableSiteIdsForElement($this)) < 2 ||
+            $this->_isCopyable = (
+                Craft::$app->getIsMultiSite() &&
+                // check if user can edit this element in other sites
+                count(ElementHelper::editableSiteIdsForElement($this)) > 1 &&
                 // also check if the element exists in other sites
-                empty(array_diff(array_keys(ElementHelper::siteStatusesForElement($this, true)), [$this->siteId]))
+                !empty(array_diff(array_keys(ElementHelper::siteStatusesForElement($this, true)), [$this->siteId]))
             );
-            ;
         }
 
         return $this->_isCopyable;
