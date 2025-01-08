@@ -257,6 +257,7 @@ return [
     'Changelog' => 'שנה יומן',
     'Changes discarded.' => 'השינויים בוטלו.',
     'Changes saved.' => 'השינויים נשמרו.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'שינוי עלול להביא לאובדן נתונים.',
     'Channel' => 'ערוץ',
     'Channels' => 'ערוצים',
