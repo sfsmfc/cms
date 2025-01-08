@@ -899,7 +899,7 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
       });
     }
 
-    if (this.requirable || this.thumbable || this.previewable) {
+    if (this.requirable || this.thumbable) {
       const actionUl = disclosureMenu.addGroup();
 
       if (this.requirable) {
