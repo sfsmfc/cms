@@ -719,8 +719,6 @@ Craft.ElementEditor = Garnish.Base.extend(
           .data('disclosureMenu');
         actionMenu.$trigger.focus();
       });
-
-      this.addListener($('.copyBetweenSites'), 'submit', 'copyValuesFromSite');
     },
 
     showFieldCopyDialogue: function (ev) {
@@ -743,31 +741,6 @@ Craft.ElementEditor = Garnish.Base.extend(
       );
 
       this.copyHud = new Garnish.HUD($btn, $hudContent);
-
-      this.addListener($('.copyBetweenSites'), 'submit', 'copyValuesFromSite');
-    },
-
-    _buildSitesList: function (sites, hud) {
-      const $ul = $('<ul/>');
-
-      sites.forEach((site) => {
-        const $button = $('<button/>', {
-          type: 'button',
-          class: 'menu-option',
-          text: site.label,
-          'data-siteId': site.value,
-        }).on('click', (ev) => {
-          let $option = $(ev.target);
-
-          hud.$body.find('#copyFromSiteId').val($option.data('siteid'));
-          this.$sitesMenuCopyBtn.text($option.text());
-          this.$sitesMenuCopyBtn.data('trigger').hide();
-        });
-
-        $('<li/>').append($button).appendTo($ul);
-      });
-
-      return $ul;
     },
 
     createDraftBeforeCopying: function () {
