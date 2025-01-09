@@ -1,0 +1,1 @@
+/*! Gifa11y 2.0.4 | @author Adam Chaboryk © 2021 - 2024 | @license MIT | @contact adam@chaboryk.xyz | https://github.com/adamchaboryk/gifa11y */

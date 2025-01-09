@@ -149,7 +149,9 @@ Craft.ElementThumbLoader.Worker = Garnish.Base.extend({
     const $img = $('<img/>', {
       sizes: $container.attr('data-sizes'),
       srcset: $container.attr('data-srcset'),
+      src: $container.attr('data-srcset').split(' ')[0],
       alt: $container.attr('data-alt') || '',
+      class: 'gifa11y-paused',
     });
     this.addListener($img, 'load,abort,error', 'loadNext');
     $img.appendTo($container);

@@ -22,7 +22,7 @@ class Gifa11yAsset extends AssetBundle
         $this->sourcePath = __dir__ . '/dist';
 
         $this->js = [
-            'gifa11y.js',
+            'gifa11y.umd.js',
         ];
 
         parent::init();
