@@ -383,6 +383,7 @@ class Table extends Field
             'field' => $this,
             'columnsField' => $columnsField,
             'defaultsField' => $defaultsField,
+            'readOnly' => $readOnly,
         ]);
     }
 
