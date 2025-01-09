@@ -196,6 +196,19 @@ class Date extends Field implements InlineEditableFieldInterface, SortableFieldI
      */
     public function getSettingsHtml(): ?string
     {
+        return $this->settingsHtml(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         if ($this->showDate && !$this->showTime) {
             $dateTimeValue = 'showDate';
         } elseif ($this->showTime && !$this->showDate) {
@@ -232,6 +245,7 @@ class Date extends Field implements InlineEditableFieldInterface, SortableFieldI
             'value' => $dateTimeValue,
             'incrementOptions' => $incrementOptions,
             'field' => $this,
+            'readOnly' => $readOnly,
         ]);
     }
 

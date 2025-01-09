@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Endringslogg',
     'Changes discarded.' => 'Endringer forkastet.',
     'Changes saved.' => 'Endringer lagret.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Å endre denne kan føre til tap av data.',
     'Channel' => 'Kanal',
     'Channels' => 'Kanaler',

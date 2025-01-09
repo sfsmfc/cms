@@ -1431,6 +1431,7 @@ JS, [
         $warning = $config['warning'] ?? null;
         $errors = $config['errors'] ?? null;
         $status = $config['status'] ?? null;
+        $disabled = $config['disabled'] ?? $config['static'] ?? false;
 
         $fieldset = $config['fieldset'] ?? false;
         $fieldId = $config['fieldId'] ?? "$id-field";
@@ -1602,6 +1603,7 @@ JS, [
                         'input',
                         $orientation,
                         $errors ? 'errors' : null,
+                        $disabled ? 'disabled' : null,
                     ]),
                 ],
                 $config['inputContainerAttributes'] ?? []
@@ -2492,6 +2494,8 @@ JS, [
             'id' => 'cvd' . mt_rand(),
         ];
 
+        $disabled = isset($config['config']['disabled']) && $config['config']['disabled'];
+
         // get the attributes that are set to be visible in the card body
         $selectedCardAttributes = $fieldLayout->getCardBodyAttributes();
 
@@ -2559,6 +2563,7 @@ JS, [
             'required' => true,
             //'targetPrefix' => 'cardView-',
             'sortable' => true,
+            'disabled' => $disabled,
         ]);
 
 
@@ -2685,6 +2690,7 @@ JS, [
      */
     public static function fieldLayoutDesignerHtml(FieldLayout $fieldLayout, array $config = []): string
     {
+        $readOnly = isset($config['disabled']) && $config['disabled'];
         $config += [
             'id' => 'fld' . mt_rand(),
             'customizableTabs' => true,
@@ -2733,6 +2739,7 @@ JS, [
             'customizableTabs' => $config['customizableTabs'],
             'customizableUi' => $config['customizableUi'],
             'withCardViewDesigner' => $config['withCardViewDesigner'] ?? false,
+            'readOnly' => $readOnly,
         ]);
         $namespacedId = $view->namespaceInputId($config['id']);
 
@@ -2777,12 +2784,13 @@ JS;
             Html::beginTag('div', ['class' => 'fld-container']) .
             Html::beginTag('div', ['class' => 'fld-workspace']) .
             Html::beginTag('div', ['class' => 'fld-tabs']) .
-            implode('', array_map(fn(FieldLayoutTab $tab) => self::_fldTabHtml($tab, $config['customizableTabs']), $tabs)) .
+            implode('', array_map(fn(FieldLayoutTab $tab) => self::_fldTabHtml($tab, $config['customizableTabs'], $readOnly), $tabs)) .
             Html::endTag('div') . // .fld-tabs
             ($config['customizableTabs']
                 ? Html::button(Craft::t('app', 'New Tab'), [
                     'type' => 'button',
                     'class' => ['fld-new-tab-btn', 'btn', 'add', 'icon'],
+                    'disabled' => $readOnly,
                 ])
                 : '') .
             Html::endTag('div') . // .fld-workspace
@@ -2797,12 +2805,14 @@ JS;
                     'class' => ['btn', 'small', 'active'],
                     'aria' => ['pressed' => 'true'],
                     'data' => ['library' => 'field'],
+                    'disabled' => $readOnly,
                 ]) .
                 Html::button(Craft::t('app', 'UI Elements'), [
                     'type' => 'button',
                     'class' => ['btn', 'small'],
                     'aria' => ['pressed' => 'false'],
                     'data' => ['library' => 'ui'],
+                    'disabled' => $readOnly,
                 ]) .
                 Html::endTag('section') // .btngroup
                 : '') .
@@ -2812,6 +2822,7 @@ JS;
                 'class' => 'fullwidth',
                 'inputmode' => 'search',
                 'placeholder' => Craft::t('app', 'Search'),
+                'disabled' => $readOnly,
             ]) .
             Html::tag('div', '', [
                 'class' => ['clear-btn', 'hidden'],
@@ -2846,9 +2857,10 @@ JS;
     /**
      * @param FieldLayoutTab $tab
      * @param bool $customizable
+     * @param bool $disabled
      * @return string
      */
-    private static function _fldTabHtml(FieldLayoutTab $tab, bool $customizable): string
+    private static function _fldTabHtml(FieldLayoutTab $tab, bool $customizable, $disabled): string
     {
         return
             Html::beginTag('div', [
@@ -2870,6 +2882,7 @@ JS;
             implode('', array_map(fn(FieldLayoutElement $element) => self::layoutElementSelectorHtml($element, false), $tab->getElements())) .
             Html::button(Craft::t('app', 'Add'), [
                 'class' => ['btn', 'add', 'icon', 'dashed', 'fullwidth', 'fld-add-btn'],
+                'disabled' => $disabled,
             ]) .
             Html::endTag('div') . // .fld-tabcontent
             Html::endTag('div'); // .fld-tab
@@ -3433,5 +3446,30 @@ JS;
         }
 
         return self::$_requestedSite ?: null;
+    }
+
+    /**
+     * Returns the notice that should show when admin is viewing the available settings pages
+     * while `allowAdminChanges` is set to false.
+     *
+     * @return string
+     * @since 5.6.0
+     */
+    public static function readOnlyNoticeHtml(): string
+    {
+        return
+            Html::beginTag('div', [
+                'class' => 'content-notice',
+            ]) .
+            Html::tag('div', '', [
+                'class' => ['content-notice-icon'],
+                'aria' => ['hidden' => 'true'],
+                'data' => ['icon' => 'lightbulb'],
+            ]) .
+            Html::tag('p', Craft::t(
+                'app',
+                'Changes to these settings aren’t permitted in this environment.',
+            )) .
+            Html::endTag('div');
     }
 }

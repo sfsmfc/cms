@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Wijzigingslogbestand',
     'Changes discarded.' => 'Wijzigingen geannuleerd.',
     'Changes saved.' => 'Wijzigingen opgeslagen.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Dit wijzigen kan leiden tot gegevensverlies',
     'Channel' => 'Kanaal',
     'Channels' => 'Kanalen',

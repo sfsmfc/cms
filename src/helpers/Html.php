@@ -12,7 +12,9 @@ use craft\elements\Asset;
 use craft\errors\InvalidHtmlTagException;
 use craft\image\SvgAllowedAttributes;
 use craft\web\View;
+use DOMElement;
 use enshrined\svgSanitize\Sanitizer;
+use Symfony\Component\DomCrawler\Crawler;
 use Throwable;
 use yii\base\Exception;
 use yii\base\InvalidArgumentException;
@@ -87,6 +89,50 @@ class Html extends \yii\helpers\Html
     public static function encodeSpaces(string $str): string
     {
         return str_replace(' ', '%20', $str);
+    }
+
+    /**
+     * Disables any form inputs in the given HTML.
+     *
+     * @param callable|string|null $html
+     * @return string|null
+     * @since 5.6.0
+     */
+    public static function disableInputs(callable|string|null $html): ?string
+    {
+        if (is_callable($html)) {
+            // Call it to get the HTML, but disregard the JS
+            Craft::$app->getView()->startJsBuffer();
+            try {
+                $html = $html();
+            } finally {
+                Craft::$app->getView()->clearJsBuffer();
+            }
+        }
+
+        if ($html === null || $html === '') {
+            return $html;
+        }
+
+        $crawler = new Crawler($html);
+
+        $inputContainers = $crawler->filter('.field > .input');
+        foreach ($inputContainers as $inputContainer) {
+            /** @var DOMElement $inputContainer */
+            $class = array_filter(explode(' ', $inputContainer->getAttribute('class')));
+            $class = array_unique([...$class, 'disabled']);
+            $inputContainer->setAttribute('class', implode(' ', $class));
+        }
+
+        $inputs = $crawler->filter('input,textarea,select,button:not(.fieldtoggle)');
+        foreach ($inputs as $input) {
+            /** @var DOMElement $input */
+            if (!$input->hasAttribute('disabled')) {
+                $input->setAttribute('disabled', '');
+            }
+        }
+
+        return $crawler->filter('body')->first()->html();
     }
 
     /**

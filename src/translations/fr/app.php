@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Journal des modifications',
     'Changes discarded.' => 'Modifications abandonnées.',
     'Changes saved.' => 'Modifications enregistrées.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Modifier cela pourrait entraîner une perte de données.',
     'Channel' => 'Canal',
     'Channels' => 'Canaux',

@@ -15,12 +15,13 @@ body.login {
     display: flex;
     align-items: center;
     padding: var(--header-padding);
-    border-bottom: var(--header-border);
+    border-block-end: var(--header-border);
     background: var(--header-bg);
 
     #login-logo,
     #system-info {
       padding-inline: 0;
+
       &:hover,
       &:focus {
         background: transparent;
@@ -167,8 +168,7 @@ body.login {
   }
 
   .login-alt-container {
-    margin-block-start: calc(var(--s) - var(--pane-padding));
-    margin-block-end: calc(var(--s) - var(--pane-padding));
+    margin-block: calc(var(--s) - var(--pane-padding));
     margin-inline: 0;
 
     button {

@@ -257,6 +257,7 @@ return [
     'Changelog' => '更改日志',
     'Changes discarded.' => '已舍弃更改。',
     'Changes saved.' => '更改已保存。',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => '进行此修改可能会导致数据丢失。',
     'Channel' => '频道',
     'Channels' => '通道',

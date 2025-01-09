@@ -165,8 +165,23 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
         );
     }
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     */
     public function getSettingsHtml(): ?string
+    {
+        return $this->settingsHtml(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
     {
         return
             Cp::editableTableFieldHtml([
@@ -195,12 +210,14 @@ class Color extends Field implements InlineEditableFieldInterface, MergeableFiel
                 'addRowLabel' => Craft::t('app', 'Add a color'),
                 'errors' => $this->getErrors('palette'),
                 'data' => ['error-key' => 'palette'],
+                'static' => $readOnly,
             ]) .
             Cp::lightswitchFieldHtml([
                 'label' => Craft::t('app', 'Allow custom colors'),
                 'id' => 'allow-custom-colors',
                 'name' => 'allowCustomColors',
                 'on' => $this->allowCustomColors,
+                'disabled' => $readOnly,
             ]);
     }
 

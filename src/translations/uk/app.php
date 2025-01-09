@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Журнал змін',
     'Changes discarded.' => 'Зміни скасовано.',
     'Changes saved.' => 'Зміни збережено.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Ця зміна може призвести до втрати даних.',
     'Channel' => 'Канал',
     'Channels' => 'Канали',

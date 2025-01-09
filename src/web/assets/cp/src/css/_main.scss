@@ -1040,7 +1040,7 @@ button {
   }
 }
 
-.revision-notice {
+.content-notice {
   display: flex;
   align-items: center;
   place-content: stretch center;
@@ -1057,7 +1057,7 @@ button {
     margin: 0;
   }
 
-  .revision-icon {
+  .content-notice-icon {
     position: relative;
     flex-shrink: 0;
     width: 34px;
@@ -2121,9 +2121,13 @@ ul.icons {
 }
 
 .disabled:not(.status, .status-label) {
-  opacity: 0.25;
-  pointer-events: none;
+  opacity: 0.5;
   user-select: none;
+  cursor: not-allowed !important;
+
+  .layoutdesigner {
+    pointer-events: none;
+  }
 }
 
 .noteditable {
@@ -7898,7 +7902,9 @@ fieldset {
     }
 
     input:disabled,
-    textarea:disabled {
+    textarea:disabled,
+    select:disabled,
+    button:disabled {
       cursor: not-allowed;
     }
   }
@@ -8597,7 +8603,7 @@ tr.indexingSession td.progress div.progressContainer div.progressInfo {
 }
 
 .select:not(.selectize) select {
-  &:hover {
+  &:hover:not(:disabled) {
     @include mixins.select-input-focused-styles;
   }
 

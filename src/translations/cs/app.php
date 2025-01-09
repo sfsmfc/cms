@@ -257,6 +257,7 @@ return [
     'Changelog' => 'Protokol změn',
     'Changes discarded.' => 'Změny byly zrušeny.',
     'Changes saved.' => 'Změny byly uloženy.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'Změna tohoto údaje může způsobit ztrátu dat.',
     'Channel' => 'Kanál',
     'Channels' => 'Kanály',
