@@ -257,6 +257,7 @@ return [
     'Changelog' => '変更ログ',
     'Changes discarded.' => '変更を破棄しました。',
     'Changes saved.' => '変更が保存されました。',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'これを変更するとデータが失われる場合があります。',
     'Channel' => 'チャネル',
     'Channels' => 'チャネル',

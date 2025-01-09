@@ -384,6 +384,7 @@ class Table extends Field implements CopyableFieldInterface
             'field' => $this,
             'columnsField' => $columnsField,
             'defaultsField' => $defaultsField,
+            'readOnly' => $readOnly,
         ]);
     }
 

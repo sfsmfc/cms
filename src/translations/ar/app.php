@@ -257,6 +257,7 @@ return [
     'Changelog' => 'سجل التغييرات',
     'Changes discarded.' => 'تم تجاهل التغييرات.',
     'Changes saved.' => 'تم حفظ التغييرات.',
+    'Changes to these settings aren’t permitted in this environment.' => 'Changes to these settings aren’t permitted in this environment.',
     'Changing this may result in data loss.' => 'تغيير هذا قد يتسبب في فقدان البيانات.',
     'Channel' => 'القناة',
     'Channels' => 'القنوات',
