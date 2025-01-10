@@ -1,11 +1,4 @@
-import {
-  arrow,
-  autoUpdate,
-  computePosition,
-  flip,
-  offset,
-  shift,
-} from '@floating-ui/dom';
+import {arrow, autoUpdate, computePosition, flip, offset, shift} from '@floating-ui/dom';
 
 /**
  * Tooltip
@@ -45,6 +38,8 @@ class CraftTooltip extends HTMLElement {
   }
 
   connectedCallback() {
+    this.abortController = new AbortController();
+
     this.arrowElement = this.querySelector('.arrow');
     this.selfManaged = this.hasAttribute('self-managed');
 
@@ -70,6 +65,8 @@ class CraftTooltip extends HTMLElement {
 
     this.listeners = [
       ['mouseenter', this.show, this.delay],
+      ['mouseleave', this.hide],
+      ['keyup', this.handleKeyUp],
       ['click', this.toggle],
       ['focus', this.show],
       ['blur', this.hide],
@@ -84,7 +81,9 @@ class CraftTooltip extends HTMLElement {
     this.triggerElement.style.pointerEvents = 'auto';
 
     this.listeners.forEach(([event, handler, delay]) => {
-      this.triggerElement.addEventListener(event, () => handler(delay));
+      this.triggerElement.addEventListener(event, () => handler(delay), {
+        signal: this.abortController.signal,
+      });
     });
 
     // Update & hide to make sure everything is where it needs to be
@@ -94,14 +93,7 @@ class CraftTooltip extends HTMLElement {
 
   disconnectedCallback() {
     this.hide();
-
-    if (this.listeners.length) {
-      this.listeners.forEach(([event, handler]) => {
-        this.triggerElement?.removeEventListener(event, handler.bind(this));
-      });
-    }
-
-    document.removeEventListener('keyup', this.handleKeyUp);
+    this.abortController.abort();
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -130,6 +122,14 @@ class CraftTooltip extends HTMLElement {
     this.tooltip = document.createElement('span');
     this.tooltip.classList.add('craft-tooltip');
     this.tooltip.style['max-width'] = this.maxWidth;
+
+    // Keep the tooltip open when the user is hovering over it.
+    this.tooltip.addEventListener('mouseenter', () => this.show(), {
+      signal: this.abortController.signal,
+    });
+    this.tooltip.addEventListener('mouseleave', this.hide, {
+      signal: this.abortController.signal,
+    });
 
     /**
      * We need to append the tooltip to the body because
@@ -167,11 +167,18 @@ class CraftTooltip extends HTMLElement {
   };
 
   show = (delay = 0) => {
+    this.isHovering = true;
+
     if (this.delayTimeout) {
       clearTimeout(this.delayTimeout);
     }
 
     this.delayTimeout = setTimeout(() => {
+      // Check if the user is still over the tooltip before doing anything
+      if (!this.isHovering) {
+        return;
+      }
+
       Object.assign(this.tooltip.style, {
         opacity: 1,
         transform: ['left', 'right'].includes(this.getStaticSide())
@@ -181,18 +188,14 @@ class CraftTooltip extends HTMLElement {
         pointerEvents: 'auto',
       });
 
-      this.showing = true;
       autoUpdate(this.triggerElement, this.tooltip, this.update);
-
-      // Close on ESC
-      document.addEventListener('keyup', this.handleKeyUp);
-
-      // Only close when leaving the entire element, not just the trigger
-      this.addEventListener('mouseleave', this.hide);
+      this.showing = true;
     }, delay);
   };
 
   hide = () => {
+    this.isHovering = false;
+
     if (this.delayTimeout) {
       clearTimeout(this.delayTimeout);
     }
@@ -204,9 +207,6 @@ class CraftTooltip extends HTMLElement {
     });
 
     this.showing = false;
-
-    document.removeEventListener('keyup', this.handleKeyUp);
-    this.removeEventListener('mouseleave', this.hide);
   };
 
   getInitialTransform() {
