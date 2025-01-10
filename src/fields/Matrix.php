@@ -1641,20 +1641,23 @@ JS;
     }
 
     /**
-     * @see CopyableFieldInterface::copyValueBetweenSites()
+     * @see CopyableFieldInterface::copyCrossSiteValue()
      * @since 5.6.0
      */
-    public function copyValueBetweenSites(ElementInterface $from, ElementInterface $to): bool
+    public function copyCrossSiteValue(ElementInterface $from, ElementInterface $to): bool
     {
         if ($this->viewMode === self::VIEW_MODE_BLOCKS) {
-            return parent::copyValueBetweenSites($from, $to);
+            return parent::copyCrossSiteValue($from, $to);
         }
 
         // get fromValue - if it's not empty, proceed
-        $fromValue = $from->getFieldValue($this->handle)->collect();
+        /** @var EntryQuery|ElementCollection<Entry> $fromValue */
+        $fromValue = $from->getFieldValue($this->handle);
+        /** @var EntryQuery|ElementCollection<Entry> $toValue */
+        $toValue = $to->getFieldValue($this->handle);
 
-        $fromIds = !$fromValue->isEmpty() ? $fromValue->pluck('id')->all() : [];
-        $toIds = $to->getFieldValue($this->handle)->collect()->pluck('id')->all();
+        $fromIds = $fromValue->ids();
+        $toIds = $toValue->ids();
 
         if ($fromIds != $toIds) {
             $to->duplicateOf = $from;

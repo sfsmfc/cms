@@ -623,23 +623,6 @@ JS, [
     }
 
     /**
-     * @see CopyableFieldInterface::copyValueBetweenSites()
-     * @since 5.6.0
-     */
-    public function copyValueBetweenSites(ElementInterface $from, ElementInterface $to): bool
-    {
-        $fromValue = $this->serializeValue($from->getFieldValue($this->handle), $from);
-        $toValue = $this->serializeValue($to->getFieldValue($this->handle), $to);
-
-        if ($fromValue != $toValue) {
-            $to->setFieldValue($this->handle, $fromValue);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Returns whether field contains nested elements, and uses the nested element manager.
      * @since 5.6.0
      */
@@ -972,6 +955,23 @@ JS, [
     {
         $value = $this->serializeValue($from->getFieldValue($this->handle), $from);
         $to->setFieldValue($this->handle, $value);
+    }
+
+    /**
+     * @see CopyableFieldInterface::copyCrossSiteValue()
+     * @since 5.6.0
+     */
+    public function copyCrossSiteValue(ElementInterface $from, ElementInterface $to): bool
+    {
+        $fromValue = $this->serializeValue($from->getFieldValue($this->handle), $from);
+        $toValue = $this->serializeValue($to->getFieldValue($this->handle), $to);
+
+        if ($fromValue != $toValue) {
+            $to->setFieldValue($this->handle, $fromValue);
+            return true;
+        }
+
+        return false;
     }
 
     /**

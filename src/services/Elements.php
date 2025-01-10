@@ -2664,45 +2664,63 @@ class Elements extends Component
      * Copy value of a field from another site
      *
      * @param ElementInterface $element
-     * @param null|string $fieldHandle
      * @param int $copyFromSiteId
-     * @return array Array of field handles updated. The key will be the handle and value a boolean
-     * @throws ElementNotFoundException
+     * @param string|string[]|null $attributes
+     * @return string[] Array of updated attributes.
+     * @throws UnsupportedSiteException
      * @throws Throwable
      * @since 5.6.0
      */
-    public function copyFieldValuesFromSite(ElementInterface $element, ?string $fieldHandle, int $copyFromSiteId): array
-    {
+    public function copyValuesFromSite(
+        ElementInterface $element,
+        int $copyFromSiteId,
+        string|array|null $attributes = null,
+    ): array {
         // get element for selected site
         /** @var string|ElementInterface $elementType */
         $elementType = get_class($element);
 
         $fromElement = $this->getElementById($element->getCanonicalId(), $elementType, $copyFromSiteId);
         if (!$fromElement) {
-            throw new ElementNotFoundException(Craft::t('app', 'Couldn’t find this {type} on the site you selected.', [
-                'type' => $element::lowerDisplayName(),
-            ]));
+            throw new UnsupportedSiteException($element, $element->siteId, 'Attempting to copy element content from an unsupported site.');
         }
 
-        $updates = [];
-
-        // if $fieldHandle === null - we're doing it for all element's fields
-        if ($fieldHandle === null) {
-            $translatableFields = array_merge(
-                $this->_getTranslatableCustomFieldHandles($element),
-                $this->_getTranslatableNativeFieldHandles($element)
-            );
-
-            foreach ($translatableFields as $translatableField) {
-                if ($this->_copyFieldValueByHandle($fromElement, $element, $translatableField)) {
-                    $updates[$translatableField] = true;
-                }
-            }
+        if (is_string($attributes)) {
+            $attributes = [$attributes];
         } else {
-            $updates[$fieldHandle] = $this->_copyFieldValueByHandle($fromElement, $element, $fieldHandle);
+            $attributes ??= array_merge(
+                $this->_getTranslatableCustomFieldHandles($element),
+                $this->_getTranslatableNativeFieldHandles($element),
+            );
         }
 
-        return array_filter($updates);
+        $updatedAttributes = [];
+        $fieldLayout = $fromElement->getFieldLayout();
+
+        foreach ($attributes as $attribute) {
+            $valueChanged = false;
+
+            /** @var FieldInterface|null $field */
+            $field = $fieldLayout?->getFieldByHandle($attribute);
+            if ($field) {
+                if ($field instanceof CopyableFieldInterface) {
+                    $valueChanged = $field->copyCrossSiteValue($fromElement, $element);
+                }
+            } elseif (
+                property_exists($fromElement, $attribute) &&
+                property_exists($element, $attribute) &&
+                $element->$attribute != $fromElement->$attribute
+            ) {
+                $element->$attribute = $fromElement->$attribute;
+                $valueChanged = true;
+            }
+
+            if ($valueChanged) {
+                $updatedAttributes[] = $attribute;
+            }
+        }
+
+        return $updatedAttributes;
     }
 
     /**
@@ -2744,35 +2762,6 @@ class Elements extends Component
                 fn($field) => isset($fields[$field->attribute()]) && $field->isCopyable($element)
             )
         );
-    }
-
-    /**
-     * Copy field value from one element to another and check if it changed
-     *
-     * @param ElementInterface $from
-     * @param ElementInterface $to
-     * @param string $fieldHandle
-     * @return bool
-     */
-    private function _copyFieldValueByHandle(ElementInterface $from, ElementInterface $to, string $fieldHandle): bool
-    {
-        /** @var FieldInterface|null $field */
-        $field = $from->getFieldLayout()?->getFieldByHandle($fieldHandle);
-        $valueChanged = false;
-
-        // if we didn't find a field, let's assume it's an attribute field and handle differently
-        if ($field === null) {
-            if (property_exists($from, $fieldHandle) && property_exists($to, $fieldHandle) && $to->{$fieldHandle} != $from->{$fieldHandle}) {
-                $to->{$fieldHandle} = $from->{$fieldHandle};
-                $valueChanged = true;
-            }
-        } else {
-            if ($field instanceof CopyableFieldInterface) {
-                $valueChanged = $field->copyValueBetweenSites($from, $to);
-            }
-        }
-
-        return $valueChanged;
     }
 
     /**

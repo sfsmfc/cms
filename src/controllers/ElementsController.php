@@ -484,7 +484,7 @@ class ElementsController extends Controller
     }
 
     /**
-     * Returns result of copying field value from another site
+     * Copies field/attribute values on an element from one site to another.
      *
      * @return Response
      * @throws BadRequestHttpException
@@ -498,7 +498,7 @@ class ElementsController extends Controller
      * @throws \yii\db\Exception
      * @since 5.6.0
      */
-    public function actionCopyFieldValuesFromSite(): Response
+    public function actionCopyValuesFromSite(): Response
     {
         $this->requireCpRequest();
 
@@ -513,38 +513,19 @@ class ElementsController extends Controller
             throw new BadRequestHttpException('No element was identified by the request.');
         }
 
-        // if $fieldHandle is null, we're copying all element fields
-        $fieldHandle = $this->request->getBodyParam('fieldHandle', null);
         $copyFromSiteId = $this->request->getRequiredBodyParam('copyFromSiteId');
+        $this->requirePermission("editSite:$copyFromSiteId");
+
+        // if $attribute is null, we're copying all element fields
+        $attribute = $this->request->getBodyParam('attribute');
         $namespace = $this->request->getBodyParam('namespace');
 
-        if ($fieldHandle === '' || empty($copyFromSiteId)) {
+        if ($attribute === '' || empty($copyFromSiteId)) {
             throw new BadRequestHttpException("Request missing required param");
         }
 
-        $elementsService = Craft::$app->getElements();
-
-        // check if this entry exists for other sites
-        if (empty($siteIdsForElement = $elementsService->getEnabledSiteIdsForElement($element->id))) {
-            $errorMsg = Craft::t('app', 'Couldn’t find this {type} on other sites.', [
-                'type' => $element::lowerDisplayName(),
-            ]);
-
-            return $this->_asFailure($element, $errorMsg);
-        }
-
-        // Check if the site id requested exists for the element
-        if (!in_array($copyFromSiteId, $siteIdsForElement, false)) {
-            $errorMsg = Craft::t('app', 'Couldn’t find this {type} on the site you selected.', [
-                'type' => $element::lowerDisplayName(),
-            ]);
-
-            return $this->_asFailure($element, $errorMsg);
-        }
-
-        // Now we can actually copy things
-        $updates = $elementsService->copyFieldValuesFromSite($element, $fieldHandle, $copyFromSiteId);
-        if (count(array_keys($updates)) === 0) {
+        $updatedFieldHandles = Craft::$app->getElements()->copyValuesFromSite($element, $copyFromSiteId, $attribute);
+        if (empty($updatedFieldHandles)) {
             return $this->_asSuccess(Craft::t('app', 'Nothing to copy.'), $element, [
                 'fragments' => [],
             ]);
@@ -558,10 +539,8 @@ class ElementsController extends Controller
         foreach ($layout->getTabs() as $tab) {
             foreach ($tab->getElements() as $layoutElement) {
                 if ($layoutElement instanceof BaseField) {
-                    $attribute = $layoutElement->attribute();
-
                     // Only return attributes that were updated
-                    if (in_array($attribute, array_keys($updates))) {
+                    if (in_array($layoutElement->attribute(), $updatedFieldHandles)) {
                         $html = $view->namespaceInputs(function() use ($element, $layoutElement) {
                             return $layoutElement->formHtml($element);
                         }, $namespace); // you have to pass the $namespace here or some attrs won't get properly namespaced (e.g. title)

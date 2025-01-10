@@ -1546,7 +1546,7 @@ JS, [
                         'copyable' => 'copyable',
                         'element-id' => $config['element-id'] ?? null,
                         'namespace' => $namespace,
-                        'field-handle' => $attribute,
+                        'attribute' => $attribute,
                         'nested' => $config['nested'] ?? null,
                     ],
                 ]);

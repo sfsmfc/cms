@@ -25,11 +25,11 @@ interface CopyableFieldInterface
     public function getIsCopyable(?ElementInterface $element = null): bool;
 
     /**
-     * Copies field’s value from one element to another.
+     * Copies the field’s value from one site to another.
      *
      * @param ElementInterface $from
      * @param ElementInterface $to
      * @return bool
      */
-    public function copyValueBetweenSites(ElementInterface $from, ElementInterface $to): bool;
+    public function copyCrossSiteValue(ElementInterface $from, ElementInterface $to): bool;
 }
