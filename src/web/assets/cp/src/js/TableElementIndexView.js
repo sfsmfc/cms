@@ -78,6 +78,7 @@ Craft.TableElementIndexView = Craft.BaseElementIndexView.extend({
 
     if (
       this.elementIndex.isAdministrative &&
+      !this.elementIndex.settings.static &&
       this.elementIndex.settings.inlineEditable !== false &&
       this.$elementContainer.has('> tr[data-id] > th .element[data-editable]')
     ) {
@@ -143,6 +144,8 @@ Craft.TableElementIndexView = Craft.BaseElementIndexView.extend({
 
       this.addListener(this.$saveBtn, 'activate', () => {
         this.$saveBtn.addClass('loading');
+        this.closeDateTimeFields();
+
         this.saveChanges()
           .then((data) => {
             if (data.errors) {
@@ -191,6 +194,8 @@ Craft.TableElementIndexView = Craft.BaseElementIndexView.extend({
         ) {
           this.$cancelBtn.addClass('loading');
           this.elementIndex.inlineEditing = false;
+          this.closeDateTimeFields();
+
           this.elementIndex.updateElements(true, false).then(() => {
             this.elementIndex.$elements.removeClass('inline-editing');
           });
@@ -198,10 +203,7 @@ Craft.TableElementIndexView = Craft.BaseElementIndexView.extend({
       });
 
       this.addListener(this.$elementContainer, 'keydown', (event) => {
-        if (
-          event.keyCode === Garnish.RETURN_KEY &&
-          Garnish.isCtrlKeyPressed(event)
-        ) {
+        if (event.keyCode === Garnish.RETURN_KEY) {
           this.$saveBtn.trigger('click');
         } else if (
           event.keyCode === Garnish.S_KEY &&
@@ -226,6 +228,19 @@ Craft.TableElementIndexView = Craft.BaseElementIndexView.extend({
           this.elementIndex.$elements.addClass('inline-editing');
         });
       });
+    }
+  },
+
+  closeDateTimeFields: function () {
+    // ensure opened date/time pickers don't linger after activating the Cancel btn
+    this.elementIndex.$elements
+      .find('.datewrapper input')
+      .datepicker('destroy');
+
+    if ($().timepicker) {
+      this.elementIndex.$elements
+        .find('.timewrapper input')
+        .timepicker('remove');
     }
   },
 

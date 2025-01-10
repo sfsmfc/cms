@@ -295,6 +295,19 @@ trait ApplicationTrait
     private array $afterRequestCallbacks = [];
 
     /**
+     * Returns the application ID combined with the environment name.
+     *
+     * @return string
+     * @since 5.4.0
+     * @see id
+     * @see env
+     */
+    public function getEnvId(): string
+    {
+        return $this->env ? sprintf('%s--%s', $this->id, $this->env) : $this->id;
+    }
+
+    /**
      * @inheritdoc
      */
     public function setVendorPath($path): void
@@ -606,7 +619,7 @@ trait ApplicationTrait
      */
     public function getLicensedEdition(): ?CmsEdition
     {
-        $licenseInfo = $this->getCache()->get('licenseInfo') ?: [];
+        $licenseInfo = $this->getCache()->get(App::licenseInfoCacheKey()) ?: [];
 
         if (!isset($licenseInfo['craft']['edition'])) {
             return null;

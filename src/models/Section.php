@@ -10,6 +10,7 @@ namespace craft\models;
 use Craft;
 use craft\base\Chippable;
 use craft\base\CpEditable;
+use craft\base\Iconic;
 use craft\base\Model;
 use craft\db\Query;
 use craft\db\Table;
@@ -33,7 +34,7 @@ use craft\validators\UniqueValidator;
  * @property EntryType[] $entryTypes Entry types
  * @property bool $hasMultiSiteEntries Whether entries in this section support multiple sites
  */
-class Section extends Model implements Chippable, CpEditable
+class Section extends Model implements Chippable, CpEditable, Iconic
 {
     public const TYPE_SINGLE = 'single';
     public const TYPE_CHANNEL = 'channel';
@@ -81,7 +82,7 @@ class Section extends Model implements Chippable, CpEditable
     public ?string $handle = null;
 
     /**
-     * @var string|null Type
+     * @var self::TYPE_*|null Type
      */
     public ?string $type = null;
 
@@ -109,7 +110,7 @@ class Section extends Model implements Chippable, CpEditable
      *  - [[PropagationMethod::None]] – Only save entries in the site they were created in
      *  - [[PropagationMethod::SiteGroup]] – Save  entries to other sites in the same site group
      *  - [[PropagationMethod::Language]] – Save entries to other sites with the same language
-     *  - [[PropagationMethod::Custom]] – Save entries to other sites based on a custom [[$propagationKeyFormat|propagation key format]]
+     *  - [[PropagationMethod::Custom]] – Let each entry choose which sites it should be saved to
      *  - [[PropagationMethod::All]] – Save entries to all sites supported by the owner element
      *
      * @since 3.2.0
@@ -209,7 +210,7 @@ class Section extends Model implements Chippable, CpEditable
                 self::TYPE_STRUCTURE,
             ],
         ];
-        $rules[] = [['name', 'handle'], UniqueValidator::class, 'targetClass' => SectionRecord::class];
+        $rules[] = [['handle'], UniqueValidator::class, 'targetClass' => SectionRecord::class];
         $rules[] = [['name', 'handle', 'type', 'entryTypes', 'propagationMethod', 'siteSettings'], 'required'];
         $rules[] = [['name', 'handle'], 'string', 'max' => 255];
         $rules[] = [['siteSettings'], 'validateSiteSettings'];
@@ -305,7 +306,10 @@ class Section extends Model implements Chippable, CpEditable
      */
     public function setSiteSettings(array $siteSettings): void
     {
-        $this->_siteSettings = ArrayHelper::index($siteSettings, 'siteId');
+        $this->_siteSettings = ArrayHelper::index(
+            $siteSettings,
+            fn(Section_SiteSettings $siteSettings) => $siteSettings->siteId,
+        );
 
         foreach ($this->_siteSettings as $settings) {
             $settings->setSection($this);
@@ -390,6 +394,14 @@ class Section extends Model implements Chippable, CpEditable
     public function getCpEditUrl(): ?string
     {
         return $this->id ? UrlHelper::cpUrl("settings/sections/$this->id") : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIcon(): ?string
+    {
+        return 'newspaper';
     }
 
     /**

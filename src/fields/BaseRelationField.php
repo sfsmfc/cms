@@ -17,6 +17,7 @@ use craft\base\InlineEditableFieldInterface;
 use craft\base\MergeableFieldInterface;
 use craft\base\NestedElementInterface;
 use craft\base\RelationalFieldInterface;
+use craft\base\ThumbableFieldInterface;
 use craft\behaviors\EventBehavior;
 use craft\db\FixedOrderExpression;
 use craft\db\Query;
@@ -61,6 +62,7 @@ abstract class BaseRelationField extends Field implements
     InlineEditableFieldInterface,
     EagerLoadingFieldInterface,
     RelationalFieldInterface,
+    ThumbableFieldInterface,
     MergeableFieldInterface
 {
     /**
@@ -74,8 +76,7 @@ abstract class BaseRelationField extends Field implements
     /**
      * Returns the element class associated with this field type.
      *
-     * @return string The Element class name
-     * @phpstan-return class-string<ElementInterface>
+     * @return class-string<ElementInterface> The Element class name
      */
     abstract public static function elementType(): string;
 
@@ -406,7 +407,7 @@ abstract class BaseRelationField extends Field implements
         $inputSources = $this->getInputSources();
 
         if ($inputSources === null) {
-            $this->addError($attribute, Craft::t('app', 'A source is required when relating ancestors.'));
+            $this->maintainHierarchy = false;
             return;
         }
 
@@ -421,19 +422,14 @@ abstract class BaseRelationField extends Field implements
         );
 
         if (count($elementSources) > 1) {
-            $this->addError($attribute, Craft::t('app', 'Only one source is allowed when relating ancestors.'));
+            $this->maintainHierarchy = false;
+            return;
         }
 
         foreach ($elementSources as $elementSource) {
             if (!isset($elementSource['structureId'])) {
-                $this->addError(
-                    $attribute,
-                    Craft::t(
-                        'app',
-                        '{source} is not a structured source. Only structured sources may be used when relating ancestors.',
-                        ['source' => $elementSource['label']]
-                    )
-                );
+                $this->maintainHierarchy = false;
+                return;
             }
         }
     }
@@ -593,7 +589,6 @@ JS, [
         }
 
         if ($errorCount) {
-            /** @var ElementInterface|string $elementType */
             $elementType = static::elementType();
             $element->addError($this->handle, Craft::t('app', 'Validation errors found in {attribute} {type}; please fix them.', [
                 'type' => $errorCount === 1 ? $elementType::lowerDisplayName() : $elementType::pluralLowerDisplayName(),
@@ -667,8 +662,6 @@ JS, [
             return $value;
         }
 
-        /** @var string|ElementInterface $class */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $class */
         $class = static::elementType();
         /** @var ElementQuery $query */
         $query = $class::find()
@@ -762,12 +755,12 @@ JS, [
                     }
                 },
             ]));
-
-            // Prepare the query for lazy eager loading
-            $query->prepForEagerLoading($this->handle, $element);
         } else {
             $query->id(false);
         }
+
+        // Prepare the query for lazy eager loading
+        $query->prepForEagerLoading($this->handle, $element);
 
         if ($this->allowLimit && $this->maxRelations) {
             $query->limit($this->maxRelations);
@@ -932,9 +925,27 @@ JS, [
         /** @var ElementQueryInterface|ElementCollection $value */
         if ($value instanceof ElementQueryInterface) {
             $value = $this->_all($value, $element)->collect();
+        } else {
+            // todo: come up with a way to get the normalized field value ignoring the eager-loaded value
+            $rawValue = $element->getBehavior('customFields')->{$this->handle} ?? null;
+            if (is_array($rawValue)) {
+                $ids = array_flip($rawValue);
+                $value = $value->filter(fn(ElementInterface $element) => isset($ids[$element->id]));
+            }
         }
 
         return $this->previewHtml($value);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function previewPlaceholderHtml(mixed $value, ?ElementInterface $element): string
+    {
+        $mockup = new (static::elementType());
+        $mockup->title = Craft::t('app', 'Related {type} Title', ['type' => $mockup->displayName()]);
+
+        return Cp::chipHtml($mockup);
     }
 
     /**
@@ -952,31 +963,64 @@ JS, [
     /**
      * @inheritdoc
      */
+    public function getThumbHtml(mixed $value, ElementInterface $element, int $size): ?string
+    {
+        /** @var ElementQueryInterface|ElementCollection $value */
+        if ($value instanceof ElementQueryInterface) {
+            $handle = sprintf('%s-%s-%s', preg_replace('/:+/', '-', __METHOD__), $this->id, $size);
+            $value = (clone $value)->eagerly($handle);
+        }
+
+        return $value->one()?->getThumbHtml($size);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getEagerLoadingMap(array $sourceElements): array|null|false
     {
         $sourceSiteId = $sourceElements[0]->siteId;
 
-        // Get the source element IDs
-        $sourceElementIds = array_map(fn(ElementInterface $element) => $element->id, $sourceElements);
+        $map = [];
+        $missingSourceElementIds = [];
 
-        // Return any relation data on these elements, defined with this field
-        $map = (new Query())
-            ->select(['sourceId as source', 'targetId as target'])
-            ->from([DbTable::RELATIONS])
-            ->where([
-                'and',
-                [
-                    'fieldId' => $this->id,
-                    'sourceId' => $sourceElementIds,
-                ],
-                [
-                    'or',
-                    ['sourceSiteId' => $sourceSiteId],
-                    ['sourceSiteId' => null],
-                ],
-            ])
-            ->orderBy(['sortOrder' => SORT_ASC])
-            ->all();
+        foreach ($sourceElements as $sourceElement) {
+            $rawValue = $sourceElement->getBehavior('customFields')->{$this->handle} ?? null;
+            if ($rawValue instanceof ElementQueryInterface) {
+                $rawValue = $rawValue->where['elements.id'] ?? null;
+            }
+            if (is_array($rawValue)) {
+                foreach ($rawValue as $targetElementId) {
+                    $map[] = ['source' => $sourceElement->id, 'target' => $targetElementId];
+                }
+            } elseif ($this->isFirstInstance($sourceElement)) {
+                // The relation IDs aren't hardcoded yet and this is the first
+                // instance of this field in the field layout, so fetch the relations
+                // via the DB table
+                $missingSourceElementIds[] = $sourceElement->id;
+            }
+        }
+
+        // Are there any source elements that don't have hardcoded relation IDs yet?
+        if (!empty($missingSourceElementIds)) {
+            $missingMappingsQuery = (new Query())
+                ->select(['sourceId as source', 'targetId as target'])
+                ->from([DbTable::RELATIONS])
+                ->where([
+                    'and',
+                    [
+                        'fieldId' => $this->id,
+                        'sourceId' => $missingSourceElementIds,
+                    ],
+                    [
+                        'or',
+                        ['sourceSiteId' => $sourceSiteId],
+                        ['sourceSiteId' => null],
+                    ],
+                ])
+                ->orderBy(['sortOrder' => SORT_ASC]);
+            array_push($map, ...$missingMappingsQuery->all());
+        }
 
         $criteria = [];
 
@@ -1066,6 +1110,11 @@ JS, [
             ArrayHelper::isNumeric($value->id)
         ) {
             $targetIds = $value->id ?: [];
+        } elseif (
+            isset($value->where['elements.id']) &&
+            ArrayHelper::isNumeric($value->where['elements.id'])
+        ) {
+            $targetIds = $value->where['elements.id'] ?: [];
         } else {
             // just running $this->_all()->ids() will cause the query to get adjusted
             // see https://github.com/craftcms/cms/issues/14674 for details
@@ -1171,7 +1220,6 @@ JS, [
      */
     public function getTargetSiteFieldHtml(): ?string
     {
-        /** @var ElementInterface|string $class */
         $class = static::elementType();
 
         if (!Craft::$app->getIsMultiSite() || !$class::isLocalized()) {
@@ -1269,7 +1317,6 @@ JS, [
      */
     protected function settingsTemplateVariables(): array
     {
-        /** @var ElementInterface|string $elementType */
         $elementType = $this->elementType();
 
         $selectionCondition = $this->getSelectionCondition() ?? $this->createSelectionCondition();
@@ -1285,9 +1332,9 @@ JS, [
                 'label' => Craft::t('app', 'Selectable {type} Condition', [
                     'type' => $elementType::pluralDisplayName(),
                 ]),
-                'instructions' => Craft::t('app', 'Only allow {type} to be selected if they match the following rules:', [
+                'instructions' => StringHelper::upperCaseFirst(Craft::t('app', 'Only allow {type} to be selected if they match the following rules:', [
                     'type' => $elementType::pluralLowerDisplayName(),
-                ]),
+                ])),
             ]);
         }
 

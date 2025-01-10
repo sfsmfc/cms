@@ -19,6 +19,7 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
     $spinner: null,
 
     _initialized: false,
+    _$replaceElement: null,
 
     get thumbLoader() {
       console.warn(
@@ -104,6 +105,12 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
           }
         });
       }
+
+      setTimeout(() => {
+        this.elementEditor = this.$container
+          .closest('form')
+          .data('elementEditor');
+      }, 100);
     },
 
     get totalSelected() {
@@ -185,6 +192,23 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
           collapseDraggees: true,
           magnetStrength: 4,
           helperLagBase: 1.5,
+          onBeforeDragStart: () => {
+            this.elementEditor?.pause();
+
+            // Disable all craft-element-labels so connectedCallback()
+            // doesn't get fired constantly during drag
+            this.$elementsContainer
+              .find('craft-element-label')
+              .attr('disabled', true);
+          },
+          onDragStop: () => {
+            this.elementEditor?.resume();
+
+            // Put things back where we found them.
+            this.$elementsContainer
+              .find('craft-element-label')
+              .removeAttr('disabled');
+          },
           onSortChange: () => {
             this.onSortChange();
           },
@@ -204,7 +228,8 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
 
     canAddMoreElements: function () {
       return (
-        !this.settings.limit || this.$elements.length < this.settings.limit
+        this.settings.allowAdd &&
+        (!this.settings.limit || this.$elements.length < this.settings.limit)
       );
     },
 
@@ -217,7 +242,7 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
     },
 
     enableAddElementsBtn: function () {
-      if (this.$addElementBtn.length) {
+      if (this.settings.allowAdd && this.$addElementBtn.length) {
         this.$addElementBtn.removeClass('hidden');
       }
 
@@ -263,7 +288,10 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
     focusNextLogicalElement: function () {
       if (this.canAddMoreElements()) {
         // If can add more elements, focus ADD button
-        if (this.$addElementBtn.length) {
+        if (
+          this.$addElementBtn.length &&
+          !this.$addElementBtn.hasClass('hidden')
+        ) {
           this.$addElementBtn.get(0).focus();
         }
       } else {
@@ -364,7 +392,7 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
             !$element.hasClass('disabled') &&
             !$element.hasClass('loading')
           ) {
-            this.elementEditor = this.createElementEditor($element);
+            this.createElementEditor($element);
           }
         };
 
@@ -436,19 +464,31 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
         });
       }
 
-      actions.push({
-        icon: 'remove',
-        label: Craft.t('app', 'Remove'),
-        callback: () => {
-          // If the element is selected, remove *all* the selected elements
-          if (this.elementSelect?.isSelected($element)) {
-            this.removeElement(this.elementSelect.getSelectedItems());
-          } else {
-            this.removeElement($element);
-          }
-        },
-        destructive: true,
-      });
+      if (this.settings.allowRemove) {
+        if (this.settings.elementType) {
+          actions.push({
+            icon: 'arrows-rotate',
+            label: Craft.t('app', 'Replace'),
+            callback: () => {
+              this._$replaceElement = $element;
+              this.showModal();
+            },
+          });
+        }
+
+        actions.push({
+          icon: 'remove',
+          label: Craft.t('app', 'Remove'),
+          callback: () => {
+            // If the element is selected, remove *all* the selected elements
+            if (this.elementSelect?.isSelected($element)) {
+              this.removeElement(this.elementSelect.getSelectedItems());
+            } else {
+              this.removeElement($element);
+            }
+          },
+        });
+      }
 
       return actions;
     },
@@ -636,11 +676,14 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
 
     animateElementAway: function ($element, callback) {
       const offset = $element.offset();
+      const width = $element.width();
+
       $element.appendTo(Garnish.$bod).css({
         'z-index': 0,
         position: 'absolute',
         top: offset.top,
         left: offset.left,
+        maxWidth: width + 'px',
       });
 
       const animateCss = {
@@ -662,7 +705,7 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
 
     showModal: function () {
       // Make sure we haven't reached the limit
-      if (!this.canAddMoreElements()) {
+      if (!this._$replaceElement && !this.canAddMoreElements()) {
         return;
       }
 
@@ -742,6 +785,11 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
       this.modal.disableCancelBtn();
       this.modal.disableSelectBtn();
       this.modal.showFooterSpinner();
+
+      if (this._$replaceElement) {
+        this.removeElement(this._$replaceElement);
+        this._$replaceElement = null;
+      }
 
       // re-render the elements even if the view modes match, to be sure we have all the correct settings
       const [inputUiType, inputUiSize] = (() => {
@@ -824,12 +872,14 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
         this.modal = null;
       }
 
-      // If can add more elements, do default behavior of focus on "Add" button
-      if (this.canAddMoreElements()) return;
+      this._$replaceElement = null;
 
-      setTimeout(() => {
-        this.focusNextLogicalElement();
-      }, 200);
+      // If we can't add any more elements, don't focus on the “Add” button
+      if (!this.canAddMoreElements()) {
+        setTimeout(() => {
+          this.focusNextLogicalElement();
+        }, 200);
+      }
     },
 
     selectElements: async function (elements) {
@@ -1033,6 +1083,8 @@ Craft.BaseElementSelectInput = Garnish.Base.extend(
       referenceElementId: null,
       referenceElementSiteId: null,
       criteria: {},
+      allowAdd: true,
+      allowRemove: true,
       allowSelfRelations: false,
       sourceElementId: null,
       disabledElementIds: null,

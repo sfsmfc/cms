@@ -39,6 +39,8 @@ Craft.ElementEditor = Garnish.Base.extend(
     cancelToken: null,
     ignoreFailedRequest: false,
     queue: null,
+    savingDraft: false,
+    saveDraftCallbacks: null,
     submittingForm: false,
 
     draftElementIds: null,
@@ -129,7 +131,8 @@ Craft.ElementEditor = Garnish.Base.extend(
 
       const $spinnerContainer =
         this.settings.$spinnerContainer ??
-        (this.isFullPage ? $('#page-title') : $());
+        (this.isFullPage ? $('#revision-indicators') : $());
+
       this.$spinner = $('<div/>', {
         class: 'revision-spinner spinner hidden',
         title: Craft.t('app', 'Saving'),
@@ -137,12 +140,8 @@ Craft.ElementEditor = Garnish.Base.extend(
       this.$statusIcon = $('<div/>', {
         class: `revision-status ${this.isFullPage ? 'invisible' : 'hidden'}`,
       }).appendTo($spinnerContainer);
-      this.$statusMessage = $('<div/>', {
-        class: 'revision-status-message visually-hidden',
-        'aria-live': 'polite',
-      }).appendTo($spinnerContainer);
 
-      this.$expandSiteStatusesBtn = $('.expand-status-btn');
+      this.$expandSiteStatusesBtn = this.$container.find('.expand-status-btn');
 
       if (this.settings.canEditMultipleSites) {
         this.addListener(
@@ -332,6 +331,16 @@ Craft.ElementEditor = Garnish.Base.extend(
 
     pause: function () {
       this.formObserver?.pause();
+      return new Promise((resolve) => {
+        if (this.savingDraft) {
+          // wait until that's done before we give the go-ahead
+          this.saveDraftCallbacks.push(() => {
+            resolve();
+          });
+        } else {
+          resolve();
+        }
+      });
     },
 
     resume: function (checkBeforeListening = true) {
@@ -425,6 +434,8 @@ Craft.ElementEditor = Garnish.Base.extend(
                     redirect: this.settings.hashedCpEditUrl,
                     params: {
                       draftId: this.settings.draftId,
+                      fieldId: this.settings.fieldId,
+                      ownerId: this.settings.ownerId,
                       provisional: 1,
                     },
                   });
@@ -433,6 +444,9 @@ Craft.ElementEditor = Garnish.Base.extend(
                     data: {
                       elementId: this.settings.canonicalId,
                       draftId: this.settings.draftId,
+                      fieldId: this.settings.fieldId,
+                      ownerId: this.settings.ownerId,
+                      siteId: this.settings.siteId,
                       provisional: 1,
                     },
                   })
@@ -822,10 +836,6 @@ Craft.ElementEditor = Garnish.Base.extend(
       return this.$statusIcon;
     },
 
-    statusMessage: function () {
-      return this.$statusMessage;
-    },
-
     createEditMetaAction: function () {
       if (!this.isFullPage) {
         return;
@@ -949,20 +959,20 @@ Craft.ElementEditor = Garnish.Base.extend(
 
     /**
      * @param {string} url
-     * @param {?string} [randoParam]
-     * @param {boolean} [asPromise=false]
+     * @param {?string} [previewParam]
+     * @param {boolean} [asPromise=true]
      * @returns {(Promise|string)}
      */
-    getTokenizedPreviewUrl: function (url, randoParam, asPromise) {
-      if (typeof asPromise === 'undefined') {
-        asPromise = true;
-      }
-
+    getTokenizedPreviewUrl: function (url, previewParam, asPromise = true) {
       const params = {};
 
-      if (randoParam || !this.settings.isLive) {
+      if (
+        this.settings.previewParamValue &&
+        (previewParam || !this.settings.isLive)
+      ) {
         // Randomize the URL so CDNs don't return cached pages
-        params[randoParam || 'x-craft-preview'] = Craft.randomString(10);
+        params[previewParam || 'x-craft-preview'] =
+          this.settings.previewParamValue;
       }
 
       if (this.settings.siteToken) {
@@ -1124,7 +1134,7 @@ Craft.ElementEditor = Garnish.Base.extend(
           `${encodeURIComponent(name)}=${encodeURIComponent(value)}`
         )
       ) {
-        return;
+        return false;
       }
 
       $('<input/>', {
@@ -1135,6 +1145,8 @@ Craft.ElementEditor = Garnish.Base.extend(
       if (this.settings.canCreateDrafts) {
         await this.saveDraft();
       }
+
+      return true;
     },
 
     async markDeltaNameAsModified(name) {
@@ -1170,7 +1182,16 @@ Craft.ElementEditor = Garnish.Base.extend(
       // remove embedded element index names
       data = data.replace(/&elementindex-[^&]*/g, '');
 
-      return data;
+      // Give other things the ability to customize the serialized data
+      // (need to be passed via a nested object so changes persist upstream)
+      const eventData = {
+        serialized: data,
+      };
+      this.trigger('serializeForm', {
+        data: eventData,
+      });
+
+      return eventData.serialized;
     },
 
     /**
@@ -1182,10 +1203,23 @@ Craft.ElementEditor = Garnish.Base.extend(
       return this.queue.push(
         () =>
           new Promise((resolve, reject) => {
-            // If this is a draft, there's nothing to check
+            // If this is a revision, there's nothing to check
             if (this.settings.revisionId) {
               resolve();
               return;
+            }
+
+            // If we're already saving a draft, try again later
+            if (this.savingDraft) {
+              this.saveDraftCallbacks.push(async () => {
+                try {
+                  await this.checkForm(force, saveDraft);
+                } catch (e) {
+                  reject(e);
+                  return;
+                }
+                resolve();
+              });
             }
 
             // If we haven't had a chance to fetch the initial data yet, try again in a bit
@@ -1193,8 +1227,14 @@ Craft.ElementEditor = Garnish.Base.extend(
               typeof this.$container.data('initialSerializedValue') ===
               'undefined'
             ) {
-              setTimeout(() => {
-                this.checkForm(force).then(resolve).catch(reject);
+              setTimeout(async () => {
+                try {
+                  await this.checkForm(force, saveDraft);
+                } catch (e) {
+                  reject(e);
+                  return;
+                }
+                resolve();
               }, 500);
               return;
             }
@@ -1256,14 +1296,13 @@ Craft.ElementEditor = Garnish.Base.extend(
     },
 
     /**
-     * @param {Object} [params]
      * @returns {Promise}
      */
-    saveDraft: function (params) {
+    saveDraft: function () {
       return this.queue.push(
         () =>
           new Promise((resolve, reject) => {
-            this._saveDraftInternal(this.serializeForm(true), params)
+            this._saveDraftInternal(this.serializeForm(true))
               .then(resolve)
               .catch(reject);
           })
@@ -1272,10 +1311,9 @@ Craft.ElementEditor = Garnish.Base.extend(
 
     /**
      * @param {Object} data
-     * @param {Object} [params]
      * @returns {Promise}
      */
-    _saveDraftInternal: function (data, params) {
+    _saveDraftInternal: function (data) {
       return new Promise((resolve, reject) => {
         // Ignore if we're already submitting the main form
         if (this.submittingForm) {
@@ -1283,7 +1321,14 @@ Craft.ElementEditor = Garnish.Base.extend(
           return;
         }
 
+        // Ignore if we're already saving the draft
+        if (this.savingDraft) {
+          reject('Draft already being saved.');
+        }
+
         this.lastSerializedValue = data;
+        this.savingDraft = true;
+        this.saveDraftCallbacks = [];
         this.failed = false;
         this.httpStatus = null;
         this.httpError = null;
@@ -1294,9 +1339,6 @@ Craft.ElementEditor = Garnish.Base.extend(
           .css('opacity', '')
           .removeClass('hidden invisible checkmark-icon alert-icon fade-out')
           .addClass('hidden');
-
-        // Clear previous status message
-        this.statusMessage().empty();
 
         if (this.$saveMetaBtn) {
           this.$saveMetaBtn.addClass('active');
@@ -1354,6 +1396,7 @@ Craft.ElementEditor = Garnish.Base.extend(
         })
           .then((response) => {
             this._afterSaveDraft();
+            this.settings.previewParamValue = response.data.previewParamValue;
             this._afterUpdateFieldLayout(data, selectedTabId, response);
             this._handleSaveDraftResponse(response);
 
@@ -1386,6 +1429,7 @@ Craft.ElementEditor = Garnish.Base.extend(
               $modifiedFields.eq(i).prepend(
                 $('<div/>', {
                   class: 'status-badge modified',
+                  'aria-hidden': 'true',
                   title: Craft.t('app', 'This field has been modified.'),
                 }).append(
                   $('<span/>', {
@@ -1427,6 +1471,15 @@ Craft.ElementEditor = Garnish.Base.extend(
             }
 
             this.ignoreFailedRequest = false;
+          })
+          .finally(async () => {
+            this.savingDraft = false;
+            const callbacks = [...this.saveDraftCallbacks];
+            this.saveDraftCallbacks = [];
+
+            for (const callback of callbacks) {
+              await callback();
+            }
           });
       });
     },
@@ -1645,6 +1698,24 @@ Craft.ElementEditor = Garnish.Base.extend(
         params.push(
           `${this.namespaceInputName('draftName')}=${this.settings.draftName}`
         );
+      }
+
+      if (this.settings.fieldId !== null) {
+        params.push(
+          `${this.namespaceInputName('fieldId')}=${this.settings.fieldId}`
+        );
+      }
+
+      if (this.settings.ownerId !== null) {
+        params.push(
+          `${this.namespaceInputName('ownerId')}=${this.settings.ownerId}`
+        );
+      }
+
+      if (this.settings.saveParams) {
+        for (const [name, value] of Object.entries(this.settings.saveParams)) {
+          params.push(`${this.namespaceInputName(name)}=${value}`);
+        }
       }
 
       return asArray ? params : params.join('&');
@@ -1867,7 +1938,11 @@ Craft.ElementEditor = Garnish.Base.extend(
 
       this.trigger('update');
 
-      if (this.settings.isProvisionalDraft && Craft.broadcaster) {
+      if (
+        (this.settings.isProvisionalDraft ||
+          this.settings.isUnpublishedDraft) &&
+        Craft.broadcaster
+      ) {
         // Broadcast a saveMessage event, in case any chips/cards should be
         // updated to show the provisional changes
         Craft.broadcaster.postMessage({
@@ -1879,14 +1954,7 @@ Craft.ElementEditor = Garnish.Base.extend(
 
     setStatusMessage: function (message) {
       this.statusIcons().attr('title', message);
-      this.statusMessage()
-        .empty()
-        .append(
-          $('<span/>', {
-            class: 'visually-hidden',
-            text: message,
-          })
-        );
+      Craft.cp.announce(message);
     },
 
     showMetaModal: function () {
@@ -2049,7 +2117,22 @@ Craft.ElementEditor = Garnish.Base.extend(
         } finally {
           this.submittingForm = false;
           this.trigger('afterSubmit');
+
+          // after fully saving the element in a slideout, trigger checkForm but without creating a draft
+          // see https://github.com/craftcms/cms/issues/15938
+          this.checkForm(false, false);
         }
+
+        if (this.settings.isUnpublishedDraft) {
+          // Remove the draft-id data from existing chips/cards
+          const $elements = $(
+            `div.element[data-id="${this.settings.elementId}"][data-settings]`
+          );
+          for (let i = 0; i < $elements.length; i++) {
+            $elements.eq(i).removeData('draft-id').removeAttr('data-draft-id');
+          }
+        }
+
         this.settings.handleSubmitResponse(response);
       }
     },
@@ -2197,18 +2280,20 @@ Craft.ElementEditor = Garnish.Base.extend(
                   });
 
                   Craft.cp.displayNotice(
-                    Craft.t('app', 'This {type} has been updated.', {
-                      type:
-                        elementUpdated &&
-                        this.settings.draftId &&
-                        !this.settings.isProvisionalDraft
-                          ? Craft.t('app', 'draft')
-                          : Craft.elementTypeNames[this.settings.elementType]
-                            ? Craft.elementTypeNames[
-                                this.settings.elementType
-                              ][2]
-                            : Craft.t('app', 'element'),
-                    }),
+                    Craft.uppercaseFirst(
+                      Craft.t('app', 'This {type} has been updated.', {
+                        type:
+                          elementUpdated &&
+                          this.settings.draftId &&
+                          !this.settings.isProvisionalDraft
+                            ? Craft.t('app', 'draft')
+                            : Craft.elementTypeNames[this.settings.elementType]
+                              ? Craft.elementTypeNames[
+                                  this.settings.elementType
+                                ][2]
+                              : Craft.t('app', 'element'),
+                      })
+                    ),
                     {
                       details: $reloadBtn,
                     }
@@ -2276,9 +2361,13 @@ Craft.ElementEditor = Garnish.Base.extend(
       isUnpublishedDraft: false,
       previewTargets: [],
       previewToken: null,
+      previewParamValue: null,
       revisionId: null,
+      fieldId: null,
+      ownerId: null,
       siteId: null,
       siteStatuses: [],
+      saveParams: null,
       siteToken: null,
       visibleLayoutElements: {},
       updatedTimestamp: null,

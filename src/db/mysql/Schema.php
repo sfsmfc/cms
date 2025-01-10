@@ -126,6 +126,7 @@ class Schema extends \yii\db\mysql\Schema
      *
      * @param string $name
      * @return string
+     * @deprecated in 5.4.0
      */
     public function quoteDatabaseName(string $name): string
     {
@@ -226,6 +227,7 @@ class Schema extends \yii\db\mysql\Schema
 
         $schemaDump = (clone $baseCommand)
             ->addArg('--no-data')
+            ->addArg('--skip-triggers')
             ->addArg('--result-file=', '{file}')
             ->addArg('{database}');
 

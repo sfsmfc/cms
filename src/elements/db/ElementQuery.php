@@ -52,6 +52,7 @@ use yii\db\Connection as YiiConnection;
 use yii\db\Expression;
 use yii\db\ExpressionInterface;
 use yii\db\QueryBuilder;
+use yii\db\Schema;
 
 /**
  * ElementQuery represents a SELECT SQL statement for elements in a way that is independent of DBMS.
@@ -113,8 +114,7 @@ class ElementQuery extends Query implements ElementQueryInterface
     // -------------------------------------------------------------------------
 
     /**
-     * @var string The name of the [[ElementInterface]] class.
-     * @phpstan-var class-string<TElement>
+     * @var class-string<TElement> The name of the [[ElementInterface]] class.
      */
     public string $elementType;
 
@@ -323,11 +323,21 @@ class ElementQuery extends Query implements ElementQueryInterface
     /**
      * @var mixed The element relation criteria.
      *
-     * See [Relations](https://craftcms.com/docs/4.x/relations.html) for supported syntax options.
+     * See [Relations](https://craftcms.com/docs/5.x/system/relations.html) for supported syntax options.
      *
      * @used-by relatedTo()
      */
     public mixed $relatedTo = null;
+
+    /**
+     * @var mixed The element relation criteria.
+     *
+     * See [Relations](https://craftcms.com/docs/5.x/system/relations.html) for supported syntax options.
+     *
+     * @used-by notRelatedTo()
+     * @since 5.4.0
+     */
+    public mixed $notRelatedTo = null;
 
     /**
      * @var mixed The title that resulting elements must have.
@@ -350,7 +360,7 @@ class ElementQuery extends Query implements ElementQueryInterface
     /**
      * @var mixed The search term to filter the resulting elements by.
      *
-     * See [Searching](https://craftcms.com/docs/4.x/searching.html) for supported syntax options.
+     * See [Searching](https://craftcms.com/docs/5.x/system/searching.html) for supported syntax options.
      *
      * @used-by ElementQuery::search()
      */
@@ -379,7 +389,7 @@ class ElementQuery extends Query implements ElementQueryInterface
     /**
      * @var string|array|null The eager-loading declaration.
      *
-     * See [Eager-Loading Elements](https://craftcms.com/docs/4.x/dev/eager-loading-elements.html) for supported syntax options.
+     * See [Eager-Loading Elements](https://craftcms.com/docs/5.x/development/eager-loading.html) for supported syntax options.
      *
      * @used-by with()
      * @used-by andWith()
@@ -567,10 +577,16 @@ class ElementQuery extends Query implements ElementQueryInterface
     private bool $_joinedElementTable = false;
 
     /**
+     * @var array<string,string|string[]> Column alias => cast type
+     * @see prepare()
+     * @see _applyOrderByParams()
+     */
+    private array $_columnsToCast = [];
+
+    /**
      * Constructor
      *
-     * @param string $elementType The element type class associated with this query
-     * @phpstan-param class-string<TElement> $elementType
+     * @param class-string<TElement> $elementType The element type class associated with this query
      * @param array $config Configurations to be applied to the newly created query object
      */
     public function __construct(string $elementType, array $config = [])
@@ -1082,6 +1098,33 @@ class ElementQuery extends Query implements ElementQueryInterface
 
     /**
      * @inheritdoc
+     * @uses $notRelatedTo
+     * @since 5.4.0
+     */
+    public function notRelatedTo($value): static
+    {
+        $this->notRelatedTo = $value;
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     * @uses $notRelatedTo
+     * @since 5.4.0
+     */
+    public function andNotRelatedTo($value): static
+    {
+        $relatedTo = $this->_andRelatedToCriteria($value, $this->notRelatedTo);
+
+        if ($relatedTo === false) {
+            return $this;
+        }
+
+        return $this->notRelatedTo($relatedTo);
+    }
+
+    /**
+     * @inheritdoc
      * @uses $relatedTo
      */
     public function relatedTo($value): static
@@ -1097,16 +1140,33 @@ class ElementQuery extends Query implements ElementQueryInterface
      */
     public function andRelatedTo($value): static
     {
-        if (!$value) {
+        $relatedTo = $this->_andRelatedToCriteria($value, $this->relatedTo);
+
+        if ($relatedTo === false) {
             return $this;
         }
 
-        if (!$this->relatedTo) {
-            return $this->relatedTo($value);
+        return $this->relatedTo($relatedTo);
+    }
+
+    /**
+     * @param $value
+     * @param $currentValue
+     * @return mixed
+     * @throws NotSupportedException
+     */
+    private function _andRelatedToCriteria($value, $currentValue): mixed
+    {
+        if (!$value) {
+            return false;
+        }
+
+        if (!$currentValue) {
+            return $value;
         }
 
         // Normalize so element/targetElement/sourceElement values get pushed down to the 2nd level
-        $relatedTo = ElementRelationParamParser::normalizeRelatedToParam($this->relatedTo);
+        $relatedTo = ElementRelationParamParser::normalizeRelatedToParam($currentValue);
         $criteriaCount = count($relatedTo) - 1;
 
         // Not possible to switch from `or` to `and` if there are multiple criteria
@@ -1116,7 +1176,8 @@ class ElementQuery extends Query implements ElementQueryInterface
 
         $relatedTo[0] = $criteriaCount > 0 ? 'and' : 'or';
         $relatedTo[] = ElementRelationParamParser::normalizeRelatedToCriteria($value);
-        return $this->relatedTo($relatedTo);
+
+        return $relatedTo;
     }
 
     /**
@@ -1479,8 +1540,8 @@ class ElementQuery extends Query implements ElementQueryInterface
         if (isset($this->id) && empty($this->id)) {
             throw new QueryAbortedException();
         }
-        /** @var string|ElementInterface $class */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $class */
+
+        /** @var class-string<ElementInterface> $class */
         $class = $this->elementType;
 
         // Make sure the siteId param is set
@@ -1642,10 +1703,19 @@ class ElementQuery extends Query implements ElementQueryInterface
                 } else {
                     $this->_columnMap[$field->handle] = $valueSql;
                 }
+
+                // when preparing the query, we sometimes need to prep custom values some more
+                $dbType = $field::dbType();
+                // for mysql, we have to make sure text column type is cast to char, otherwise it won't be sorted correctly
+                // see https://github.com/craftcms/cms/issues/15609
+                if ($db->getIsMysql() && is_string($dbType) && Db::parseColumnType($dbType) === Schema::TYPE_TEXT) {
+                    $this->_columnsToCast[$field->handle] = 'CHAR(255)';
+                }
             }
         }
 
         $this->_applyRelatedToParam();
+        $this->_applyNotRelatedToParam();
         $this->_applyStructureParams($class);
         $this->_applyRevisionParams();
         $this->_applySearchParam();
@@ -1796,14 +1866,7 @@ class ElementQuery extends Query implements ElementQueryInterface
             return null;
         }
 
-        if (isset($this->eagerLoadAlias)) {
-            $alias = $this->eagerLoadAlias;
-        } else {
-            $alias = $this->eagerLoadHandle;
-            if (str_contains($alias, ':')) {
-                $alias = explode(':', $alias, 2)[1];
-            }
-        }
+        $alias = $this->eagerLoadAlias ?? "eagerly:$this->eagerLoadHandle";
 
         // see if it was already eager-loaded
         $eagerLoaded = match ($count) {
@@ -2010,7 +2073,7 @@ class ElementQuery extends Query implements ElementQueryInterface
     }
 
     /**
-     * Clears the [cached result](https://craftcms.com/docs/4.x/element-queries.html#cache).
+     * Clears the [cached result](https://craftcms.com/docs/5.x/development/element-queries.html#cache).
      *
      * @see getCachedResult()
      * @see setCachedResult()
@@ -2198,10 +2261,10 @@ class ElementQuery extends Query implements ElementQueryInterface
         $vars = array_keys(Craft::getObjectVars($this));
         $behavior = $this->getBehavior('customFields');
         $behaviorVars = array_keys(Craft::getObjectVars($behavior));
-        $fields = array_merge(
-            array_combine($vars, $vars),
-            array_combine($behaviorVars, array_map(fn(string $var) => fn() => $behavior->$var, $behaviorVars))
-        );
+        // if using an array_merge here, reverse the order so that the $behaviorVars go before $vars;
+        // the properties ($var) have to take priority over custom fields ($behaviorVars);
+        $fields = array_combine($vars, $vars) +
+            array_combine($behaviorVars, array_map(fn(string $var) => fn() => $behavior->$var, $behaviorVars));
         unset($fields['query'], $fields['subQuery'], $fields['owner']);
         return $fields;
     }
@@ -2223,8 +2286,7 @@ class ElementQuery extends Query implements ElementQueryInterface
             return $element;
         }
 
-        /** @var string|ElementInterface $class */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $class */
+        /** @var class-string<ElementInterface> $class */
         $class = $this->elementType;
 
         // Instantiate the element
@@ -2643,14 +2705,11 @@ class ElementQuery extends Query implements ElementQueryInterface
     /**
      * Applies the 'status' param to the query being prepared.
      *
-     * @param string $class
-     * @phpstan-param class-string<ElementInterface> $class
+     * @param class-string<ElementInterface> $class
      * @throws QueryAbortedException
      */
     private function _applyStatusParam(string $class): void
     {
-        /** @var string|ElementInterface $class */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $class */
         if (!$this->status || !$class::hasStatuses()) {
             return;
         }
@@ -2726,6 +2785,38 @@ class ElementQuery extends Query implements ElementQueryInterface
     }
 
     /**
+     * Applies the 'notRelatedTo' param to the query being prepared.
+     *
+     * @throws QueryAbortedException
+     */
+    private function _applyNotRelatedToParam(): void
+    {
+        if (!$this->notRelatedTo) {
+            return;
+        }
+
+        $notRelatedToParam = $this->notRelatedTo;
+
+        $parser = new ElementRelationParamParser([
+            'fields' => $this->customFields ? ArrayHelper::index(
+                $this->customFields,
+                fn(FieldInterface $field) => $field->layoutElement?->getOriginalHandle() ?? $field->handle,
+            ) : [],
+        ]);
+        $condition = $parser->parse($notRelatedToParam, $this->siteId !== '*' ? $this->siteId : null);
+
+        if ($condition === false) {
+            // just don't modify the query
+            return;
+        }
+
+        // Prepend `not` as this is not expect to be provided
+        $condition = ['not', $condition];
+
+        $this->subQuery->andWhere($condition);
+    }
+
+    /**
      * Returns whether we should join structure data in the query.
      *
      * @return bool
@@ -2741,8 +2832,7 @@ class ElementQuery extends Query implements ElementQueryInterface
     /**
      * Applies the structure params to the query being prepared.
      *
-     * @param string $class
-     * @phpstan-param class-string<ElementInterface> $class
+     * @param class-string<ElementInterface> $class
      * @throws QueryAbortedException
      */
     private function _applyStructureParams(string $class): void
@@ -3048,8 +3138,7 @@ class ElementQuery extends Query implements ElementQueryInterface
      * Normalizes a structure param value to either an Element object or false.
      *
      * @param string $property The parameter’s property name.
-     * @param string $class The element class
-     * @phpstan-param class-string<ElementInterface> $class
+     * @param class-string<ElementInterface> $class The element class
      * @return ElementInterface The normalized element
      * @throws QueryAbortedException if the element can't be found
      */
@@ -3061,8 +3150,6 @@ class ElementQuery extends Query implements ElementQueryInterface
             throw new QueryAbortedException();
         }
 
-        /** @var string|ElementInterface $class */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $class */
         if ($element instanceof ElementInterface && !$element->lft) {
             $element = $element->getCanonicalId();
 
@@ -3137,11 +3224,19 @@ class ElementQuery extends Query implements ElementQueryInterface
 
             $this->_searchResults = $searchResults;
 
-            $elementIds = array_map(function(string $key) {
-                [$elementId] = explode('-', $key, 2);
-                return $elementId;
-            }, array_keys($searchResults));
-            $this->subQuery->andWhere(['elements.id' => $elementIds]);
+            $elementIdsBySiteId = [];
+            foreach (array_keys($searchResults) as $key) {
+                [$elementId, $siteId] = explode('-', $key, 2);
+                $elementIdsBySiteId[$siteId][] = $elementId;
+            }
+            $condition = ['or'];
+            foreach ($elementIdsBySiteId as $siteId => $elementIds) {
+                $condition[] = [
+                    'elements_sites.siteId' => $siteId,
+                    'elements.id' => $elementIds,
+                ];
+            }
+            $this->subQuery->andWhere($condition);
         } else {
             // Just filter the main query by the search query
             $searchQuery = $searchService->createDbQuery($this->search, $this);
@@ -3229,7 +3324,11 @@ class ElementQuery extends Query implements ElementQueryInterface
                     $params = [];
                     $orderByColumns[$pos] = (new CoalesceColumnsExpression($columnName))->getSql($params);
                 } else {
-                    $orderByColumns[$pos] = $columnName;
+                    if (isset($this->_columnsToCast[$orderValue])) {
+                        $orderByColumns[$pos] = "CAST($columnName AS {$this->_columnsToCast[$orderValue]})";
+                    } else {
+                        $orderByColumns[$pos] = $columnName;
+                    }
                 }
 
                 $orderBy = array_combine($orderByColumns, $orderBy);
@@ -3298,13 +3397,13 @@ class ElementQuery extends Query implements ElementQueryInterface
             if ($alias === '**') {
                 $includeDefaults = true;
             } else {
-                // Is this a mapped column name (without a custom alias)?
-                if ($alias === $column && isset($this->_columnMap[$alias])) {
-                    $column = $this->_columnMap[$alias];
+                // Is this a mapped column name?
+                if (is_string($column) && isset($this->_columnMap[$column])) {
+                    $column = $this->_columnMap[$column];
 
                     // Completely ditch the mapped name if instantiated elements are going to be returned
-                    if (!$this->asArray && is_string($this->_columnMap[$alias])) {
-                        $alias = $this->_columnMap[$alias];
+                    if (!$this->asArray && is_string($column)) {
+                        $alias = $column;
                     }
                 }
 

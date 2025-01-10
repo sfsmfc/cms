@@ -9,11 +9,13 @@ namespace craft\controllers;
 
 use Craft;
 use craft\base\ElementContainerFieldInterface;
+use craft\base\FieldInterface;
+use craft\base\FieldLayoutElement;
 use craft\elements\Entry;
 use craft\enums\Color;
+use craft\fieldlayoutelements\entries\EntryTitleField;
 use craft\helpers\Cp;
 use craft\helpers\Html;
-use craft\helpers\UrlHelper;
 use craft\models\EntryType;
 use craft\models\Section;
 use craft\web\Controller;
@@ -70,6 +72,20 @@ class EntryTypesController extends Controller
             $title = Craft::t('app', 'Create a new entry type');
         }
 
+        $fieldLayout = $entryType->getFieldLayout();
+        if ($entryType->hasTitleField) {
+            // Ensure the Title field is present
+            if (!$fieldLayout->isFieldIncluded('title')) {
+                $fieldLayout->prependElements([new EntryTitleField()]);
+            }
+        } else {
+            // Remove the title field
+            foreach ($fieldLayout->getTabs() as $tab) {
+                $elements = array_filter($tab->getElements(), fn(FieldLayoutElement $element) => !$element instanceof EntryTitleField);
+                $tab->setElements($elements);
+            }
+        }
+
         $response = $this->asCpScreen()
             ->editUrl($entryType->getCpEditUrl())
             ->title($title)
@@ -105,16 +121,8 @@ class EntryTypesController extends Controller
 
                         $labels = [];
                         $items = array_map(function(Section|ElementContainerFieldInterface $usage) use (&$labels) {
-                            if ($usage instanceof Section) {
-                                $label = Craft::t('site', $usage->name);
-                                $url = $usage->getCpEditUrl();
-                                $icon = 'newspaper';
-                            } else {
-                                $label = Craft::t('site', $usage->name);
-                                $url = UrlHelper::cpUrl("settings/fields/edit/$usage->id");
-                                $icon = $usage::icon();
-                            }
-                            $labels[] = $label;
+                            $icon = $usage instanceof FieldInterface ? $usage::icon() : $usage->getIcon();
+                            $label = $labels[] = $usage->getUiLabel();
                             $labelHtml = Html::beginTag('span', [
                                     'class' => ['flex', 'flex-nowrap', 'gap-s'],
                                 ]) .
@@ -123,7 +131,7 @@ class EntryTypesController extends Controller
                                 ]) .
                                 Html::tag('span', Html::encode($label)) .
                                 Html::endTag('span');
-                            return Html::a($labelHtml, $url);
+                            return Html::a($labelHtml, $usage->getCpEditUrl());
                         }, $entryType->findUsages());
 
                         // sort by label
@@ -167,7 +175,6 @@ class EntryTypesController extends Controller
         $entryType->icon = $this->request->getBodyParam('icon', $entryType->icon);
         $color = $this->request->getBodyParam('color', $entryType->color?->value);
         $entryType->color = $color && $color !== '__blank__' ? Color::from($color) : null;
-        $entryType->hasTitleField = (bool)$this->request->getBodyParam('hasTitleField', $entryType->hasTitleField);
         $entryType->titleTranslationMethod = $this->request->getBodyParam('titleTranslationMethod', $entryType->titleTranslationMethod);
         $entryType->titleTranslationKeyFormat = $this->request->getBodyParam('titleTranslationKeyFormat', $entryType->titleTranslationKeyFormat);
         $entryType->titleFormat = $this->request->getBodyParam('titleFormat', $entryType->titleFormat);
