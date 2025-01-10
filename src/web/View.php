@@ -1378,6 +1378,37 @@ class View extends \yii\web\View
     }
 
     /**
+     * Registers a generic `<script>` tag with the given variables, pre-JSON-encoded.
+     *
+     * @param callable $scriptFn callback function that returns the JS code to be registered.
+     * @param array $vars Array of variables that will be JSON-encoded before being passed to `$scriptFn`
+     * @param int $position the position at which the JS script tag should be inserted
+     * * in a page. The possible values are:
+     * *
+     * * - [[POS_HEAD]]: in the head section
+     * * - [[POS_BEGIN]]: at the beginning of the body section
+     * * - [[POS_END]]: at the end of the body section
+     * * - [[POS_LOAD]]: enclosed within jQuery(window).load().
+     * *   Note that by using this position, the method will automatically register the jQuery js file.
+     * * - [[POS_READY]]: enclosed within jQuery(document).ready(). This is the default value.
+     * *   Note that by using this position, the method will automatically register the jQuery js file.
+     * *
+     * @param array $options the HTML attributes for the `<script>` tag.
+     * @param string|null $key the key that identifies the generic `<script>` code block. If null, it will use
+     * $script as the key. If two generic `<script>` code blocks are registered with the same key, the latter
+     * will overwrite the former.
+     */
+    public function registerScriptWithVars(callable $scriptFn, array $vars, int $position = self::POS_END, array $options = [], ?string $key = null): void
+    {
+        $jsVars = array_map(function($variable) {
+            return Json::encode($variable);
+        }, $vars);
+
+        $script = call_user_func($scriptFn, ...array_values($jsVars));
+        $this->registerScript($script, $position, $options);
+    }
+
+    /**
      * Registers arbitrary HTML to be injected into the final page response.
      *
      * @param string $html the HTML code to be registered
