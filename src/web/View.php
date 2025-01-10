@@ -2158,6 +2158,10 @@ JS;
         if (!empty($this->title)) {
             $lines[] = '<title>' . Html::encode($this->title) . '</title>';
         }
+
+        if (!empty($this->_jsImports)) {
+            $lines[] = '<script type="importmap">{"imports": ' . Json::encode($this->_jsImports) . '}</script>';
+        }
         if (!empty($this->_scripts[self::POS_HEAD])) {
             $lines[] = implode("\n", $this->_scripts[self::POS_HEAD]);
         }
@@ -2165,9 +2169,6 @@ JS;
             $lines[] = implode("\n", $this->_html[self::POS_HEAD]);
         }
 
-        if (!empty($this->_jsImports)) {
-            $lines[] = '<script type="importmap">{"imports": ' . Json::encode($this->_jsImports) . '}</script>';
-        }
 
         $html = parent::renderHeadHtml();
 
