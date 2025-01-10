@@ -1488,14 +1488,6 @@ JS, [
             $errors ? 'has-errors' : null,
         ]), Html::explodeClass($config['fieldClass'] ?? []));
 
-        if (($config['showAttribute'] ?? false) && ($currentUser = Craft::$app->getUser()->getIdentity())) {
-            $showAttribute = $currentUser->admin && $currentUser->getPreference('showFieldHandles');
-        } else {
-            $showAttribute = false;
-        }
-
-        $showLabelExtra = $showAttribute || isset($config['labelExtra']);
-
         $instructionsHtml = $instructions
             ? Html::tag('div', preg_replace('/&amp;(\w+);/', '&$1;', Markdown::process(Html::encodeInvalidTags($instructions), 'gfm-comment')), [
                 'id' => $instructionsId,
@@ -1530,6 +1522,15 @@ JS, [
                         ])
                         : '')
                 );
+
+            if (!empty($config['actionMenuItems'])) {
+                $labelHtml .= static::disclosureMenu($config['actionMenuItems'], [
+                    'buttonAttributes' => [
+                        'class' => ['action-btn', 'small'],
+                        'hiddenLabel' => Craft::t('app', 'Actions'),
+                    ],
+                ]);
+            }
         } else {
             $labelHtml = '';
         }
@@ -1567,7 +1568,7 @@ JS, [
                 ]) .
                 Html::endTag('div')
                 : '') .
-            (($label || $showLabelExtra)
+            (($label || isset($config['labelExtra']))
                 ? (
                     Html::beginTag('div', ['class' => 'heading']) .
                     ($config['headingPrefix'] ?? '') .
@@ -1581,16 +1582,8 @@ JS, [
                             ],
                         ], $config['labelAttributes'] ?? []))
                         : '') .
-                    ($showLabelExtra
-                        ? Html::tag('div', '', [
-                            'class' => ['flex-grow'],
-                        ]) .
-                        ($showAttribute ? static::renderTemplate('_includes/forms/copytextbtn.twig', [
-                            'id' => "$id-attribute",
-                            'class' => ['code', 'small', 'light'],
-                            'value' => $config['attribute'],
-                        ]) : '') .
-                        ($config['labelExtra'] ?? '')
+                    (isset($config['labelExtra'])
+                        ? Html::tag('div', '', ['class' => 'flex-grow']) . $config['labelExtra']
                         : '') .
                     ($config['headingSuffix'] ?? '') .
                     Html::endTag('div')
