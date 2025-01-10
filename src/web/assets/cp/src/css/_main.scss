@@ -2583,6 +2583,7 @@ div.btn.submit input {
     padding: 0;
     border-radius: 0;
     background-color: transparent;
+    height: var(--ui-control-height);
 
     &.current-step,
     &.active-drop-target {
@@ -2650,7 +2651,7 @@ div.btn.submit input {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      height: var(--ui-control-height);
+      height: 100%;
       background-color: var(--ui-control-bg-color);
 
       [data-icon] {
