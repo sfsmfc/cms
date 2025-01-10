@@ -85,6 +85,7 @@ abstract class BaseField extends FieldLayoutElement
      *
      * @return bool
      * @since 4.5.4
+     * @deprecated in 5.6.0
      */
     public function showAttribute(): bool
     {
@@ -400,6 +401,7 @@ abstract class BaseField extends FieldLayoutElement
             'translationDescription' => $this->translationDescription($element, $static),
             'copyable' => !$static && $translatable && $this->uid && $element?->getIsCrossSiteCopyable() && $this->isCrossSiteCopyable($element),
             'element-id' => $element->getCanonicalId(),
+            'actionMenuItems' => $this->actionMenuItems(),
             'errors' => !$static ? $this->errors($element) : [],
         ]);
     }
@@ -791,6 +793,19 @@ abstract class BaseField extends FieldLayoutElement
     public function isCrossSiteCopyable(ElementInterface $element): bool
     {
         return false;
+    }
+
+    /**
+     * Returns any action menu items that should be shown for the field.
+     *
+     *  See [[\craft\helpers\Cp::disclosureMenu()]] for documentation on supported item properties.
+     *
+     * @return array
+     * @since 5.6.0
+     */
+    protected function actionMenuItems(): array
+    {
+        return [];
     }
 
     /**

@@ -2398,7 +2398,7 @@ craft-copy-attribute {
   padding-inline: var(--s) !important;
   font-size: 12px;
   line-height: calc(22rem / 16);
-  height: calc(22rem / 16);
+  height: calc(22rem / 16) !important;
 }
 
 .btngroup.small,
@@ -7847,9 +7847,13 @@ fieldset {
     align-items: center;
     position: relative;
     margin-block: -5px 5px;
+    min-height: calc(22rem / 16);
 
     & > label,
     & > legend {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
       font-weight: bold;
 
       code {
@@ -7870,6 +7874,10 @@ fieldset {
       &.copyable {
         cursor: pointer;
       }
+    }
+
+    .action-btn {
+      margin-inline-start: var(--xs);
     }
 
     & + .instructions {
