@@ -7955,22 +7955,8 @@ fieldset {
   }
 }
 
-.copy-translation-dialogue {
+.cross-site-copy-modal {
   max-width: 380px;
-
-  .copy-sites-menu-btn {
-    margin-block: 0;
-    margin-inline: 0.75em;
-    min-width: 8.7em;
-  }
-
-  hr {
-    margin-block: var(--m);
-  }
-
-  .smalltext {
-    color: var(--medium-text-color);
-  }
 }
 
 .expand-status-btn {

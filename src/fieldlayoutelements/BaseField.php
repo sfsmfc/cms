@@ -399,7 +399,7 @@ abstract class BaseField extends FieldLayoutElement
             'orientation' => $this->orientation($element, $static),
             'translatable' => $translatable,
             'translationDescription' => $this->translationDescription($element, $static),
-            'copyable' => !$static && $translatable && $this->uid && $element?->getIsCrossSiteCopyable() && $this->isCrossSiteCopyable($element),
+            'crossSiteCopyable' => !$static && $translatable && $this->uid && $element?->getIsCrossSiteCopyable() && $this->isCrossSiteCopyable($element),
             'element-id' => $element->getCanonicalId(),
             'actionMenuItems' => $this->actionMenuItems(),
             'errors' => !$static ? $this->errors($element) : [],

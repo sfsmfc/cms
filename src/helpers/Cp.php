@@ -1481,7 +1481,7 @@ JS, [
         $instructionsPosition = $config['instructionsPosition'] ?? 'before';
         $orientation = $config['orientation'] ?? ($site ? $site->getLocale() : Craft::$app->getLocale())->getOrientation();
         $translatable = Craft::$app->getIsMultiSite() ? ($config['translatable'] ?? ($site !== null)) : false;
-        $copyable = ($config['copyable'] ?? false) && ($config['element-id'] ?? null);
+        $crossSiteCopyable = ($config['crossSiteCopyable'] ?? false) && ($config['element-id'] ?? null);
 
         $fieldClass = array_merge(array_filter([
             'field',
@@ -1489,7 +1489,33 @@ JS, [
             $errors ? 'has-errors' : null,
         ]), Html::explodeClass($config['fieldClass'] ?? []));
 
-        $showLabelExtra = isset($config['labelExtra']) || $copyable;
+        $actionMenuItems = $config['actionMenuItems'] ?? [];
+        if ($crossSiteCopyable) {
+            // prepare namespace for the purpose of copying
+            $namespace = Craft::$app->getView()->getNamespace();
+
+            $actionMenuItems = array_filter([
+                [
+                    'icon' => 'clone',
+                    'label' => Craft::t('app', 'Copy value from site…'),
+                    'attributes' => [
+                        'data' => [
+                            'cross-site-copy' => true,
+                            'element-id' => $config['element-id'],
+                            'layout-element' => $config['layout-element'],
+                            'label' => $label,
+                            'namespace' => ($namespace && $namespace !== 'field')
+                                ? StringHelper::removeRight($namespace, '[fields]')
+                                : null,
+                        ],
+                    ],
+                ],
+                !empty($actionMenuItems) ? ['type' => 'hr'] : null,
+                ...$actionMenuItems,
+            ]);
+        }
+
+        $showLabelExtra = isset($config['labelExtra']) || $crossSiteCopyable;
 
         $instructionsHtml = $instructions
             ? Html::tag('div', preg_replace('/&amp;(\w+);/', '&$1;', Markdown::process(Html::encodeInvalidTags($instructions), 'gfm-comment')), [
@@ -1516,36 +1542,6 @@ JS, [
             'delay' => '1000',
         ]);
 
-        // If this is a copyable field, make the translation icon a button
-        if ($copyable) {
-            // prepare namespace for the purpose of copying
-            $namespace = Craft::$app->getView()->getNamespace();
-            if ($namespace) {
-                if ($namespace === 'fields') {
-                    $namespace = null;
-                } else {
-                    $namespace = StringHelper::removeRight($namespace, '[fields]');
-                }
-            }
-
-            $copyBtn = Html::button(
-                Html::tag('span', self::iconSvg('clone'), ['class' => ['cp-icon', 'puny']]),
-                [
-                    'class' => 'copyable btn icon small hairline btn-empty',
-                    'aria-expanded' => 'false',
-                    'aria-label' => Craft::t('app', 'Copy value of “{name}” from another site', [
-                        'name' => $label,
-                    ]),
-                    'data' => [
-                        'copyable' => true,
-                        'element-id' => $config['element-id'],
-                        'layout-element' => $config['layout-element'],
-                        'namespace' => $namespace,
-                    ],
-                ]);
-        }
-
-
         if ($label) {
             $labelHtml = $label . (
                     ($required
@@ -1562,11 +1558,11 @@ JS, [
                     ($translatable ? $translationIconHtml : '')
                 );
 
-            if (!empty($config['actionMenuItems'])) {
-                $labelHtml .= static::disclosureMenu($config['actionMenuItems'], [
+            if (!empty($actionMenuItems)) {
+                $labelHtml .= static::disclosureMenu($actionMenuItems, [
+                    'hiddenLabel' => Craft::t('app', 'Actions'),
                     'buttonAttributes' => [
                         'class' => ['action-btn', 'small'],
-                        'hiddenLabel' => Craft::t('app', 'Actions'),
                     ],
                 ]);
             }

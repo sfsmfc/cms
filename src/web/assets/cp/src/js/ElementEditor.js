@@ -151,9 +151,17 @@ Craft.ElementEditor = Garnish.Base.extend(
         );
 
         // Use event delegation so we don't have to reinitialize when markup is replaced
-        this.$container.on('click', '[data-copyable]', (ev) => {
-          ev.preventDefault();
-          this.showFieldCopyHud(ev.currentTarget);
+        Garnish.$bod.on('click', '[data-cross-site-copy]', (ev) => {
+          // Make sure the action menu is within this element editor container
+          const $target = $(ev.currentTarget);
+          const $field = $target
+            .closest('.menu')
+            .data('disclosureMenu')
+            ?.$trigger.closest('.field');
+          if ($field.closest(this.$container).length) {
+            ev.preventDefault();
+            this.showFieldCopyModal($target, $field);
+          }
         });
       }
 
@@ -595,14 +603,29 @@ Craft.ElementEditor = Garnish.Base.extend(
       this._updateGlobalStatus();
     },
 
-    showFieldCopyHud: function (btn) {
-      const $btn = $(btn);
+    showFieldCopyModal: function ($btn, $field) {
+      const headingId =
+        'cross-site-copy-heading-' + Math.floor(Math.random() * 1000000);
 
       const $hudContent = $('<div/>', {
-        class: 'copy-translation-dialogue',
+        class: 'modal fitted cross-site-copy-modal',
+        'aria-labelledby': headingId,
       });
+      const $body = $('<div/>', {
+        class: 'body',
+      }).appendTo($hudContent);
 
-      const $form = Craft.createForm().appendTo($hudContent);
+      $body.append(
+        `<div class="header"><h1 id="${headingId}" class="h2">${Craft.t(
+          'app',
+          'Copy “{name}” value',
+          {
+            name: $btn.data('label'),
+          }
+        )}</h1></div>`
+      );
+
+      const $form = Craft.createForm().appendTo($body);
       $form.append(Craft.getCsrfInput());
 
       const $fields = $('<div/>', {
@@ -628,7 +651,7 @@ Craft.ElementEditor = Garnish.Base.extend(
         })
         .appendTo($fields);
 
-      const hud = new Garnish.HUD($btn, $hudContent);
+      const modal = new Garnish.Modal($hudContent);
 
       const $siteSelect = $siteSelectField.find('select').focus();
 
@@ -655,9 +678,9 @@ Craft.ElementEditor = Garnish.Base.extend(
 
           const {fieldHtml, headHtml, bodyHtml, message} = response.data;
 
-          const $field = $btn.closest('.field');
-          $field.replaceWith(fieldHtml);
-          Craft.initUiElements($field);
+          const $newField = $(fieldHtml);
+          $field.replaceWith($newField);
+          Craft.initUiElements($newField);
           await Craft.appendHeadHtml(headHtml);
           await Craft.appendBodyHtml(bodyHtml);
 
@@ -665,7 +688,7 @@ Craft.ElementEditor = Garnish.Base.extend(
         } finally {
           $submitBtn.removeClass('loading');
           Craft.cp.announce(Craft.t('app', 'Loading complete'));
-          hud.hide();
+          modal.hide();
         }
       });
     },
