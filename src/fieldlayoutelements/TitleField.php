@@ -94,12 +94,8 @@ class TitleField extends TextField
     /**
      * @inheritdoc
      */
-    public function isCopyable(?ElementInterface $element = null, bool $static = false): bool
+    public function isCrossSiteCopyable(ElementInterface $element): bool
     {
-        if ($static) {
-            return false;
-        }
-
-        return $this->translatable($element) && $element?->getIsCopyable();
+        return true;
     }
 }

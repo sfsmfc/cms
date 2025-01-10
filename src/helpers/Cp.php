@@ -1481,7 +1481,7 @@ JS, [
         $instructionsPosition = $config['instructionsPosition'] ?? 'before';
         $orientation = $config['orientation'] ?? ($site ? $site->getLocale() : Craft::$app->getLocale())->getOrientation();
         $translatable = Craft::$app->getIsMultiSite() ? ($config['translatable'] ?? ($site !== null)) : false;
-        $copyable = (bool)($config['copyable'] ?? false);
+        $copyable = ($config['copyable'] ?? false) && ($config['element-id'] ?? null);
 
         $fieldClass = array_merge(array_filter([
             'field',
@@ -1539,15 +1539,14 @@ JS, [
                 [
                     'class' => 'copyable btn icon small hairline btn-empty',
                     'aria-expanded' => 'false',
-                    'aria-label' => Craft::t('app', 'Copy value of field {attribute} from another site', [
-                        'attribute' => $attribute,
+                    'aria-label' => Craft::t('app', 'Copy value of “{name}” from another site', [
+                        'name' => $label,
                     ]),
                     'data' => [
-                        'copyable' => 'copyable',
-                        'element-id' => $config['element-id'] ?? null,
+                        'copyable' => true,
+                        'element-id' => $config['element-id'],
+                        'layout-element' => $config['layout-element'],
                         'namespace' => $namespace,
-                        'attribute' => $attribute,
-                        'nested' => $config['nested'] ?? null,
                     ],
                 ]);
         }

@@ -648,9 +648,7 @@ JS, [
     {
         $resetValue = false;
 
-        if ($owner->copying) {
-            $this->duplicateNestedElements($owner->duplicateOf, $owner, true, !$isNew, true);
-        } elseif ($owner->duplicateOf !== null) {
+        if ($owner->duplicateOf !== null) {
             // If this is a draft, its nested element ownership will be duplicated by Drafts::createDraft()
             if ($owner->getIsRevision()) {
                 $this->createRevisions($owner->duplicateOf, $owner);
@@ -950,7 +948,7 @@ JS, [
 
         $transaction = Craft::$app->getDb()->beginTransaction();
         try {
-            $setCanonicalId = !$target->copying && $target->getIsDerivative() && $target->getCanonical()->id !== $target->id;
+            $setCanonicalId = $target->getIsDerivative() && $target->getCanonical()->id !== $target->id;
 
             /** @var NestedElementInterface[] $elements */
             foreach ($elements as $element) {

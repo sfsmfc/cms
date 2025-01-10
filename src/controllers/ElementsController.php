@@ -26,6 +26,7 @@ use craft\errors\UnsupportedSiteException;
 use craft\events\DefineElementEditorHtmlEvent;
 use craft\events\DraftEvent;
 use craft\fieldlayoutelements\BaseField;
+use craft\fieldlayoutelements\CustomField;
 use craft\fields\Matrix;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Component;
@@ -513,56 +514,50 @@ class ElementsController extends Controller
             throw new BadRequestHttpException('No element was identified by the request.');
         }
 
-        $copyFromSiteId = $this->request->getRequiredBodyParam('copyFromSiteId');
+        $copyFromSiteId = (int)$this->request->getRequiredBodyParam('fromSiteId');
         $this->requirePermission("editSite:$copyFromSiteId");
 
-        // if $attribute is null, we're copying all element fields
-        $attribute = $this->request->getBodyParam('attribute');
+        $layoutElementUid = $this->request->getRequiredBodyParam('layoutElementUid');
         $namespace = $this->request->getBodyParam('namespace');
 
-        if ($attribute === '' || empty($copyFromSiteId)) {
-            throw new BadRequestHttpException("Request missing required param");
+        $fromElement = $element::find()
+            ->id($element->id)
+            ->structureId($element->structureId)
+            ->siteId($copyFromSiteId)
+            ->drafts(null)
+            ->provisionalDrafts(null)
+            ->one();
+
+        if (!$fromElement) {
+            throw new UnsupportedSiteException($element, $copyFromSiteId, 'Attempting to copy element content from an unsupported site.');
         }
 
-        $updatedFieldHandles = Craft::$app->getElements()->copyValuesFromSite($element, $copyFromSiteId, $attribute);
-        if (empty($updatedFieldHandles)) {
-            return $this->_asSuccess(Craft::t('app', 'Nothing to copy.'), $element, [
-                'fragments' => [],
+        $layoutElement = $element->getFieldLayout()->getElementByUid($layoutElementUid);
+        if (!$layoutElement instanceof BaseField || !$layoutElement->isCrossSiteCopyable($element)) {
+            throw new BadRequestHttpException("Invalid layout element UUID: $layoutElementUid");
+        }
+        if ($layoutElement instanceof CustomField) {
+            $layoutElement->getField()->copyCrossSiteValue($fromElement, $element);
+        } else {
+            $attribute = $layoutElement->attribute();
+            $element->$attribute = $fromElement->$attribute;
+        }
+
+        $view = $this->getView();
+        $html = $view->namespaceInputs(fn() => $layoutElement->formHtml($element), $namespace);
+
+        if ($html) {
+            $html = Html::modifyTagAttributes($html, [
+                'data' => [
+                    'layout-element' => $layoutElement->uid,
+                ],
             ]);
         }
 
-        $fragments = [];
-        $view = Craft::$app->getView();
-        $layout = $element->getFieldLayout();
-
-        // Loop over each of the updated fields and gather the HTML of the field
-        foreach ($layout->getTabs() as $tab) {
-            foreach ($tab->getElements() as $layoutElement) {
-                if ($layoutElement instanceof BaseField) {
-                    // Only return attributes that were updated
-                    if (in_array($layoutElement->attribute(), $updatedFieldHandles)) {
-                        $html = $view->namespaceInputs(function() use ($element, $layoutElement) {
-                            return $layoutElement->formHtml($element);
-                        }, $namespace); // you have to pass the $namespace here or some attrs won't get properly namespaced (e.g. title)
-
-                        if ($html) {
-                            $html = Html::modifyTagAttributes($html, [
-                                'data' => [
-                                    'layout-element' => $layoutElement->uid,
-                                ],
-                            ]);
-                        }
-
-                        $fragments[$layoutElement->uid] = $html;
-                    }
-                }
-            }
-        }
-
-        return $this->_asSuccess('Content copied.', $element, [
+        return $this->_asSuccess(Craft::t('app', 'Field value copied.'), $element, [
+            'fieldHtml' => $html,
             'headHtml' => $view->getHeadHtml(),
             'bodyHtml' => $view->getBodyHtml(),
-            'fragments' => $fragments,
         ]);
     }
 
@@ -2362,6 +2357,9 @@ JS, [
                 ->siteId($siteId)
                 ->preferSites($preferSites)
                 ->unique()
+                ->drafts(null)
+                ->provisionalDrafts(null)
+                ->revisions(null)
                 ->status(null)
                 ->one();
 

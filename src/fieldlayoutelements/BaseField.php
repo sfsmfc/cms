@@ -372,8 +372,10 @@ abstract class BaseField extends FieldLayoutElement
         $instructions = $this->instructions($element, $static);
         $tip = $this->tip($element, $static);
         $warning = $this->warning($element, $static);
+        $translatable = $this->translatable($element, $static);
 
         return Cp::fieldHtml($inputHtml, [
+            'layout-element' => $this->uid,
             'fieldset' => $this->useFieldset(),
             'id' => $this->id(),
             'labelId' => $this->labelId(),
@@ -394,10 +396,9 @@ abstract class BaseField extends FieldLayoutElement
             'tip' => $tip !== null ? Html::encode($tip) : null,
             'warning' => $warning !== null ? Html::encode($warning) : null,
             'orientation' => $this->orientation($element, $static),
-            'translatable' => $this->translatable($element, $static),
+            'translatable' => $translatable,
             'translationDescription' => $this->translationDescription($element, $static),
-            'copyable' => $this->isCopyable($element, $static),
-            'nested' => $this->isNested($element, $static),
+            'copyable' => !$static && $translatable && $this->uid && $element?->getIsCrossSiteCopyable() && $this->isCrossSiteCopyable($element),
             'element-id' => $element->getCanonicalId(),
             'errors' => !$static ? $this->errors($element) : [],
         ]);
@@ -782,25 +783,12 @@ abstract class BaseField extends FieldLayoutElement
     }
 
     /**
-     * Returns whether field supports copying its value across sites
+     * Returns whether field supports copying its value across sites.
      *
-     * @param ElementInterface|null $element
-     * @param bool $static
+     * @param ElementInterface $element
      * @return bool
      */
-    public function isCopyable(?ElementInterface $element = null, bool $static = false): bool
-    {
-        return false;
-    }
-
-    /**
-     * Returns whether field contains nested elements, and uses the nested element manager.
-     *
-     * @param ElementInterface|null $element
-     * @param bool $static
-     * @return bool
-     */
-    public function isNested(?ElementInterface $element = null, bool $static = false): bool
+    public function isCrossSiteCopyable(ElementInterface $element): bool
     {
         return false;
     }

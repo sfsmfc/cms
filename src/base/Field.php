@@ -614,24 +614,6 @@ JS, [
     }
 
     /**
-     * @see CopyableFieldInterface::getIsCopyable()
-     * @since 5.6.0
-     */
-    public function getIsCopyable(?ElementInterface $element = null): bool
-    {
-        return $this->getIsTranslatable($element) && $element?->getIsCopyable();
-    }
-
-    /**
-     * Returns whether field contains nested elements, and uses the nested element manager.
-     * @since 5.6.0
-     */
-    public function getIsNested(?ElementInterface $element = null): bool
-    {
-        return $this instanceof ElementContainerFieldInterface;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getStatus(ElementInterface $element): ?array
@@ -961,17 +943,9 @@ JS, [
      * @see CopyableFieldInterface::copyCrossSiteValue()
      * @since 5.6.0
      */
-    public function copyCrossSiteValue(ElementInterface $from, ElementInterface $to): bool
+    public function copyCrossSiteValue(ElementInterface $from, ElementInterface $to): void
     {
-        $fromValue = $this->serializeValue($from->getFieldValue($this->handle), $from);
-        $toValue = $this->serializeValue($to->getFieldValue($this->handle), $to);
-
-        if ($fromValue != $toValue) {
-            $to->setFieldValue($this->handle, $fromValue);
-            return true;
-        }
-
-        return false;
+        $this->copyValue($from, $to);
     }
 
     /**

@@ -8,7 +8,6 @@
 namespace craft\services;
 
 use Craft;
-use craft\base\CopyableFieldInterface;
 use craft\base\Element;
 use craft\base\ElementActionInterface;
 use craft\base\ElementExporterInterface;
@@ -2658,110 +2657,6 @@ class Elements extends Component
         }
 
         return true;
-    }
-
-    /**
-     * Copy value of a field from another site
-     *
-     * @param ElementInterface $element
-     * @param int $copyFromSiteId
-     * @param string|string[]|null $attributes
-     * @return string[] Array of updated attributes.
-     * @throws UnsupportedSiteException
-     * @throws Throwable
-     * @since 5.6.0
-     */
-    public function copyValuesFromSite(
-        ElementInterface $element,
-        int $copyFromSiteId,
-        string|array|null $attributes = null,
-    ): array {
-        // get element for selected site
-        /** @var string|ElementInterface $elementType */
-        $elementType = get_class($element);
-
-        $fromElement = $this->getElementById($element->getCanonicalId(), $elementType, $copyFromSiteId);
-        if (!$fromElement) {
-            throw new UnsupportedSiteException($element, $element->siteId, 'Attempting to copy element content from an unsupported site.');
-        }
-
-        if (is_string($attributes)) {
-            $attributes = [$attributes];
-        } else {
-            $attributes ??= array_merge(
-                $this->_getTranslatableCustomFieldHandles($element),
-                $this->_getTranslatableNativeFieldHandles($element),
-            );
-        }
-
-        $updatedAttributes = [];
-        $fieldLayout = $fromElement->getFieldLayout();
-
-        foreach ($attributes as $attribute) {
-            $valueChanged = false;
-
-            /** @var FieldInterface|null $field */
-            $field = $fieldLayout?->getFieldByHandle($attribute);
-            if ($field) {
-                if ($field instanceof CopyableFieldInterface) {
-                    $valueChanged = $field->copyCrossSiteValue($fromElement, $element);
-                }
-            } elseif (
-                property_exists($fromElement, $attribute) &&
-                property_exists($element, $attribute) &&
-                $element->$attribute != $fromElement->$attribute
-            ) {
-                $element->$attribute = $fromElement->$attribute;
-                $valueChanged = true;
-            }
-
-            if ($valueChanged) {
-                $updatedAttributes[] = $attribute;
-            }
-        }
-
-        return $updatedAttributes;
-    }
-
-    /**
-     * Get field handles of all translatable custom fields used in the element
-     *
-     * @param ElementInterface $element
-     * @return array
-     */
-    private function _getTranslatableCustomFieldHandles(ElementInterface $element): array
-    {
-        $customFields = $element->getFieldLayout()?->getVisibleCustomFields($element);
-        return array_map(
-            function($field) {
-                /** @var Field $field */
-                return $field->handle;
-            },
-            array_filter($customFields,
-                fn($field) => $field instanceof CopyableFieldInterface && $field->getIsCopyable($element)
-            )
-        );
-    }
-
-    /**
-     * Get field handles of all translatable native fields used in the element
-     *
-     * @param ElementInterface $element
-     * @return array
-     * @throws InvalidConfigException
-     */
-    private function _getTranslatableNativeFieldHandles(ElementInterface $element): array
-    {
-        $fields = $element->fields();
-        return array_map(
-            function($field) {
-                return $field->attribute();
-            },
-            array_filter(
-                $element->getFieldLayout()?->getAvailableNativeFields(),
-                fn($field) => isset($fields[$field->attribute()]) && $field->isCopyable($element)
-            )
-        );
     }
 
     /**

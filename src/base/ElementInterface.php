@@ -1678,7 +1678,7 @@ interface ElementInterface extends
      * @return bool
      * @since 5.6.0
      */
-    public function getIsCopyable(): bool;
+    public function getIsCrossSiteCopyable(): bool;
 
     // Indexes, etc.
     // -------------------------------------------------------------------------

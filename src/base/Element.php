@@ -35,7 +35,6 @@ use craft\elements\exporters\Raw;
 use craft\elements\User;
 use craft\enums\AttributeStatus;
 use craft\enums\Color;
-use craft\enums\MenuItemType;
 use craft\errors\InvalidFieldException;
 use craft\events\AuthorizationCheckEvent;
 use craft\events\DefineAltActionsEvent;
@@ -2440,9 +2439,9 @@ abstract class Element extends Component implements ElementInterface
 
     /**
      * @var bool|null
-     * @see getIsCopyable()
+     * @see getIsCrossSiteCopyable()
      */
-    private ?bool $_isCopyable = null;
+    private ?bool $_isCrossSiteCopyable = null;
 
     /**
      * @inheritdoc
@@ -2628,7 +2627,6 @@ abstract class Element extends Component implements ElementInterface
 
         unset(
             $names['awaitingFieldValues'],
-            $names['copying'],
             $names['duplicateOf'],
             $names['elementQueryResult'],
             $names['firstSave'],
@@ -3878,31 +3876,6 @@ abstract class Element extends Component implements ElementInterface
                 'url' => $url,
                 'attributes' => [
                     'target' => '_blank',
-                ],
-            ];
-        }
-
-        // Copy content
-        $user = Craft::$app->getUser()->getIdentity();
-        if (
-            !$this->getIsRevision() &&
-            $this->canSave($user) &&
-            $this->getIsCopyable()
-        ) {
-            $copyContentId = sprintf('action-copy-content-%s', mt_rand());
-            $items[] = [
-                'id' => $copyContentId,
-                'icon' => 'clone',
-                'label' => Craft::t('app', 'Copy content from site'),
-                'type' => MenuItemType::Button,
-                'showInChips' => false,
-                'attributes' => [
-                    'data' => [
-                        'copy-content' => true,
-                    ],
-                    'aria' => [
-                        'label' => Craft::t('app', 'Copy content from site'),
-                    ],
                 ],
             ];
         }
@@ -5521,10 +5494,10 @@ JS, [
     /**
      * @inheritdoc
      */
-    public function getIsCopyable(): bool
+    public function getIsCrossSiteCopyable(): bool
     {
-        if (!isset($this->_isCopyable)) {
-            $this->_isCopyable = (
+        if (!isset($this->_isCrossSiteCopyable)) {
+            $this->_isCrossSiteCopyable = (
                 Craft::$app->getIsMultiSite() &&
                 // check if user can edit this element in other sites
                 count(ElementHelper::editableSiteIdsForElement($this)) > 1 &&
@@ -5533,7 +5506,7 @@ JS, [
             );
         }
 
-        return $this->_isCopyable;
+        return $this->_isCrossSiteCopyable;
     }
 
     // Indexes, etc.
