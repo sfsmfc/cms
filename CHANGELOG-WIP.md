@@ -13,6 +13,7 @@
 - Entry indexes now only show table column options and sort options for custom fields associated with the selected sections/entry types within custom entry sources’ conditions.
 - Structure views are now available to element indexes on mobile browsers. ([#16190](https://github.com/craftcms/cms/discussions/16190))
 - Datepickers now include a dropdown menu for selecting the year. ([#16376](https://github.com/craftcms/cms/pull/16376))
+- Custom fields within element edit pages can now have action menus with “Edit field” and “Copy field handle” items. ([#16415](https://github.com/craftcms/cms/pull/16415))
 - Heads-up displays now reposition themselves on window scroll.
 
 ### Accessibility
@@ -44,11 +45,13 @@
 - After creating a new field from a field layout designer, the field is now immediately added to the field layout tab. ([#16374](https://github.com/craftcms/cms/pull/16374))
 - Templates rendered for “Template” field layout UI elements can now call control panel template functions like `elementChip()` and `elementCard()`. ([#16267](https://github.com/craftcms/cms/issues/16267))
 - “Template” field layout UI elements now show suggestions for the Template input.
+- Element condition builders now always show field handles within the rule selection menu, for admin users.
 - Added the `utils/delete-empty-volume-folders` command. ([#16388](https://github.com/craftcms/cms/issues/16388))
 - Improved the error output for nested elements when they can’t be resaved via `resave` commands.
 - `resave` commands’ `--drafts`, `--provisional-drafts`, and `--revisions` options can now be set to `null`, causing elements to be resaved regardless of whether they’re drafts/provisional drafts/revisions.
 - Added the `systemTemplateCss` config setting. ([#16344](https://github.com/craftcms/cms/pull/16344))
 - The `loginPath`, `logoutPath`, `setPasswordPath`, and `verifyEmailPath` config settings are now respected in headless mode. ([#16344](https://github.com/craftcms/cms/pull/16344))
+- Removed the “Show field handles in edit forms” admin user preference. ([#16415](https://github.com/craftcms/cms/pull/16415))
 
 ### Development
 - Added support for fallback element partial templates, e.g. `_partials/entry.twig` as opposed to `_partials/entry/typeHandle.twig`. ([#16125](https://github.com/craftcms/cms/pull/16125))
@@ -117,10 +120,12 @@
 - Added `craft\web\User::setImpersonatorId()`.
 - Added `craft\web\View::setTwig()`.
 - Added `craft\web\twig\variables\Cp::EVENT_REGISTER_READ_ONLY_CP_SETTINGS`. ([#16265](https://github.com/craftcms/cms/pull/16265))
+- Added `craft\fieldlayoutelements\BaseField::actionMenuItems()`.
 - `GuzzleHttp\Client` is now instantiated via `Craft::createObject()`. ([#16366](https://github.com/craftcms/cms/pull/16366))
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
 - `craft\helpers\Cp::elementIndexHtml()` now supports passing `defaultSort` in the `$config` array, when `sources` is `null`. ([#16236](https://github.com/craftcms/cms/discussions/16236))
+- `craft\helpers\Cp::fieldHtml()` now supports passing an `actionMenuItems` array in the config. ([#16415](https://github.com/craftcms/cms/pull/16415))
 - `craft\helpers\DateTimeHelper::humanDuration()` now has a `$language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 - `craft\models\Site` now implements `craft\base\Chippable`.
 - `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260))
