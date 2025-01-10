@@ -8,13 +8,13 @@
 namespace craft\base;
 
 /**
- * CopyableFieldInterface defines the common interface to be implemented by field classes
+ * CrossSiteCopyableFieldInterface defines the common interface to be implemented by field classes
  * that wish to support copying their values between sites in a multisite installation.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 5.6.0
  */
-interface CopyableFieldInterface
+interface CrossSiteCopyableFieldInterface
 {
     /**
      * Copies the field’s value from one site to another.

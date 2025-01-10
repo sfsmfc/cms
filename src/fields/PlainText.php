@@ -8,7 +8,7 @@
 namespace craft\fields;
 
 use Craft;
-use craft\base\CopyableFieldInterface;
+use craft\base\CrossSiteCopyableFieldInterface;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\base\InlineEditableFieldInterface;
@@ -24,7 +24,7 @@ use craft\helpers\StringHelper;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 3.0.0
  */
-class PlainText extends Field implements InlineEditableFieldInterface, SortableFieldInterface, MergeableFieldInterface, CopyableFieldInterface
+class PlainText extends Field implements InlineEditableFieldInterface, SortableFieldInterface, MergeableFieldInterface, CrossSiteCopyableFieldInterface
 {
     /**
      * @inheritdoc

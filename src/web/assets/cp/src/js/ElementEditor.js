@@ -151,11 +151,10 @@ Craft.ElementEditor = Garnish.Base.extend(
         );
 
         // Use event delegation so we don't have to reinitialize when markup is replaced
-        this.$container.on(
-          'click',
-          '[data-copyable]',
-          this.showFieldCopyHud.bind(this)
-        );
+        this.$container.on('click', '[data-copyable]', (ev) => {
+          ev.preventDefault();
+          this.showFieldCopyHud(ev.currentTarget);
+        });
       }
 
       if (this.settings.previewTargets.length && this.isFullPage) {
@@ -278,16 +277,12 @@ Craft.ElementEditor = Garnish.Base.extend(
         });
       }
 
-      this.initFieldCopy();
-
       this.activityTooltips = {};
 
       if (this.isFullPage) {
         Craft.ui.setFocusOnErrorSummary(this.$container);
       }
     },
-
-    initFieldCopy() {},
 
     _createQueue: function () {
       const queue = new Craft.Queue();
@@ -600,10 +595,8 @@ Craft.ElementEditor = Garnish.Base.extend(
       this._updateGlobalStatus();
     },
 
-    showFieldCopyHud: function (ev) {
-      ev.preventDefault();
-
-      const $btn = $(ev.currentTarget);
+    showFieldCopyHud: function (btn) {
+      const $btn = $(btn);
 
       const $hudContent = $('<div/>', {
         class: 'copy-translation-dialogue',
@@ -616,7 +609,7 @@ Craft.ElementEditor = Garnish.Base.extend(
         class: 'flex flex-end flex-nowrap',
       }).appendTo($form);
 
-      const $siteSelect = Craft.ui
+      const $siteSelectField = Craft.ui
         .createSelectField({
           label: Craft.t('app', 'Copy from'),
           class: ['fullwidth'],
@@ -637,6 +630,8 @@ Craft.ElementEditor = Garnish.Base.extend(
 
       const hud = new Garnish.HUD($btn, $hudContent);
 
+      const $siteSelect = $siteSelectField.find('select').focus();
+
       this.addListener($form, 'submit', async (ev) => {
         ev.preventDefault();
         const $submitBtn = $form.find('[type=submit]');
@@ -651,7 +646,7 @@ Craft.ElementEditor = Garnish.Base.extend(
               data: {
                 elementId: this.getDraftElementId($btn.data('element-id')),
                 siteId: this.settings.siteId,
-                fromSiteId: parseInt($siteSelect.find('select').val()),
+                fromSiteId: parseInt($siteSelect.val()),
                 layoutElementUid: $btn.data('layout-element'),
                 namespace: $btn.data('namespace'),
               },

@@ -8,7 +8,7 @@
 namespace craft\fields;
 
 use Craft;
-use craft\base\CopyableFieldInterface;
+use craft\base\CrossSiteCopyableFieldInterface;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\base\InlineEditableFieldInterface;
@@ -27,7 +27,7 @@ use yii\db\Schema;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 3.0.0
  */
-class Email extends Field implements InlineEditableFieldInterface, MergeableFieldInterface, CopyableFieldInterface
+class Email extends Field implements InlineEditableFieldInterface, MergeableFieldInterface, CrossSiteCopyableFieldInterface
 {
     /**
      * @inheritdoc

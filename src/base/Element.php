@@ -2438,10 +2438,10 @@ abstract class Element extends Component implements ElementInterface
     private $_serializeFields = false;
 
     /**
-     * @var bool|null
+     * @var bool
      * @see getIsCrossSiteCopyable()
      */
-    private ?bool $_isCrossSiteCopyable = null;
+    private bool $_isCrossSiteCopyable;
 
     /**
      * @inheritdoc

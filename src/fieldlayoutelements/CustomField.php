@@ -8,7 +8,7 @@
 namespace craft\fieldlayoutelements;
 
 use Craft;
-use craft\base\CopyableFieldInterface;
+use craft\base\CrossSiteCopyableFieldInterface;
 use craft\base\ElementInterface;
 use craft\base\FieldInterface;
 use craft\base\PreviewableFieldInterface;
@@ -438,6 +438,6 @@ class CustomField extends BaseField
      */
     public function isCrossSiteCopyable(ElementInterface $element): bool
     {
-        return $this->_field instanceof CopyableFieldInterface && $this->_field->getIsTranslatable($element);
+        return $this->_field instanceof CrossSiteCopyableFieldInterface && $this->_field->getIsTranslatable($element);
     }
 }

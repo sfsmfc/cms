@@ -3165,7 +3165,7 @@ JS;
      * - `liAttributes` – Any HTML attributes that should be set on the item’s `<li>` tag
      *
      * @param array $config
-     * @param string $menuId ,
+     * @param string $menuId
      * @return string
      * @since 5.0.0
      */

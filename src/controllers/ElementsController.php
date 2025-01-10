@@ -488,15 +488,6 @@ class ElementsController extends Controller
      * Copies field/attribute values on an element from one site to another.
      *
      * @return Response
-     * @throws BadRequestHttpException
-     * @throws ForbiddenHttpException
-     * @throws ServerErrorHttpException
-     * @throws Throwable
-     * @throws \craft\errors\ElementNotFoundException
-     * @throws \craft\errors\InvalidFieldException
-     * @throws \craft\errors\MissingComponentException
-     * @throws \yii\base\Exception
-     * @throws \yii\db\Exception
      * @since 5.6.0
      */
     public function actionCopyValuesFromSite(): Response
