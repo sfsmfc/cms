@@ -321,6 +321,12 @@ class View extends \yii\web\View
     private array $_html = [];
 
     /**
+     * @var array registered imports for javascript es modules
+     * @see registerJsImport()
+     */
+    private array $_jsImports = [];
+
+    /**
      * @var callable[][]
      */
     private array $_hooks = [];
@@ -1429,6 +1435,17 @@ class View extends \yii\web\View
     }
 
     /**
+     * Registers a javascript import map entry to be injected into the final page response.
+     *
+     * @param string $key The module specifier.
+     * @param string $value  The URL or path to the resource the key will resolve to.
+    */
+    public function registerJsImport(string $key, string $value): void
+    {
+        $this->_jsImports[$key] = $value;
+    }
+
+    /**
      * @inheritdoc
      */
     public function endBody(): void
@@ -2146,6 +2163,10 @@ JS;
         }
         if (!empty($this->_html[self::POS_HEAD])) {
             $lines[] = implode("\n", $this->_html[self::POS_HEAD]);
+        }
+
+        if (!empty($this->_jsImports)) {
+            $lines[] = '<script type="importmap">{"imports": ' . Json::encode($this->_jsImports) . '}</script>';
         }
 
         $html = parent::renderHeadHtml();
