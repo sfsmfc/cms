@@ -111,7 +111,7 @@ class ImageTransforms
             // Don't change the same transform
             $transform = clone $transform;
 
-            $whiteList = $transform->attributes();
+            $attributes = $transform->attributes();
 
             $nullables = [
                 'id',
@@ -121,15 +121,14 @@ class ImageTransforms
                 'parameterChangeTime',
             ];
 
-            // Why aren't we just using setAttributes()?
-            foreach ($parameters as $parameter => $value) {
-                if (in_array($parameter, $whiteList, true)) {
-                    $transform->$parameter = $value;
+            foreach ($parameters as $name => $value) {
+                if (in_array($name, $attributes, true)) {
+                    $transform->$name = $value;
                 }
             }
 
-            foreach ($nullables as $nullable) {
-                $transform->{$nullable} = null;
+            foreach ($nullables as $name) {
+                $transform->$name = null;
             }
         }
 
@@ -278,7 +277,6 @@ class ImageTransforms
             return $transform;
         }
 
-        // TODO: review if this is dead code. With $transform typed as mixed, it is unclear what kind of object this would be. stdObject?
         if (is_object($transform)) {
             $transform = ArrayHelper::toArray($transform);
         }

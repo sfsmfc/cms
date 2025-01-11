@@ -128,7 +128,10 @@ class ImageTransforms extends Component
         if (!isset($this->_transforms)) {
             $this->_transforms = new MemoizableArray(
                 $this->_createTransformQuery()->all(),
-                fn(array $result) => Craft::createObject(ImageTransform::class, [$result]),
+                fn(array $result) => Craft::createObject([
+                    'class' => ImageTransform::class,
+                    ...$result,
+                ]),
             );
         }
 
@@ -422,7 +425,8 @@ class ImageTransforms extends Component
 
                 $transform = Craft::createObject([
                     'class' => ImageTransform::class,
-                ] + $refTransform->toArray());
+                        ...$refTransform->toArray(),
+                ]);
 
                 if ($sizeUnit === 'w') {
                     $transform->width = (int)$sizeValue;

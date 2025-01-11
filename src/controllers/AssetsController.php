@@ -1320,7 +1320,8 @@ class AssetsController extends Controller
         } else {
             $transform = Craft::createObject([
                 'class' => ImageTransform::class,
-            ] + ImageTransforms::parseTransformString($transformString));
+                ...ImageTransforms::parseTransformString($transformString),
+            ]);
 
             $ext = $transform->format ?: ImageTransforms::detectTransformFormat($asset);
         }
