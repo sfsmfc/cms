@@ -307,7 +307,10 @@ class ImageTransforms
                 return self::extendTransform($baseTransform, $transform);
             }
 
-            return Craft::createObject(ImageTransform::class, [$transform]);
+            return Craft::createObject([
+                'class' => ImageTransform::class,
+                ...$transform,
+            ]);
         }
 
         if (is_string($transform)) {
