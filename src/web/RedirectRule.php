@@ -21,33 +21,12 @@ use yii\base\Component;
  */
 class RedirectRule extends Component
 {
-    /**
-     * @event \yii\base\Event The event that is triggered before redirecting the request.
-     */
-    public const EVENT_BEFORE_REDIRECT = 'beforeRedirect';
-
     public string $to;
     public string $from;
     public int $statusCode = 302;
     public bool $caseSensitive = false;
     private Closure $_match;
     private array $regexTokens = [];
-
-    public function __invoke(): void
-    {
-        $url = $this->getMatch();
-
-        if ($url === null) {
-            return;
-        }
-
-        if ($this->hasEventHandlers(self::EVENT_BEFORE_REDIRECT)) {
-            $this->trigger(self::EVENT_BEFORE_REDIRECT);
-        }
-
-        Craft::$app->getResponse()->redirect($url, $this->statusCode);
-        Craft::$app->end();
-    }
 
     public function getMatch(): ?string
     {
