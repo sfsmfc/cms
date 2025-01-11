@@ -135,6 +135,7 @@
 - `craft\helpers\DateTimeHelper::humanDuration()` now has a `$language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 - `craft\models\Site` now implements `craft\base\Chippable`.
 - `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260))
+- `craft\models\ImageTransform` objects are now instantiated via `Craft::createObject()`. ([#15646](https://github.com/craftcms/cms/pull/15646))
 - Elements’ `defineCardAttributes()` methods can now return a `placeholder` value set to a callable.
 - Deprecated `craft\elements\User::EVENT_REGISTER_USER_ACTIONS`.
 - Deprecated `craft\elements\User::IMPERSONATE_KEY`. `craft\web\User::getImpersonatorId()` should be used instead.
