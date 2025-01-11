@@ -1589,9 +1589,7 @@ JS, [
                         ], $config['labelAttributes'] ?? []))
                         : '') .
                     (isset($config['labelExtra'])
-                        ? Html::tag('div', '', ['class' => 'flex-grow']) .
-                        Html::beginTag('div', ['class' => ['flex', 'flex-gap-xs']]) . $config['labelExtra'] .
-                        Html::endTag('div')
+                        ? Html::tag('div', '', ['class' => 'flex-grow']) . $config['labelExtra']
                         : '') .
                     ($config['headingSuffix'] ?? '') .
                     Html::endTag('div')
