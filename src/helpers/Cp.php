@@ -1481,41 +1481,12 @@ JS, [
         $instructionsPosition = $config['instructionsPosition'] ?? 'before';
         $orientation = $config['orientation'] ?? ($site ? $site->getLocale() : Craft::$app->getLocale())->getOrientation();
         $translatable = Craft::$app->getIsMultiSite() ? ($config['translatable'] ?? ($site !== null)) : false;
-        $crossSiteCopyable = ($config['crossSiteCopyable'] ?? false) && ($config['element-id'] ?? null);
 
         $fieldClass = array_merge(array_filter([
             'field',
             ($config['first'] ?? false) ? 'first' : null,
             $errors ? 'has-errors' : null,
         ]), Html::explodeClass($config['fieldClass'] ?? []));
-
-        $actionMenuItems = $config['actionMenuItems'] ?? [];
-        if ($crossSiteCopyable) {
-            // prepare namespace for the purpose of copying
-            $namespace = Craft::$app->getView()->getNamespace();
-
-            $actionMenuItems = array_filter([
-                [
-                    'icon' => 'clone',
-                    'label' => Craft::t('app', 'Copy value from site…'),
-                    'attributes' => [
-                        'data' => [
-                            'cross-site-copy' => true,
-                            'element-id' => $config['element-id'],
-                            'layout-element' => $config['layout-element'],
-                            'label' => $label,
-                            'namespace' => ($namespace && $namespace !== 'field')
-                                ? StringHelper::removeRight($namespace, '[fields]')
-                                : null,
-                        ],
-                    ],
-                ],
-                !empty($actionMenuItems) ? ['type' => 'hr'] : null,
-                ...$actionMenuItems,
-            ]);
-        }
-
-        $showLabelExtra = isset($config['labelExtra']) || $crossSiteCopyable;
 
         $instructionsHtml = $instructions
             ? Html::tag('div', preg_replace('/&amp;(\w+);/', '&$1;', Markdown::process(Html::encodeInvalidTags($instructions), 'gfm-comment')), [
@@ -1558,8 +1529,8 @@ JS, [
                     ($translatable ? $translationIconHtml : '')
                 );
 
-            if (!empty($actionMenuItems)) {
-                $labelHtml .= static::disclosureMenu($actionMenuItems, [
+            if (!empty($config['actionMenuItems'])) {
+                $labelHtml .= static::disclosureMenu($config['actionMenuItems'], [
                     'hiddenLabel' => Craft::t('app', 'Actions'),
                     'buttonAttributes' => [
                         'class' => ['action-btn', 'small'],
@@ -1603,7 +1574,7 @@ JS, [
                 ]) .
                 Html::endTag('div')
                 : '') .
-            (($label || $showLabelExtra)
+            (($label || isset($config['labelExtra']))
                 ? (
                     Html::beginTag('div', ['class' => 'heading']) .
                     ($config['headingPrefix'] ?? '') .
@@ -1617,7 +1588,7 @@ JS, [
                             ],
                         ], $config['labelAttributes'] ?? []))
                         : '') .
-                    ($showLabelExtra
+                    (isset($config['labelExtra'])
                         ? Html::tag('div', '', ['class' => 'flex-grow']) .
                         Html::beginTag('div', ['class' => ['flex', 'flex-gap-xs']]) . $config['labelExtra'] .
                         Html::endTag('div')

@@ -437,7 +437,7 @@ class CustomField extends BaseField
     /**
      * @inheritdoc
      */
-    protected function actionMenuItems(): array
+    protected function actionMenuItems(?ElementInterface $element = null, bool $static = false): array
     {
         if ($this->_field instanceof Actionable) {
             $items = $this->_field->getActionMenuItems();
