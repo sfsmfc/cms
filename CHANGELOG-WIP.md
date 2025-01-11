@@ -1,6 +1,7 @@
 # Release notes for Craft CMS 5.6 (WIP)
 
 ### Content Management
+- It’s now possible to copy custom field values from other sites. ([#14056](https://github.com/craftcms/cms/pull/14056))
 - “Related To”, “Not Related To”, “Author”, and relational field condition rules now allow multiple elements to be specified. ([#16121](https://github.com/craftcms/cms/discussions/16121))
 - Improved the styling of inline code fragments. ([#16141](https://github.com/craftcms/cms/pull/16141))
 - Improved the styling of attribute previews in card view. ([#16324](https://github.com/craftcms/cms/pull/16324))
@@ -13,7 +14,7 @@
 - Entry indexes now only show table column options and sort options for custom fields associated with the selected sections/entry types within custom entry sources’ conditions.
 - Structure views are now available to element indexes on mobile browsers. ([#16190](https://github.com/craftcms/cms/discussions/16190))
 - Datepickers now include a dropdown menu for selecting the year. ([#16376](https://github.com/craftcms/cms/pull/16376))
-- Custom fields within element edit pages can now have action menus with “Edit field” and “Copy field handle” items. ([#16415](https://github.com/craftcms/cms/pull/16415))
+- Custom fields within element edit pages can now have action menus with “Copy value from site…”, “Edit field” and “Copy field handle” items. ([#16415](https://github.com/craftcms/cms/pull/16415), [#14056](https://github.com/craftcms/cms/pull/14056))
 - Heads-up displays now reposition themselves on window scroll.
 
 ### Accessibility
@@ -24,6 +25,7 @@
 - Improved the accessibility of action menus on the Plugins index page.
 - Improved the accessibility of “More” and “Advanced” toggle triggers. ([#16293]](https://github.com/craftcms/cms/pull/16293))
 - Improved the accessibility of the Craft Support widget. ([#16293]](https://github.com/craftcms/cms/pull/16293))
+- Improved the accessibility of field translatable indicators and tooltips.
 
 ### Administration
 - Added the “Affiliated Site” native user field. ([#16174](https://github.com/craftcms/cms/pull/16174))
@@ -121,6 +123,10 @@
 - Added `craft\web\User::setImpersonatorId()`.
 - Added `craft\web\View::setTwig()`.
 - Added `craft\web\twig\variables\Cp::EVENT_REGISTER_READ_ONLY_CP_SETTINGS`. ([#16265](https://github.com/craftcms/cms/pull/16265))
+- Added `craft\base\CrossSiteCopyableFieldInterface`. ([#14056](https://github.com/craftcms/cms/pull/14056))
+- Added `craft\base\ElementInterface::getIsCrossSiteCopyable()`. ([#14056](https://github.com/craftcms/cms/pull/14056))
+- Added `craft\base\Field::copyCrossSiteValue()`. ([#14056](https://github.com/craftcms/cms/pull/14056))
+- Added `craft\fieldlayoutelements\BaseField::isCrossSiteCopyable()`.
 - `GuzzleHttp\Client` is now instantiated via `Craft::createObject()`. ([#16366](https://github.com/craftcms/cms/pull/16366))
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
