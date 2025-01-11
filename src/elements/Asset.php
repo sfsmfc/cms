@@ -1956,16 +1956,7 @@ JS,[
 
             [$value, $unit] = Assets::parseSrcsetSize($size);
 
-            $sizeTransform = $transform ? $transform->toArray([
-                'format',
-                'height',
-                'interlace',
-                'mode',
-                'position',
-                'quality',
-                'width',
-                'fill',
-            ]) : [];
+            $sizeTransform = $transform ? $transform->toArray() : [];
 
             if ($unit === 'w') {
                 $sizeTransform['width'] = (int)$value;
