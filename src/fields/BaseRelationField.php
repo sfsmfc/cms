@@ -1057,6 +1057,33 @@ JS, [
         ];
     }
 
+    /**
+     * Returns the custom field arguments for the selected source(s).
+     *
+     * @return array
+     * @since 5.6.0
+     */
+    protected function gqlFieldArguments(): array
+    {
+        $elementSourcesService = Craft::$app->getElementSources();
+        $gqlService = Craft::$app->getGql();
+        $fieldLayouts = [];
+        $arguments = [];
+
+        foreach ((array)$this->getInputSources() as $source) {
+            $sourceFieldLayouts = $elementSourcesService->getFieldLayoutsForSource(static::elementType(), $source);
+            foreach ($sourceFieldLayouts as $fieldLayout) {
+                $fieldLayouts[$fieldLayout->uid] = $fieldLayout;
+            }
+        }
+
+        foreach ($fieldLayouts as $fieldLayout) {
+            $arguments += $gqlService->getFieldLayoutArguments($fieldLayout);
+        }
+
+        return $arguments;
+    }
+
     // Events
     // -------------------------------------------------------------------------
 

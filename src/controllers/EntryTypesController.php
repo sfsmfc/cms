@@ -20,6 +20,7 @@ use craft\models\EntryType;
 use craft\models\Section;
 use craft\web\Controller;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -33,13 +34,26 @@ use yii\web\Response;
  */
 class EntryTypesController extends Controller
 {
+    private bool $readOnly;
+
     /**
      * @inheritdoc
      */
     public function beforeAction($action): bool
     {
-        // All section actions require an admin
-        $this->requireAdmin();
+        // All actions require an admin account (but not allowAdminChanges)
+        $this->requireAdmin(false);
+
+        $viewActions = ['edit', 'table-data'];
+        if (in_array($action->id, $viewActions)) {
+            // Some actions require admin but not allowAdminChanges
+            $this->requireAdmin(false);
+        } else {
+            // All other actions require an admin & allowAdminChanges
+            $this->requireAdmin();
+        }
+
+        $this->readOnly = !Craft::$app->getConfig()->getGeneral()->allowAdminChanges;
 
         return parent::beforeAction($action);
     }
@@ -54,6 +68,10 @@ class EntryTypesController extends Controller
      */
     public function actionEdit(?int $entryTypeId = null, ?EntryType $entryType = null): Response
     {
+        if ($entryTypeId === null && $this->readOnly) {
+            throw new ForbiddenHttpException('Administrative changes are disallowed in this environment.');
+        }
+
         if ($entryTypeId !== null) {
             if ($entryType === null) {
                 $entryType = Craft::$app->getEntries()->getEntryTypeById($entryTypeId);
@@ -91,26 +109,36 @@ class EntryTypesController extends Controller
             ->title($title)
             ->addCrumb(Craft::t('app', 'Settings'), 'settings')
             ->addCrumb(Craft::t('app', 'Entry Types'), 'settings/entry-types')
-            ->action('entry-types/save')
-            ->redirectUrl('settings/entry-types')
-            ->addAltAction(Craft::t('app', 'Save and continue editing'), [
-                'redirect' => 'settings/entry-types/{id}',
-                'shortcut' => true,
-                'retainScroll' => true,
-            ])
             ->contentTemplate('settings/entry-types/_edit.twig', [
                 'entryTypeId' => $entryTypeId,
                 'entryType' => $entryType,
                 'typeName' => Entry::displayName(),
                 'lowerTypeName' => Entry::lowerDisplayName(),
+                'readOnly' => $this->readOnly,
             ]);
 
-        if ($entryType->id) {
+        if (!$this->readOnly) {
             $response
-                ->addAltAction(Craft::t('app', 'Delete'), [
+                ->action('entry-types/save')
+                ->redirectUrl('settings/entry-types')
+                ->addAltAction(Craft::t('app', 'Save and continue editing'), [
+                    'redirect' => 'settings/entry-types/{id}',
+                    'shortcut' => true,
+                    'retainScroll' => true,
+                ]);
+        } else {
+            $response->noticeHtml(Cp::readOnlyNoticeHtml());
+        }
+
+        if ($entryType->id) {
+            if (!$this->readOnly) {
+                $response->addAltAction(Craft::t('app', 'Delete'), [
                     'action' => 'entry-types/delete',
                     'destructive' => true,
-                ])
+                ]);
+            }
+
+            $response
                 ->metaSidebarHtml(Cp::metadataHtml([
                     Craft::t('app', 'ID') => $entryType->id,
                     Craft::t('app', 'Used by') => function() use ($entryType) {

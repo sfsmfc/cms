@@ -85,6 +85,7 @@ abstract class BaseField extends FieldLayoutElement
      *
      * @return bool
      * @since 4.5.4
+     * @deprecated in 5.6.0
      */
     public function showAttribute(): bool
     {
@@ -396,6 +397,7 @@ abstract class BaseField extends FieldLayoutElement
             'orientation' => $this->orientation($element, $static),
             'translatable' => $this->translatable($element, $static),
             'translationDescription' => $this->translationDescription($element, $static),
+            'actionMenuItems' => $this->actionMenuItems(),
             'errors' => !$static ? $this->errors($element) : [],
         ]);
     }
@@ -776,6 +778,19 @@ abstract class BaseField extends FieldLayoutElement
     protected function translationDescription(?ElementInterface $element = null, bool $static = false): ?string
     {
         return null;
+    }
+
+    /**
+     * Returns any action menu items that should be shown for the field.
+     *
+     *  See [[\craft\helpers\Cp::disclosureMenu()]] for documentation on supported item properties.
+     *
+     * @return array
+     * @since 5.6.0
+     */
+    protected function actionMenuItems(): array
+    {
+        return [];
     }
 
     /**

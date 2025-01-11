@@ -124,6 +124,19 @@ class Time extends Field implements InlineEditableFieldInterface, SortableFieldI
      */
     public function getSettingsHtml(): ?string
     {
+        return $this->settingsHtml(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         $incrementOptions = [5, 10, 15, 30, 60];
         $incrementOptions = array_combine($incrementOptions, $incrementOptions);
 
@@ -132,6 +145,7 @@ class Time extends Field implements InlineEditableFieldInterface, SortableFieldI
             'field' => $this,
             'min' => $this->min ? DateTimeHelper::toDateTime(['time' => $this->min], true) : null,
             'max' => $this->max ? DateTimeHelper::toDateTime(['time' => $this->max], true) : null,
+            'readOnly' => $readOnly,
         ]);
     }
 

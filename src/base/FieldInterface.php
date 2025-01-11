@@ -92,7 +92,7 @@ interface FieldInterface extends SavableComponentInterface, Chippable, Grippable
     public static function phpType(): string;
 
     /**
-     * Returns the DB data type(s) that this field will store within the `elements_sites.content` column.
+     * Returns the DB data type(s) that fields of this type will store within the `elements_sites.content` column.
      *
      * ```php
      * return \yii\db\Schema::TYPE_STRING;
