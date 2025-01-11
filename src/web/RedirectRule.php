@@ -7,42 +7,46 @@
 
 namespace craft\web;
 
+use Closure;
 use Craft;
-use craft\helpers\StringHelper;
 use Illuminate\Support\Collection;
 use League\Uri\Http;
+use yii\base\Component;
 
-class RedirectRule extends \yii\base\BaseObject
+/**
+ * Class RedirectRule
+ *
+ * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
+ * @since 5.6.0
+ */
+class RedirectRule extends Component
 {
+    /**
+     * @event \yii\base\Event The event that is triggered before redirecting the request.
+     */
+    public const EVENT_BEFORE_REDIRECT = 'beforeRedirect';
+
     public string $to;
     public string $from;
     public int $statusCode = 302;
     public bool $caseSensitive = false;
-    private \Closure $_match;
+    private Closure $_match;
     private array $regexTokens = [];
 
-    public function __invoke(?callable $callback = null): void
+    public function __invoke(): void
     {
-        $to = $this->getMatch();
+        $url = $this->getMatch();
 
-        if ($to === null) {
+        if ($url === null) {
             return;
         }
 
-        if ($callback) {
-            $callback($this);
+        if ($this->hasEventHandlers(self::EVENT_BEFORE_REDIRECT)) {
+            $this->trigger(self::EVENT_BEFORE_REDIRECT);
         }
 
-        Craft::$app->getResponse()->redirect(
-            $to,
-            $this->statusCode,
-        );
+        Craft::$app->getResponse()->redirect($url, $this->statusCode);
         Craft::$app->end();
-    }
-
-    public function setMatch(\Closure $match): void
-    {
-        $this->_match = $match;
     }
 
     public function getMatch(): ?string
@@ -72,6 +76,11 @@ class RedirectRule extends \yii\base\BaseObject
         return strcasecmp($this->from, $subject) === 0 ? $this->to : null;
     }
 
+    public function setMatch(callable $match): void
+    {
+        $this->_match = $match;
+    }
+
     private function replaceParams(string $value, array $params): string
     {
         $params = Collection::make($params)
@@ -85,7 +94,7 @@ class RedirectRule extends \yii\base\BaseObject
         // Tokenize the patterns first, so we only escape regex chars outside of patterns
         $tokenizedPattern = preg_replace_callback('/<([\w._-]+):?([^>]+)?>/', function($match) {
             $name = $match[1];
-            $pattern = strtr($match[2] ?? '[^\/]+', StringHelper::regexTokens());
+            $pattern = strtr($match[2] ?? '[^\/]+', UrlRule::regexTokens());
             $token = "<$name>";
             $this->regexTokens[$token] = "(?P<$name>$pattern)";
 

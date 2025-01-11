@@ -33,7 +33,6 @@ class StringHelper extends \yii\helpers\StringHelper
      * @since 3.0.37
      */
     public const UUID_PATTERN = '[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-4[A-Za-z0-9]{3}-[89abAB][A-Za-z0-9]{3}-[A-Za-z0-9]{12}';
-    public const HANDLE_PATTERN = '(?:[a-zA-Z][a-zA-Z0-9_]*)';
 
     /**
      * @var array Character mappings
@@ -1358,33 +1357,6 @@ class StringHelper extends \yii\helpers\StringHelper
         /** @var ASCII::*_LANGUAGE_CODE $language */
         $language = $language ?? Craft::$app->language;
         return (string)BaseStringy::create($str)->slugify($replacement, $language);
-    }
-
-    /**
-     * @return string The regex pattern for a slug.
-     */
-    public static function slugPattern(): string
-    {
-        $slugChars = ['.', '_', '-'];
-        $slugWordSeparator = Craft::$app->getConfig()->getGeneral()->slugWordSeparator;
-
-        if ($slugWordSeparator !== '/' && !in_array($slugWordSeparator, $slugChars, true)) {
-            $slugChars[] = $slugWordSeparator;
-        }
-
-        return '(?:[\p{L}\p{N}\p{M}' . preg_quote(implode($slugChars), '/') . ']+)';
-    }
-
-    /**
-     * @return array An array of regex tokens as keys and patterns as values.
-     */
-    public static function regexTokens(): array
-    {
-        return [
-            '{handle}' => self::HANDLE_PATTERN,
-            '{slug}' => self::slugPattern(),
-            '{uid}' => self::UUID_PATTERN,
-        ];
     }
 
     /**

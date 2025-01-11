@@ -7,8 +7,10 @@
 
 namespace craft\web;
 
+use Craft;
 use craft\helpers\ArrayHelper;
 use craft\helpers\StringHelper;
+use craft\validators\HandleValidator;
 
 /**
  * @inheritdoc
@@ -17,6 +19,28 @@ use craft\helpers\StringHelper;
  */
 class UrlRule extends \yii\web\UrlRule
 {
+    /**
+     * Returns an array of regex tokens supported by URL rules.
+     *
+     * @return array
+     * @since 5.6.0
+     */
+    public static function regexTokens(): array
+    {
+        $slugChars = ['.', '_', '-'];
+        $slugWordSeparator = Craft::$app->getConfig()->getGeneral()->slugWordSeparator;
+        if ($slugWordSeparator !== '/' && !in_array($slugWordSeparator, $slugChars, true)) {
+            $slugChars[] = $slugWordSeparator;
+        }
+
+        return [
+            '{handle}' => sprintf('(?:%s)', HandleValidator::$handlePattern),
+            // Reference: http://www.regular-expressions.info/unicode.html
+            '{slug}' => sprintf('(?:[\p{L}\p{N}\p{M}%s]+)', preg_quote(implode($slugChars), '/')),
+            '{uid}' => sprintf('(?:%s)', StringHelper::UUID_PATTERN),
+        ];
+    }
+
     /**
      * @var array Pattern tokens that will be swapped out at runtime.
      */
@@ -49,8 +73,7 @@ class UrlRule extends \yii\web\UrlRule
         if (isset($config['pattern'])) {
             // Swap out any regex tokens in the pattern
             if (!isset(self::$_regexTokens)) {
-                // Reference: http://www.regular-expressions.info/unicode.html
-                self::$_regexTokens = StringHelper::regexTokens();
+                self::$_regexTokens = static::regexTokens();
             }
 
             $config['pattern'] = strtr($config['pattern'], self::$_regexTokens);

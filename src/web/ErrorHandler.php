@@ -9,7 +9,7 @@ namespace craft\web;
 
 use Craft;
 use craft\events\ExceptionEvent;
-use craft\events\RedirectRuleEvent;
+use craft\events\RedirectEvent;
 use craft\helpers\App;
 use craft\helpers\Json;
 use craft\helpers\Template;
@@ -41,6 +41,7 @@ class ErrorHandler extends \yii\web\ErrorHandler
 
     /**
      * @event RedirectEvent The event that is triggered before a 404 redirect.
+     * @since 5.6.0
      */
     public const EVENT_BEFORE_REDIRECT = 'beforeRedirect';
 
@@ -66,25 +67,30 @@ class ErrorHandler extends \yii\web\ErrorHandler
             $redirectRules = Craft::$app->getConfig()->getConfigFromFile('redirects');
             if ($redirectRules) {
                 foreach ($redirectRules as $from => $rule) {
-                    $callback = function(RedirectRule $redirectRule) {
-                        $this->trigger(
-                            self::EVENT_BEFORE_REDIRECT,
-                            new RedirectRuleEvent(['redirectRule' => $redirectRule])
-                        );
-                    };
+                    if (!$rule instanceof RedirectRule) {
+                        $config = is_string($rule) ? ['to' => $rule] : $rule;
+                        $rule = Craft::createObject([
+                            'class' => RedirectRule::class,
+                            'from' => $from,
+                            ...$config,
+                        ]);
+                    }
 
-                    if ($rule instanceof RedirectRule) {
-                        $rule($callback);
+                    $url = $rule->getMatch();
+
+                    if ($url === null) {
                         continue;
                     }
 
-                    $config = is_string($rule) ? ['to' => $rule] : $rule;
-
-                    if (!isset($config['from']) && is_string($from)) {
-                        $config['from'] = $from;
+                    if ($this->hasEventHandlers(self::EVENT_BEFORE_REDIRECT)) {
+                        $this->trigger(self::EVENT_BEFORE_REDIRECT, new RedirectEvent([
+                            'rule' => $rule,
+                        ]));
+                        ;
                     }
 
-                    Craft::createObject(RedirectRule::class, [$config])($callback);
+                    Craft::$app->getResponse()->redirect($url, $rule->statusCode);
+                    Craft::$app->end();
                 }
             }
 

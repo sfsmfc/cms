@@ -11,11 +11,12 @@ use craft\base\Event;
 use craft\web\RedirectRule;
 
 /**
- * RedirectRuleEvent class.
+ * RedirectEvent class.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
+ * @since 5.6.0
  */
-class RedirectRuleEvent extends Event
+class RedirectEvent extends Event
 {
-    public RedirectRule $redirectRule;
+    public RedirectRule $rule;
 }
