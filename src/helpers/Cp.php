@@ -1619,9 +1619,7 @@ JS, [
                         : '') .
                     ($showLabelExtra
                         ? Html::tag('div', '', ['class' => 'flex-grow']) .
-                        Html::beginTag('div', ['class' => ['flex', 'flex-gap-xs']]) .
-                        ($config['labelExtra'] ?? '') .
-                        ($copyBtn ?? '') .
+                        Html::beginTag('div', ['class' => ['flex', 'flex-gap-xs']]) . $config['labelExtra'] .
                         Html::endTag('div')
                         : '') .
                     ($config['headingSuffix'] ?? '') .
