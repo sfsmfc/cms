@@ -26,6 +26,7 @@ use craft\errors\UnsupportedSiteException;
 use craft\events\DefineElementEditorHtmlEvent;
 use craft\events\DraftEvent;
 use craft\fieldlayoutelements\BaseField;
+use craft\fieldlayoutelements\CustomField;
 use craft\fields\Matrix;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Component;
@@ -481,6 +482,74 @@ class ElementsController extends Controller
         }
 
         return $response;
+    }
+
+    /**
+     * Copies field/attribute values on an element from one site to another.
+     *
+     * @return Response
+     * @since 5.6.0
+     */
+    public function actionCopyValuesFromSite(): Response
+    {
+        $this->requireCpRequest();
+
+        /** @var Element|Response|null $element */
+        $element = $this->_element(checkForProvisionalDraft: true);
+
+        if ($element instanceof Response) {
+            return $element;
+        }
+
+        if (!$element || $element->getIsRevision()) {
+            throw new BadRequestHttpException('No element was identified by the request.');
+        }
+
+        $copyFromSiteId = (int)$this->request->getRequiredBodyParam('fromSiteId');
+        $this->requirePermission("editSite:$copyFromSiteId");
+
+        $layoutElementUid = $this->request->getRequiredBodyParam('layoutElementUid');
+        $namespace = $this->request->getBodyParam('namespace');
+
+        $fromElement = $element::find()
+            ->id($element->id)
+            ->structureId($element->structureId)
+            ->siteId($copyFromSiteId)
+            ->drafts(null)
+            ->provisionalDrafts(null)
+            ->one();
+
+        if (!$fromElement) {
+            throw new UnsupportedSiteException($element, $copyFromSiteId, 'Attempting to copy element content from an unsupported site.');
+        }
+
+        $layoutElement = $element->getFieldLayout()->getElementByUid($layoutElementUid);
+        if (!$layoutElement instanceof BaseField || !$layoutElement->isCrossSiteCopyable($element)) {
+            throw new BadRequestHttpException("Invalid layout element UUID: $layoutElementUid");
+        }
+        if ($layoutElement instanceof CustomField) {
+            $layoutElement->getField()->copyCrossSiteValue($fromElement, $element);
+        } else {
+            $attribute = $layoutElement->attribute();
+            $element->$attribute = $fromElement->$attribute;
+        }
+
+        $view = $this->getView();
+        $html = $view->namespaceInputs(fn() => $layoutElement->formHtml($element), $namespace);
+
+        if ($html) {
+            $html = Html::modifyTagAttributes($html, [
+                'data' => [
+                    'layout-element' => $layoutElement->uid,
+                ],
+            ]);
+        }
+
+        return $this->_asSuccess(Craft::t('app', 'Field value copied.'), $element, [
+            'fieldHtml' => $html,
+            'headHtml' => $view->getHeadHtml(),
+            'bodyHtml' => $view->getBodyHtml(),
+        ]);
     }
 
     /**
@@ -2279,6 +2348,9 @@ JS, [
                 ->siteId($siteId)
                 ->preferSites($preferSites)
                 ->unique()
+                ->drafts(null)
+                ->provisionalDrafts(null)
+                ->revisions(null)
                 ->status(null)
                 ->one();
 

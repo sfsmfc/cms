@@ -8,6 +8,7 @@
 namespace craft\fields;
 
 use Craft;
+use craft\base\CrossSiteCopyableFieldInterface;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\base\InlineEditableFieldInterface;
@@ -30,7 +31,7 @@ use yii\db\Schema;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 3.0.0
  */
-class Number extends Field implements InlineEditableFieldInterface, SortableFieldInterface, MergeableFieldInterface
+class Number extends Field implements InlineEditableFieldInterface, SortableFieldInterface, MergeableFieldInterface, CrossSiteCopyableFieldInterface
 {
     /**
      * @since 3.5.11

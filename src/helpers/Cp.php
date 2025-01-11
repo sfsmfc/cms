@@ -1495,6 +1495,24 @@ JS, [
             ])
             : '';
 
+        $translationDescription = $config['translationDescription'] ?? Craft::t('app', 'This field is translatable.');
+        $translationIconHtml = Html::button('', [
+            'class' => ['t9n-indicator'],
+            'data' => [
+                'icon' => 'language',
+            ],
+            'aria' => [
+                'label' => $translationDescription,
+            ],
+        ]);
+
+        $translationIconHtml = Html::tag('craft-tooltip', $translationIconHtml, [
+            'placement' => 'bottom',
+            'max-width' => '200px',
+            'text' => $translationDescription,
+            'delay' => '1000',
+        ]);
+
         if ($label) {
             $labelHtml = $label . (
                     ($required
@@ -1508,26 +1526,14 @@ JS, [
                             ],
                         ])
                         : '') .
-                    ($translatable
-                        ? Html::tag('span', '', [
-                            'class' => ['t9n-indicator'],
-                            'title' => $config['translationDescription'] ?? Craft::t('app', 'This field is translatable.'),
-                            'data' => [
-                                'icon' => 'language',
-                            ],
-                            'aria' => [
-                                'label' => $config['translationDescription'] ?? Craft::t('app', 'This field is translatable.'),
-                            ],
-                            'role' => 'img',
-                        ])
-                        : '')
+                    ($translatable ? $translationIconHtml : '')
                 );
 
             if (!empty($config['actionMenuItems'])) {
                 $labelHtml .= static::disclosureMenu($config['actionMenuItems'], [
+                    'hiddenLabel' => Craft::t('app', 'Actions'),
                     'buttonAttributes' => [
                         'class' => ['action-btn', 'small'],
-                        'hiddenLabel' => Craft::t('app', 'Actions'),
                     ],
                 ]);
             }
@@ -1543,8 +1549,8 @@ JS, [
                     'class' => $fieldClass,
                     'id' => $fieldId,
                     'data' => [
-                        'attribute' => $attribute,
-                    ] + $data,
+                            'attribute' => $attribute,
+                        ] + $data,
                 ],
                 $config['fieldAttributes'] ?? []
             )) .
@@ -3118,7 +3124,7 @@ JS;
      * - `liAttributes` – Any HTML attributes that should be set on the item’s `<li>` tag
      *
      * @param array $config
-     * @param string $menuId,
+     * @param string $menuId
      * @return string
      * @since 5.0.0
      */
@@ -3332,7 +3338,7 @@ JS;
                 $path = match ($icon) {
                     'asterisk-slash', 'diamond-slash', 'element-card', 'element-card-slash', 'element-cards', 'graphql',
                     'grip-dots', 'image-slash', 'list-flip', 'list-tree-flip', 'share-flip' =>
-                        Craft::getAlias("@app/icons/custom-icons/$icon.svg"),
+                    Craft::getAlias("@app/icons/custom-icons/$icon.svg"),
                     default => Craft::getAlias("@appicons/$icon.svg"),
                 };
                 if (!file_exists($path)) {

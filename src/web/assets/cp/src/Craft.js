@@ -108,3 +108,4 @@ import './js/CraftSpinner.js';
 import './js/CraftTooltip.js';
 import './js/CraftElementLabel';
 import './js/CraftProxyScrollbar';
+import './js/CraftCopyAttribute.js';
