@@ -4575,7 +4575,7 @@ const FilterHud = Garnish.HUD.extend({
         $('<div/>', {
           text: Craft.t('app', 'Loading'),
           class: 'visually-hidden',
-          'aria-role': 'alert',
+          role: 'alert',
         })
       );
 
@@ -4603,6 +4603,7 @@ const FilterHud = Garnish.HUD.extend({
       this.hide();
     });
 
+    Craft.cp.announce(Craft.t('app', 'Loading'));
     Craft.sendActionRequest('POST', 'element-indexes/filter-hud', {
       data: {
         elementType: this.elementIndex.elementType,
@@ -4617,6 +4618,7 @@ const FilterHud = Garnish.HUD.extend({
       .then(async (response) => {
         this.loading = false;
         this.$hud.removeClass('loading');
+        Craft.cp.announce(Craft.t('app', 'Loading complete'));
         $loadingContent.remove();
 
         this.$main.append(response.data.hudHtml);

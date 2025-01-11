@@ -962,6 +962,15 @@ JS, [
     }
 
     /**
+     * @see CrossSiteCopyableFieldInterface::copyCrossSiteValue()
+     * @since 5.6.0
+     */
+    public function copyCrossSiteValue(ElementInterface $from, ElementInterface $to): void
+    {
+        $this->copyValue($from, $to);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getElementConditionRuleType(): array|string|null
