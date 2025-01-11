@@ -70,6 +70,7 @@
 - It’s now possible to reference custom field handles in element queries’ `where` params. ([#16318](https://github.com/craftcms/cms/pull/16318))
 - Number fields’ scalar values now return an integer if Decimals is set to `0`, and a number formatted with the correct decimal points when using MySQL. ([16369](https://github.com/craftcms/cms/issues/16369))
 - Added support for specifying the current site via an `X-Craft-Site` header set to a site ID or handle. ([#16367](https://github.com/craftcms/cms/pull/16367))
+- Added support for defining redirects from `config/redirects.php`. ([#16355](https://github.com/craftcms/cms/pull/16355))
 - Deprecated the `ucfirst` Twig filter. `capitalize` should be used instead.
 
 ### Extensibility
@@ -93,6 +94,7 @@
 - Added `craft\elements\db\ElementQueryInterface::getFieldLayouts()`.
 - Added `craft\elements\db\NestedElementQueryTrait::fieldLayouts()`.
 - Added `craft\events\DefineAltActionsEvent`.
+- Added `craft\events\RedirectEvent`. ([#16355](https://github.com/craftcms/cms/pull/16355))
 - Added `craft\fieldlayoutelements\BaseField::actionMenuItems()`.
 - Added `craft\fieldlayoutelements\BaseField::isCrossSiteCopyable()`.
 - Added `craft\fields\BaseRelationField::gqlFieldArguments()`.
@@ -122,6 +124,9 @@
 - Added `craft\models\MailSettings::$siteOverrides`.
 - Added `craft\services\Elements::canSaveCanonical()`.
 - Added `craft\services\Gql::getFieldLayoutArguments()`.
+- Added `craft\web\ErrorHandler::EVENT_BEFORE_REDIRECT`. ([#16355](https://github.com/craftcms/cms/pull/16355))
+- Added `craft\web\RedirectRule`. ([#16355](https://github.com/craftcms/cms/pull/16355))
+- Added `craft\web\UrlRule::regexTokens()`.
 - Added `craft\web\User::getImpersonator()`.
 - Added `craft\web\User::getImpersonatorId()`.
 - Added `craft\web\User::setImpersonatorId()`.
@@ -137,6 +142,7 @@
 - `craft\models\Site` now implements `craft\base\Chippable`.
 - `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260))
 - Elements’ `defineCardAttributes()` methods can now return a `placeholder` value set to a callable.
+- Deprecated `craft\controllers\RedirectController`. ([#16355](https://github.com/craftcms/cms/pull/16355))
 - Deprecated `craft\elements\User::EVENT_REGISTER_USER_ACTIONS`.
 - Deprecated `craft\elements\User::IMPERSONATE_KEY`. `craft\web\User::getImpersonatorId()` should be used instead.
 - Deprecated `craft\fields\Color::$presets`. ([#16249](https://github.com/craftcms/cms/pull/16249))
