@@ -74,9 +74,12 @@
 
 ### Extensibility
 - Added `craft\base\ConfigurableComponentInterface::getReadOnlySettingsHtml()`. ([#16265](https://github.com/craftcms/cms/pull/16265))
+- Added `craft\base\CrossSiteCopyableFieldInterface`. ([#14056](https://github.com/craftcms/cms/pull/14056))
 - Added `craft\base\Element::EVENT_DEFINE_ALT_ACTIONS`. ([#16294](https://github.com/craftcms/cms/pull/16294))
 - Added `craft\base\ElementInterface::getAltActions()`. ([#16294](https://github.com/craftcms/cms/pull/16294))
+- Added `craft\base\ElementInterface::getIsCrossSiteCopyable()`. ([#14056](https://github.com/craftcms/cms/pull/14056))
 - Added `craft\base\ElementTrait::$viewMode`. ([#16324](https://github.com/craftcms/cms/pull/16324))
+- Added `craft\base\Field::copyCrossSiteValue()`. ([#14056](https://github.com/craftcms/cms/pull/14056))
 - Added `craft\base\Field::dbTypeForValueSql()`.
 - Added `craft\base\NestedElementTrait::ownerType()`.
 - Added `craft\base\PluginTrait::$hasReadOnlyCpSettings`. ([#16265](https://github.com/craftcms/cms/pull/16265))
@@ -91,6 +94,7 @@
 - Added `craft\elements\db\NestedElementQueryTrait::fieldLayouts()`.
 - Added `craft\events\DefineAltActionsEvent`.
 - Added `craft\fieldlayoutelements\BaseField::actionMenuItems()`.
+- Added `craft\fieldlayoutelements\BaseField::isCrossSiteCopyable()`.
 - Added `craft\fields\BaseRelationField::gqlFieldArguments()`.
 - Added `craft\fields\Color::$allowCustomColors`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added `craft\fields\Color::$palette`. ([#16249](https://github.com/craftcms/cms/pull/16249))
@@ -123,10 +127,6 @@
 - Added `craft\web\User::setImpersonatorId()`.
 - Added `craft\web\View::setTwig()`.
 - Added `craft\web\twig\variables\Cp::EVENT_REGISTER_READ_ONLY_CP_SETTINGS`. ([#16265](https://github.com/craftcms/cms/pull/16265))
-- Added `craft\base\CrossSiteCopyableFieldInterface`. ([#14056](https://github.com/craftcms/cms/pull/14056))
-- Added `craft\base\ElementInterface::getIsCrossSiteCopyable()`. ([#14056](https://github.com/craftcms/cms/pull/14056))
-- Added `craft\base\Field::copyCrossSiteValue()`. ([#14056](https://github.com/craftcms/cms/pull/14056))
-- Added `craft\fieldlayoutelements\BaseField::isCrossSiteCopyable()`.
 - `GuzzleHttp\Client` is now instantiated via `Craft::createObject()`. ([#16366](https://github.com/craftcms/cms/pull/16366))
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
