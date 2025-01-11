@@ -88,6 +88,7 @@
 - Added `craft\elements\db\ElementQueryInterface::getFieldLayouts()`.
 - Added `craft\elements\db\NestedElementQueryTrait::fieldLayouts()`.
 - Added `craft\events\DefineAltActionsEvent`.
+- Added `craft\fieldlayoutelements\BaseField::actionMenuItems()`.
 - Added `craft\fields\BaseRelationField::gqlFieldArguments()`.
 - Added `craft\fields\Color::$allowCustomColors`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added `craft\fields\Color::$palette`. ([#16249](https://github.com/craftcms/cms/pull/16249))
@@ -120,7 +121,6 @@
 - Added `craft\web\User::setImpersonatorId()`.
 - Added `craft\web\View::setTwig()`.
 - Added `craft\web\twig\variables\Cp::EVENT_REGISTER_READ_ONLY_CP_SETTINGS`. ([#16265](https://github.com/craftcms/cms/pull/16265))
-- Added `craft\fieldlayoutelements\BaseField::actionMenuItems()`.
 - `GuzzleHttp\Client` is now instantiated via `Craft::createObject()`. ([#16366](https://github.com/craftcms/cms/pull/16366))
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
