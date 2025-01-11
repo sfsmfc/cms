@@ -86,9 +86,10 @@
         class: ['dashed', 'add-btn'],
       },
       omitIfEmpty: false,
+      disabled: disabled,
     }) }}
 
-    {% if createAction %}
+    {% if createAction and not disabled %}
       {{ forms.button({
         class: ['add', 'icon', 'dashed', 'create-btn'],
         label: 'Create'|t('app'),

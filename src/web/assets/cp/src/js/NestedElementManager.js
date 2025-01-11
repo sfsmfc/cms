@@ -466,6 +466,11 @@ Craft.NestedElementManager = Garnish.Base.extend(
 
     createElementEditor($element) {
       const slideout = Craft.createElementEditor(this.elementType, $element, {
+        onLoad: () => {
+          slideout.elementEditor.on('update', () => {
+            Craft.Preview.refresh();
+          });
+        },
         onBeforeSubmit: async () => {
           // If the nested element is primarily owned by the same owner element it was queried for,
           // then ensure we're working with a draft and save the nested entry changes to the draft

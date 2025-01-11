@@ -30,6 +30,7 @@ use craft\web\twig\SinglePreloaderExtension;
 use craft\web\twig\TemplateLoader;
 use Illuminate\Support\Collection;
 use LogicException;
+use Stringable;
 use Throwable;
 use Twig\Error\LoaderError as TwigLoaderError;
 use Twig\Error\RuntimeError as TwigRuntimeError;
@@ -384,6 +385,21 @@ class View extends \yii\web\View
     }
 
     /**
+     * Sets the Twig environment for the current template mode.
+     *
+     * @param Environment $twig
+     * @since 5.6.0
+     */
+    public function setTwig(Environment $twig): void
+    {
+        if ($this->_templateMode === self::TEMPLATE_MODE_CP) {
+            $this->_cpTwig = $twig;
+        } else {
+            $this->_siteTwig = $twig;
+        }
+    }
+
+    /**
      * Creates a new Twig environment.
      *
      * @return Environment
@@ -398,7 +414,9 @@ class View extends \yii\web\View
         $twig = new Environment(new TemplateLoader($this), $this->_getTwigOptions());
 
         // Mark SafeHtml as a safe interface
-        $twig->getRuntime(EscaperRuntime::class)->addSafeClass(SafeHtml::class, ['html']);
+        /** @var class-string<Stringable> $safeClass */
+        $safeClass = SafeHtml::class;
+        $twig->getRuntime(EscaperRuntime::class)->addSafeClass($safeClass, ['html']);
 
         $twig->addExtension(new StringLoaderExtension());
         $twig->addExtension(new Extension($this, $twig));
@@ -1979,7 +1997,7 @@ JS;
      */
     public function endPage($ajaxMode = false): void
     {
-        if (!$ajaxMode && Craft::$app->getRequest()->getIsCpRequest()) {
+        if (!$ajaxMode && $this->_templateMode === static::TEMPLATE_MODE_CP) {
             $this->_setJsProperty('registeredJsFiles', $this->_registeredJsFiles);
             $this->_setJsProperty('registeredAssetBundles', $this->_registeredAssetBundles);
         }

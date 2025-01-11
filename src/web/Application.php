@@ -179,9 +179,17 @@ class Application extends \yii\web\Application
                 $this->getDb()->enableReplicas = false;
             }
 
-            $headers = $this->getResponse()->getHeaders();
+            $isCpRequest = $request->getIsCpRequest();
+            $response = $this->getResponse();
+            $headers = $response->getHeaders();
             $generalConfig = $this->getConfig()->getGeneral();
 
+            // Set no-cache headers for all action and CP requests
+            if ($request->getIsActionRequest() || $request->getIsCpRequest()) {
+                $response->setNoCacheHeaders();
+            }
+
+            // Set the permissions policy
             if ($generalConfig->permissionsPolicyHeader && $request->getIsSiteRequest()) {
                 $headers->set('Permissions-Policy', $generalConfig->permissionsPolicyHeader);
             }
@@ -189,7 +197,7 @@ class Application extends \yii\web\Application
             // Tell bots not to index/follow control panel and tokenized pages
             if (
                 $generalConfig->disallowRobots ||
-                $request->getIsCpRequest() ||
+                $isCpRequest ||
                 $request->getToken() !== null ||
                 $request->getIsPreview() ||
                 ($request->getIsActionRequest() && !($request->getIsLoginRequest() && $request->getIsGet()))
@@ -198,7 +206,7 @@ class Application extends \yii\web\Application
             }
 
             // Prevent some possible XSS attack vectors
-            if ($request->getIsCpRequest()) {
+            if ($isCpRequest) {
                 $headers->add('Content-Security-Policy', "frame-ancestors 'self'");
                 $headers->set('X-Frame-Options', 'SAMEORIGIN');
                 $headers->set('X-Content-Type-Options', 'nosniff');
@@ -229,7 +237,7 @@ class Application extends \yii\web\Application
             if (!$this->getUpdates()->getIsCraftSchemaVersionCompatible()) {
                 $this->_unregisterDebugModule();
 
-                if ($request->getIsCpRequest()) {
+                if ($isCpRequest) {
                     $version = $this->getInfo()->version;
 
                     throw new HttpException(200, Craft::t('app', 'Craft CMS does not support backtracking to this version. Please update to Craft CMS {version} or later.', [
@@ -243,7 +251,7 @@ class Application extends \yii\web\Application
             // getIsCraftDbMigrationNeeded will return true if we’re in the middle of a manual or auto-update for Craft itself.
             // If we’re in maintenance mode and it’s not a site request, show the manual update template.
             if ($this->getUpdates()->getIsCraftUpdatePending()) {
-                return $this->_processUpdateLogic($request) ?: $this->getResponse();
+                return $this->_processUpdateLogic($request) ?: $response;
             }
 
             // If there’s a new version, but the schema hasn’t changed, just update the info table
@@ -263,15 +271,16 @@ class Application extends \yii\web\Application
 
             // Check if a plugin needs to update the database.
             if ($this->getUpdates()->getIsPluginUpdatePending()) {
-                return $this->_processUpdateLogic($request) ?: $this->getResponse();
+                return $this->_processUpdateLogic($request) ?: $response;
             }
 
-            if ($request->getIsCpRequest() && !$request->getIsActionRequest()) {
+            if (!$request->getIsActionRequest()) {
                 $userSession = $this->getUser();
 
                 // If this is a plugin template request, make sure the user has access to the plugin
                 // If this is a non-login, non-validate, non-setPassword control panel request, make sure the user has access to the control panel
                 if (
+                    $isCpRequest &&
                     ($firstSeg = $request->getSegment(1)) !== null &&
                     ($plugin = $this->getPlugins()->getPlugin($firstSeg)) !== null
                 ) {
@@ -291,7 +300,7 @@ class Application extends \yii\web\Application
                         return $this->runAction('users/setup-2fa');
                     }
 
-                    if (!$this->getCanTestEditions()) {
+                    if ($isCpRequest && !$this->getCanTestEditions()) {
                         // Are there are any licensing issues cached?
                         $licenseIssues = App::licensingIssues(false);
                         if (!empty($licenseIssues)) {
