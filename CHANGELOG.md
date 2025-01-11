@@ -4,6 +4,7 @@
 
 - Fixed a bug where the control panel could display a notice about the Craft CMS license belonging to a different domain, even when accessing the control panel from the correct domain. ([#16396](https://github.com/craftcms/cms/issues/16396))
 - Fixed a bug where field layout elements’ action menus could have an empty action group.
+- Fixed a bug where Single section entries could be duplicated after running the `entry-types/merge` command. ([#16394](https://github.com/craftcms/cms/issues/16394))
 
 ## 5.5.9 - 2025-01-06
 
