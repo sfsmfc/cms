@@ -966,7 +966,9 @@ class Entries extends Component
         // if we didn't find any, try without the typeId,
         // in case that changed to something completely new
         if ($entry === null) {
-            $entry = $baseEntryQuery->one();
+            $entry = $baseEntryQuery
+                ->typeId(null)
+                ->one();
 
             if ($entry !== null) {
                 $entry->setTypeId($entryTypeIds[0]);
@@ -977,6 +979,7 @@ class Entries extends Component
         // try without the typeId with trashed where they were deleted with entry type
         if ($entry === null) {
             $entry = $baseEntryQuery
+                ->typeId(null)
                 ->trashed(null)
                 ->where(['entries.deletedWithEntryType' => true])
                 ->one();
