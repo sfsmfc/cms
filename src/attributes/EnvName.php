@@ -20,5 +20,6 @@ class EnvName
 {
     public function __construct(
         public readonly string $name,
-    ) {}
+    ) {
+    }
 }
