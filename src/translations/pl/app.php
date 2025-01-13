@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Kopiuj tag odsyłacza',
     'Copy to clipboard' => 'Kopiuj do schowka',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Nie można utworzyć tokenu podglądu.',
     'Could not create the group:' => 'Nie można utworzyć grupy:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Pokaż karty w siatce',
     'Show date and time' => 'Pokaż datę i czas',
     'Show date' => 'Pokaż datę',
+    'Show field handles in edit forms' => 'Pokaż uchwyty pól w formularzach edycji',
     'Show full exception views when Dev Mode is disabled' => 'Pokaż pełne widoki wyjątków, gdy wyłączony jest tryb deweloperski',
     'Show in element cards' => 'Pokaż w kartach elementów',
     'Show in folder' => 'Pokaż w folderze',
@@ -2250,5 +2252,4 @@ Gratulacje! Craft z powodzeniem może wysyłać e-maile. Zostały użyte poniżs
     '“{handle}” is a reserved word.' => '"{handle}" jest słowem zastrzeżonym.',
     '“{handle}” isn’t a valid handle.' => '"{handle}" nie jest prawidłowym odnośnikiem.',
     '“{name}” deleted.' => 'Usunięto "{name}".',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
