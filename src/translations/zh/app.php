@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => '复制参考标签',
     'Copy to clipboard' => '复制到剪贴板',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => '无法创建预览令牌。',
     'Could not create the group:' => '无法创建群组：',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => '在网格中显示卡片',
     'Show date and time' => '显示日期和时间',
     'Show date' => '显示日期',
+    'Show field handles in edit forms' => '在编辑表单中显示字段句柄',
     'Show full exception views when Dev Mode is disabled' => '在开发者模式禁用时显示完整异常视图',
     'Show in element cards' => '在元素卡片中显示',
     'Show in folder' => '在文件夹中显示',
@@ -2248,5 +2250,4 @@ return [
     '“{handle}” is a reserved word.' => '“{handle}”是预定字。',
     '“{handle}” isn’t a valid handle.' => '“{handle}”不是有效处理。',
     '“{name}” deleted.' => '“{name}”已删除。',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
