@@ -62,6 +62,27 @@
             {% endif %}
         </div>
     {% endfor %}
+    {{ forms.textField({
+        label: 'Widget Title'|t('app'),
+        id: 'custom-title',
+        name: 'customTitle',
+        value: widget.customTitle,
+        placeholder: 'Create a new {section} entry'|t('app', {
+            section: (section ?? sections|first).getUiLabel(),
+        }),
+    }) }}
 {% else %}
     <p>{{ "No sections are available."|t('app') }}</p>
 {% endif %}
+
+{% js %}
+  (() => {
+    const $sectionSelect = $('#{{ 'section'|namespaceInputId }}');
+    const $titleInput = $('#{{ 'custom-title'|namespaceInputId }}');
+    $sectionSelect.on('change', () => {
+      $titleInput.attr('placeholder', Craft.t('app', 'Create a new {section} entry', {
+        section: $sectionSelect.find(`option[value="${$sectionSelect.val()}"]`).text(),
+      }));
+    });
+  })();
+{% endjs %}
