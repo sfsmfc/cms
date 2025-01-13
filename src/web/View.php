@@ -308,6 +308,14 @@ class View extends \yii\web\View
      */
     private array $_assetBundleBuffers = [];
 
+
+    /**
+     * @var array
+     * @see startJsImportBuffer()
+     * @see clearJsImportBuffer()
+     */
+    private array $_jsImportBuffers = [];
+
     /**
      * @var array|null the registered generic `<script>` code blocks
      * @see registerScript()
@@ -1347,6 +1355,39 @@ class View extends \yii\web\View
     }
 
     /**
+     * Starts a buffer for any JavaScript imports registered with [[registerJsImport()]].
+     *
+     * The buffer’s contents can be cleared and returned later via [[clearJsImportBuffer()]].
+     *
+     * @see clearJsImportBuffer()
+     * @since 5.6.0
+     */
+    public function startJsImportBuffer(): void
+    {
+        $this->_jsImportBuffers[] = $this->_jsImports;
+        $this->_jsImports = [];
+    }
+
+    /**
+     * Clears and ends a buffer started via [[startJsImportBuffer()]], returning any JavaScript imports that were registered
+     * while the buffer was active.
+     *
+     * @return array|false The JavaScript imports that were registered while the buffer was active, or `false` if there wasn’t an active buffer.
+     * @see startAssetBundleBuffer()
+     * @since 5.6.0
+     */
+    public function clearJsImportBuffer(): array|false
+    {
+        if (empty($this->_jsImportBuffers)) {
+            return false;
+        }
+
+        $bufferedJsImports = $this->_jsImports;
+        $this->_jsImports = array_pop($this->_jsImportBuffers);
+        return $bufferedJsImports;
+    }
+
+    /**
      * @inheritdoc
      */
     public function registerJsFile($url, $options = [], $key = null): void
@@ -1389,16 +1430,10 @@ class View extends \yii\web\View
      * @param callable $scriptFn callback function that returns the JS code to be registered.
      * @param array $vars Array of variables that will be JSON-encoded before being passed to `$scriptFn`
      * @param int $position the position at which the JS script tag should be inserted
-     * * in a page. The possible values are:
-     * *
-     * * - [[POS_HEAD]]: in the head section
-     * * - [[POS_BEGIN]]: at the beginning of the body section
-     * * - [[POS_END]]: at the end of the body section
-     * * - [[POS_LOAD]]: enclosed within jQuery(window).load().
-     * *   Note that by using this position, the method will automatically register the jQuery js file.
-     * * - [[POS_READY]]: enclosed within jQuery(document).ready(). This is the default value.
-     * *   Note that by using this position, the method will automatically register the jQuery js file.
-     * *
+     *  in a page. The possible values are:
+     *  - [[POS_HEAD]]: in the head section
+     *  - [[POS_BEGIN]]: at the beginning of the body section
+     *  - [[POS_END]]: at the end of the body section
      * @param array $options the HTML attributes for the `<script>` tag.
      * @param string|null $key the key that identifies the generic `<script>` code block. If null, it will use
      * $script as the key. If two generic `<script>` code blocks are registered with the same key, the latter
@@ -1435,7 +1470,7 @@ class View extends \yii\web\View
     }
 
     /**
-     * Registers a javascript import map entry to be injected into the final page response.
+     * Registers a JavaScript import map entry to be injected into the final page response.
      *
      * @param string $key The module specifier.
      * @param string $value  The URL or path to the resource the key will resolve to.
