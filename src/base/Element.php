@@ -2438,6 +2438,12 @@ abstract class Element extends Component implements ElementInterface
     private $_serializeFields = false;
 
     /**
+     * @var bool
+     * @see getIsCrossSiteCopyable()
+     */
+    private bool $_isCrossSiteCopyable;
+
+    /**
      * @inheritdoc
      */
     public function __construct($config = [])
@@ -5483,6 +5489,24 @@ JS, [
         }
 
         return $this->_currentRevision ?: null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIsCrossSiteCopyable(): bool
+    {
+        if (!isset($this->_isCrossSiteCopyable)) {
+            $this->_isCrossSiteCopyable = (
+                Craft::$app->getIsMultiSite() &&
+                // check if user can edit this element in other sites
+                count(ElementHelper::editableSiteIdsForElement($this)) > 1 &&
+                // also check if the element exists in other sites
+                !empty(array_diff(array_keys(ElementHelper::siteStatusesForElement($this, true)), [$this->siteId]))
+            );
+        }
+
+        return $this->_isCrossSiteCopyable;
     }
 
     // Indexes, etc.

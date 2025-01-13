@@ -25,8 +25,17 @@ interface IntervalManagerInterface {
   start(): void;
 }
 
+type Site = {
+  handle: string;
+  id: number;
+  name: string;
+  uid: string;
+};
+
 // Declare existing variables, mock the things we'll use.
 declare var Craft: {
+  csrfTokenName?: string;
+  csrfTokenValue?: string;
   ProgressBar: ProgressBarInterface;
   IntervalManager: IntervalManagerInterface;
   t(category: string, message: string, params?: object): string;
@@ -34,6 +43,7 @@ declare var Craft: {
   initUiElements($container: JQuery): void;
   expandPostArray(arr: object): any;
   escapeHtml(str: string);
+  sites: Site[];
   Preview: any;
   cp: any;
 };

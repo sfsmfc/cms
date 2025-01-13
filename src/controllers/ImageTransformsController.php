@@ -90,7 +90,7 @@ class ImageTransformsController extends Controller
                     throw new NotFoundHttpException('Transform not found');
                 }
             } else {
-                $transform = new ImageTransform();
+                $transform = Craft::createObject(ImageTransform::class);
             }
         }
 
@@ -144,7 +144,7 @@ class ImageTransformsController extends Controller
     {
         $this->requirePostRequest();
 
-        $transform = new ImageTransform();
+        $transform = Craft::createObject(ImageTransform::class);
         $transform->id = $this->request->getBodyParam('transformId');
         $transform->name = $this->request->getBodyParam('name');
         $transform->handle = $this->request->getBodyParam('handle');

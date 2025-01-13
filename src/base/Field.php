@@ -534,30 +534,55 @@ abstract class Field extends SavableComponent implements FieldInterface, Iconic,
     public function getActionMenuItems(): array
     {
         $items = [];
+        $userSessionService = Craft::$app->getUser();
 
-        if (
-            $this->id &&
-            Craft::$app->getUser()->getIsAdmin() &&
-            Craft::$app->getConfig()->getGeneral()->allowAdminChanges
-        ) {
-            $editId = sprintf('action-edit-%s', mt_rand());
-            $items[] = [
-                'id' => $editId,
-                'icon' => 'edit',
-                'label' => Craft::t('app', 'Edit'),
-            ];
-
+        if ($this->id && $userSessionService->getIsAdmin()) {
             $view = Craft::$app->getView();
-            $view->registerJsWithVars(fn($id, $params) => <<<JS
-$('#' + $id).on('click', () => {
-  new Craft.CpScreenSlideout('fields/edit-field', {
-    params: $params,
+
+            if (Craft::$app->getConfig()->getGeneral()->allowAdminChanges) {
+                // Edit field
+                $editId = sprintf('action-edit-%s', mt_rand());
+                $items[] = [
+                    'id' => $editId,
+                    'icon' => 'edit',
+                    'label' => Craft::t('app', 'Edit field'),
+                ];
+                $view->registerJsWithVars(fn($id, $params) => <<<JS
+(() => {
+  $('#' + $id).on('click', () => {
+    new Craft.CpScreenSlideout('fields/edit-field', {
+      params: $params,
+    });
   });
-});
+})();
 JS, [
-                $view->namespaceInputId($editId),
-                ['fieldId' => $this->id],
-            ]);
+                    $view->namespaceInputId($editId),
+                    ['fieldId' => $this->id],
+                ]);
+            }
+
+            // Copy field handle
+            if (!$userSessionService->getIdentity()->getPreference('showFieldHandles')) {
+                $copyId = sprintf('action-copy-handle-%s', mt_rand());
+                $items[] = [
+                    'id' => $copyId,
+                    'icon' => 'clipboard',
+                    'label' => Craft::t('app', 'Copy field handle'),
+                ];
+                $view->registerJsWithVars(fn($id, $attribute) => <<<JS
+(() => {
+  $('#' + $id).on('click', () => {
+    Craft.ui.createCopyTextPrompt({
+      label: Craft.t('app', 'Field Handle'),
+      value: $attribute,
+    });
+  });
+})();
+JS, [
+                    $view->namespaceInputId($copyId),
+                    $this->handle,
+                ]);
+            }
         }
 
         return $items;
@@ -937,6 +962,15 @@ JS, [
     {
         $value = $this->serializeValue($from->getFieldValue($this->handle), $from);
         $to->setFieldValue($this->handle, $value);
+    }
+
+    /**
+     * @see CrossSiteCopyableFieldInterface::copyCrossSiteValue()
+     * @since 5.6.0
+     */
+    public function copyCrossSiteValue(ElementInterface $from, ElementInterface $to): void
+    {
+        $this->copyValue($from, $to);
     }
 
     /**
