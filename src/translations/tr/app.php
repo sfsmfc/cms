@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Referans etiketini kopyala',
     'Copy to clipboard' => 'Panoya kopyala',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Önizleme belirteci oluşturulamadı.',
     'Could not create the group:' => 'Grup oluşturulamadı:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Kartları ızgarada göster',
     'Show date and time' => 'Tarihi ve zamanı göster',
     'Show date' => 'Tarihi göster',
+    'Show field handles in edit forms' => 'Alan tanımlayıcılarını düzenleme formlarında göster',
     'Show full exception views when Dev Mode is disabled' => 'Geliştirici Modu devre dışıyken tüm istisnai görünümleri göster',
     'Show in element cards' => 'Öge kartlarında göster',
     'Show in folder' => 'Klasörde göster',
@@ -2250,5 +2252,4 @@ Tebrikler! Craft eposta göndermeyi başardı.Gerkli ayarlar şu şekilde: {{ se
     '“{handle}” is a reserved word.' => '“{handle}” özel amaçlı bir sözcük.',
     '“{handle}” isn’t a valid handle.' => '“{handle}” geçerli değil.',
     '“{name}” deleted.' => '“{name}” silindi.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
