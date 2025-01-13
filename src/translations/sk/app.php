@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Skopírovať referenčnú značku',
     'Copy to clipboard' => 'Skopírovať do schránky',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Nepodarilo sa vytvoriť token náhľadu.',
     'Could not create the group:' => 'Nemožno vytvoriť skupinu:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Zobraziť karty v tabuľke',
     'Show date and time' => 'Ukázať dátum a čas',
     'Show date' => 'Ukázať dátum',
+    'Show field handles in edit forms' => 'Zobraziť popisovače vo formulároch úprav',
     'Show full exception views when Dev Mode is disabled' => 'Plné zobrazenie výnimiek v zakázanom režime vývojára',
     'Show in element cards' => 'Zobrazovať v kartách prvkov pri ďalšom prihlásení',
     'Show in folder' => 'Zobraziť v priečinku',
@@ -2248,5 +2250,4 @@ return [
     '“{handle}” is a reserved word.' => '„{handle}“ je vyhradené slovo.',
     '“{handle}” isn’t a valid handle.' => '„{handle}“ nie je platný identifikátor.',
     '“{name}” deleted.' => '„{name}“ - zmazané.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
