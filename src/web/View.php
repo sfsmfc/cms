@@ -329,7 +329,7 @@ class View extends \yii\web\View
     private array $_html = [];
 
     /**
-     * @var array registered imports for javascript es modules
+     * @var array the registered imports for JavaScript es modules
      * @see registerJsImport()
      */
     private array $_jsImports = [];
@@ -2203,7 +2203,6 @@ JS;
         if (!empty($this->_html[self::POS_HEAD])) {
             $lines[] = implode("\n", $this->_html[self::POS_HEAD]);
         }
-
 
         $html = parent::renderHeadHtml();
 
