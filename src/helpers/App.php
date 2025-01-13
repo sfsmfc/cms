@@ -9,6 +9,7 @@ namespace craft\helpers;
 
 use Closure;
 use Craft;
+use craft\attributes\EnvName;
 use craft\behaviors\SessionBehavior;
 use craft\cache\FileCache;
 use craft\config\DbConfig;
@@ -160,12 +161,23 @@ class App
                 continue;
             }
 
-            $propName = $prop->getName();
-            $envName = $envPrefix . strtoupper(StringHelper::toSnakeCase($propName));
-            $envValue = static::env($envName);
+            $envName = null;
+
+            foreach ($prop->getAttributes(EnvName::class) as $attribute) {
+                /** @var EnvName $envName */
+                $envName = $attribute->newInstance();
+                $envName = $envName->name;
+                break;
+            }
+
+            if (!$envName) {
+                $envName = strtoupper(StringHelper::toSnakeCase($prop->getName()));
+            }
+
+            $envValue = static::env(sprintf('%s%s', $envPrefix, $envName));
 
             if ($envValue !== null) {
-                $envConfig[$propName] = $envValue;
+                $envConfig[$prop->getName()] = $envValue;
             }
         }
 
