@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Referenz-Schlagwort kopieren',
     'Copy to clipboard' => 'In die Zwischenablage kopieren',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Es konnte kein Vorschau-Token erstellt werden.',
     'Could not create the group:' => 'Die Gruppe konnte nicht erstellt werden:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Karten in einem Raster anzeigen',
     'Show date and time' => 'Datum und Zeit anzeigen',
     'Show date' => 'Datum anzeigen',
+    'Show field handles in edit forms' => 'Zeige Feld Identifikatoren in Bearbeitungsformularen an',
     'Show full exception views when Dev Mode is disabled' => 'Zeigt vollständige Ausnahmeansichten an, wenn der Entwicklermodus deaktiviert ist',
     'Show in element cards' => 'In Elementkarten anzeigen',
     'Show in folder' => 'In Ordner anzeigen',
@@ -2250,5 +2252,4 @@ Glückwunsch! Craft konnte erfolgreich eine E-Mail versenden. Hier sind die von 
     '“{handle}” is a reserved word.' => '„{handle}“ ist ein reserviertes Wort.',
     '“{handle}” isn’t a valid handle.' => '„{handle}“ ist kein gültiger Kurzname.',
     '“{name}” deleted.' => '„{name}“ wurde gelöscht.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
