@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Kopier referansestikkordet',
     'Copy to clipboard' => 'Kopier til utklippstavlen',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Kunne ikke opprette en forhåndsvisningstoken.',
     'Could not create the group:' => 'Kunne ikke opprette gruppen:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Vis kortene i et rutenett',
     'Show date and time' => 'Vis tid og dato',
     'Show date' => 'Vis dato',
+    'Show field handles in edit forms' => 'Vis feltetikett i redigeringsskjemaer',
     'Show full exception views when Dev Mode is disabled' => 'Vis fulle unntaksvisninger når utviklermodus er deaktivert',
     'Show in element cards' => 'Vis i elementkort',
     'Show in folder' => 'Vis i mappe',
@@ -2250,5 +2252,4 @@ Gratulerer! Craft var i stand til å sende e-post. Her er innstillingene du beny
     '“{handle}” is a reserved word.' => '«{handle}» er et reservert ord.',
     '“{handle}” isn’t a valid handle.' => '«{handle}» er ikke et gyldig kodeord.',
     '“{name}” deleted.' => '«{name}» slettet.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
