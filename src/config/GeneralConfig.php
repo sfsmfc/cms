@@ -9,6 +9,7 @@ namespace craft\config;
 
 use Closure;
 use Craft;
+use craft\attributes\EnvName;
 use craft\helpers\ConfigHelper;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Localization;
@@ -943,6 +944,24 @@ class GeneralConfig extends BaseConfig
      * @group System
      */
     public bool $devMode = false;
+
+    /**
+     * @var bool Whether two-step verification features should be disabled.
+     *
+     * ::: code
+     * ```php Static Config
+     * ->disable2fa()
+     * ```
+     * ```shell Environment Override
+     * CRAFT_DISABLE_2FA=true
+     * ```
+     * :::
+     *
+     * @group Users
+     * @since 5.6.0
+     */
+    #[EnvName('DISABLE_2FA')]
+    public bool $disable2fa = false;
 
     /**
      * @var string[]|string|null Array of plugin handles that should be disabled, regardless of what the project config says.
@@ -4313,6 +4332,30 @@ class GeneralConfig extends BaseConfig
     public function devMode(bool $value = true): self
     {
         $this->devMode = $value;
+        return $this;
+    }
+
+    /**
+     * Whether two-step verification features should be disabled.
+     *
+     * ::: code
+     * ```php Static Config
+     * ->disable2fa()
+     * ```
+     * ```shell Environment Override
+     * CRAFT_DISABLE_2FA=true
+     * ```
+     * :::
+     *
+     * @group Users
+     * @param bool $value
+     * @return self
+     * @see $disable2fa
+     * @since 5.6.0
+     */
+    public function disable2fa(bool $value = true): self
+    {
+        $this->disable2fa = $value;
         return $this;
     }
 
