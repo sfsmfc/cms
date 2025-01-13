@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'העתק את תגית ההפניה',
     'Copy to clipboard' => 'העתק ללוח גזירים',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'לא ניתן ליצור אסימון תצוגה מקדימה.',
     'Could not create the group:' => 'לא ניתן ליצור את הקבוצה:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'הצג כרטיסים ברשת',
     'Show date and time' => 'הצג תאריך ושעה',
     'Show date' => 'הצג תאריך',
+    'Show field handles in edit forms' => 'הצג מזהים ייחודיים בטפסי עריכה',
     'Show full exception views when Dev Mode is disabled' => 'הצג תצוגות חריגה מלאות כאשר מצב Dev מנוטרל',
     'Show in element cards' => 'הצג בכרטיסי האלמנטים',
     'Show in folder' => 'הצג בתיקייה',
@@ -2248,5 +2250,4 @@ return [
     '“{handle}” is a reserved word.' => '“{handle}” היא מילה שמורה.',
     '“{handle}” isn’t a valid handle.' => '“{handle}” אינו מזהה חוקי.',
     '“{name}” deleted.' => '“{name}” נמחק',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
