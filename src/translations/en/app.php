@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Copy the reference tag',
     'Copy to clipboard' => 'Copy to clipboard',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Could not create a preview token.',
     'Could not create the group:' => 'Could not create the group:',
@@ -2248,5 +2249,4 @@ return [
     '“{handle}” is a reserved word.' => '“{handle}” is a reserved word.',
     '“{handle}” isn’t a valid handle.' => '“{handle}” isn’t a valid handle.',
     '“{name}” deleted.' => '“{name}” deleted.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
