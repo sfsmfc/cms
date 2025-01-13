@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => '참조 태그 복사',
     'Copy to clipboard' => '클립보드에 복사',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => '미리보기 토큰을 생성할 수 없습니다.',
     'Could not create the group:' => '그룹을 생성할 수 없습니다:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => '그리드에 카드 표시',
     'Show date and time' => '날짜와 시간 표시',
     'Show date' => '날짜 표시',
+    'Show field handles in edit forms' => '편집 양식에 필드 핸들 표시',
     'Show full exception views when Dev Mode is disabled' => '전체 예외 보기 표시(개발자 모드가 비활성화 상태인 경우)',
     'Show in element cards' => '요소 카드에 표시',
     'Show in folder' => '폴더에 표시',
@@ -2248,5 +2250,4 @@ return [
     '“{handle}” is a reserved word.' => '“{handle}”은(는) 예약된 단어입니다.',
     '“{handle}” isn’t a valid handle.' => '“{handle}”(은)는 유효한 핸들이 아닙니다.',
     '“{name}” deleted.' => '“{name}” 삭제됨.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
