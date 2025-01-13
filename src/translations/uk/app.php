@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Копіювати тег посилань',
     'Copy to clipboard' => 'Копіювати до буфера обміну',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Не вдалося створити токен попереднього перегляду.',
     'Could not create the group:' => 'Не вдалося створити групу:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Показувати картки в таблиці',
     'Show date and time' => 'Показати дату й час',
     'Show date' => 'Показати дату',
+    'Show field handles in edit forms' => 'Показувати дескриптори полів у формах редагування',
     'Show full exception views when Dev Mode is disabled' => 'Показувати перегляди винятків повністю, коли режим розробника вимкнено',
     'Show in element cards' => 'Показувати в картках елементів',
     'Show in folder' => 'Показувати в папці',
@@ -2248,5 +2250,4 @@ return [
     '“{handle}” is a reserved word.' => '«{handle}» є зарезервованим словом.',
     '“{handle}” isn’t a valid handle.' => 'Неприпустимий дескриптор «{handle}».',
     '“{name}” deleted.' => '«{name}» видалено.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
