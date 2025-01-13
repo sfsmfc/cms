@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'De referentietag kopiëren',
     'Copy to clipboard' => 'Kopiëren naar klembord',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Kan het previewtoken niet maken.',
     'Could not create the group:' => 'Kan de groep niet maken:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Kaarten weergeven in een raster',
     'Show date and time' => 'Toon datum en tijd',
     'Show date' => 'Toon datum',
+    'Show field handles in edit forms' => 'Veldingangen tonen in bewerkingsformulieren',
     'Show full exception views when Dev Mode is disabled' => 'Volledige uitzonderingsweergaven weergeven wanneer ontwikkelmodus is uitgeschakeld',
     'Show in element cards' => 'Weergeven in elementkaarten',
     'Show in folder' => 'Weergeven in map',
@@ -2248,5 +2250,4 @@ return [
     '“{handle}” is a reserved word.' => '“{handle}” is een voorbehouden woord.',
     '“{handle}” isn’t a valid handle.' => '“{handle}” is geen geldige handle.',
     '“{name}” deleted.' => '“{name}” verwijderd.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
