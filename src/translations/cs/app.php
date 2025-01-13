@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Kopírovat referenční tag',
     'Copy to clipboard' => 'Zkopírovat do schránky',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Nelze vytvořit token náhledu.',
     'Could not create the group:' => 'Nepovedlo se vytvořit skupinu:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Zobrazit karty v mřížce',
     'Show date and time' => 'Zobrazit datum a čas',
     'Show date' => 'Zobrazit datum',
+    'Show field handles in edit forms' => 'Zobrazit atributy polí ve formulářích pro úpravy',
     'Show full exception views when Dev Mode is disabled' => 'Zobrazit celé náhledy výjimky, když je deaktivován vývojářský režim',
     'Show in element cards' => 'Zobrazit v kartách prvků',
     'Show in folder' => 'Zobrazit ve složce',
@@ -2250,5 +2252,4 @@ Gratulujeme, Craftu se podařilo odeslat email.Byla pro to použita následujíc
     '“{handle}” is a reserved word.' => '"{handle}" je vyhrazené slovo a nelze použít.',
     '“{handle}” isn’t a valid handle.' => '"{handle}" není platný handler.',
     '“{name}” deleted.' => '"{name}" smazán.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
