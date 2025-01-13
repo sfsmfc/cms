@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'نسخ علامة المرجع',
     'Copy to clipboard' => 'النسخ إلى الحافظة',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'تعذر إنشاء رمز المعاينة.',
     'Could not create the group:' => 'تعذر إنشاء المجموعة:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'عرض البطاقات في شبكة',
     'Show date and time' => 'إظهار التاريخ والوقت',
     'Show date' => 'إظهار التاريخ',
+    'Show field handles in edit forms' => 'إظهار مقابض الحقول في نماذج التحرير',
     'Show full exception views when Dev Mode is disabled' => 'إظهار طرق عرض الاستثناءات الكاملة عندما يكون وضع التطوير معطلًا',
     'Show in element cards' => 'العرض في بطاقات العناصر',
     'Show in folder' => 'العرض في المجلد',
@@ -2248,5 +2250,4 @@ return [
     '“{handle}” is a reserved word.' => '”{handle}“ هي كلمة محجوزة.',
     '“{handle}” isn’t a valid handle.' => '”{handle}“ ليس مقبض صالح.',
     '“{name}” deleted.' => 'تم حذف ”{name}“.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
