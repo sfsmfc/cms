@@ -19,7 +19,7 @@ use yii\console\ExitCode;
  * Prunes orphaned elements of a given type.
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 4.14.0
+ * @since 4.13.10
  */
 class PruneOrphanedElementsOfTypeController extends Controller
 {
