@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Referenciacímke másolása',
     'Copy to clipboard' => 'Másolás a vágólapra',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Nem sikerült előnézet-tokent létrehozni.',
     'Could not create the group:' => 'Nem sikerült létrehozni a csoportot:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Kártyák megjelenítése rácsban',
     'Show date and time' => 'Dátum és idö mutatása',
     'Show date' => 'Dátum mutatása',
+    'Show field handles in edit forms' => 'Mutassa a mezőkezelőket szerkeszthető alakban',
     'Show full exception views when Dev Mode is disabled' => 'Kivétel nézetek teljes megjelenítése kikapcsolt fejlesztői módban',
     'Show in element cards' => 'Megjelenítés elemkártyákon',
     'Show in folder' => 'Megjelenítés mappában',
@@ -2252,5 +2254,4 @@ Köszönjük, hogy regsiztráltál, a felhasználói filókod aktiváláshoz kat
     '“{handle}” is a reserved word.' => '“{handle}” egy fenntartott szó.',
     '“{handle}” isn’t a valid handle.' => '“{handle}” nem egy érvényes kezelő.',
     '“{name}” deleted.' => '“{name}” törölve.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
