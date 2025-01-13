@@ -248,24 +248,27 @@ class UsersController extends Controller
             $duration = $generalConfig->userSessionDuration;
         }
 
-        // if user has an active 2SV method, move on to that
-        $authService = Craft::$app->getAuth();
         $userSession = Craft::$app->getUser();
-        if (!empty($authService->getActiveMethods($user))) {
-            $authService->setUser($user, $duration);
 
-            if ($this->request->getIsSiteRequest() && !$this->request->getAcceptsJson()) {
-                $loginPath = $generalConfig->getLoginPath();
-                if (!$loginPath) {
-                    $authService->setUser(null);
-                    throw new InvalidConfigException('User requires two-step verification, but the loginPath config setting is disabled.');
+        // if user has an active 2SV method, move on to that
+        if (!$generalConfig->disable2fa) {
+            $authService = Craft::$app->getAuth();
+            if ($authService->hasActiveMethod($user)) {
+                $authService->setUser($user, $duration);
+
+                if ($this->request->getIsSiteRequest() && !$this->request->getAcceptsJson()) {
+                    $loginPath = $generalConfig->getLoginPath();
+                    if (!$loginPath) {
+                        $authService->setUser(null);
+                        throw new InvalidConfigException('User requires two-step verification, but the loginPath config setting is disabled.');
+                    }
+                    return $this->redirect(UrlHelper::siteUrl($loginPath, [
+                        'verify' => 1,
+                    ]));
                 }
-                return $this->redirect(UrlHelper::siteUrl($loginPath, [
-                    'verify' => 1,
-                ]));
-            }
 
-            return $this->runAction('auth-form');
+                return $this->runAction('auth-form');
+            }
         }
 
         // if we're impersonating, pass the user we're impersonating to the complete method

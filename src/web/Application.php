@@ -294,10 +294,12 @@ class Application extends \yii\web\Application
 
                 if (!$userSession->getIsGuest()) {
                     // See if the user is expected to have 2FA enabled
-                    $auth = $this->getAuth();
-                    $user = $userSession->getIdentity();
-                    if ($auth->is2faRequired($user) && !$auth->hasActiveMethod($user)) {
-                        return $this->runAction('users/setup-2fa');
+                    if (!$generalConfig->disable2fa) {
+                        $auth = $this->getAuth();
+                        $user = $userSession->getIdentity();
+                        if ($auth->is2faRequired($user) && !$auth->hasActiveMethod($user)) {
+                            return $this->runAction('users/setup-2fa');
+                        }
                     }
 
                     if ($isCpRequest && !$this->getCanTestEditions()) {
