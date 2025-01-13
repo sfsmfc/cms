@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'คัดลอกแท็กอ้างอิง',
     'Copy to clipboard' => 'คัดลอกไปยังคลิปบอร์ด',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'ไม่สามารถสร้างโทเค็นตัวอย่างได้',
     'Could not create the group:' => 'ไม่สามารถสร้างกลุ่มได้:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'แสดงการ์ดในตาราง',
     'Show date and time' => 'Show date and time',
     'Show date' => 'Show date',
+    'Show field handles in edit forms' => 'Show field handles in edit forms',
     'Show full exception views when Dev Mode is disabled' => 'Show full exception views when Dev Mode is disabled',
     'Show in element cards' => 'แสดงในการ์ดองค์ประกอบ',
     'Show in folder' => 'แสดงในโฟลเดอร์',
@@ -2248,5 +2250,4 @@ return [
     '“{handle}” is a reserved word.' => '“{handle}” is a reserved word.',
     '“{handle}” isn’t a valid handle.' => '“{handle}” isn’t a valid handle.',
     '“{name}” deleted.' => '“{name}” deleted.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
