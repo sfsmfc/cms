@@ -120,8 +120,8 @@ class QuickPost extends Widget
             'sections' => $sections,
             'widget' => $this,
             'siteId' => $this->siteId,
-            'sectionId' => $this->section()?->id,
-            'entryTypeId' => $this->entryType()?->id,
+            'section' => $this->section(),
+            'entryType' => $this->entryType(),
         ]);
     }
 
