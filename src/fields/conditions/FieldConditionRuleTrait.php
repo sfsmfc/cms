@@ -183,7 +183,7 @@ trait FieldConditionRuleTrait
     public function getLabelHint(): ?string
     {
         static $showHandles = null;
-        $showHandles ??= Craft::$app->getUser()->getIsAdmin();
+        $showHandles ??= Craft::$app->getUser()->getIdentity()?->getPreference('showFieldHandles') ?? false;
         return $showHandles ? $this->field()->handle : null;
     }
 

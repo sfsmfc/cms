@@ -534,8 +534,9 @@ abstract class Field extends SavableComponent implements FieldInterface, Iconic,
     public function getActionMenuItems(): array
     {
         $items = [];
+        $userSessionService = Craft::$app->getUser();
 
-        if ($this->id && Craft::$app->getUser()->getIsAdmin()) {
+        if ($this->id && $userSessionService->getIsAdmin()) {
             $view = Craft::$app->getView();
 
             if (Craft::$app->getConfig()->getGeneral()->allowAdminChanges) {
@@ -561,13 +562,14 @@ JS, [
             }
 
             // Copy field handle
-            $copyId = sprintf('action-copy-handle-%s', mt_rand());
-            $items[] = [
-                'id' => $copyId,
-                'icon' => 'clipboard',
-                'label' => Craft::t('app', 'Copy field handle'),
-            ];
-            $view->registerJsWithVars(fn($id, $attribute) => <<<JS
+            if (!$userSessionService->getIdentity()->getPreference('showFieldHandles')) {
+                $copyId = sprintf('action-copy-handle-%s', mt_rand());
+                $items[] = [
+                    'id' => $copyId,
+                    'icon' => 'clipboard',
+                    'label' => Craft::t('app', 'Copy field handle'),
+                ];
+                $view->registerJsWithVars(fn($id, $attribute) => <<<JS
 (() => {
   $('#' + $id).on('click', () => {
     Craft.ui.createCopyTextPrompt({
@@ -577,9 +579,10 @@ JS, [
   });
 })();
 JS, [
-                $view->namespaceInputId($copyId),
-                $this->handle,
-            ]);
+                    $view->namespaceInputId($copyId),
+                    $this->handle,
+                ]);
+            }
         }
 
         return $items;

@@ -1488,6 +1488,15 @@ JS, [
             $errors ? 'has-errors' : null,
         ]), Html::explodeClass($config['fieldClass'] ?? []));
 
+        $userSessionService = Craft::$app->getUser();
+        $showAttribute = (
+            ($config['showAttribute'] ?? false) &&
+            $userSessionService->getIsAdmin() &&
+            $userSessionService->getIdentity()->getPreference('showFieldHandles')
+        );
+        $showActionMenu = !empty($config['actionMenuItems']);
+        $showLabelExtra = $showAttribute || $showActionMenu || isset($config['labelExtra']);
+
         $instructionsHtml = $instructions
             ? Html::tag('div', preg_replace('/&amp;(\w+);/', '&$1;', Markdown::process(Html::encodeInvalidTags($instructions), 'gfm-comment')), [
                 'id' => $instructionsId,
@@ -1528,15 +1537,6 @@ JS, [
                         : '') .
                     ($translatable ? $translationIconHtml : '')
                 );
-
-            if (!empty($config['actionMenuItems'])) {
-                $labelHtml .= static::disclosureMenu($config['actionMenuItems'], [
-                    'hiddenLabel' => Craft::t('app', 'Actions'),
-                    'buttonAttributes' => [
-                        'class' => ['action-btn', 'small'],
-                    ],
-                ]);
-            }
         } else {
             $labelHtml = '';
         }
@@ -1574,7 +1574,7 @@ JS, [
                 ]) .
                 Html::endTag('div')
                 : '') .
-            (($label || isset($config['labelExtra']))
+            (($label || $showLabelExtra)
                 ? (
                     Html::beginTag('div', ['class' => 'heading']) .
                     ($config['headingPrefix'] ?? '') .
@@ -1588,8 +1588,20 @@ JS, [
                             ],
                         ], $config['labelAttributes'] ?? []))
                         : '') .
-                    (isset($config['labelExtra'])
-                        ? Html::tag('div', '', ['class' => 'flex-grow']) . $config['labelExtra']
+                    ($showLabelExtra
+                        ? Html::tag('div', '', ['class' => 'flex-grow']) .
+                        ($showActionMenu ? static::disclosureMenu($config['actionMenuItems'], [
+                            'hiddenLabel' => Craft::t('app', 'Actions'),
+                            'buttonAttributes' => [
+                                'class' => ['action-btn', 'small'],
+                            ],
+                        ]) : '') .
+                        ($showAttribute ? static::renderTemplate('_includes/forms/copytextbtn.twig', [
+                            'id' => "$id-attribute",
+                            'class' => ['code', 'small', 'light'],
+                            'value' => $config['attribute'],
+                        ]) : '') .
+                        ($config['labelExtra'] ?? '')
                         : '') .
                     ($config['headingSuffix'] ?? '') .
                     Html::endTag('div')

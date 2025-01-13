@@ -85,7 +85,6 @@ abstract class BaseField extends FieldLayoutElement
      *
      * @return bool
      * @since 4.5.4
-     * @deprecated in 5.6.0
      */
     public function showAttribute(): bool
     {

@@ -1475,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Show cards in a grid',
     'Show date and time' => 'Show date and time',
     'Show date' => 'Show date',
+    'Show field handles in edit forms' => 'Show field handles in edit forms',
     'Show full exception views when Dev Mode is disabled' => 'Show full exception views when Dev Mode is disabled',
     'Show in element cards' => 'Show in element cards',
     'Show in folder' => 'Show in folder',
