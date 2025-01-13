@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => '参照タグをコピー',
     'Copy to clipboard' => 'クリップボードにコピー',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'プレビュートークンを作成できませんでした。',
     'Could not create the group:' => '次のグループを作成できませんでした：',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'グリッドでカードを表示',
     'Show date and time' => '日時を表示する',
     'Show date' => '日付を表示する',
+    'Show field handles in edit forms' => '編集フォームでフィールドのハンドルを表示する',
     'Show full exception views when Dev Mode is disabled' => '開発モードが無効な場合に完全な例外ビューを表示する',
     'Show in element cards' => 'エレメントカードで表示',
     'Show in folder' => 'フォルダーで表示',
@@ -2248,5 +2250,4 @@ return [
     '“{handle}” is a reserved word.' => '「{handle}」はすでに登録した言葉です。',
     '“{handle}” isn’t a valid handle.' => '「{handle}」は利用できないハンドルです。',
     '“{name}” deleted.' => '“{name}”は削除されました。',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
