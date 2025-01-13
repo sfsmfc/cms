@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'کپی برچسب مرجع',
     'Copy to clipboard' => 'کپی به کلیپ بورد',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'توکن پیش‌نویس نتوانست ساخته شود.',
     'Could not create the group:' => 'نتوانست گروه را بسازد:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'نمایش کارت‌ها در یک شبکه',
     'Show date and time' => 'نمایش تاریخ و زمان',
     'Show date' => 'نمایش تاریخ',
+    'Show field handles in edit forms' => 'نمایش شناسه‌های فیلد در فرم‌های ویرایش',
     'Show full exception views when Dev Mode is disabled' => 'نمایش شرح استثناء به صورت کامل در هنگامی که حالت توسعه غیرفعال است',
     'Show in element cards' => 'نمایش در کارت‌های عنصر',
     'Show in folder' => 'نمایش در پوشه',
@@ -2248,5 +2250,4 @@ return [
     '“{handle}” is a reserved word.' => '"{handle}" یک کلمه رزرو شده است.',
     '“{handle}” isn’t a valid handle.' => '"{handle}" یک شناسه صحیح نیست.',
     '“{name}” deleted.' => '"{name}" حذف گردید.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
