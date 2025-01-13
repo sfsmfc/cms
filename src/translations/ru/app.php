@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Скопировать ссылочный тег',
     'Copy to clipboard' => 'Копировать в буфер обмена',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Не удается создать токен предпросмотра.',
     'Could not create the group:' => 'Не удалось создать группу:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Показывать карточки в таблице',
     'Show date and time' => 'Показать дату и время',
     'Show date' => 'Показать дату',
+    'Show field handles in edit forms' => 'Показывать дескрипторы полей в формах редактирования',
     'Show full exception views when Dev Mode is disabled' => 'Выводить представления исключений полностью при отключенном режиме разработчика',
     'Show in element cards' => 'Показывать в карточках элементов',
     'Show in folder' => 'Показывать в папке',
@@ -2249,5 +2251,4 @@ return [
     '“{handle}” is a reserved word.' => '«{handle}» является зарезервированным словом.',
     '“{handle}” isn’t a valid handle.' => 'Недопустимый дескриптор «{handle}»',
     '“{name}” deleted.' => '«{name}» удалено.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
