@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Kopiera referenstaggen',
     'Copy to clipboard' => 'Kopiera till urklipp',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Det gick inte att skapa förhandsvisningstoken.',
     'Could not create the group:' => 'Det gick inte att skapa gruppen:',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Visa korten i ett rutnät',
     'Show date and time' => 'Visa datum och tid',
     'Show date' => 'Visa datum',
+    'Show field handles in edit forms' => 'Visa fält-handles i redigeringsformulären',
     'Show full exception views when Dev Mode is disabled' => 'Visa fullständig undantagsvisning när utvecklarläge är avaktiverat',
     'Show in element cards' => 'Visa i elementkort',
     'Show in folder' => 'Visa i mapp',
@@ -2248,5 +2250,4 @@ return [
     '“{handle}” is a reserved word.' => '“{handle}” är ett reserverat ord.',
     '“{handle}” isn’t a valid handle.' => '“{handle}” är ej ett giltigt handle.',
     '“{name}” deleted.' => '“{name}” har raderats.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
