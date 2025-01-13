@@ -26,6 +26,7 @@
 - Improved the accessibility of “More” and “Advanced” toggle triggers. ([#16293]](https://github.com/craftcms/cms/pull/16293))
 - Improved the accessibility of the Craft Support widget. ([#16293]](https://github.com/craftcms/cms/pull/16293))
 - Improved the accessibility of field translatable indicators and tooltips.
+- Progress bars now announce their progress to screen readers. ([#16398](https://github.com/craftcms/cms/pull/16398))
 
 ### Administration
 - Added the “Affiliated Site” native user field. ([#16174](https://github.com/craftcms/cms/pull/16174))
@@ -148,6 +149,7 @@
 - `_includes/forms/autosuggest.twig` now supports a `suggestTemplates` variable. 
 - `_includes/forms/colorSelect.twig` now supports `options` and `withBlankOption` variables.
 - `_includes/forms/selectize.twig` now supports a `color` property in option data, which can be set to a hex value or a color name.
+- Added `Craft.IntervalManager`. ([#16398](https://github.com/craftcms/cms/pull/16398))
 - Sortable checkbox selects now always display the selected options first on initial render.
 
 ### System
