@@ -363,6 +363,7 @@ return [
     'Copy the reference tag' => 'Copier l’étiquette de référence',
     'Copy to clipboard' => 'Copier dans le presse-papiers',
     'Copy value from site…' => 'Copy value from site…',
+    'Copy “{name}” value' => 'Copy “{name}” value',
     'Copy' => 'Copy',
     'Could not create a preview token.' => 'Échec de création d\'un jeton d\'aperçu.',
     'Could not create the group:' => 'Impossible de créer le groupe :',
@@ -1474,6 +1475,7 @@ return [
     'Show cards in a grid' => 'Afficher les cartes sur une grille',
     'Show date and time' => 'Afficher la date et l’heure',
     'Show date' => 'Afficher la date',
+    'Show field handles in edit forms' => 'Afficher les identifiants des champs dans les formulaires d\'édition',
     'Show full exception views when Dev Mode is disabled' => 'Montrer la vue complète des exceptions quand le mode dev est désactivé',
     'Show in element cards' => 'Afficher dans les cartes d\'éléments',
     'Show in folder' => 'Afficher dans le dossier',
@@ -2249,5 +2251,4 @@ return [
     '“{handle}” is a reserved word.' => '“{handle}” est un mot réservé.',
     '“{handle}” isn’t a valid handle.' => '“{handle}” n’est pas un identificateur valide.',
     '“{name}” deleted.' => '“{name}” supprimé.',
-    'Copy “{name}” value' => 'Copy “{name}” value',
 ];
