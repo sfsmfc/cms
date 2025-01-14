@@ -6,6 +6,7 @@
 - Fixed a bug where field layout elements’ action menus could have an empty action group.
 - Fixed a bug where Single section entries could be duplicated after running the `entry-types/merge` command. ([#16394](https://github.com/craftcms/cms/issues/16394))
 - Fixed a styling bug with the system message modal. ([#16410](https://github.com/craftcms/cms/issues/16410))
+- Fixed a bug where relational fields could eager-load elements from a different instance of the same field, if one of the instances had no relations. ([#16191](https://github.com/craftcms/cms/issues/16191))
 
 ## 5.5.9 - 2025-01-06
 
