@@ -336,7 +336,7 @@ class Assets extends Component
         $assetQuery = Asset::find()->folderId($allFolderIds);
         $elementService = Craft::$app->getElements();
 
-        foreach ($assetQuery->each() as $asset) {
+        foreach (Db::each($assetQuery) as $asset) {
             /** @var Asset $asset */
             $asset->keepFileOnDelete = !$deleteDir;
             $elementService->deleteElement($asset, true);
