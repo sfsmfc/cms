@@ -50,6 +50,7 @@
 - After creating a new field from a field layout designer, the field is now immediately added to the field layout tab. ([#16374](https://github.com/craftcms/cms/pull/16374))
 - Templates rendered for “Template” field layout UI elements can now call control panel template functions like `elementChip()` and `elementCard()`. ([#16267](https://github.com/craftcms/cms/issues/16267))
 - “Template” field layout UI elements now show suggestions for the Template input.
+- Added the `elements/delete-all-of-type` command. ([#16423](https://github.com/craftcms/cms/pull/16423))
 - Added the `utils/delete-empty-volume-folders` command. ([#16388](https://github.com/craftcms/cms/issues/16388))
 - Improved the error output for nested elements when they can’t be resaved via `resave` commands.
 - `resave` commands’ `--drafts`, `--provisional-drafts`, and `--revisions` options can now be set to `null`, causing elements to be resaved regardless of whether they’re drafts/provisional drafts/revisions.
