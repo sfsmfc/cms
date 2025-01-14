@@ -86,7 +86,6 @@ class ErrorHandler extends \yii\web\ErrorHandler
                         $this->trigger(self::EVENT_BEFORE_REDIRECT, new RedirectEvent([
                             'rule' => $rule,
                         ]));
-                        ;
                     }
 
                     Craft::$app->getResponse()->redirect($url, $rule->statusCode);
