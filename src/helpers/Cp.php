@@ -1541,27 +1541,21 @@ JS, [
             $labelHtml = '';
         }
 
-        $containerTag = $fieldset ? 'fieldset' : 'div';
-
         return
-            Html::beginTag($containerTag, ArrayHelper::merge(
+            Html::beginTag('div', ArrayHelper::merge(
                 [
                     'class' => $fieldClass,
                     'id' => $fieldId,
+                    'aria' => [
+                        'labelledby' => $fieldset ? $labelId : null,
+                    ],
+                    'role' => $fieldset ? 'group' : null,
                     'data' => [
-                            'attribute' => $attribute,
-                        ] + $data,
+                        'attribute' => $attribute,
+                    ] + $data,
                 ],
                 $config['fieldAttributes'] ?? []
             )) .
-            (($label && $fieldset)
-                ? Html::tag('legend', $labelHtml, [
-                    'class' => ['visually-hidden'],
-                    'data' => [
-                        'label' => $label,
-                    ],
-                ])
-                : '') .
             ($status
                 ? Html::beginTag('div', [
                     'id' => $statusId,
@@ -1583,9 +1577,6 @@ JS, [
                             'id' => $labelId,
                             'class' => $config['labelClass'] ?? null,
                             'for' => !$fieldset ? $id : null,
-                            'aria' => [
-                                'hidden' => $fieldset ? 'true' : null,
-                            ],
                         ], $config['labelAttributes'] ?? []))
                         : '') .
                     ($showLabelExtra
@@ -1628,7 +1619,7 @@ JS, [
                     'errors' => $errors,
                 ])
                 : '') .
-            Html::endTag($containerTag);
+            Html::endTag('div');
     }
 
     /**
