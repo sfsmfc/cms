@@ -3,6 +3,7 @@
 ### Content Management
 - It’s now possible to copy custom field values from other sites. ([#14056](https://github.com/craftcms/cms/pull/14056))
 - “Related To”, “Not Related To”, “Author”, and relational field condition rules now allow multiple elements to be specified. ([#16121](https://github.com/craftcms/cms/discussions/16121))
+- Added the “Widget Title” setting to Quick Post widgets. ([#16429](https://github.com/craftcms/cms/pull/16429))
 - Improved the styling of inline code fragments. ([#16141](https://github.com/craftcms/cms/pull/16141))
 - Improved the styling of attribute previews in card view. ([#16324](https://github.com/craftcms/cms/pull/16324))
 - Added the “Affiliated Site” user condition rule. ([#16174](https://github.com/craftcms/cms/pull/16174))
