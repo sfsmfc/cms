@@ -39,6 +39,10 @@ class Search
         // Convert non-breaking spaces entities to regular ones
         $str = str_replace(['&nbsp;', '&#160;', '&#xa0;'], ' ', $str);
 
+        // Get rid of Unicode special characters
+        // (see https://github.com/craftcms/cms/issues/16430)
+        $str = preg_replace('/[\x{80}-\x{10FFFF}]/u', '', $str);
+
         // Get rid of entities
         $str = preg_replace('/&#?[a-z0-9]{2,8};/i', '', $str);
 
