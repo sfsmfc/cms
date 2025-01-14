@@ -674,7 +674,11 @@ JS, [
                     ->andWhere(['elements.id' => $value])
                     ->orderBy([new FixedOrderExpression('elements.id', $value, Craft::$app->getDb())]);
             } else {
-                $query->andWhere('0 = 1');
+                // if the value here is an empty array, the target ids are already stored
+                // in the elements_sites.content column, as an empty array;
+                // meaning the content was saved since v5.3.0 and the field is supposed to be empty;
+                // see https://github.com/craftcms/cms/issues/16191
+                $query->andWhere(['elements.id' => []]);
             }
         } elseif ($value === null && $element?->id && $this->isFirstInstance($element)) {
             // If $value is null, the element + field haven’t been saved since updating to Craft 5.3+,
