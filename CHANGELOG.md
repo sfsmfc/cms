@@ -1,5 +1,9 @@
 # Release Notes for Craft CMS 4
 
+## Unreleased
+
+- Fixed a bug where the control panel could display a notice about the Craft CMS license belonging to a different domain, even when accessing the control panel from the correct domain. ([#16396](https://github.com/craftcms/cms/issues/16396))
+
 ## 4.13.9 - 2025-01-06
 
 - Fixed a bug where custom fields could cause validation errors when running the `users/create` command.
