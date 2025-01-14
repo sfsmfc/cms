@@ -9,6 +9,7 @@ namespace craft\config;
 
 use Closure;
 use Craft;
+use craft\attributes\EnvName;
 use craft\helpers\ConfigHelper;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Localization;
@@ -945,6 +946,24 @@ class GeneralConfig extends BaseConfig
     public bool $devMode = false;
 
     /**
+     * @var bool Whether two-step verification features should be disabled.
+     *
+     * ::: code
+     * ```php Static Config
+     * ->disable2fa()
+     * ```
+     * ```shell Environment Override
+     * CRAFT_DISABLE_2FA=true
+     * ```
+     * :::
+     *
+     * @group Users
+     * @since 5.6.0
+     */
+    #[EnvName('DISABLE_2FA')]
+    public bool $disable2fa = false;
+
+    /**
      * @var string[]|string|null Array of plugin handles that should be disabled, regardless of what the project config says.
      *
      * ```php
@@ -1690,8 +1709,6 @@ class GeneralConfig extends BaseConfig
      *
      * This can be set to `false` to disable front-end login.
      *
-     * Note that this config setting is ignored when <config5:headlessMode> is enabled.
-     *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
      * ::: code
@@ -1712,8 +1729,6 @@ class GeneralConfig extends BaseConfig
      * @var mixed The URI Craft should use for user logout on the front end.
      *
      * This can be set to `false` to disable front-end logout.
-     *
-     * Note that this config setting is ignored when <config5:headlessMode> is enabled.
      *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
@@ -2698,12 +2713,23 @@ class GeneralConfig extends BaseConfig
     /**
      * @var string A private, random, cryptographically-secure key that is used for hashing and encrypting data in [[\craft\services\Security]].
      *
-     * This value should be the same across all environments. If this key ever changes, any data that was encrypted with it will be inaccessible.
+     * ::: warning
+     * **Do not** share this key publicly. If exposed, it could lead to a compromised system.
+     * :::
+     *
+     * In the event that the key is compromised, a new secure key can be generated with the command:
+     *
+     * ```sh
+     * php craft setup/security-key
+     * ```
+     *
+     * Note that if the key changes, any data that is encrypted with it (e.g. user session cookies) will be inaccessible.
      *
      * ```php Static Config
      * ->securityKey('2cf24dba5...')
      * ```
      *
+     * @see https://craftcms.com/knowledge-base/securing-craft
      * @group Security
      */
     public string $securityKey = '';
@@ -2744,8 +2770,6 @@ class GeneralConfig extends BaseConfig
 
     /**
      * @var mixed The URI or URL that Craft should use for Set Password forms on the front end.
-     *
-     * This setting is ignored when <config5:headlessMode> is enabled, unless it’s set to an absolute URL.
      *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
@@ -2953,6 +2977,24 @@ class GeneralConfig extends BaseConfig
      * @since 3.1.0
      */
     public bool $storeUserIps = false;
+
+    /**
+     * @var string|null The URL to a CSS file that should be included when rendering system templates on the front end,
+     * such as the Login and Set Password templates.
+     *
+     * ::: code
+     * ```php Static Config
+     * ->systemTemplateCss('/css/cp-theme.css');
+     * ```
+     * ```shell Environment Override
+     * CRAFT_SYSTEM_TEMPLATE_CSS=/css/cp-theme.css
+     * ```
+     * :::
+     *
+     * @group System
+     * @since 5.6.0
+     */
+    public ?string $systemTemplateCss = null;
 
     /**
      * @var string|null The handle of the filesystem that should be used for storing temporary asset uploads. A local temp folder will
@@ -3292,8 +3334,6 @@ class GeneralConfig extends BaseConfig
 
     /**
      * @var mixed The URI or URL that Craft should use for email verification links on the front end.
-     *
-     * This setting is ignored when <config5:headlessMode> is enabled, unless it’s set to an absolute URL.
      *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
@@ -4307,6 +4347,30 @@ class GeneralConfig extends BaseConfig
     }
 
     /**
+     * Whether two-step verification features should be disabled.
+     *
+     * ::: code
+     * ```php Static Config
+     * ->disable2fa()
+     * ```
+     * ```shell Environment Override
+     * CRAFT_DISABLE_2FA=true
+     * ```
+     * :::
+     *
+     * @group Users
+     * @param bool $value
+     * @return self
+     * @see $disable2fa
+     * @since 5.6.0
+     */
+    public function disable2fa(bool $value = true): self
+    {
+        $this->disable2fa = $value;
+        return $this;
+    }
+
+    /**
      * Array of plugin handles that should be disabled, regardless of what the project config says.
      *
      * ```php
@@ -5149,8 +5213,6 @@ class GeneralConfig extends BaseConfig
      *
      * This can be set to `false` to disable front-end login.
      *
-     * Note that this config setting is ignored when <config5:headlessMode> is enabled.
-     *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
      * ```php
@@ -5173,8 +5235,6 @@ class GeneralConfig extends BaseConfig
      * The URI Craft should use for user logout on the front end.
      *
      * This can be set to `false` to disable front-end logout.
-     *
-     * Note that this config setting is ignored when <config5:headlessMode> is enabled.
      *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
@@ -6225,7 +6285,7 @@ class GeneralConfig extends BaseConfig
      * @see $safeMode
      * @since 5.1.0
      */
-    public function safeMode(bool $value = false): self
+    public function safeMode(bool $value = true): self
     {
         $this->safeMode = $value;
         return $this;
@@ -6296,7 +6356,17 @@ class GeneralConfig extends BaseConfig
     /**
      * A private, random, cryptographically-secure key that is used for hashing and encrypting data in [[\craft\services\Security]].
      *
-     * This value should be the same across all environments. If this key ever changes, any data that was encrypted with it will be inaccessible.
+     * ::: warning
+     * **Do not** share this key publicly. If exposed, it could lead to a compromised system.
+     * :::
+     *
+     * In the event that the key is compromised, a new secure key can be generated with the command:
+     *
+     * ```sh
+     * php craft setup/security-key
+     * ```
+     *
+     * Note that if the key changes, any data that is encrypted with it (e.g. user session cookies) will be inaccessible.
      *
      * ```php
      * ->securityKey('2cf24dba5...')
@@ -6306,6 +6376,7 @@ class GeneralConfig extends BaseConfig
      * @param string $value
      * @return self
      * @see $securityKey
+     * @see https://craftcms.com/knowledge-base/securing-craft
      * @since 4.2.0
      */
     public function securityKey(string $value): self
@@ -6355,8 +6426,6 @@ class GeneralConfig extends BaseConfig
 
     /**
      * The URI or URL that Craft should use for Set Password forms on the front end.
-     *
-     * This setting is ignored when <config5:headlessMode> is enabled, unless it’s set to an absolute URL.
      *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *
@@ -6589,6 +6658,31 @@ class GeneralConfig extends BaseConfig
     public function storeUserIps(bool $value = true): self
     {
         $this->storeUserIps = $value;
+        return $this;
+    }
+
+    /**
+     * The URL to a CSS file that should be included when rendering system templates on the front end,
+     * such as the Login and Set Password templates.
+     *
+     * ::: code
+     * ```php Static Config
+     * ->systemTemplateCss('/css/cp-theme.css');
+     * ```
+     * ```shell Environment Override
+     * CRAFT_SYSTEM_TEMPLATE_CSS=/css/cp-theme.css
+     * ```
+     * :::
+     *
+     * @group System
+     * @param string|null $value
+     * @return self
+     * @see $systemTemplateCss
+     * @since 5.6.0
+     */
+    public function systemTemplateCss(?string $value): self
+    {
+        $this->systemTemplateCss = $value;
         return $this;
     }
 
@@ -6974,8 +7068,6 @@ class GeneralConfig extends BaseConfig
 
     /**
      * The URI or URL that Craft should use for email verification links on the front end.
-     *
-     * This setting is ignored when <config5:headlessMode> is enabled, unless it’s set to an absolute URL.
      *
      * See [[ConfigHelper::localizedValue()]] for a list of supported value types.
      *

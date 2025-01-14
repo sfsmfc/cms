@@ -413,6 +413,19 @@ $.extend(Craft, {
   },
 
   /**
+   * Sleeps for the given duration in milliseconds.
+   *
+   * @param {number} delay
+   * @return {Promise}
+   * @since 5.6.0
+   */
+  sleep: function (delay) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, delay);
+    });
+  },
+
+  /**
    * @param {string} [path]
    * @param {(Object|string)} [params]
    * @param {string} [baseUrl]
@@ -3113,7 +3126,11 @@ $.extend($.fn, {
       let checkValue = () => {
         let hasValue = false;
         for (let i = 0; i < $inputs.length; i++) {
-          if ($inputs.eq(i).val() && !$inputs.eq(i).is(':disabled')) {
+          if ($inputs.eq(i).is(':disabled')) {
+            hasValue = false;
+            break;
+          }
+          if ($inputs.eq(i).val()) {
             hasValue = true;
             break;
           }
