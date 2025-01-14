@@ -68,6 +68,7 @@
 - It’s now possible to set Link field values to arrays with `value` keys set to element instances or IDs. ([#16255](https://github.com/craftcms/cms/pull/16255))
 - The `duration` Twig filter now has a `language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
+- `{% cache %}` tags now cache any JavaScript import maps registered via `craft\web\View::registerJsImport()` within them.
 - The `{% requireAdmin %}` tag now supports passing a boolean value, which determines whether administrative changes must be allowed (defaults to `true`).
 - It’s now possible to reference custom field handles in element queries’ `where` params. ([#16318](https://github.com/craftcms/cms/pull/16318))
 - Number fields’ scalar values now return an integer if Decimals is set to `0`, and a number formatted with the correct decimal points when using MySQL. ([16369](https://github.com/craftcms/cms/issues/16369))
@@ -134,7 +135,11 @@
 - Added `craft\web\User::getImpersonator()`.
 - Added `craft\web\User::getImpersonatorId()`.
 - Added `craft\web\User::setImpersonatorId()`.
+- Added `craft\web\View::clearJsImportBuffer()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
+- Added `craft\web\View::registerJsImport()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
+- Added `craft\web\View::registerScriptWithVars()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
 - Added `craft\web\View::setTwig()`.
+- Added `craft\web\View::startJsImportBuffer()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
 - Added `craft\web\twig\variables\Cp::EVENT_REGISTER_READ_ONLY_CP_SETTINGS`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - `GuzzleHttp\Client` is now instantiated via `Craft::createObject()`. ([#16366](https://github.com/craftcms/cms/pull/16366))
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
