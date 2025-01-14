@@ -276,6 +276,7 @@ return [
     'Choose which user groups should have access to this source.' => 'Choose which user groups should have access to this source.',
     'Choose' => 'Choose',
     'City' => 'City',
+    'Class' => 'Class',
     'Clear Caches' => 'Clear Caches',
     'Clear all' => 'Clear all',
     'Clear caches' => 'Clear caches',
