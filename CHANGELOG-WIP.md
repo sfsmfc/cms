@@ -3,6 +3,7 @@
 ### Content Management
 - It’s now possible to copy custom field values from other sites. ([#14056](https://github.com/craftcms/cms/pull/14056))
 - “Related To”, “Not Related To”, “Author”, and relational field condition rules now allow multiple elements to be specified. ([#16121](https://github.com/craftcms/cms/discussions/16121))
+- Added the “Widget Title” setting to Quick Post widgets. ([#16429](https://github.com/craftcms/cms/pull/16429))
 - Improved the styling of inline code fragments. ([#16141](https://github.com/craftcms/cms/pull/16141))
 - Improved the styling of attribute previews in card view. ([#16324](https://github.com/craftcms/cms/pull/16324))
 - Added the “Affiliated Site” user condition rule. ([#16174](https://github.com/craftcms/cms/pull/16174))
@@ -26,6 +27,8 @@
 - Improved the accessibility of “More” and “Advanced” toggle triggers. ([#16293]](https://github.com/craftcms/cms/pull/16293))
 - Improved the accessibility of the Craft Support widget. ([#16293]](https://github.com/craftcms/cms/pull/16293))
 - Improved the accessibility of field translatable indicators and tooltips.
+- Progress bars now announce their progress to screen readers. ([#16398](https://github.com/craftcms/cms/pull/16398))
+- Loading spinners within element indexes and inline-editable Matrix fields are now announced to screen readers. ([#16417](https://github.com/craftcms/cms/pull/16417))
 
 ### Administration
 - Added the “Affiliated Site” native user field. ([#16174](https://github.com/craftcms/cms/pull/16174))
@@ -47,13 +50,12 @@
 - After creating a new field from a field layout designer, the field is now immediately added to the field layout tab. ([#16374](https://github.com/craftcms/cms/pull/16374))
 - Templates rendered for “Template” field layout UI elements can now call control panel template functions like `elementChip()` and `elementCard()`. ([#16267](https://github.com/craftcms/cms/issues/16267))
 - “Template” field layout UI elements now show suggestions for the Template input.
-- Element condition builders now always show field handles within the rule selection menu, for admin users.
+- Added the `elements/delete-all-of-type` command. ([#16423](https://github.com/craftcms/cms/pull/16423))
 - Added the `utils/delete-empty-volume-folders` command. ([#16388](https://github.com/craftcms/cms/issues/16388))
 - Improved the error output for nested elements when they can’t be resaved via `resave` commands.
 - `resave` commands’ `--drafts`, `--provisional-drafts`, and `--revisions` options can now be set to `null`, causing elements to be resaved regardless of whether they’re drafts/provisional drafts/revisions.
 - Added the `systemTemplateCss` config setting. ([#16344](https://github.com/craftcms/cms/pull/16344))
 - The `loginPath`, `logoutPath`, `setPasswordPath`, and `verifyEmailPath` config settings are now respected in headless mode. ([#16344](https://github.com/craftcms/cms/pull/16344))
-- Removed the “Show field handles in edit forms” admin user preference. ([#16415](https://github.com/craftcms/cms/pull/16415))
 
 ### Development
 - Added support for fallback element partial templates, e.g. `_partials/entry.twig` as opposed to `_partials/entry/typeHandle.twig`. ([#16125](https://github.com/craftcms/cms/pull/16125))
@@ -66,14 +68,17 @@
 - It’s now possible to set Link field values to arrays with `value` keys set to element instances or IDs. ([#16255](https://github.com/craftcms/cms/pull/16255))
 - The `duration` Twig filter now has a `language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
+- `{% cache %}` tags now cache any JavaScript import map entries registered via `craft\web\View::registerJsImport()` within them.
 - The `{% requireAdmin %}` tag now supports passing a boolean value, which determines whether administrative changes must be allowed (defaults to `true`).
 - It’s now possible to reference custom field handles in element queries’ `where` params. ([#16318](https://github.com/craftcms/cms/pull/16318))
 - Number fields’ scalar values now return an integer if Decimals is set to `0`, and a number formatted with the correct decimal points when using MySQL. ([16369](https://github.com/craftcms/cms/issues/16369))
 - Added support for specifying the current site via an `X-Craft-Site` header set to a site ID or handle. ([#16367](https://github.com/craftcms/cms/pull/16367))
+- Added the `disable2fa` config setting. ([#16426](https://github.com/craftcms/cms/pull/16426))
 - Added support for defining redirects from `config/redirects.php`. ([#16355](https://github.com/craftcms/cms/pull/16355))
 - Deprecated the `ucfirst` Twig filter. `capitalize` should be used instead.
 
 ### Extensibility
+- Added `craft\attributes\EnvName`.
 - Added `craft\base\ConfigurableComponentInterface::getReadOnlySettingsHtml()`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - Added `craft\base\CrossSiteCopyableFieldInterface`. ([#14056](https://github.com/craftcms/cms/pull/14056))
 - Added `craft\base\Element::EVENT_DEFINE_ALT_ACTIONS`. ([#16294](https://github.com/craftcms/cms/pull/16294))
@@ -130,11 +135,16 @@
 - Added `craft\web\User::getImpersonator()`.
 - Added `craft\web\User::getImpersonatorId()`.
 - Added `craft\web\User::setImpersonatorId()`.
+- Added `craft\web\View::clearJsImportBuffer()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
+- Added `craft\web\View::registerJsImport()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
+- Added `craft\web\View::registerScriptWithVars()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
 - Added `craft\web\View::setTwig()`.
+- Added `craft\web\View::startJsImportBuffer()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
 - Added `craft\web\twig\variables\Cp::EVENT_REGISTER_READ_ONLY_CP_SETTINGS`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - `GuzzleHttp\Client` is now instantiated via `Craft::createObject()`. ([#16366](https://github.com/craftcms/cms/pull/16366))
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
+- `craft\helpers\App::envConfig()` now checks for a `craft\attributes\EnvName` attribute on public properties, which can be used to override the environment variable name (sans prefix) that is associated with the property.
 - `craft\helpers\Cp::elementIndexHtml()` now supports passing `defaultSort` in the `$config` array, when `sources` is `null`. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\helpers\Cp::fieldHtml()` now supports passing an `actionMenuItems` array in the config. ([#16415](https://github.com/craftcms/cms/pull/16415))
 - `craft\helpers\DateTimeHelper::humanDuration()` now has a `$language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
@@ -150,6 +160,7 @@
 - `_includes/forms/autosuggest.twig` now supports a `suggestTemplates` variable. 
 - `_includes/forms/colorSelect.twig` now supports `options` and `withBlankOption` variables.
 - `_includes/forms/selectize.twig` now supports a `color` property in option data, which can be set to a hex value or a color name.
+- Added `Craft.IntervalManager`. ([#16398](https://github.com/craftcms/cms/pull/16398))
 - Sortable checkbox selects now always display the selected options first on initial render.
 
 ### System
