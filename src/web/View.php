@@ -1456,6 +1456,7 @@ class View extends \yii\web\View
      * @param string|null $key the key that identifies the generic `<script>` code block. If null, it will use
      * $script as the key. If two generic `<script>` code blocks are registered with the same key, the latter
      * will overwrite the former.
+     * @since 5.6.0
      */
     public function registerScriptWithVars(callable $scriptFn, array $vars, int $position = self::POS_END, array $options = [], ?string $key = null): void
     {
@@ -1492,6 +1493,7 @@ class View extends \yii\web\View
      *
      * @param string $key The module specifier.
      * @param string $value  The URL or path to the resource the key will resolve to.
+     * @since 5.6.0
     */
     public function registerJsImport(string $key, string $value): void
     {
