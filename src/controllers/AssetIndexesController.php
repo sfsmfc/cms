@@ -155,7 +155,7 @@ class AssetIndexesController extends Controller
                 $assetIndexer->stopIndexingSession($indexingSession);
                 return $this->asFailure(data: [
                     'stop' => $sessionId,
-                    'message' => Craft::t('app', 'There was an issue indexing assets.'),
+                    'message' => Craft::t('app', 'There was a problem indexing assets.'),
                 ]);
             }
 

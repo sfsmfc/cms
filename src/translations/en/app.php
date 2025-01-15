@@ -1533,6 +1533,7 @@ return [
     'There was a problem activating the user.' => 'There was a problem activating the user.',
     'There was a problem deactivating the user.' => 'There was a problem deactivating the user.',
     'There was a problem impersonating this user.' => 'There was a problem impersonating this user.',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => 'There was a problem saving your message.',
     'There was a problem sending the password reset email.' => 'There was a problem sending the password reset email.',
     'There was a problem with uploading the file.' => 'There was a problem with uploading the file.',
