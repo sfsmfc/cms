@@ -5499,7 +5499,7 @@ table.data tbody tr:not(.disabled).active-drop-target {
 }
 
 .pane-header {
-  margin-block: calc(var(--xl) * -1) var(--xl);
+  margin-block: var(--neg-padding) var(--padding);
   margin-inline: var(--neg-padding);
   padding-block: 5px 6px;
   padding-inline: var(--padding);
