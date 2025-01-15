@@ -1040,7 +1040,7 @@ button {
   }
 }
 
-.revision-notice {
+.content-notice {
   display: flex;
   align-items: center;
   place-content: stretch center;
@@ -1057,7 +1057,7 @@ button {
     margin: 0;
   }
 
-  .revision-icon {
+  .content-notice-icon {
     position: relative;
     flex-shrink: 0;
     width: 34px;
@@ -1937,6 +1937,7 @@ ul.icons {
 }
 
 .btn {
+  isolation: isolate;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -2106,6 +2107,14 @@ ul.icons {
     margin-block-start: 2px;
   }
 
+  &.copyable {
+    color: var(--medium-text-color);
+
+    [data-icon] {
+      margin-inline: 0;
+    }
+  }
+
   [data-icon] {
     margin-block-start: -3px;
     margin-inline-end: 5px;
@@ -2121,9 +2130,13 @@ ul.icons {
 }
 
 .disabled:not(.status, .status-label) {
-  opacity: 0.25;
-  pointer-events: none;
+  opacity: 0.5;
   user-select: none;
+  cursor: not-allowed !important;
+
+  .layoutdesigner {
+    pointer-events: none;
+  }
 }
 
 .noteditable {
@@ -2225,46 +2238,25 @@ ul.icons {
   }
 }
 
-.copytextbtn {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  align-items: center;
+craft-copy-attribute {
+  @include mixins.fixed-width-font(calc(11rem / 16));
   border: 1px solid var(--hairline-color);
-  border-radius: var(--small-border-radius);
-  padding-block: var(--xs);
-  padding-inline: calc(var(--xs) + 1px);
-  cursor: pointer;
+  padding-block: 0;
+  padding-inline: 5px;
+  border-radius: var(--button-border-radius);
   color: var(--medium-text-color);
-  gap: var(--xs);
-  line-height: 1;
 
-  .copytextbtn__icon {
-    font-size: calc(12rem / 16);
+  button {
+    gap: 5px;
     display: inline-flex;
-    justify-content: center;
-    padding: 0;
-    width: 13px;
-    height: 13px;
-    background: none;
-    color: var(--light-text-color);
-  }
+    flex-wrap: nowrap;
+    align-items: center;
+    cursor: pointer;
 
-  &:hover,
-  &:focus {
-    border-color: var(--medium-hairline-color);
-    color: var(--text-color);
-
-    .copytextbtn__value {
+    &:hover,
+    &:focus {
+      border-color: var(--medium-hairline-color);
       color: var(--text-color);
-    }
-  }
-
-  &.small {
-    padding-block: 2px;
-    padding-inline: var(--xs);
-
-    .copytextbtn__value {
-      font-size: calc(11rem / 16);
     }
   }
 }
@@ -2406,7 +2398,7 @@ ul.icons {
   padding-inline: var(--s) !important;
   font-size: 12px;
   line-height: calc(22rem / 16);
-  height: calc(22rem / 16);
+  height: calc(22rem / 16) !important;
 }
 
 .btngroup.small,
@@ -2579,6 +2571,7 @@ div.btn.submit input {
     padding: 0;
     border-radius: 0;
     background-color: transparent;
+    height: var(--ui-control-height);
 
     &.current-step,
     &.active-drop-target {
@@ -2646,7 +2639,7 @@ div.btn.submit input {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      height: var(--ui-control-height);
+      height: 100%;
       background-color: var(--ui-control-bg-color);
 
       [data-icon] {
@@ -5506,7 +5499,7 @@ table.data tbody tr:not(.disabled).active-drop-target {
 }
 
 .pane-header {
-  margin-block: calc(var(--xl) * -1) var(--xl);
+  margin-block: var(--neg-padding) var(--padding);
   margin-inline: var(--neg-padding);
   padding-block: 5px 6px;
   padding-inline: var(--padding);
@@ -6448,6 +6441,10 @@ $min2ColWidth: 400px;
 
   h1 {
     margin: 0;
+  }
+
+  &::after {
+    @include mixins.clearafter;
   }
 }
 
@@ -7851,12 +7848,18 @@ fieldset {
   & > .heading {
     display: flex;
     flex-wrap: wrap;
+    gap: 5px;
     align-items: center;
     position: relative;
     margin-block: -5px 5px;
+    min-height: calc(22rem / 16);
 
     & > label,
     & > legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      align-items: center;
       font-weight: bold;
 
       code {
@@ -7868,11 +7871,19 @@ fieldset {
       }
     }
 
+    .required::after {
+      margin-inline-start: 0;
+    }
+
     .t9n-indicator {
       position: relative;
       inset-block-start: calc(-1rem / 16);
-      margin-inline-start: 7px;
+      margin-inline: 2px;
       color: var(--light-text-color);
+
+      &.copyable {
+        cursor: pointer;
+      }
     }
 
     & + .instructions {
@@ -7898,7 +7909,9 @@ fieldset {
     }
 
     input:disabled,
-    textarea:disabled {
+    textarea:disabled,
+    select:disabled,
+    button:disabled {
       cursor: not-allowed;
     }
   }
@@ -7946,6 +7959,10 @@ fieldset {
   li + li {
     margin-block-start: 0.25em;
   }
+}
+
+.cross-site-copy-modal {
+  max-width: 380px;
 }
 
 .expand-status-btn {
@@ -8597,7 +8614,7 @@ tr.indexingSession td.progress div.progressContainer div.progressInfo {
 }
 
 .select:not(.selectize) select {
-  &:hover {
+  &:hover:not(:disabled) {
     @include mixins.select-input-focused-styles;
   }
 

@@ -9,6 +9,7 @@ namespace craft\fields;
 
 use Craft;
 use craft\base\conditions\ConditionInterface;
+use craft\base\CrossSiteCopyableFieldInterface;
 use craft\base\EagerLoadingFieldInterface;
 use craft\base\Element;
 use craft\base\ElementInterface;
@@ -63,7 +64,8 @@ abstract class BaseRelationField extends Field implements
     EagerLoadingFieldInterface,
     RelationalFieldInterface,
     ThumbableFieldInterface,
-    MergeableFieldInterface
+    MergeableFieldInterface,
+    CrossSiteCopyableFieldInterface
 {
     /**
      * @event ElementCriteriaEvent The event that is triggered when defining the selection criteria for this field.
@@ -669,12 +671,9 @@ JS, [
 
         if (is_array($value)) {
             $value = array_values(array_filter($value));
+            $query->andWhere(['elements.id' => $value]);
             if (!empty($value)) {
-                $query
-                    ->andWhere(['elements.id' => $value])
-                    ->orderBy([new FixedOrderExpression('elements.id', $value, Craft::$app->getDb())]);
-            } else {
-                $query->andWhere('0 = 1');
+                $query->orderBy([new FixedOrderExpression('elements.id', $value, Craft::$app->getDb())]);
             }
         } elseif ($value === null && $element?->id && $this->isFirstInstance($element)) {
             // If $value is null, the element + field haven’t been saved since updating to Craft 5.3+,

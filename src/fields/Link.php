@@ -8,6 +8,7 @@
 namespace craft\fields;
 
 use Craft;
+use craft\base\CrossSiteCopyableFieldInterface;
 use craft\base\ElementInterface;
 use craft\base\Event;
 use craft\base\Field;
@@ -50,7 +51,7 @@ use yii\db\Schema;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 5.3.0
  */
-class Link extends Field implements InlineEditableFieldInterface, RelationalFieldInterface, MergeableFieldInterface
+class Link extends Field implements InlineEditableFieldInterface, RelationalFieldInterface, MergeableFieldInterface, CrossSiteCopyableFieldInterface
 {
     use RelationalFieldTrait;
 
@@ -332,6 +333,19 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
      */
     public function getSettingsHtml(): ?string
     {
+        return $this->settingsHtml(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         // Sort types by the order from the config and if anything remains by the label, with URL at the top
         // get only the selected types
         /** @var Collection<string,class-string<BaseLinkType>> $selectedTypes */
@@ -381,14 +395,19 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
             'required' => true,
             'targetPrefix' => 'types-',
             'sortable' => true,
+            'disabled' => $readOnly,
         ]);
 
         $linkTypes = $this->getLinkTypes();
         $view = Craft::$app->getView();
 
         foreach ($types->all() as $typeId => $typeClass) {
+            /** @var BaseLinkType $linkType */
             $linkType = $linkTypes[$typeId] ?? Component::createComponent($typeClass, BaseLinkType::class);
-            $typeSettingsHtml = $view->namespaceInputs(fn() => $linkType->getSettingsHtml(), "typeSettings[$typeId]");
+            $typeSettingsHtml = $view->namespaceInputs(
+                fn() => $readOnly ? $linkType->getReadOnlySettingsHtml() : $linkType->getSettingsHtml(),
+                "typeSettings[$typeId]",
+            );
             if ($typeSettingsHtml) {
                 $html .=
                     Html::beginTag('div', [
@@ -411,6 +430,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'id' => 'show-label-field',
                 'name' => 'showLabelField',
                 'on' => $this->showLabelField,
+                'disabled' => $readOnly,
             ]) .
             Cp::checkboxSelectFieldHtml([
                 'label' => Craft::t('app', 'Advanced Fields'),
@@ -427,6 +447,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 ],
                 'values' => $this->advancedFields,
                 'sortable' => true,
+                'disabled' => $readOnly,
             ]) .
             Html::tag('hr') .
             Html::button(Craft::t('app', 'Advanced'), options: [
@@ -448,6 +469,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                 'value' => $this->maxLength,
                 'errors' => $this->getErrors('maxLength'),
                 'data' => ['error-key' => 'maxLength'],
+                'disabled' => $readOnly,
             ]);
 
         if (Craft::$app->getConfig()->getGeneral()->enableGql) {
@@ -461,6 +483,7 @@ class Link extends Field implements InlineEditableFieldInterface, RelationalFiel
                         ['label' => Craft::t('app', 'URL only'), 'value' => 'url'],
                     ],
                     'value' => $this->fullGraphqlData ? 'full' : 'url',
+                    'disabled' => $readOnly,
                 ]);
         }
 

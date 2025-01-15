@@ -58,6 +58,9 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
       this.$uiLibrary = this.$libraryContainer.children('.fld-ui-library');
       this.$uiLibraryElements = this.$uiLibrary.children();
 
+      if (this.settings.readOnly) {
+        this.$fieldLibrary.attr('tabindex', '-1');
+      }
       // Set up the layout grids
       this.tabGrid = new Craft.Grid(this.$tabContainer, {
         itemSelector: '.fld-tab',
@@ -72,7 +75,9 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
       }
 
       this.elementDrag = new Craft.FieldLayoutDesigner.ElementDrag(this);
-      this.initLibraryElements(this.$libraryContainer.find('.fld-element'));
+      if (!this.settings.readOnly) {
+        this.initLibraryElements(this.$libraryContainer.find('.fld-element'));
+      }
 
       if (this.settings.customizableTabs) {
         this.tabDrag = new Craft.FieldLayoutDesigner.TabDrag(this);
@@ -130,6 +135,7 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
         .createButton({
           label: Craft.t('app', 'New field'),
           class: 'mt-m fullwidth add icon dashed',
+          disabled: this.settings.readOnly,
         })
         .appendTo(this.$libraryContainer);
 
@@ -185,7 +191,7 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
 
       cvd.$libraryContainer
         .data('sortableCheckboxSelect')
-        .dragSort.on('dragStop', function () {
+        ?.dragSort.on('dragStop', function () {
           cvd.updatePreview();
         });
     },
@@ -374,6 +380,7 @@ Craft.FieldLayoutDesigner = Garnish.Base.extend(
       customizableTabs: true,
       customizableUi: true,
       withCardViewDesigner: false,
+      readOnly: false,
     },
 
     async createSlideout(data, js) {
@@ -505,6 +512,7 @@ Craft.FieldLayoutDesigner.Tab = Garnish.Base.extend({
       'aria-haspopup': 'true',
       'aria-label': Craft.t('app', 'Actions'),
       title: Craft.t('app', 'Actions'),
+      disabled: this.designer.settings.readOnly,
     }).appendTo($tab);
     const $menu = $('<div/>', {
       id: menuId,
@@ -879,6 +887,7 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
             return config;
           });
         },
+        readOnly: this.tab.designer.settings.readOnly,
       });
       widthSlider.$container.appendTo(this.$container);
     }
@@ -893,6 +902,7 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
       'aria-haspopup': 'true',
       'aria-label': Craft.t('app', 'Actions'),
       title: Craft.t('app', 'Actions'),
+      disabled: this.tab.designer.settings.readOnly,
     }).appendTo(this.$container);
     $('<div/>', {
       id: menuId,
@@ -905,7 +915,7 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
 
     this.hasSettings = Garnish.hasAttr(this.$container, 'data-has-settings');
 
-    if (this.hasSettings) {
+    if (this.hasSettings && !this.tab.designer.settings.readOnly) {
       disclosureMenu.addItem({
         label: Craft.t('app', 'Instance settings'),
         icon: 'gear',
@@ -929,7 +939,7 @@ Craft.FieldLayoutDesigner.Element = Garnish.Base.extend({
       });
     }
 
-    if (this.requirable || this.thumbable || this.previewable) {
+    if (this.requirable || this.thumbable) {
       const actionUl = disclosureMenu.addGroup();
 
       if (this.requirable) {
@@ -1922,12 +1932,15 @@ Craft.FieldLayoutDesigner.CardViewDesigner = Garnish.Base.extend({
     let cvd = this.$container.data('cvd');
 
     // when item is moved up or down via disclosure menu - update preview
-    this.sortableCheckboxSelect.$container.on('movedUp movedDown', function () {
-      cvd.updatePreview();
-    });
+    this.sortableCheckboxSelect?.$container.on(
+      'movedUp movedDown',
+      function () {
+        cvd.updatePreview();
+      }
+    );
 
     // when checkbox is checked or unchecked - apply config & update preview
-    this.sortableCheckboxSelect.$container.on(
+    this.sortableCheckboxSelect?.$container.on(
       'checked unchecked',
       function (ev) {
         let val = $(ev.target).find('input.checkbox').val();

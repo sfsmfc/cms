@@ -1,7 +1,9 @@
 # Release notes for Craft CMS 5.6 (WIP)
 
 ### Content Management
+- It’s now possible to copy custom field values from other sites. ([#14056](https://github.com/craftcms/cms/pull/14056))
 - “Related To”, “Not Related To”, “Author”, and relational field condition rules now allow multiple elements to be specified. ([#16121](https://github.com/craftcms/cms/discussions/16121))
+- Added the “Widget Title” setting to Quick Post widgets. ([#16429](https://github.com/craftcms/cms/pull/16429))
 - Improved the styling of inline code fragments. ([#16141](https://github.com/craftcms/cms/pull/16141))
 - Improved the styling of attribute previews in card view. ([#16324](https://github.com/craftcms/cms/pull/16324))
 - Added the “Affiliated Site” user condition rule. ([#16174](https://github.com/craftcms/cms/pull/16174))
@@ -13,6 +15,7 @@
 - Entry indexes now only show table column options and sort options for custom fields associated with the selected sections/entry types within custom entry sources’ conditions.
 - Structure views are now available to element indexes on mobile browsers. ([#16190](https://github.com/craftcms/cms/discussions/16190))
 - Datepickers now include a dropdown menu for selecting the year. ([#16376](https://github.com/craftcms/cms/pull/16376))
+- Custom fields within element edit pages can now have action menus with “Copy value from site…”, “Edit field” and “Copy field handle” items. ([#16415](https://github.com/craftcms/cms/pull/16415), [#14056](https://github.com/craftcms/cms/pull/14056))
 - Heads-up displays now reposition themselves on window scroll.
 
 ### Accessibility
@@ -23,6 +26,10 @@
 - Improved the accessibility of action menus on the Plugins index page.
 - Improved the accessibility of “More” and “Advanced” toggle triggers. ([#16293]](https://github.com/craftcms/cms/pull/16293))
 - Improved the accessibility of the Craft Support widget. ([#16293]](https://github.com/craftcms/cms/pull/16293))
+- Improved the accessibility of field translatable indicators and tooltips.
+- Progress bars now announce their progress to screen readers. ([#16398](https://github.com/craftcms/cms/pull/16398))
+- Loading spinners within element indexes and inline-editable Matrix fields are now announced to screen readers. ([#16417](https://github.com/craftcms/cms/pull/16417))
+- Improved the accessibility of timepicker inputs. ([#16152](https://github.com/craftcms/cms/pull/16152))
 
 ### Administration
 - Added the “Affiliated Site” native user field. ([#16174](https://github.com/craftcms/cms/pull/16174))
@@ -33,6 +40,7 @@
 - Added the “Palette” setting to Color fields, which replaces “Presets”. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added the “Allow custom colors” setting to Color fields. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added the “Field” entry condition rule, which replaces “Matrix field”, includes a “has a value” operator. ([#16270](https://github.com/craftcms/cms/discussions/16270))
+- It’s now possible to view (but not edit) system and plugin settings on environments where `allowAdminChanges` is disabled. ([#16265](https://github.com/craftcms/cms/pull/16265)) 
 - Section condition rules now have a “has a value” operator. ([#16270](https://github.com/craftcms/cms/discussions/16270))
 - Added “Copy plugin handle” and “Copy package name” options to plugins’ action menus on the Plugins index page. ([#16281](https://github.com/craftcms/cms/discussions/16281))
 - The Updates utility now shows an action menu for each plugin, with “Copy plugin handle” and “Copy package name” options. ([#16281](https://github.com/craftcms/cms/discussions/16281))
@@ -43,6 +51,7 @@
 - After creating a new field from a field layout designer, the field is now immediately added to the field layout tab. ([#16374](https://github.com/craftcms/cms/pull/16374))
 - Templates rendered for “Template” field layout UI elements can now call control panel template functions like `elementChip()` and `elementCard()`. ([#16267](https://github.com/craftcms/cms/issues/16267))
 - “Template” field layout UI elements now show suggestions for the Template input.
+- Added the `elements/delete-all-of-type` command. ([#16423](https://github.com/craftcms/cms/pull/16423))
 - Added the `utils/delete-empty-volume-folders` command. ([#16388](https://github.com/craftcms/cms/issues/16388))
 - Improved the error output for nested elements when they can’t be resaved via `resave` commands.
 - `resave` commands’ `--drafts`, `--provisional-drafts`, and `--revisions` options can now be set to `null`, causing elements to be resaved regardless of whether they’re drafts/provisional drafts/revisions.
@@ -60,17 +69,28 @@
 - It’s now possible to set Link field values to arrays with `value` keys set to element instances or IDs. ([#16255](https://github.com/craftcms/cms/pull/16255))
 - The `duration` Twig filter now has a `language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 - The `indexOf` Twig filter now has a `default` argument, which can be any integer or `null`. (`-1` by default for backwards compatibility.)
+- `{% cache %}` tags now cache any JavaScript import map entries registered via `craft\web\View::registerJsImport()` within them.
+- The `{% requireAdmin %}` tag now supports passing a boolean value, which determines whether administrative changes must be allowed (defaults to `true`).
 - It’s now possible to reference custom field handles in element queries’ `where` params. ([#16318](https://github.com/craftcms/cms/pull/16318))
 - Number fields’ scalar values now return an integer if Decimals is set to `0`, and a number formatted with the correct decimal points when using MySQL. ([16369](https://github.com/craftcms/cms/issues/16369))
 - Added support for specifying the current site via an `X-Craft-Site` header set to a site ID or handle. ([#16367](https://github.com/craftcms/cms/pull/16367))
+- Added the `disable2fa` config setting. ([#16426](https://github.com/craftcms/cms/pull/16426))
+- Added support for defining redirects from `config/redirects.php`. ([#16355](https://github.com/craftcms/cms/pull/16355))
 - Deprecated the `ucfirst` Twig filter. `capitalize` should be used instead.
 
 ### Extensibility
+- Added `craft\attributes\EnvName`.
+- Added `craft\base\ConfigurableComponentInterface::getReadOnlySettingsHtml()`. ([#16265](https://github.com/craftcms/cms/pull/16265))
+- Added `craft\base\CrossSiteCopyableFieldInterface`. ([#14056](https://github.com/craftcms/cms/pull/14056))
 - Added `craft\base\Element::EVENT_DEFINE_ALT_ACTIONS`. ([#16294](https://github.com/craftcms/cms/pull/16294))
 - Added `craft\base\ElementInterface::getAltActions()`. ([#16294](https://github.com/craftcms/cms/pull/16294))
+- Added `craft\base\ElementInterface::getIsCrossSiteCopyable()`. ([#14056](https://github.com/craftcms/cms/pull/14056))
 - Added `craft\base\ElementTrait::$viewMode`. ([#16324](https://github.com/craftcms/cms/pull/16324))
+- Added `craft\base\Field::copyCrossSiteValue()`. ([#14056](https://github.com/craftcms/cms/pull/14056))
 - Added `craft\base\Field::dbTypeForValueSql()`.
 - Added `craft\base\NestedElementTrait::ownerType()`.
+- Added `craft\base\PluginTrait::$hasReadOnlyCpSettings`. ([#16265](https://github.com/craftcms/cms/pull/16265))
+- Added `craft\base\Plugininterface::getReadOnlySettingsResponse()`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - Added `craft\base\conditions\BaseElementSelectConditionRule::allowMultiple()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::getElementIds()`.
 - Added `craft\base\conditions\BaseElementSelectConditionRule::setElementIds()`.
@@ -80,6 +100,9 @@
 - Added `craft\elements\db\ElementQueryInterface::getFieldLayouts()`.
 - Added `craft\elements\db\NestedElementQueryTrait::fieldLayouts()`.
 - Added `craft\events\DefineAltActionsEvent`.
+- Added `craft\events\RedirectEvent`. ([#16355](https://github.com/craftcms/cms/pull/16355))
+- Added `craft\fieldlayoutelements\BaseField::actionMenuItems()`.
+- Added `craft\fieldlayoutelements\BaseField::isCrossSiteCopyable()`.
 - Added `craft\fields\BaseRelationField::gqlFieldArguments()`.
 - Added `craft\fields\Color::$allowCustomColors`. ([#16249](https://github.com/craftcms/cms/pull/16249))
 - Added `craft\fields\Color::$palette`. ([#16249](https://github.com/craftcms/cms/pull/16249))
@@ -95,28 +118,43 @@
 - Added `craft\gql\types\LinkData`.
 - Added `craft\gql\types\generators\LinkDataType`.
 - Added `craft\helpers\Cp::colorHtml()`.
+- Added `craft\helpers\Cp::readOnlyNoticeHtml()`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_0_MIRRORED`.
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_0`.
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_180_MIRRORED`.
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_270_MIRRORED`.
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_90_MIRRORED`.
+- Added `craft\helpes\Html::disableInputs()`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - Added `craft\mail\Mailer::$siteId`.
 - Added `craft\mail\Mailer::$siteOverrides`.
+- Added `craft\models\AssetIndexingSession::$forceStop`. ([#16435](https://github.com/craftcms/cms/pull/16435))
 - Added `craft\models\MailSettings::$siteOverrides`.
 - Added `craft\services\Elements::canSaveCanonical()`.
 - Added `craft\services\Gql::getFieldLayoutArguments()`.
+- Added `craft\web\ErrorHandler::EVENT_BEFORE_REDIRECT`. ([#16355](https://github.com/craftcms/cms/pull/16355))
+- Added `craft\web\RedirectRule`. ([#16355](https://github.com/craftcms/cms/pull/16355))
+- Added `craft\web\UrlRule::regexTokens()`.
 - Added `craft\web\User::getImpersonator()`.
 - Added `craft\web\User::getImpersonatorId()`.
 - Added `craft\web\User::setImpersonatorId()`.
+- Added `craft\web\View::clearJsImportBuffer()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
+- Added `craft\web\View::registerJsImport()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
+- Added `craft\web\View::registerScriptWithVars()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
 - Added `craft\web\View::setTwig()`.
+- Added `craft\web\View::startJsImportBuffer()`. ([#16414](https://github.com/craftcms/cms/pull/16414))
+- Added `craft\web\twig\variables\Cp::EVENT_REGISTER_READ_ONLY_CP_SETTINGS`. ([#16265](https://github.com/craftcms/cms/pull/16265))
 - `GuzzleHttp\Client` is now instantiated via `Craft::createObject()`. ([#16366](https://github.com/craftcms/cms/pull/16366))
 - `craft\elements\NestedElementManager::getIndexHtml()` now supports passing `defaultSort` in the `$config` array. ([#16236](https://github.com/craftcms/cms/discussions/16236))
 - `craft\elements\conditions\entries\MatrixFieldConditionRule` is now an alias of `FieldConditionRule`.
+- `craft\helpers\App::envConfig()` now checks for a `craft\attributes\EnvName` attribute on public properties, which can be used to override the environment variable name (sans prefix) that is associated with the property.
 - `craft\helpers\Cp::elementIndexHtml()` now supports passing `defaultSort` in the `$config` array, when `sources` is `null`. ([#16236](https://github.com/craftcms/cms/discussions/16236))
+- `craft\helpers\Cp::fieldHtml()` now supports passing an `actionMenuItems` array in the config. ([#16415](https://github.com/craftcms/cms/pull/16415))
 - `craft\helpers\DateTimeHelper::humanDuration()` now has a `$language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
+- `craft\models\ImageTransform` objects are now instantiated via `Craft::createObject()`. ([#15646](https://github.com/craftcms/cms/pull/15646))
 - `craft\models\Site` now implements `craft\base\Chippable`.
 - `craft\services\Revisions::createRevision()` no longer creates the revision if an `EVENT_BEFORE_CREATE_REVISION` event handler sets `$event->handled` to `true` and at least one revision already exists for the element. ([#16260](https://github.com/craftcms/cms/discussions/16260))
 - Elements’ `defineCardAttributes()` methods can now return a `placeholder` value set to a callable.
+- Deprecated `craft\controllers\RedirectController`. ([#16355](https://github.com/craftcms/cms/pull/16355))
 - Deprecated `craft\elements\User::EVENT_REGISTER_USER_ACTIONS`.
 - Deprecated `craft\elements\User::IMPERSONATE_KEY`. `craft\web\User::getImpersonatorId()` should be used instead.
 - Deprecated `craft\fields\Color::$presets`. ([#16249](https://github.com/craftcms/cms/pull/16249))
@@ -124,6 +162,7 @@
 - `_includes/forms/autosuggest.twig` now supports a `suggestTemplates` variable. 
 - `_includes/forms/colorSelect.twig` now supports `options` and `withBlankOption` variables.
 - `_includes/forms/selectize.twig` now supports a `color` property in option data, which can be set to a hex value or a color name.
+- Added `Craft.IntervalManager`. ([#16398](https://github.com/craftcms/cms/pull/16398))
 - Sortable checkbox selects now always display the selected options first on initial render.
 
 ### System
@@ -138,8 +177,13 @@
 - Reduced the size of GraphQL introspection schemas. ([#16326](https://github.com/craftcms/cms/pull/16326))
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
 - Image cleansing now preserves the original image quality, if known.
+- Added the Symfony CssSelector component.
+- Added the Symfony DomCrawler component.
 - Fixed a bug where `craft\config\GeneralConfig::safeMode()` set Safe Mode to `false` by default.
 - Fixed a bug where Craft wasn’t auto-rotating or flipping images uploaded with a mirrored EXIF orientation.
+- Fixed a bug where elements weren’t getting returned in a consistent order when `orderBy` was set to `RAND(X)` across varying `limit` param values. ([#16432](https://github.com/craftcms/cms/issues/16432))
+- Fixed a bug where asset indexing could get stuck in an infinite loop if the index data was deleted. ([#16435](https://github.com/craftcms/cms/pull/16435))
 - Fixed a bug where embedded element index filter HUDs were including condition rules for fields that weren’t applicable to the nested elements. ([#16289](https://github.com/craftcms/cms/discussions/16289))
 - Fixed a bug where element queries were ignoring params for custom fields that weren’t involved with the query, rather than returning zero results.
-- Fixed a bug where opening heads-up displays could cause the page to scroll to the focused element. 
+- Fixed a bug where opening heads-up displays could cause the page to scroll to the focused element.
+- Fixed a bug where field labels weren’t being read by screen readers. ([#16424](https://github.com/craftcms/cms/pull/16424))
