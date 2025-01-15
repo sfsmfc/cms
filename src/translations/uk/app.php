@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => 'Під час активації цього користувача виникла проблема: {error}',
     'There was a problem deactivating the user.' => 'Під час деактивації цього користувача виникла проблема.',
     'There was a problem impersonating this user.' => 'Під час імітування цього користувача виникла проблема.',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => 'Під час збереження вашого повідомлення виникла проблема.',
     'There was a problem sending the password reset email.' => 'Виникла проблема з надсиланням листа для скидання пароля.',
     'There was a problem with uploading the file.' => 'При завантаженні файлу сталася помилка.',
