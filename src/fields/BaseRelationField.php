@@ -671,12 +671,9 @@ JS, [
 
         if (is_array($value)) {
             $value = array_values(array_filter($value));
+            $query->andWhere(['elements.id' => $value]);
             if (!empty($value)) {
-                $query
-                    ->andWhere(['elements.id' => $value])
-                    ->orderBy([new FixedOrderExpression('elements.id', $value, Craft::$app->getDb())]);
-            } else {
-                $query->andWhere('0 = 1');
+                $query->orderBy([new FixedOrderExpression('elements.id', $value, Craft::$app->getDb())]);
             }
         } elseif ($value === null && $element?->id && $this->isFirstInstance($element)) {
             // If $value is null, the element + field haven’t been saved since updating to Craft 5.3+,
