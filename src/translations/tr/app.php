@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => 'Kullanıcı etkinleştirilirken bir sorun oluştu: {error}',
     'There was a problem deactivating the user.' => 'Kullanıcı devre dışı bırakılırken bir sorun oluştu.',
     'There was a problem impersonating this user.' => 'Bu kullanıcının yerine kullanımda bir problem oluştu.',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => 'Mesajınızın kaydedilmesinde bir problem oluştu.',
     'There was a problem sending the password reset email.' => 'Şifre yenileme epostanızı gönderirken bir problem oluştu.',
     'There was a problem with uploading the file.' => 'Dosya karşıya yüklenirken bir sorun oluştu.',

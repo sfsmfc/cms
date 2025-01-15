@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => 'مشکلی در فعال کردن کاربر وجود داشت: {error}',
     'There was a problem deactivating the user.' => 'مشکلی در هنگام غیر‌فعال‌کردن کاربر وجود داشت.',
     'There was a problem impersonating this user.' => 'مشکلی در هنگام در نقش این کاربر بودن وجود داشت.',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => 'مشکلی در هنگام ذخیره کردن پیام شما وجود داشت.',
     'There was a problem sending the password reset email.' => 'مشکلی در هنگام ارسال پست الکترونیکی بازنشانی رمز عبور وجود داشت.',
     'There was a problem with uploading the file.' => 'مشکلی در هنگام آپلود کردن فایل وجود داشت.',

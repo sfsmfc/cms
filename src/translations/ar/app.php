@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => 'حدثت مشكلة في تنشيط المستخدم: {error}',
     'There was a problem deactivating the user.' => 'حدثت مشكلة أثناء إلغاء تنشيط المستخدم.',
     'There was a problem impersonating this user.' => 'كانت هناك مشكلة أثناء انتحال صفة هذا المستخدم.',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => 'حدثت مشكلة أثناء حفظ الرسالة.',
     'There was a problem sending the password reset email.' => 'حدثت مشكلة أثناء إرسال رسالة إعادة تعيين كلمة المرور.',
     'There was a problem with uploading the file.' => 'حدثت مشكلة أثناء تحميل الملف.',

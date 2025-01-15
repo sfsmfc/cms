@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => '사용자를 활성화하는 중에 문제가 발생했습니다: {error}',
     'There was a problem deactivating the user.' => '사용자를 비활성화하는 중에 문제가 발생했습니다.',
     'There was a problem impersonating this user.' => '이 사용자를 가장하는 동안 문제가 발생했습니다.',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => '메시지를 저장하는 동안 문제가 발생했습니다.',
     'There was a problem sending the password reset email.' => '비밀번호 재설정 이메일을 보내는데 문제가 있습니다.',
     'There was a problem with uploading the file.' => '파일 업데이트 중에 문제가 발생했습니다.',

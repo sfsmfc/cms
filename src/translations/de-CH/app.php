@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => 'Beim Aktivieren des Benutzers ist ein Problem aufgetreten: {error}',
     'There was a problem deactivating the user.' => 'Beim Deaktivieren des Benutzers ist ein Problem aufgetreten.',
     'There was a problem impersonating this user.' => 'Bei der Darstellung als dieser Benutzer ist ein Problem aufgetreten.',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => 'Beim Speichern Ihrer Nachricht ist ein Fehler aufgetreten.',
     'There was a problem sending the password reset email.' => 'Es gab ein Problem beim Senden der E-Mail zum Zurücksetzen des Passworts.',
     'There was a problem with uploading the file.' => 'Beim Hochladen der Datei ist ein Fehler aufgetreten.',

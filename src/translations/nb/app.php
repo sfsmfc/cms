@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => 'Det oppsto et problem med å aktivere brukeren: {error}',
     'There was a problem deactivating the user.' => 'Det oppsto et problem med å deaktivere brukeren.',
     'There was a problem impersonating this user.' => 'Det oppstod et problem under forsøket på å utgi seg for denne brukeren.',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => 'Det oppstod et problem med å lagre meldingen din.',
     'There was a problem sending the password reset email.' => 'Det oppstod et problem med å sende e-posten med tilbakestilling av passordet.',
     'There was a problem with uploading the file.' => 'Det oppstod et problem da filen skulle lastes opp.',
