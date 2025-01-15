@@ -1967,7 +1967,8 @@ ul.icons {
     }
   }
 
-  &:active {
+  &:active,
+  &.active {
     border: var(--button-border--active);
     background: var(--button-bg--active);
 
@@ -1978,6 +1979,11 @@ ul.icons {
 
   &:not([aria-current]) {
     cursor: pointer;
+  }
+
+  &[aria-current],
+  &.active {
+    cursor: default;
   }
 
   &.chromeless,
@@ -1996,12 +2002,14 @@ ul.icons {
 
     &:hover,
     &:active,
+    &.active,
     &:focus {
       background: transparent;
     }
 
     &:hover,
-    &:active {
+    &:active,
+    &.active {
       color: var(--link-color);
       text-decoration: underline;
     }
@@ -2012,6 +2020,7 @@ ul.icons {
     border: 1px solid var(--medium-hairline-color);
 
     &:active,
+    &.active,
     &[aria-expanded='true'] {
       background: var(--ui-control-static-bg-color);
     }
@@ -2020,6 +2029,7 @@ ul.icons {
   &.hairline {
     &:hover,
     &:active,
+    &.active,
     &[aria-expanded='true'] {
       border-color: var(--dark-hairline-color);
     }
@@ -2028,7 +2038,7 @@ ul.icons {
   &.hairline-dark {
     border: 1px solid var(--dark-hairline-color);
 
-    &:not(:hover, :active, [aria-expanded='true']) {
+    &:not(:hover, :active, .active, [aria-expanded='true']) {
       background-color: transparent;
     }
   }
@@ -2038,6 +2048,7 @@ ul.icons {
 
     &:hover,
     &:active,
+    &.active,
     &[aria-expanded='true'] {
       border-color: var(--link-color);
     }
