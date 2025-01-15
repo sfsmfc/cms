@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => '激活用户时出错：{error}',
     'There was a problem deactivating the user.' => '停用用户时出错。',
     'There was a problem impersonating this user.' => '模拟该用户时出错。',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => '保存信息时出错。',
     'There was a problem sending the password reset email.' => '发送密码重置电子邮件出现问题。',
     'There was a problem with uploading the file.' => '上传文件时出现问题。',
