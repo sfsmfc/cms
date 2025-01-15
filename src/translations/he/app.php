@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => 'הייתה בעיה בהפעלת המשתמש: {error}',
     'There was a problem deactivating the user.' => 'הייתה בעיה בנטרול המשתמש.',
     'There was a problem impersonating this user.' => 'הייתה בעיה בהתחזות למשתמש זה.',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => 'הייתה בעיה בשמירת ההודעה.',
     'There was a problem sending the password reset email.' => 'התגלתה בעיה במשלוח דוא"ל איפוס הסיסמה.',
     'There was a problem with uploading the file.' => 'אירעה בעיה בהעלאת הקובץ.',
