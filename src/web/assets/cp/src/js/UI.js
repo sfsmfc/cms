@@ -1095,7 +1095,7 @@ Craft.ui = {
     const wrapperId = `${id}-wrapper-${Math.floor(Math.random() * 1000000000)}`;
 
     const getInstance = () => {
-      return $input[0].timepickerObj;
+      return $input[0]?.timepickerObj;
     };
 
     const getTimepickerListbox = () => {
