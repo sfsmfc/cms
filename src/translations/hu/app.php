@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => 'Probléma lépett fel a felhasználó aktiválása során. {error}',
     'There was a problem deactivating the user.' => 'A felhasználó deaktiválása során probléma merült fel.',
     'There was a problem impersonating this user.' => 'A felhasználó megszemélyesítésénél hiba lépett fel.',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => 'Hiba történt az üzenet mentése közben.',
     'There was a problem sending the password reset email.' => 'Probléma lépett fel a jelszó visszaállítás email küldése közben.',
     'There was a problem with uploading the file.' => 'Gond volt a fájl feltöltésével.',
