@@ -20,6 +20,7 @@
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_180_MIRRORED`.
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_270_MIRRORED`.
 - Added `craft\helpers\Image::EXIF_IFD0_ROTATE_90_MIRRORED`.
+- Added `craft\models\AssetIndexingSession::$forceStop`. ([#16435](https://github.com/craftcms/cms/pull/16435))
 - `GuzzleHttp\Client` is now instantiated via `Craft::createObject()`. ([#16366](https://github.com/craftcms/cms/pull/16366))
 - `craft\helpers\DateTimeHelper::humanDuration()` now has a `$language` argument. ([#16332](https://github.com/craftcms/cms/pull/16332))
 
@@ -31,4 +32,5 @@
 - Fixed a bug where `craft\config\GeneralConfig::safeMode()` set Safe Mode to `false` by default.
 - Fixed a bug where Craft wasn’t auto-rotating or flipping images uploaded with a mirrored EXIF orientation.
 - Fixed a bug where elements weren’t getting returned in a consistent order when `orderBy` was set to `RAND(X)` across varying `limit` param values. ([#16432](https://github.com/craftcms/cms/issues/16432))
+- Fixed a bug where asset indexing could get stuck in an infinite loop if the index data was deleted. ([#16435](https://github.com/craftcms/cms/pull/16435))
 - Updated Twig to 3.15. ([#16207](https://github.com/craftcms/cms/discussions/16207))
