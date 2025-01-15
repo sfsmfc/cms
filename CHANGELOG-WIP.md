@@ -29,6 +29,7 @@
 - Improved the accessibility of field translatable indicators and tooltips.
 - Progress bars now announce their progress to screen readers. ([#16398](https://github.com/craftcms/cms/pull/16398))
 - Loading spinners within element indexes and inline-editable Matrix fields are now announced to screen readers. ([#16417](https://github.com/craftcms/cms/pull/16417))
+- Improved the accessibility of timepicker inputs. ([#16152](https://github.com/craftcms/cms/pull/16152))
 
 ### Administration
 - Added the “Affiliated Site” native user field. ([#16174](https://github.com/craftcms/cms/pull/16174))
