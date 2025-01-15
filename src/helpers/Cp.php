@@ -44,6 +44,7 @@ use craft\web\View;
 use Illuminate\Support\Collection;
 use yii\base\Event;
 use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\helpers\Markdown;
 use yii\validators\RequiredValidator;
 
@@ -892,6 +893,12 @@ class Cp
         $user = Craft::$app->getUser()->getIdentity();
         $editable = $user && $elementsService->canView($element, $user);
 
+        $primaryOwner = null;
+        try {
+            $primaryOwner = $element instanceof NestedElementInterface ? $element->getPrimaryOwner() : null;
+        } catch (InvalidConfigException $e) {
+        }
+        
         return ArrayHelper::merge(
             Html::normalizeTagAttributes($element->getHtmlAttributes($config['context'])),
             [
@@ -909,7 +916,7 @@ class Cp
                     'field-id' => $element instanceof NestedElementInterface ? $element->getField()?->id : null,
                     'primary-owner-id' => $element instanceof NestedElementInterface ? $element->getPrimaryOwnerId() : null,
                     'owner-id' => $element instanceof NestedElementInterface ? $element->getOwnerId() : null,
-                    'owner-is-canonical' => $element instanceof NestedElementInterface ? $element->getPrimaryOwner()?->getIsCanonical() : null,
+                    'owner-is-canonical' => $primaryOwner?->getIsCanonical(),
                     'site-id' => $element->siteId,
                     'status' => $element->getStatus(),
                     'label' => (string)$element,
@@ -1190,9 +1197,11 @@ class Cp
             'showStatusMenu' => 'auto',
             'showSiteMenu' => 'auto',
             'fieldLayouts' => [],
+            'defaultSort' => null,
             'defaultTableColumns' => null,
             'registerJs' => true,
             'jsSettings' => [],
+            'defaultViewMode' => 'table',
         ];
 
         if ($config['showStatusMenu'] !== 'auto') {
@@ -1283,7 +1292,9 @@ class Cp
                     'key' => '__IMP__',
                     'label' => Craft::t('app', 'All elements'),
                     'hasThumbs' => $elementType::hasThumbs(),
+                    'defaultSort' => $config['defaultSort'],
                     'defaultViewMode' => $config['defaultViewMode'],
+                    'fieldLayouts' => $config['fieldLayouts'],
                 ],
             ];
 
@@ -1420,6 +1431,7 @@ JS, [
         $warning = $config['warning'] ?? null;
         $errors = $config['errors'] ?? null;
         $status = $config['status'] ?? null;
+        $disabled = $config['disabled'] ?? $config['static'] ?? false;
 
         $fieldset = $config['fieldset'] ?? false;
         $fieldId = $config['fieldId'] ?? "$id-field";
@@ -1476,13 +1488,14 @@ JS, [
             $errors ? 'has-errors' : null,
         ]), Html::explodeClass($config['fieldClass'] ?? []));
 
-        if (($config['showAttribute'] ?? false) && ($currentUser = Craft::$app->getUser()->getIdentity())) {
-            $showAttribute = $currentUser->admin && $currentUser->getPreference('showFieldHandles');
-        } else {
-            $showAttribute = false;
-        }
-
-        $showLabelExtra = $showAttribute || isset($config['labelExtra']);
+        $userSessionService = Craft::$app->getUser();
+        $showAttribute = (
+            ($config['showAttribute'] ?? false) &&
+            $userSessionService->getIsAdmin() &&
+            $userSessionService->getIdentity()->getPreference('showFieldHandles')
+        );
+        $showActionMenu = !empty($config['actionMenuItems']);
+        $showLabelExtra = $showAttribute || $showActionMenu || isset($config['labelExtra']);
 
         $instructionsHtml = $instructions
             ? Html::tag('div', preg_replace('/&amp;(\w+);/', '&$1;', Markdown::process(Html::encodeInvalidTags($instructions), 'gfm-comment')), [
@@ -1490,6 +1503,24 @@ JS, [
                 'class' => ['instructions'],
             ])
             : '';
+
+        $translationDescription = $config['translationDescription'] ?? Craft::t('app', 'This field is translatable.');
+        $translationIconHtml = Html::button('', [
+            'class' => ['t9n-indicator'],
+            'data' => [
+                'icon' => 'language',
+            ],
+            'aria' => [
+                'label' => $translationDescription,
+            ],
+        ]);
+
+        $translationIconHtml = Html::tag('craft-tooltip', $translationIconHtml, [
+            'placement' => 'bottom',
+            'max-width' => '200px',
+            'text' => $translationDescription,
+            'delay' => '1000',
+        ]);
 
         if ($label) {
             $labelHtml = $label . (
@@ -1504,45 +1535,27 @@ JS, [
                             ],
                         ])
                         : '') .
-                    ($translatable
-                        ? Html::tag('span', '', [
-                            'class' => ['t9n-indicator'],
-                            'title' => $config['translationDescription'] ?? Craft::t('app', 'This field is translatable.'),
-                            'data' => [
-                                'icon' => 'language',
-                            ],
-                            'aria' => [
-                                'label' => $config['translationDescription'] ?? Craft::t('app', 'This field is translatable.'),
-                            ],
-                            'role' => 'img',
-                        ])
-                        : '')
+                    ($translatable ? $translationIconHtml : '')
                 );
         } else {
             $labelHtml = '';
         }
 
-        $containerTag = $fieldset ? 'fieldset' : 'div';
-
         return
-            Html::beginTag($containerTag, ArrayHelper::merge(
+            Html::beginTag('div', ArrayHelper::merge(
                 [
                     'class' => $fieldClass,
                     'id' => $fieldId,
+                    'aria' => [
+                        'labelledby' => $fieldset ? $labelId : null,
+                    ],
+                    'role' => $fieldset ? 'group' : null,
                     'data' => [
                         'attribute' => $attribute,
                     ] + $data,
                 ],
                 $config['fieldAttributes'] ?? []
             )) .
-            (($label && $fieldset)
-                ? Html::tag('legend', $labelHtml, [
-                    'class' => ['visually-hidden'],
-                    'data' => [
-                        'label' => $label,
-                    ],
-                ])
-                : '') .
             ($status
                 ? Html::beginTag('div', [
                     'id' => $statusId,
@@ -1564,15 +1577,16 @@ JS, [
                             'id' => $labelId,
                             'class' => $config['labelClass'] ?? null,
                             'for' => !$fieldset ? $id : null,
-                            'aria' => [
-                                'hidden' => $fieldset ? 'true' : null,
-                            ],
                         ], $config['labelAttributes'] ?? []))
                         : '') .
                     ($showLabelExtra
-                        ? Html::tag('div', '', [
-                            'class' => ['flex-grow'],
-                        ]) .
+                        ? Html::tag('div', '', ['class' => 'flex-grow']) .
+                        ($showActionMenu ? static::disclosureMenu($config['actionMenuItems'], [
+                            'hiddenLabel' => Craft::t('app', 'Actions'),
+                            'buttonAttributes' => [
+                                'class' => ['action-btn', 'small'],
+                            ],
+                        ]) : '') .
                         ($showAttribute ? static::renderTemplate('_includes/forms/copytextbtn.twig', [
                             'id' => "$id-attribute",
                             'class' => ['code', 'small', 'light'],
@@ -1591,6 +1605,7 @@ JS, [
                         'input',
                         $orientation,
                         $errors ? 'errors' : null,
+                        $disabled ? 'disabled' : null,
                     ]),
                 ],
                 $config['inputContainerAttributes'] ?? []
@@ -1604,7 +1619,7 @@ JS, [
                     'errors' => $errors,
                 ])
                 : '') .
-            Html::endTag($containerTag);
+            Html::endTag('div');
     }
 
     /**
@@ -1703,6 +1718,19 @@ JS, [
     {
         $config['id'] = $config['id'] ?? 'checkboxgroup' . mt_rand();
         return static::fieldHtml('template:_includes/forms/checkboxGroup.twig', $config);
+    }
+
+    /**
+     * Renders a color input’s HTML.
+     *
+     * @param array $config
+     * @return string
+     * @throws InvalidArgumentException if `$config['siteId']` is invalid
+     * @since 5.6.0
+     */
+    public static function colorHtml(array $config): string
+    {
+        return static::renderTemplate('_includes/forms/color.twig', $config);
     }
 
     /**
@@ -2468,6 +2496,8 @@ JS, [
             'id' => 'cvd' . mt_rand(),
         ];
 
+        $disabled = isset($config['config']['disabled']) && $config['config']['disabled'];
+
         // get the attributes that are set to be visible in the card body
         $selectedCardAttributes = $fieldLayout->getCardBodyAttributes();
 
@@ -2535,6 +2565,7 @@ JS, [
             'required' => true,
             //'targetPrefix' => 'cardView-',
             'sortable' => true,
+            'disabled' => $disabled,
         ]);
 
 
@@ -2627,7 +2658,11 @@ JS, [
             } elseif ($cardElement instanceof BaseField) {
                 $previewHtml .= Html::tag('div', $cardElement->previewPlaceholderHtml(null, null));
             } else {
-                $previewHtml .= Html::tag('div', $elementType::attributePreviewHtml($cardElement));
+                $html = $elementType::attributePreviewHtml($cardElement);
+                if (is_callable($html)) {
+                    $html = $html();
+                }
+                $previewHtml .= Html::tag('div', $html);
             }
         }
 
@@ -2657,6 +2692,7 @@ JS, [
      */
     public static function fieldLayoutDesignerHtml(FieldLayout $fieldLayout, array $config = []): string
     {
+        $readOnly = isset($config['disabled']) && $config['disabled'];
         $config += [
             'id' => 'fld' . mt_rand(),
             'customizableTabs' => true,
@@ -2705,6 +2741,7 @@ JS, [
             'customizableTabs' => $config['customizableTabs'],
             'customizableUi' => $config['customizableUi'],
             'withCardViewDesigner' => $config['withCardViewDesigner'] ?? false,
+            'readOnly' => $readOnly,
         ]);
         $namespacedId = $view->namespaceInputId($config['id']);
 
@@ -2749,12 +2786,13 @@ JS;
             Html::beginTag('div', ['class' => 'fld-container']) .
             Html::beginTag('div', ['class' => 'fld-workspace']) .
             Html::beginTag('div', ['class' => 'fld-tabs']) .
-            implode('', array_map(fn(FieldLayoutTab $tab) => self::_fldTabHtml($tab, $config['customizableTabs']), $tabs)) .
+            implode('', array_map(fn(FieldLayoutTab $tab) => self::_fldTabHtml($tab, $config['customizableTabs'], $readOnly), $tabs)) .
             Html::endTag('div') . // .fld-tabs
             ($config['customizableTabs']
                 ? Html::button(Craft::t('app', 'New Tab'), [
                     'type' => 'button',
                     'class' => ['fld-new-tab-btn', 'btn', 'add', 'icon'],
+                    'disabled' => $readOnly,
                 ])
                 : '') .
             Html::endTag('div') . // .fld-workspace
@@ -2769,12 +2807,14 @@ JS;
                     'class' => ['btn', 'small', 'active'],
                     'aria' => ['pressed' => 'true'],
                     'data' => ['library' => 'field'],
+                    'disabled' => $readOnly,
                 ]) .
                 Html::button(Craft::t('app', 'UI Elements'), [
                     'type' => 'button',
                     'class' => ['btn', 'small'],
                     'aria' => ['pressed' => 'false'],
                     'data' => ['library' => 'ui'],
+                    'disabled' => $readOnly,
                 ]) .
                 Html::endTag('section') // .btngroup
                 : '') .
@@ -2784,9 +2824,10 @@ JS;
                 'class' => 'fullwidth',
                 'inputmode' => 'search',
                 'placeholder' => Craft::t('app', 'Search'),
+                'disabled' => $readOnly,
             ]) .
             Html::tag('div', '', [
-                'class' => ['clear', 'hidden'],
+                'class' => ['clear-btn', 'hidden'],
                 'title' => Craft::t('app', 'Clear'),
                 'aria' => ['label' => Craft::t('app', 'Clear')],
             ]) .
@@ -2818,11 +2859,11 @@ JS;
     /**
      * @param FieldLayoutTab $tab
      * @param bool $customizable
+     * @param bool $disabled
      * @return string
      */
-    private static function _fldTabHtml(FieldLayoutTab $tab, bool $customizable): string
+    private static function _fldTabHtml(FieldLayoutTab $tab, bool $customizable, $disabled): string
     {
-        $menuId = sprintf('menu-%s', mt_rand());
         return
             Html::beginTag('div', [
                 'class' => 'fld-tab',
@@ -2843,11 +2884,7 @@ JS;
             implode('', array_map(fn(FieldLayoutElement $element) => self::layoutElementSelectorHtml($element, false), $tab->getElements())) .
             Html::button(Craft::t('app', 'Add'), [
                 'class' => ['btn', 'add', 'icon', 'dashed', 'fullwidth', 'fld-add-btn'],
-                'aria' => ['controls' => $menuId],
-            ]) .
-            Html::tag('div', options: [
-                'id' => $menuId,
-                'class' => ['menu', 'menu--disclosure', 'fld-library-menu'],
+                'disabled' => $disabled,
             ]) .
             Html::endTag('div') . // .fld-tabcontent
             Html::endTag('div'); // .fld-tab
@@ -3090,7 +3127,7 @@ JS;
      * - `liAttributes` – Any HTML attributes that should be set on the item’s `<li>` tag
      *
      * @param array $config
-     * @param string $menuId,
+     * @param string $menuId
      * @return string
      * @since 5.0.0
      */
@@ -3223,13 +3260,17 @@ JS;
      *
      * @param string $icon
      * @param string|null $fallbackLabel
+     * @param string|null $altText
      * @return string
      * @since 5.0.0
      */
-    public static function iconSvg(string $icon, ?string $fallbackLabel = null): string
+    public static function iconSvg(string $icon, ?string $fallbackLabel = null, ?string $altText = null): string
     {
         $locale = Craft::$app->getLocale();
         $orientation = $locale->getOrientation();
+        $attributes = [
+            'focusable' => 'false',
+        ];
 
         // BC support for some legacy icon names
         $icon = match ($icon) {
@@ -3300,7 +3341,7 @@ JS;
                 $path = match ($icon) {
                     'asterisk-slash', 'diamond-slash', 'element-card', 'element-card-slash', 'element-cards', 'graphql',
                     'grip-dots', 'image-slash', 'list-flip', 'list-tree-flip', 'share-flip' =>
-                        Craft::getAlias("@app/icons/custom-icons/$icon.svg"),
+                    Craft::getAlias("@app/icons/custom-icons/$icon.svg"),
                     default => Craft::getAlias("@appicons/$icon.svg"),
                 };
                 if (!file_exists($path)) {
@@ -3318,11 +3359,22 @@ JS;
             return self::fallbackIconSvg($fallbackLabel);
         }
 
-        // Add aria-hidden="true"
+        if ($altText !== null) {
+            $attributes['aria'] = ['label' => $altText];
+            $attributes['role'] = 'img';
+        } else {
+            $attributes['aria'] = [
+                'hidden' => 'true',
+                'labelledby' => false,
+            ];
+        }
+
+        // Remove title tag
+        $svg = preg_replace(Html::TITLE_TAG_RE, '', $svg);
+
+        // Add attributes for accessibility
         try {
-            $svg = Html::modifyTagAttributes($svg, [
-                'aria' => ['hidden' => 'true'],
-            ]);
+            $svg = Html::modifyTagAttributes($svg, $attributes);
         } catch (InvalidArgumentException) {
         }
 
@@ -3396,5 +3448,30 @@ JS;
         }
 
         return self::$_requestedSite ?: null;
+    }
+
+    /**
+     * Returns the notice that should show when admin is viewing the available settings pages
+     * while `allowAdminChanges` is set to false.
+     *
+     * @return string
+     * @since 5.6.0
+     */
+    public static function readOnlyNoticeHtml(): string
+    {
+        return
+            Html::beginTag('div', [
+                'class' => 'content-notice',
+            ]) .
+            Html::tag('div', '', [
+                'class' => ['content-notice-icon'],
+                'aria' => ['hidden' => 'true'],
+                'data' => ['icon' => 'lightbulb'],
+            ]) .
+            Html::tag('p', Craft::t(
+                'app',
+                'Changes to these settings aren’t permitted in this environment.',
+            )) .
+            Html::endTag('div');
     }
 }

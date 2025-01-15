@@ -200,14 +200,10 @@ class Category extends Element
      */
     protected static function defineFieldLayouts(?string $source): array
     {
-        if ($source !== null) {
-            $groups = [];
-            if (preg_match('/^group:(.+)$/', $source, $matches)) {
-                $group = Craft::$app->getCategories()->getGroupByUid($matches[1]);
-                if ($group) {
-                    $groups[] = $group;
-                }
-            }
+        if ($source !== null && preg_match('/^group:(.+)$/', $source, $matches)) {
+            $groups = array_filter([
+                Craft::$app->getCategories()->getGroupByUid($matches[1]),
+            ]);
         } else {
             $groups = Craft::$app->getCategories()->getAllGroups();
         }
@@ -315,7 +311,6 @@ class Category extends Element
                 'orderBy' => 'dateUpdated',
                 'defaultDir' => 'desc',
             ],
-            'id ' => Craft::t('app', 'ID'),
         ];
     }
 
@@ -349,7 +344,7 @@ class Category extends Element
         return array_merge(parent::defineCardAttributes(), [
             'parent' => [
                 'label' => Craft::t('app', 'Parent'),
-                'placeholder' => Html::tag(
+                'placeholder' => fn() => Html::tag(
                     'span',
                     Craft::t('app', 'Parent {type} Title', ['type' => self::displayName()]),
                     ['class' => 'card-placeholder'],

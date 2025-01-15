@@ -56,7 +56,6 @@
 {% endif %}
 {% endjs %}
 
-{% set hasSystemIcon = CraftEdition >= CraftPro and craft.rebrand.isIconUploaded %}
 {% set fullPageForm = (fullPageForm is defined and fullPageForm) %}
 
 {% set editionName = craft.app.edition.name %}
@@ -362,8 +361,8 @@ history.replaceState(undefined, undefined, window.location.href.match(/^[^#]*/)[
                 {% endif %}
                 <div id="app-info">
                     {% set fullEditionName = '{edition} edition'|t('app', {edition: editionName}) %}
-                    <span>
-                        <span lang="en">
+                    <span class="flex items-center">
+                        <span lang="en" class="flex items-center">
                             Craft CMS
                             <span id="edition-logo" title="{{ fullEditionName }}">
                                 <span aria-hidden="true">{{ editionName }}</span>

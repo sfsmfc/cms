@@ -8,6 +8,7 @@
 namespace craft\web;
 
 use Craft;
+use craft\base\ElementInterface;
 use craft\events\AssetBundleEvent;
 use craft\events\CreateTwigEvent;
 use craft\events\RegisterTemplateRootsEvent;
@@ -27,7 +28,9 @@ use craft\web\twig\GlobalsExtension;
 use craft\web\twig\SafeHtml;
 use craft\web\twig\SinglePreloaderExtension;
 use craft\web\twig\TemplateLoader;
+use Illuminate\Support\Collection;
 use LogicException;
+use Stringable;
 use Throwable;
 use Twig\Error\LoaderError as TwigLoaderError;
 use Twig\Error\RuntimeError as TwigRuntimeError;
@@ -306,6 +309,14 @@ class View extends \yii\web\View
      */
     private array $_assetBundleBuffers = [];
 
+
+    /**
+     * @var array
+     * @see startJsImportBuffer()
+     * @see clearJsImportBuffer()
+     */
+    private array $_jsImportBuffers = [];
+
     /**
      * @var array|null the registered generic `<script>` code blocks
      * @see registerScript()
@@ -317,6 +328,12 @@ class View extends \yii\web\View
      * @see registerHtml()
      */
     private array $_html = [];
+
+    /**
+     * @var array the registered imports for JavaScript es modules
+     * @see registerJsImport()
+     */
+    private array $_jsImports = [];
 
     /**
      * @var callable[][]
@@ -363,6 +380,9 @@ class View extends \yii\web\View
         }
 
         // Register the control panel hooks
+        $this->hook('cp.layouts.elementindex', [$this, '_prepareElementIndexVariables']);
+        $this->hook('cp.elements.toolbar', [$this, '_prepareElementToolbarVariables']);
+        $this->hook('cp.elements.sources', [$this, '_prepareElementSourcesVariables']);
         $this->hook('cp.elements.element', [$this, '_elementChipHtml']);
     }
 
@@ -376,6 +396,21 @@ class View extends \yii\web\View
         return $this->_templateMode === self::TEMPLATE_MODE_CP
             ? $this->_cpTwig ?? ($this->_cpTwig = $this->createTwig())
             : $this->_siteTwig ?? ($this->_siteTwig = $this->createTwig());
+    }
+
+    /**
+     * Sets the Twig environment for the current template mode.
+     *
+     * @param Environment $twig
+     * @since 5.6.0
+     */
+    public function setTwig(Environment $twig): void
+    {
+        if ($this->_templateMode === self::TEMPLATE_MODE_CP) {
+            $this->_cpTwig = $twig;
+        } else {
+            $this->_siteTwig = $twig;
+        }
     }
 
     /**
@@ -393,7 +428,9 @@ class View extends \yii\web\View
         $twig = new Environment(new TemplateLoader($this), $this->_getTwigOptions());
 
         // Mark SafeHtml as a safe interface
-        $twig->getRuntime(EscaperRuntime::class)->addSafeClass(SafeHtml::class, ['html']);
+        /** @var class-string<Stringable> $safeClass */
+        $safeClass = SafeHtml::class;
+        $twig->getRuntime(EscaperRuntime::class)->addSafeClass($safeClass, ['html']);
 
         $twig->addExtension(new StringLoaderExtension());
         $twig->addExtension(new Extension($this, $twig));
@@ -1336,6 +1373,39 @@ class View extends \yii\web\View
     }
 
     /**
+     * Starts a buffer for any JavaScript imports registered with [[registerJsImport()]].
+     *
+     * The buffer’s contents can be cleared and returned later via [[clearJsImportBuffer()]].
+     *
+     * @see clearJsImportBuffer()
+     * @since 5.6.0
+     */
+    public function startJsImportBuffer(): void
+    {
+        $this->_jsImportBuffers[] = $this->_jsImports;
+        $this->_jsImports = [];
+    }
+
+    /**
+     * Clears and ends a buffer started via [[startJsImportBuffer()]], returning any JavaScript imports that were registered
+     * while the buffer was active.
+     *
+     * @return array|false The JavaScript imports that were registered while the buffer was active, or `false` if there wasn’t an active buffer.
+     * @see startAssetBundleBuffer()
+     * @since 5.6.0
+     */
+    public function clearJsImportBuffer(): array|false
+    {
+        if (empty($this->_jsImportBuffers)) {
+            return false;
+        }
+
+        $bufferedJsImports = $this->_jsImports;
+        $this->_jsImports = array_pop($this->_jsImportBuffers);
+        return $bufferedJsImports;
+    }
+
+    /**
      * @inheritdoc
      */
     public function registerJsFile($url, $options = [], $key = null): void
@@ -1373,6 +1443,32 @@ class View extends \yii\web\View
     }
 
     /**
+     * Registers a generic `<script>` tag with the given variables, pre-JSON-encoded.
+     *
+     * @param callable $scriptFn callback function that returns the JS code to be registered.
+     * @param array $vars Array of variables that will be JSON-encoded before being passed to `$scriptFn`
+     * @param int $position the position at which the JS script tag should be inserted
+     *  in a page. The possible values are:
+     *  - [[POS_HEAD]]: in the head section
+     *  - [[POS_BEGIN]]: at the beginning of the body section
+     *  - [[POS_END]]: at the end of the body section
+     * @param array $options the HTML attributes for the `<script>` tag.
+     * @param string|null $key the key that identifies the generic `<script>` code block. If null, it will use
+     * $script as the key. If two generic `<script>` code blocks are registered with the same key, the latter
+     * will overwrite the former.
+     * @since 5.6.0
+     */
+    public function registerScriptWithVars(callable $scriptFn, array $vars, int $position = self::POS_END, array $options = [], ?string $key = null): void
+    {
+        $jsVars = array_map(function($variable) {
+            return Json::encode($variable);
+        }, $vars);
+
+        $script = call_user_func($scriptFn, ...array_values($jsVars));
+        $this->registerScript($script, $position, $options);
+    }
+
+    /**
      * Registers arbitrary HTML to be injected into the final page response.
      *
      * @param string $html the HTML code to be registered
@@ -1390,6 +1486,18 @@ class View extends \yii\web\View
             $key = md5($html);
         }
         $this->_html[$position][$key] = $html;
+    }
+
+    /**
+     * Registers a JavaScript import map entry to be injected into the final page response.
+     *
+     * @param string $key The module specifier.
+     * @param string $value  The URL or path to the resource the key will resolve to.
+     * @since 5.6.0
+    */
+    public function registerJsImport(string $key, string $value): void
+    {
+        $this->_jsImports[$key] = $value;
     }
 
     /**
@@ -1974,7 +2082,7 @@ JS;
      */
     public function endPage($ajaxMode = false): void
     {
-        if (!$ajaxMode && Craft::$app->getRequest()->getIsCpRequest()) {
+        if (!$ajaxMode && $this->_templateMode === static::TEMPLATE_MODE_CP) {
             $this->_setJsProperty('registeredJsFiles', $this->_registeredJsFiles);
             $this->_setJsProperty('registeredAssetBundles', $this->_registeredAssetBundles);
         }
@@ -2104,6 +2212,10 @@ JS;
         $lines = [];
         if (!empty($this->title)) {
             $lines[] = '<title>' . Html::encode($this->title) . '</title>';
+        }
+
+        if (!empty($this->_jsImports)) {
+            $lines[] = '<script type="importmap">{"imports": ' . Json::encode($this->_jsImports) . '}</script>';
         }
         if (!empty($this->_scripts[self::POS_HEAD])) {
             $lines[] = implode("\n", $this->_scripts[self::POS_HEAD]);
@@ -2391,6 +2503,79 @@ JS;
         }
         $js .= '}';
         $this->registerJs($js, self::POS_HEAD);
+    }
+
+    private function _prepareElementIndexVariables(array &$context): null
+    {
+        /** @var class-string<ElementInterface> $elementType */
+        $elementType = $context['elementType'];
+
+        $context['title'] ??= $elementType::pluralDisplayName();
+        $context['context'] = 'index';
+        $context['sources'] = Craft::$app->getElementSources()->getSources($elementType, withDisabled: true);
+
+        $context['showSiteMenu'] = Craft::$app->getIsMultiSite() ? ($context['showSiteMenu'] ?? 'auto') : false;
+        if ($context['showSiteMenu'] === 'auto') {
+            $context['showSiteMenu'] = $elementType::isLocalized();
+        }
+
+        $context['elementDisplayName'] = $elementType::displayName();
+        $context['elementPluralDisplayName'] = $elementType::pluralDisplayName();
+        $context['canHaveDrafts'] ??= $elementType::hasDrafts();
+
+        return null;
+    }
+
+    private function _prepareElementToolbarVariables(array &$context): null
+    {
+        /** @var class-string<ElementInterface> $elementType */
+        $elementType = $context['elementType'];
+
+        $context['context'] ??= 'index';
+        $context['isAdministrative'] = match ($context['context']) {
+            'index', 'embedded-index' => true,
+            default => false,
+        };
+        $context['showStatusMenu'] ??= 'auto';
+        if ($context['showStatusMenu'] === 'auto') {
+            $context['showStatusMenu'] = $elementType::hasStatuses();
+        }
+        $context['showSiteMenu'] = Craft::$app->getIsMultiSite() ? ($context['showSiteMenu'] ?? 'auto') : false;
+        if ($context['showSiteMenu'] === 'auto') {
+            $context['showSiteMenu'] = $elementType::isLocalized();
+        }
+        $context['idPrefix'] = sprintf('elementtoolbar%s-', mt_rand());
+
+        if ($context['showStatusMenu']) {
+            $context['elementStatuses'] = $elementType::statuses();
+        }
+
+        return null;
+    }
+
+    private function _prepareElementSourcesVariables(array &$context): null
+    {
+        /** @var class-string<ElementInterface> $elementType */
+        $elementType = $context['elementType'];
+
+        $context['keyPrefix'] ??= '';
+        $context['isTopLevel'] = $context['keyPrefix'] === '';
+
+        if ($context['isTopLevel']) {
+            $context['baseSortOptions'] ??= Collection::make($elementType::sortOptions())
+                ->map(fn($option, $key) => [
+                    'label' => $option['label'] ?? $option,
+                    'attr' => $option['attribute'] ?? $option['orderBy'] ?? $key,
+                    'defaultDir' => $option['defaultDir'] ?? 'asc',
+                ])
+                ->values()
+                ->all();
+            $context['tableColumns'] ??= Craft::$app->getElementSources()->getAvailableTableAttributes($elementType);
+        }
+
+        $context['viewModes'] ??= $elementType::indexViewModes();
+
+        return null;
     }
 
     /**

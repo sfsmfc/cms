@@ -952,16 +952,44 @@ class Entries extends Component
         // Get/save the entry with updated title, slug, and URI format
         // ---------------------------------------------------------------------
 
-        // If there are any existing entries, find the first one with a valid typeId
-        /** @var Entry|null $entry */
-        $entry = Entry::find()
-            ->typeId($entryTypeIds)
+        $baseEntryQuery = Entry::find()
             ->sectionId($section->id)
             ->siteId($siteIds)
-            ->status(null)
+            ->status(null);
+
+        // If there are any existing entries, find the first one with a valid typeId
+        /** @var Entry|null $entry */
+        $entry = $baseEntryQuery
+            ->typeId($entryTypeIds)
             ->one();
 
-        // Otherwise create a new one
+        // if we didn't find any, try without the typeId,
+        // in case that changed to something completely new
+        if ($entry === null) {
+            $entry = $baseEntryQuery
+                ->typeId(null)
+                ->one();
+
+            if ($entry !== null) {
+                $entry->setTypeId($entryTypeIds[0]);
+            }
+        }
+
+        // if we still don't have any,
+        // try without the typeId with trashed where they were deleted with entry type
+        if ($entry === null) {
+            $entry = $baseEntryQuery
+                ->typeId(null)
+                ->trashed(null)
+                ->where(['entries.deletedWithEntryType' => true])
+                ->one();
+
+            if ($entry !== null) {
+                $entry->setTypeId($entryTypeIds[0]);
+            }
+        }
+
+        // Finally, if we still don't have an entry, create a new one
         if ($entry === null) {
             // Create one
             $entry = new Entry();
@@ -1119,13 +1147,13 @@ SQL)->execute();
 UPDATE $entriesTable [[entries]]
 SET [[deletedWithSection]] = TRUE
 FROM $elementsTable [[elements]]
-WHERE $conditionSql
+WHERE [[entries.id]] = [[elements.id]] AND $conditionSql
 SQL)->execute();
                 $db->createCommand(<<<SQL
 UPDATE $elementsTable [[elements]]
 SET [[dateDeleted]] = '$now'
 FROM $entriesTable [[entries]]
-WHERE $conditionSql
+WHERE [[entries.id]] = [[elements.id]] AND $conditionSql
 SQL)->execute();
             }
 
@@ -1285,7 +1313,7 @@ SQL)->execute();
         if ($searchTerm !== null && $searchTerm !== '') {
             $searchParams = $this->_getSearchParams($searchTerm);
             if (!empty($searchParams)) {
-                $query->where(['or', ...$searchParams]);
+                $query->andWhere(['or', ...$searchParams]);
             }
         }
 

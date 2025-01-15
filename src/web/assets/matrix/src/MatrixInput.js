@@ -115,6 +115,7 @@
 
         this.addListener(this.$addEntryBtn, 'activate', async function () {
           this.$addEntryBtn.addClass('loading');
+          Craft.cp.announce(Craft.t('app', 'Loading'));
           try {
             await this.addEntry(this.$addEntryBtn.data('type'));
           } finally {
@@ -129,6 +130,7 @@
             .$container.find('button')
             .on('activate', async (ev) => {
               this.$addEntryMenuBtn.addClass('loading');
+              Craft.cp.announce(Craft.t('app', 'Loading'));
               try {
                 await this.addEntry($(ev.currentTarget).data('type'));
               } finally {
@@ -232,7 +234,7 @@
           );
         }
 
-        Craft.queue.push(async () => {
+        await Craft.queue.push(async () => {
           if (this.addingEntry) {
             // only one new entry at a time
             return;
@@ -259,7 +261,7 @@
           const $entry = $(data.blockHtml);
 
           // Pause the element editor
-          this.elementEditor?.pause();
+          await this.elementEditor?.pause();
 
           if ($insertBefore) {
             $entry.insertBefore($insertBefore);

@@ -1495,6 +1495,15 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         }
         this.activeViewMenu = this.viewMenus[this.sourceKey];
         this.activeViewMenu.showTrigger();
+
+        // check if we should show the View button (ViewMenu.$trigger)
+        if (this.activeViewMenu) {
+          if (!this.activeViewMenu?.menuHasContent()) {
+            this.activeViewMenu.disableTrigger();
+          } else {
+            this.activeViewMenu.enableTrigger();
+          }
+        }
       }
     },
 
@@ -1548,6 +1557,11 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         criteria.status = this.status;
       }
 
+      const viewState = $.extend({}, this.getSelectedSourceState());
+      if (Garnish.isMobileBrowser(true)) {
+        viewState.tableColumns = [];
+      }
+
       const params = {
         context: this.settings.context,
         elementType: this.elementType,
@@ -1559,7 +1573,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         baseCriteria,
         criteria,
         disabledElementIds: this.settings.disabledElementIds,
-        viewState: $.extend({}, this.getSelectedSourceState()),
+        viewState,
         paginated: this.paginated,
         selectable: this.selectable,
         sortable: this.sortable,
@@ -2358,7 +2372,7 @@ Craft.BaseElementIndex = Garnish.Base.extend(
      * @returns {Object[]}
      */
     getSortOptions: function ($source) {
-      const sortOptions = this.getSourceData($source, 'sort-opts') || [];
+      const sortOptions = [...(this.getSourceData($source, 'sort-opts') || [])];
 
       // Make sure there's at least one attribute
       if (!sortOptions.length) {
@@ -2565,6 +2579,15 @@ Craft.BaseElementIndex = Garnish.Base.extend(
         this.viewModeBtns[this._viewMode]
           .addClass('active')
           .attr('aria-pressed', 'true');
+      }
+
+      // check if we should show the View button (ViewMenu.$trigger)
+      if (this.activeViewMenu) {
+        if (!this.activeViewMenu?.menuHasContent()) {
+          this.activeViewMenu.disableTrigger();
+        } else {
+          this.activeViewMenu.enableTrigger();
+        }
       }
     },
 
@@ -4034,14 +4057,6 @@ const ViewMenu = Garnish.Base.extend({
 
     this.menu.on('show', () => {
       this.$trigger.addClass('active');
-      this.updateSortField();
-      this.updateTableFieldVisibility();
-      if (
-        this.elementIndex.getSelectedSourceState('mode') !==
-        this.elementIndex.defaultViewMode
-      ) {
-        this._createRevertBtn();
-      }
     });
 
     this.menu.on('hide', () => {
@@ -4054,6 +4069,19 @@ const ViewMenu = Garnish.Base.extend({
     });
   },
 
+  updateMenuContent: function () {
+    this.updateSortField();
+    this.updateTableFieldVisibility();
+  },
+
+  menuHasContent: function () {
+    this.updateMenuContent();
+    return (
+      (this.$sortField && !this.$sortField.hasClass('hidden')) ||
+      (this.$tableColumnsField && !this.$tableColumnsField.hasClass('hidden'))
+    );
+  },
+
   showTrigger: function () {
     this.$trigger.removeClass('hidden');
   },
@@ -4064,18 +4092,24 @@ const ViewMenu = Garnish.Base.extend({
     this.menu.hide();
   },
 
+  enableTrigger: function () {
+    this.$trigger.removeClass('disabled');
+    this.$trigger.attr('aria-disabled', false);
+  },
+
+  disableTrigger: function () {
+    this.$trigger.data('trigger').hide();
+    this.$trigger.addClass('disabled');
+    this.$trigger.attr('aria-disabled', true);
+    this.menu.hide();
+  },
+
   updateTableFieldVisibility: function () {
     // we only want to show the "Table Columns" checkboxes and "Use defaults" btn in table and structure views
     if (
-      this.elementIndex.viewMode !== 'table' &&
-      this.elementIndex.viewMode !== 'structure'
+      ['table', 'structure'].includes(this.elementIndex.viewMode) &&
+      !Garnish.isMobileBrowser(true)
     ) {
-      if (this.$tableColumnsContainer) {
-        this.$tableColumnsContainer
-          .closest('.table-columns-field')
-          .addClass('hidden');
-      }
-    } else {
       if (this.$tableColumnsContainer) {
         this.$tableColumnsContainer
           .closest('.table-columns-field')
@@ -4083,6 +4117,12 @@ const ViewMenu = Garnish.Base.extend({
       }
       if (this.$revertBtn) {
         this.$revertBtn.removeClass('hidden');
+      }
+    } else {
+      if (this.$tableColumnsContainer) {
+        this.$tableColumnsContainer
+          .closest('.table-columns-field')
+          .addClass('hidden');
       }
     }
   },
@@ -4535,7 +4575,7 @@ const FilterHud = Garnish.HUD.extend({
         $('<div/>', {
           text: Craft.t('app', 'Loading'),
           class: 'visually-hidden',
-          'aria-role': 'alert',
+          role: 'alert',
         })
       );
 
@@ -4563,6 +4603,7 @@ const FilterHud = Garnish.HUD.extend({
       this.hide();
     });
 
+    Craft.cp.announce(Craft.t('app', 'Loading'));
     Craft.sendActionRequest('POST', 'element-indexes/filter-hud', {
       data: {
         elementType: this.elementIndex.elementType,
@@ -4570,12 +4611,14 @@ const FilterHud = Garnish.HUD.extend({
         condition: this.elementIndex.settings.condition,
         conditionConfig: this.conditionConfig,
         serialized: this.serialized,
+        fieldLayouts: this.elementIndex.$source.data('field-layouts'),
         id: `${this.id}-filters`,
       },
     })
       .then(async (response) => {
         this.loading = false;
         this.$hud.removeClass('loading');
+        Craft.cp.announce(Craft.t('app', 'Loading complete'));
         $loadingContent.remove();
 
         this.$main.append(response.data.hudHtml);

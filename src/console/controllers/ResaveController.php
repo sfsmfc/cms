@@ -21,8 +21,10 @@ use craft\elements\Tag;
 use craft\elements\User;
 use craft\errors\InvalidElementException;
 use craft\events\MultiElementActionEvent;
+use craft\helpers\App;
 use craft\helpers\Console;
 use craft\helpers\ElementHelper;
+use craft\helpers\Inflector;
 use craft\helpers\Queue;
 use craft\helpers\StringHelper;
 use craft\models\CategoryGroup;
@@ -101,21 +103,24 @@ class ResaveController extends Controller
 
     /**
      * @var bool Whether to resave element drafts.
+     * Set to `null` if all elements should be resaved regardless of whether they’re drafts.
      * @since 3.6.5
      */
-    public bool $drafts = false;
+    public bool|string|null $drafts = null;
 
     /**
      * @var bool Whether to resave provisional element drafts.
+     * Set to `null` if all elements should be resaved regardless of whether they’re provisional drafts.
      * @since 3.7.0
      */
-    public bool $provisionalDrafts = false;
+    public bool|string|null $provisionalDrafts = null;
 
     /**
-     * @var bool Whether to resave element revisions.
+     * @var bool|string Whether to resave element revisions.
+     * Set to `null` if all elements should be resaved regardless of whether they’re revisions.
      * @since 3.7.35
      */
-    public bool $revisions = false;
+    public bool|string|null $revisions = null;
 
     /**
      * @var int|string|null The ID(s) of the elements to resave.
@@ -322,6 +327,16 @@ class ResaveController extends Controller
             return false;
         }
 
+        // Can't default these properties to false because then yii\console\Controller::runAction() will
+        // typecast their values to booleans
+        foreach (['drafts', 'provisionalDrafts', 'revisions'] as $property) {
+            $this->$property ??= false;
+            if (is_string($this->$property)) {
+                $value = App::normalizeValue($this->$property);
+                $this->$property = $value !== null ? (bool)$value : null;
+            }
+        }
+
         if (isset($this->propagateTo)) {
             $siteHandles = array_filter(StringHelper::split($this->propagateTo));
             $this->propagateTo = [];
@@ -373,11 +388,41 @@ class ResaveController extends Controller
         array_push($actions, ...array_keys($this->actions()));
 
         $params = $this->getPassedOptionValues();
+        $actionsToSkip = [];
 
+        // check if all actions support all the params
+        foreach ($actions as $key => $id) {
+            if (!$this->doesActionSupportsAllOptions($id, $params)) {
+                $actionsToSkip[] = $id;
+                unset($actions[$key]);
+            }
+        }
+
+        // ask for confirmation
+        if ($this->interactive && !empty($actionsToSkip)) {
+            $this->output('The following commands don’t support the provided options, and will be skipped:', Console::FG_YELLOW);
+            foreach ($actionsToSkip as $id) {
+                $invalidParams = array_map(
+                    fn($param) => sprintf('`--%s`', StringHelper::toKebabCase($param)),
+                    $this->getUnsupportedOptions($id, $params)
+                );
+                $this->output(' ' . $this->markdownToAnsi(sprintf(
+                    '- `resave/%s` doesn’t support %s',
+                    $id,
+                    Inflector::sentence($invalidParams)
+                )));
+            }
+            Console::outdent();
+            if (!$this->confirm('Continue?', true)) {
+                return ExitCode::OK;
+            }
+        }
+
+        // run the actions which support all the params
         foreach ($actions as $id) {
             try {
+                $this->output();
                 $this->do("Running `resave/$id`", function() use ($id, $params) {
-                    $this->output();
                     Console::indent();
                     try {
                         $this->runAction($id, $params);
@@ -596,16 +641,13 @@ class ResaveController extends Controller
     }
 
     /**
-     * @param string $elementType The element type that should be resaved
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The element type that should be resaved
      * @param array $criteria The element criteria that determines which elements should be resaved
      * @return int
      * @since 3.7.0
      */
     public function resaveElements(string $elementType, array $criteria = []): int
     {
-        /** @var string|ElementInterface $elementType */
-        /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
         $criteria += $this->_baseCriteria();
 
         if ($this->queue) {
@@ -650,19 +692,14 @@ class ResaveController extends Controller
      */
     private function _baseCriteria(): array
     {
-        $criteria = [];
+        $criteria = [
+            'drafts' => $this->drafts,
+            'provisionalDrafts' => $this->provisionalDrafts,
+            'revisions' => $this->revisions,
+        ];
 
-        if ($this->drafts) {
+        if ($this->provisionalDrafts !== false && $this->drafts == false) {
             $criteria['drafts'] = true;
-        }
-
-        if ($this->provisionalDrafts) {
-            $criteria['drafts'] = true;
-            $criteria['provisionalDrafts'] = true;
-        }
-
-        if ($this->revisions) {
-            $criteria['revisions'] = true;
         }
 
         if ($this->elementId) {
@@ -795,14 +832,53 @@ class ResaveController extends Controller
         } else {
             $elementsService->on(Elements::EVENT_BEFORE_RESAVE_ELEMENT, $beforeCallback);
             $elementsService->on(Elements::EVENT_AFTER_RESAVE_ELEMENT, $afterCallback);
-            $elementsService->resaveElements($query, true, !$this->revisions, $this->updateSearchIndex, $this->touch);
+            $elementsService->resaveElements($query, true, $this->revisions === false, $this->updateSearchIndex, $this->touch);
             $elementsService->off(Elements::EVENT_BEFORE_RESAVE_ELEMENT, $beforeCallback);
             $elementsService->off(Elements::EVENT_AFTER_RESAVE_ELEMENT, $afterCallback);
         }
 
         $label = isset($this->propagateTo) ? 'propagating' : 'resaving';
         $this->output("Done $label $elementsText.", Console::FG_YELLOW);
-        $this->output();
         return $fail ? ExitCode::UNSPECIFIED_ERROR : ExitCode::OK;
+    }
+
+    /**
+     * Returns whether all options passed to an action are supported.
+     * Used by resave/all command.
+     *
+     * @param string $actionId
+     * @param array $params
+     * @return bool
+     */
+    private function doesActionSupportsAllOptions(string $actionId, array $params): bool
+    {
+        $options = $this->options($actionId);
+        foreach ($params as $param => $value) {
+            if (!in_array($param, $options)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns an array of options that are not supported by the action.
+     *
+     * @param string $actionId
+     * @param array $params
+     * @return array
+     */
+    private function getUnsupportedOptions(string $actionId, array $params): array
+    {
+        $unsupportedParams = [];
+        $options = $this->options($actionId);
+        foreach ($params as $param => $value) {
+            if (!in_array($param, $options)) {
+                $unsupportedParams[] = $param;
+            }
+        }
+
+        return $unsupportedParams;
     }
 }

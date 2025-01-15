@@ -447,14 +447,10 @@ class Asset extends Element
      */
     protected static function defineFieldLayouts(?string $source): array
     {
-        if ($source !== null) {
-            $volumes = [];
-            if (preg_match('/^volume:(.+)$/', $source, $matches)) {
-                $volume = Craft::$app->getVolumes()->getVolumeByUid($matches[1]);
-                if ($volume) {
-                    $volumes[] = $volume;
-                }
-            }
+        if ($source !== null && preg_match('/^volume:(.+)$/', $source, $matches)) {
+            $volumes = array_filter([
+                Craft::$app->getVolumes()->getVolumeByUid($matches[1]),
+            ]);
         } else {
             $volumes = Craft::$app->getVolumes()->getAllVolumes();
         }
@@ -586,7 +582,6 @@ class Asset extends Element
                 'orderBy' => 'dateUpdated',
                 'defaultDir' => 'desc',
             ],
-            'id' => Craft::t('app', 'ID'),
             'width' => Craft::t('app', 'Width'),
             'height' => Craft::t('app', 'Height'),
         ];
@@ -670,45 +665,45 @@ class Asset extends Element
             ],
             'filename' => [
                 'label' => Craft::t('app', 'Filename'),
-                'placeholder' => Craft::t('app', 'placeholder') . '.png',
+                'placeholder' => fn() => Craft::t('app', 'placeholder') . '.png',
             ],
             'size' => [
                 'label' => Craft::t('app', 'File Size'),
-                'placeholder' => '2KB',
+                'placeholder' => fn() => '2KB',
             ],
             'kind' => [
                 'label' => Craft::t('app', 'File Kind'),
-                'placeholder' => Craft::t('app', 'Image'),
+                'placeholder' => fn() => Craft::t('app', 'Image'),
 
             ],
             'imageSize' => [
                 'label' => Craft::t('app', 'Dimensions'),
-                'placeholder' => '700x500',
+                'placeholder' => fn() => '700x500',
             ],
             'width' => [
                 'label' => Craft::t('app', 'Image Width'),
-                'placeholder' => '700px',
+                'placeholder' => fn() => '700px',
             ],
             'height' => [
                 'label' => Craft::t('app', 'Image Height'),
-                'placeholder' => '500px',
+                'placeholder' => fn() => '500px',
             ],
             'location' => [
                 'label' => Craft::t('app', 'Location'),
-                'placeholder' => Craft::t('app', 'Volume'),
+                'placeholder' => fn() => Craft::t('app', 'Volume'),
             ],
             'link' => [
                 'label' => Craft::t('app', 'Link'),
                 'icon' => 'world',
-                'placeholder' => ElementHelper::linkAttributeHtml(null),
+                'placeholder' => fn() => ElementHelper::linkAttributeHtml(null),
             ],
             'dateModified' => [
                 'label' => Craft::t('app', 'File Modified Date'),
-                'placeholder' => (new \DateTime())->sub(new \DateInterval('P14D')),
+                'placeholder' => fn() => (new \DateTime())->sub(new \DateInterval('P14D')),
             ],
             'uploader' => [
                 'label' => Craft::t('app', 'Uploaded By'),
-                'placeholder' => ($uploader = Craft::$app->getUser()->getIdentity()) ? Cp::elementChipHtml($uploader) : '',
+                'placeholder' => fn() => ($uploader = Craft::$app->getUser()->getIdentity()) ? Cp::elementChipHtml($uploader) : '',
             ],
         ]);
 
@@ -1961,16 +1956,7 @@ JS,[
 
             [$value, $unit] = Assets::parseSrcsetSize($size);
 
-            $sizeTransform = $transform ? $transform->toArray([
-                'format',
-                'height',
-                'interlace',
-                'mode',
-                'position',
-                'quality',
-                'width',
-                'fill',
-            ]) : [];
+            $sizeTransform = $transform ? $transform->toArray() : [];
 
             if ($unit === 'w') {
                 $sizeTransform['width'] = (int)$value;

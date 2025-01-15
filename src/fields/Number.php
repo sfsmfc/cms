@@ -8,6 +8,7 @@
 namespace craft\fields;
 
 use Craft;
+use craft\base\CrossSiteCopyableFieldInterface;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\base\InlineEditableFieldInterface;
@@ -30,7 +31,7 @@ use yii\db\Schema;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 3.0.0
  */
-class Number extends Field implements InlineEditableFieldInterface, SortableFieldInterface, MergeableFieldInterface
+class Number extends Field implements InlineEditableFieldInterface, SortableFieldInterface, MergeableFieldInterface, CrossSiteCopyableFieldInterface
 {
     /**
      * @since 3.5.11
@@ -74,8 +75,11 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
      */
     public static function dbType(): string
     {
-        $db = Craft::$app->getDb();
-        return $db->getIsMysql() ? sprintf('%s(65,16)', Schema::TYPE_DECIMAL) : Schema::TYPE_DECIMAL;
+        if (Craft::$app->getDb()->getIsMysql()) {
+            return sprintf('%s(65,16)', Schema::TYPE_DECIMAL);
+        }
+
+        return Schema::TYPE_DECIMAL;
     }
 
     /**
@@ -193,8 +197,22 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
      */
     public function getSettingsHtml(): ?string
     {
+        return $this->settingsHtml(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsHtml(): ?string
+    {
+        return $this->settingsHtml(true);
+    }
+
+    private function settingsHtml(bool $readOnly): string
+    {
         return Craft::$app->getView()->renderTemplate('_components/fieldtypes/Number/settings.twig', [
             'field' => $this,
+            'readOnly' => $readOnly,
         ]);
     }
 
@@ -228,13 +246,11 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
             return null;
         }
 
-        if (is_string($value) && is_numeric($value)) {
-            if ((int)$value == $value) {
-                return (int)$value;
-            }
-            if ((float)$value == $value) {
-                return (float)$value;
-            }
+        if (is_numeric($value)) {
+            // ensure we only store the selected number of decimals and that the result is the same as in v4
+            // https://github.com/craftcms/cms/issues/16181
+            $value = round((float)$value, $this->decimals);
+            return $this->decimals === 0 ? (int)$value : $value;
         }
 
         return $value;
@@ -261,7 +277,7 @@ class Number extends Field implements InlineEditableFieldInterface, SortableFiel
                         $value = Craft::$app->getFormatter()->asDecimal($value, $this->decimals);
                     } catch (InvalidArgumentException) {
                     }
-                } elseif ($this->decimals) {
+                } elseif ($this->decimals !== 0) {
                     // Just make sure we're using the right decimal symbol
                     $decimalSeparator = Craft::$app->getFormattingLocale()->getNumberSymbol(Locale::SYMBOL_DECIMAL_SEPARATOR);
                     try {
@@ -325,6 +341,22 @@ JS;
         }
 
         return NumberFieldConditionRule::class;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function dbTypeForValueSql(): array|string|null
+    {
+        if (!$this->decimals) {
+            return Schema::TYPE_INTEGER;
+        }
+
+        if (Craft::$app->getDb()->getIsMysql()) {
+            return sprintf('%s(65,%s)', Schema::TYPE_DECIMAL, $this->decimals);
+        }
+
+        return Schema::TYPE_DECIMAL;
     }
 
     /**

@@ -371,21 +371,17 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
      */
     protected static function defineFieldLayouts(?string $source): array
     {
-        if ($source !== null) {
-            if ($source === '*') {
-                $sections = Craft::$app->getEntries()->getAllSections();
-            } elseif ($source === 'singles') {
-                $sections = Craft::$app->getEntries()->getSectionsByType(Section::TYPE_SINGLE);
-            } else {
-                $sections = [];
-                if (preg_match('/^section:(.+)$/', $source, $matches)) {
-                    $section = Craft::$app->getEntries()->getSectionByUid($matches[1]);
-                    if ($section) {
-                        $sections[] = $section;
-                    }
-                }
-            }
+        if ($source === '*') {
+            $sections = Craft::$app->getEntries()->getAllSections();
+        } elseif ($source === 'singles') {
+            $sections = Craft::$app->getEntries()->getSectionsByType(Section::TYPE_SINGLE);
+        } elseif ($source !== null && preg_match('/^section:(.+)$/', $source, $matches)) {
+            $sections = array_filter([
+                Craft::$app->getEntries()->getSectionByUid($matches[1]),
+            ]);
+        }
 
+        if (isset($sections)) {
             $entryTypes = array_values(array_unique(array_merge(
                 ...array_map(fn(Section $section) => $section->getEntryTypes(), $sections),
             )));
@@ -580,7 +576,6 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
                 'orderBy' => 'dateUpdated',
                 'defaultDir' => 'desc',
             ],
-            'id' => Craft::t('app', 'ID'),
         ];
     }
 
@@ -642,19 +637,19 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
         $attributes = array_merge(parent::defineCardAttributes(), [
             'section' => [
                 'label' => Craft::t('app', 'Section'),
-                'placeholder' => Craft::t('app', 'Section'),
+                'placeholder' => fn() => Craft::t('app', 'Section'),
             ],
             'type' => [
                 'label' => Craft::t('app', 'Entry Type'),
-                'placeholder' => Craft::t('app', 'Entry Type'),
+                'placeholder' => fn() => Craft::t('app', 'Entry Type'),
             ],
             'authors' => [
                 'label' => Craft::t('app', 'Authors'),
-                'placeholder' => $currentUser ? Cp::elementChipHtml($currentUser) : '',
+                'placeholder' => fn() => $currentUser ? Cp::elementChipHtml($currentUser) : '',
             ],
             'parent' => [
                 'label' => Craft::t('app', 'Parent'),
-                'placeholder' => Html::tag(
+                'placeholder' => fn() => Html::tag(
                     'span',
                     Craft::t('app', 'Parent {type} Title', ['type' => self::displayName()]),
                     ['class' => 'card-placeholder'],
@@ -662,23 +657,23 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
             ],
             'postDate' => [
                 'label' => Craft::t('app', 'Post Date'),
-                'placeholder' => (new \DateTime())->sub(new \DateInterval('P15D')),
+                'placeholder' => fn() => (new \DateTime())->sub(new \DateInterval('P15D')),
             ],
             'expiryDate' => [
                 'label' => Craft::t('app', 'Expiry Date'),
-                'placeholder' => (new \DateTime())->add(new \DateInterval('P15D')),
+                'placeholder' => fn() => (new \DateTime())->add(new \DateInterval('P15D')),
             ],
             'revisionNotes' => [
                 'label' => Craft::t('app', 'Revision Notes'),
-                'placeholder' => Craft::t('app', 'Revision Notes'),
+                'placeholder' => fn() => Craft::t('app', 'Revision Notes'),
             ],
             'revisionCreator' => [
                 'label' => Craft::t('app', 'Last Edited By'),
-                'placeholder' => $currentUser ? Cp::elementChipHtml($currentUser) : '',
+                'placeholder' => fn() => $currentUser ? Cp::elementChipHtml($currentUser) : '',
             ],
             'drafts' => [
                 'label' => Craft::t('app', 'Drafts'),
-                'placeholder' => Html::tag(
+                'placeholder' => fn() => Html::tag(
                     'span',
                     Craft::t('app', 'Draft {num}', ['num' => 1]),
                     ['class' => 'card-placeholder'],
@@ -2044,7 +2039,11 @@ class Entry extends Element implements NestedElementInterface, ExpirableElementI
                 return $section ? Html::encode(Craft::t('site', $section->name)) : '';
             case 'type':
                 try {
-                    return Cp::chipHtml($this->getType());
+                    $config = [];
+                    if ($this->viewMode === 'cards') {
+                        $config['showThumb'] = false;
+                    }
+                    return Cp::chipHtml($this->getType(), $config);
                 } catch (InvalidConfigException) {
                     return Craft::t('app', 'Unknown');
                 }

@@ -1,23 +1,6 @@
 {% apply spaceless %}
-{% set keyPrefix = keyPrefix ?? '' %}
-{% set isTopLevel = not keyPrefix %}
 
-{% if isTopLevel and (baseSortOptions is not defined or tableColumns is not defined) %}
-    {% set elementInstance = craft.app.elements.createElement(elementType) %}
-    {% set baseSortOptions = baseSortOptions ?? elementInstance.sortOptions()|map((option, key) => {
-        label: option.label ?? option,
-        attr: option.attribute ?? option.orderBy ?? key,
-        defaultDir: option.defaultDir ?? 'asc',
-    })|values %}
-    {% set tableColumns = tableColumns ?? craft.app.elementSources.getAvailableTableAttributes(elementType) %}
-{% endif %}
-
-{% if viewModes is not defined %}
-    {% if elementInstance is not defined %}
-        {% set elementInstance = craft.app.elements.createElement(elementType) %}
-    {% endif %}
-    {% set viewModes = elementInstance.indexViewModes() %}
-{% endif %}
+{% hook 'cp.elements.sources' %}
 
 {% macro sourceLink(key, source, isTopLevel, elementType, baseSortOptions, tableColumns, defaultTableColumns, viewModes) %}
     {{ tag('a', {
@@ -57,6 +40,7 @@
             'default-filter': source.defaultFilter ?? false,
             'default-view-mode': source.defaultViewMode ?? false,
             'view-modes': viewModes ?? [],
+            'field-layouts': source.fieldLayouts is defined ? source.fieldLayouts|map(layout => layout.getConfig()) : false,
         }|merge(source.data ?? {}),
         html: _self.sourceInnerHtml(source)
     }) }}

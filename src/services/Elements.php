@@ -533,7 +533,7 @@ class Elements extends Component
      * Creates an element with a given config.
      *
      * @template T of ElementInterface
-     * @param string|array $config The element’s class name, or its config, with a `type` value
+     * @param class-string<T>|array $config The element’s class name, or its config, with a `type` value
      * @phpstan-param class-string<T>|array{type:class-string<T>} $config
      * @return T The element
      */
@@ -549,8 +549,7 @@ class Elements extends Component
     /**
      * Creates an element query for a given element type.
      *
-     * @param string $elementType The element class
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The element class
      * @return ElementQueryInterface The element query
      * @throws InvalidArgumentException if $elementType is not a valid element
      * @since 3.5.0
@@ -678,7 +677,7 @@ class Elements extends Component
             return;
         }
 
-        $duration = $expiryDate->getTimestamp() - time();
+        $duration = $expiryDate->getTimestamp() - DateTimeHelper::currentTimeStamp();
 
         if ($duration > 0 && (!$this->_cacheDuration || $duration < $this->_cacheDuration)) {
             $this->_cacheDuration = $duration;
@@ -802,8 +801,7 @@ class Elements extends Component
     /**
      * Invalidates caches for the given element type.
      *
-     * @param string $elementType
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType
      * @since 3.5.0
      */
     public function invalidateCachesForElementType(string $elementType): void
@@ -889,8 +887,7 @@ class Elements extends Component
      *
      * @template T of ElementInterface
      * @param int $elementId The element’s ID.
-     * @param string|null $elementType The element class.
-     * @phpstan-param class-string<T>|null $elementType
+     * @param class-string<T>|null $elementType The element class.
      * @param int|string|int[]|null $siteId The site(s) to fetch the element in.
      * Defaults to the current site.
      * @param array $criteria
@@ -910,8 +907,7 @@ class Elements extends Component
      *
      * @template T of ElementInterface
      * @param string $uid The element’s UID.
-     * @param string|null $elementType The element class.
-     * @phpstan-param class-string<T>|null $elementType
+     * @param class-string<T>|null $elementType The element class.
      * @param int|string|int[]|null $siteId The site(s) to fetch the element in.
      * Defaults to the current site.
      * @param array $criteria
@@ -929,8 +925,7 @@ class Elements extends Component
      * @template T of ElementInterface
      * @param string $property Either `id` or `uid`
      * @param int|string $elementId The element’s ID/UID
-     * @param string|null $elementType The element class.
-     * @phpstan-param class-string<T>|null $elementType
+     * @param class-string<T>|null $elementType The element class.
      * @param int|string|int[]|null $siteId The site(s) to fetch the element in.
      * Defaults to the current site.
      * @param array $criteria
@@ -1026,7 +1021,7 @@ class Elements extends Component
      * Returns the class of an element with a given ID.
      *
      * @param int $elementId The element’s ID
-     * @return string|null The element’s class, or null if it could not be found
+     * @return class-string<ElementInterface>|null The element’s class, or null if it could not be found
      */
     public function getElementTypeById(int $elementId): ?string
     {
@@ -1588,12 +1583,14 @@ class Elements extends Component
 
                         // Make sure this isn't a revision
                         if ($skipRevisions) {
+                            $label = $element->getUiLabel();
+                            $label = $label !== '' ? "$label ($element->id)" : sprintf('%s %s', $element::lowerDisplayName(), $element->id);
                             try {
                                 if (ElementHelper::isRevision($element)) {
-                                    throw new InvalidElementException($element, "Skipped resaving {$element->getUiLabel()} ($element->id) because it's a revision.");
+                                    throw new InvalidElementException($element, "Skipped resaving $label because it's a revision.");
                                 }
                             } catch (Throwable $rootException) {
-                                throw new InvalidElementException($element, "Skipped resaving {$element->getUiLabel()} ($element->id) due to an error obtaining its root element: " . $rootException->getMessage());
+                                throw new InvalidElementException($element, "Skipped resaving $label due to an error obtaining its root element: " . $rootException->getMessage());
                             }
                         }
                     } catch (InvalidElementException $e) {
@@ -1681,7 +1678,6 @@ class Elements extends Component
                     $supportedSites = ArrayHelper::index(ElementHelper::supportedSitesForElement($element), 'siteId');
                     $supportedSiteIds = array_keys($supportedSites);
                     $elementSiteIds = $siteIds !== null ? array_intersect($siteIds, $supportedSiteIds) : $supportedSiteIds;
-                    /** @var string|ElementInterface $elementType */
                     $elementType = get_class($element);
 
                     $e = null;
@@ -2247,7 +2243,6 @@ class Elements extends Component
             }
 
             // Update any reference tags
-            /** @var ElementInterface|null $elementType */
             $elementType = $this->getElementTypeById($prevailingElement->id);
 
             if ($elementType !== null && ($refHandle = $elementType::refHandle()) !== null) {
@@ -2290,8 +2285,7 @@ class Elements extends Component
      * Deletes an element by its ID.
      *
      * @param int $elementId The element’s ID
-     * @param string|null $elementType The element class.
-     * @phpstan-param class-string<ElementInterface>|null $elementType
+     * @param class-string<ElementInterface>|null $elementType The element class.
      * @param int|null $siteId The site to fetch the element in.
      * Defaults to the current site.
      * @param bool $hardDelete Whether the element should be hard-deleted immediately, instead of soft-deleted
@@ -2832,7 +2826,7 @@ class Elements extends Component
      * Creates an element action with a given config.
      *
      * @template T of ElementActionInterface
-     * @param string|array $config The element action’s class name, or its config, with a `type` value and optionally a `settings` value
+     * @param class-string<T>|array $config The element action’s class name, or its config, with a `type` value and optionally a `settings` value
      * @phpstan-param class-string<T>|array{type:class-string<T>} $config
      * @return T The element action
      */
@@ -2845,7 +2839,7 @@ class Elements extends Component
      * Creates an element exporter with a given config.
      *
      * @template T of ElementExporterInterface
-     * @param string|array $config The element exporter’s class name, or its config, with a `type` value and optionally a `settings` value
+     * @param class-string<T>|array $config The element exporter’s class name, or its config, with a `type` value and optionally a `settings` value
      * @phpstan-param class-string<T>|array{type:class-string<T>} $config
      * @return T The element exporter
      */
@@ -2890,8 +2884,7 @@ class Elements extends Component
         }
 
         foreach ($this->getAllElementTypes() as $class) {
-            /** @var string|ElementInterface $class */
-            /** @phpstan-var class-string<ElementInterface>|ElementInterface $class */
+            /** @var class-string<ElementInterface> $class */
             if (
                 ($elementRefHandle = $class::refHandle()) !== null &&
                 strcasecmp($elementRefHandle, $refHandle) === 0
@@ -3171,14 +3164,12 @@ class Elements extends Component
     /**
      * Eager-loads additional elements onto a given set of elements.
      *
-     * @param string $elementType The root element type class
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType The root element type class
      * @param ElementInterface[] $elements The root element models that should be updated with the eager-loaded elements
      * @param array|string|EagerLoadPlan[] $with Dot-delimited paths of the elements that should be eager-loaded into the root elements
      */
     public function eagerLoadElements(string $elementType, array $elements, array|string $with): void
     {
-        /** @var ElementInterface|string $elementType */
         // Bail if there aren't even any elements
         if (empty($elements)) {
             return;
@@ -3190,8 +3181,7 @@ class Elements extends Component
     }
 
     /**
-     * @param string $elementType
-     * @phpstan-param class-string<ElementInterface> $elementType
+     * @param class-string<ElementInterface> $elementType
      * @param ElementInterface[][] $elementsBySite
      * @param EagerLoadPlan[] $with
      */
@@ -3225,7 +3215,6 @@ class Elements extends Component
                 }
 
                 // Get the eager-loading map from the source element type
-                /** @var ElementInterface|string $elementType */
                 $map = $elementType::eagerLoadingMap($filteredElements, $plan->handle);
 
                 if ($map === null) {
@@ -4315,6 +4304,25 @@ SQL;
         }
 
         return $this->_authCheck($element, $user, self::EVENT_AUTHORIZE_SAVE) ?? $element->canSave($user);
+    }
+
+    /**
+     * Returns whether a user is authorized to save the canonical version of the given element.
+     *
+     * @param ElementInterface $element
+     * @param User|null $user
+     * @return bool
+     * @since 5.6.0
+     */
+    public function canSaveCanonical(ElementInterface $element, ?User $user = null): bool
+    {
+        if ($element->getIsUnpublishedDraft()) {
+            $fakeCanonical = clone $element;
+            $fakeCanonical->draftId = null;
+            return $this->canSave($fakeCanonical, $user);
+        }
+
+        return $this->canSave($element->getCanonical(true), $user);
     }
 
     /**

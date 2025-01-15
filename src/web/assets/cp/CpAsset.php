@@ -18,7 +18,6 @@ use craft\helpers\Cp;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Html;
 use craft\helpers\Json;
-use craft\helpers\Session;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\i18n\Locale;
@@ -40,6 +39,7 @@ use craft\web\assets\jqueryui\JqueryUiAsset;
 use craft\web\assets\picturefill\PicturefillAsset;
 use craft\web\assets\selectize\SelectizeAsset;
 use craft\web\assets\tailwindreset\TailwindResetAsset;
+use craft\web\assets\theme\ThemeAsset;
 use craft\web\assets\velocity\VelocityAsset;
 use craft\web\assets\xregexp\XregexpAsset;
 use craft\web\View;
@@ -75,6 +75,7 @@ class CpAsset extends AssetBundle
         XregexpAsset::class,
         FabricAsset::class,
         IframeResizerAsset::class,
+        ThemeAsset::class,
     ];
 
     /**
@@ -156,9 +157,12 @@ JS;
             'Content',
             'Continue',
             'Copied to clipboard.',
+            'Copy from',
             'Copy the URL',
             'Copy the reference tag',
             'Copy to clipboard',
+            'Copy “{name}” value',
+            'Copy',
             'Could not save due to validation errors.',
             'Couldn’t delete “{name}”.',
             'Couldn’t reorder items.',
@@ -191,6 +195,7 @@ JS;
             'Don’t use for element thumbnails',
             'Draft Name',
             'Edit draft settings',
+            'Edit global field settings',
             'Edit {type}',
             'Edit',
             'Edited',
@@ -225,7 +230,9 @@ JS;
             'Hide sidebar',
             'Hide',
             'Incorrect password.',
+            'Indexing assets: {progress}',
             'Information',
+            'Instance settings',
             'Instructions',
             'Invalid email.',
             'Invalid username or email.',
@@ -296,6 +303,8 @@ JS;
             'Previewing {type} device in {orientation}',
             'Previewing {type} device',
             'Previous Page',
+            'Process complete',
+            'Processing',
             'Really delete folder “{folder}”?',
             'Recent Activity',
             'Refresh',
@@ -424,6 +433,7 @@ JS;
             '{num, number} {num, plural, =1{degree} other{degrees}}',
             '{num, number} {num, plural, =1{notification} other{notifications}}',
             '{num, number} {num, plural, =1{result} other{results}}',
+            '{num} percent complete',
             '{pct} width',
             '{total, number} {total, plural, =1{error} other{errors}} found in {num, number} {num, plural, =1{tab} other{tabs}}.',
             '{total, number} {total, plural, =1{{item}} other{{items}}}',
@@ -506,23 +516,13 @@ JS;
 
         $elementTypeNames = [];
         foreach (Craft::$app->getElements()->getAllElementTypes() as $elementType) {
-            /** @var string|ElementInterface $elementType */
-            /** @phpstan-var class-string<ElementInterface>|ElementInterface $elementType */
+            /** @var class-string<ElementInterface> $elementType */
             $elementTypeNames[$elementType] = [
                 $elementType::displayName(),
                 $elementType::pluralDisplayName(),
                 $elementType::lowerDisplayName(),
                 $elementType::pluralLowerDisplayName(),
             ];
-        }
-
-        $impersonator = null;
-        // if we're impersonating, we need to check if the original user has passkey
-        if ($previousUserId = Session::get(User::IMPERSONATE_KEY)) {
-            /** @var User|null $impersonator */
-            $impersonator = User::find()
-                ->id($previousUserId)
-                ->one();
         }
 
         $data += [
@@ -560,7 +560,7 @@ JS;
             'siteToken' => $generalConfig->siteToken,
             'slugWordSeparator' => $generalConfig->slugWordSeparator,
             'userEmail' => $currentUser->email,
-            'userHasPasskeys' => Craft::$app->getAuth()->hasPasskeys($impersonator ?? $currentUser),
+            'userHasPasskeys' => Craft::$app->getAuth()->hasPasskeys($userSession->getImpersonator() ?? $currentUser),
             'userIsAdmin' => $currentUser->admin,
             'username' => $currentUser->username,
         ];
@@ -572,6 +572,7 @@ JS;
     {
         return [
             'constrainInput' => false,
+            'changeYear' => true,
             'dateFormat' => $formattingLocale->getDateFormat(Locale::LENGTH_SHORT, Locale::FORMAT_JUI),
             'dayNames' => $locale->getWeekDayNames(Locale::LENGTH_FULL),
             'dayNamesMin' => $locale->getWeekDayNames(Locale::LENGTH_ABBREVIATED),
