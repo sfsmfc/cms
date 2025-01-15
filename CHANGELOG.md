@@ -1,6 +1,6 @@
 # Release Notes for Craft CMS 4
 
-## Unreleased
+## 4.13.10 - 2025-01-14
 
 - Fixed a bug where the control panel could display a notice about the Craft CMS license belonging to a different domain, even when accessing the control panel from the correct domain. ([#16396](https://github.com/craftcms/cms/issues/16396))
 - Fixed a bug where Unicode special characters weren’t getting stripped out of search keywords. ([#16430](https://github.com/craftcms/cms/issues/16430))
