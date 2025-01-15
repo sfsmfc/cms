@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => 'ユーザーの有効化中に問題が発生しました: {error}',
     'There was a problem deactivating the user.' => 'ユーザーを無効にしようとして問題が発生しました。',
     'There was a problem impersonating this user.' => 'このユーザーをインパーソネートするのに問題が生じました。',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => 'メッセージの保存の際に問題が発生しました。',
     'There was a problem sending the password reset email.' => 'パスワードの解除メールを送信中に問題が発生しました。',
     'There was a problem with uploading the file.' => 'ファイルのアップロードの際に問題が発生しました。',
