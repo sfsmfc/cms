@@ -1082,6 +1082,97 @@ Craft.ui = {
     return $btn;
   },
 
+  /**
+   * Updates an input using the timepicker plugin for accessibility.
+   *
+   * @param {Object} $input - The input element
+   */
+  remediateTimepickerA11y: function (input) {
+    const $input = $(input);
+    let $listWrapper = null;
+    let listboxObserver = null;
+    const id = $input.attr('id');
+    const wrapperId = `${id}-wrapper-${Math.floor(Math.random() * 1000000000)}`;
+
+    const getInstance = () => {
+      return $input[0].timepickerObj;
+    };
+
+    const getTimepickerListbox = () => {
+      const instance = getInstance();
+      return $(instance.list);
+    };
+
+    getAccessibleName = () => {
+      return $input.attr('aria-label');
+    };
+
+    const callback = (mutationList, observer) => {
+      for (const mutation of mutationList) {
+        const {target} = mutation;
+
+        if ($(target).hasClass('ui-timepicker-selected')) {
+          const optionId = target.id;
+          $input.attr('aria-activedescendant', optionId);
+          $(target).attr('aria-selected', 'true');
+        } else {
+          $(target).attr('aria-selected', 'false');
+        }
+      }
+    };
+
+    if (!getInstance()) return;
+
+    // Add aria-controls to input
+    $input.attr('aria-controls', wrapperId);
+
+    $input.on('showTimepicker', () => {
+      $input.attr('aria-expanded', 'true');
+      $listWrapper = getTimepickerListbox();
+
+      setTimeout(() => {
+        $listWrapper.attr({
+          role: 'listbox',
+          id: wrapperId,
+          'aria-label': getAccessibleName(),
+        });
+
+        // Apply option roles to child elements
+        $listWrapper.find('li').each(function (index) {
+          const isSelected = $(this).hasClass('ui-timepicker-selected');
+          const optionId = `${id}-option-${index}`;
+
+          $(this).attr({
+            id: optionId,
+            role: 'option',
+            'aria-selected': isSelected,
+          });
+
+          if (isSelected) {
+            $input.attr('aria-activedescendant', optionId);
+          }
+        });
+
+        // Watch for updates to the listbox
+        if (!listboxObserver) {
+          listboxObserver = new MutationObserver(callback);
+        }
+
+        listboxObserver.observe($listWrapper[0], {
+          subtree: true,
+          attributeFilter: ['class'],
+        });
+      }, 0);
+    });
+
+    $input.on('hideTimepicker', () => {
+      $input.attr('aria-expanded', 'false');
+      if (listboxObserver) {
+        listboxObserver.disconnect();
+      }
+    });
+  },
+
   createTimeInput: function (config) {
     const isMobile = Garnish.isMobileBrowser();
     const id =
@@ -1127,6 +1218,7 @@ Craft.ui = {
       $input.datetimeinput();
     } else {
       $input.timepicker(Craft.timepickerOptions);
+      this.remediateTimepickerA11y($input);
       if (value) {
         $input.timepicker(
           'setTime',
