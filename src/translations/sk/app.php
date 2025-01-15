@@ -1694,6 +1694,7 @@ return [
     'There was a problem activating the user: {error}' => 'Vyskytol sa problém s aktiváciou používateľa: {error}',
     'There was a problem deactivating the user.' => 'Vyskytol sa problém s deaktiváciou používateľa.',
     'There was a problem impersonating this user.' => 'Vyskytol sa problém zosobniť tohto používateľa.',
+    'There was a problem indexing assets.' => 'There was a problem indexing assets.',
     'There was a problem saving your message.' => 'Vyskytol sa problém pri ukladaní správy.',
     'There was a problem sending the password reset email.' => 'Vyskytol sa problém pri odosielaní emailu na obnovenie hesla.',
     'There was a problem with uploading the file.' => 'Pri nahrávaní súboru sa vyskytol sa problém.',
