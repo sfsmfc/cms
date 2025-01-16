@@ -478,6 +478,12 @@ class Elements extends Component
      */
     private ?bool $_updateSearchIndex = null;
 
+
+    /**
+     * @var bool|null Whether we should be updating search indexes for elements if not told explicitly.
+     */
+    public static ?bool $treatPrimarySiteAsNew = false;
+
     /**
      * Creates an element with a given config.
      *
@@ -3675,6 +3681,13 @@ class Elements extends Component
         } else {
             $siteElement->enabled = $element->enabled;
             $siteElement->resaving = $element->resaving;
+        }
+
+        if (
+            self::$treatPrimarySiteAsNew && 
+            $siteElement->siteId === Craft::$app->getSites()->getPrimarySite()->id
+        ) {
+            $siteElement->isNewForSite = false;
         }
 
         // Does the main site's element specify a status for this site?
