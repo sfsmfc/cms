@@ -480,7 +480,7 @@ class Elements extends Component
 
 
     /**
-     * @var bool|null Whether we should be updating search indexes for elements if not told explicitly.
+     * @var bool Add pssibility to deactivate the isNewForSite for primray site (need for translation)
      */
     public static ?bool $treatPrimarySiteAsNew = false;
 
